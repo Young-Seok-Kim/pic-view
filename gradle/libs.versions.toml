@@ -16,7 +16,7 @@ retrofit = "2.11.0"
 okhttp = "4.12.0"
 coroutine = "1.8.1"
 firebaseBom = "33.9.0"
-naverMap = "3.19.0"
+naverMap = "3.23.2"
 glide = "4.16.0"
 
 # 외부 연동(카카오 / 구글) 라이브러리 버전
