@@ -1,0 +1,63 @@
+# Built artifacts
+*.apk
+*.aar
+*.ap_
+*.aab
+
+# Files for the ART/Dalvik VM
+*.dex
+
+# Java class files
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+
+# Gradle files
+.gradle/
+build/
+.idea/
+
+# Android Studio local configuration and caches
+/local.properties
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.idea/caches
+.idea/compiler.xml
+.idea/deploymentTargetSelector.xml
+.idea/kotlinc.xml
+.idea/vcs.xml
+
+# Project-specific IML files
+*.iml
+.idea/modules/
+
+# NDK and CMake artifacts
+.externalNativeBuild/
+.cxx/
+*.cmake
+*.so
+
+# Log files
+*.log
+
+# Android Studio Captures (스냅샷/프로파일러 데이터)
+/captures/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Keystore files (나중에 앱 배포할 때 서명 키 절대 유출 방지)
+*.jks
+*.keystore
+
+# Secrets (TourAPI 등 API Key 보관용 추가 방어막)
+secrets.properties
+/app/google-services.json
