@@ -13,7 +13,6 @@ class MyApplication : Application() {
         KakaoSdk.init(this, BuildConfig.KAKAO_NATIVE_APP_KEY)
 
         // 2. 네이버 지도 SDK 초기화
-        NaverMapSdk.getInstance(this).client =
-            NaverMapSdk.NaverCloudPlatformClient(BuildConfig.NAVER_CLIENT_ID)
+        NaverMapSdk.getInstance(this).client = NaverMapSdk.NcpKeyClient(BuildConfig.NAVER_CLIENT_ID)
     }
 }

@@ -84,5 +84,5 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 }
 secrets {
-
+    propertiesFileName = "local.properties"
 }
