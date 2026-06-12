@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
     alias(libs.plugins.google.android.secrets)
+    kotlin("kapt")
 }
 
 android {
@@ -82,6 +83,24 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // 💡 권장: 뷰 모델 및 라이프사이클 스코프 지원 (필수!)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
+    implementation("androidx.fragment:fragment-ktx:1.8.2") // Fragment에서의 ViewModel 접근 및 뷰바인딩 편의성 증대
+
+    implementation("io.github.ParkSangGwon:tedpermission-normal:3.3.0")
+    implementation("com.airbnb.android:lottie:6.4.0")
+    implementation("androidx.camera:camera-core:1.3.0")
+    implementation("androidx.camera:camera-camera2:1.3.0")
+    implementation("androidx.camera:camera-lifecycle:1.3.0")
+    implementation("androidx.camera:camera-view:1.3.0")
+    implementation("com.google.guava:guava:31.1-android")
+
+    implementation("androidx.core:core-splashscreen:1.0.1")
+
+    // 💡 권장: 이미지 로딩 Glide 컴파일러 (애노테이션 처리용)
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
 }
 secrets {
     propertiesFileName = "local.properties"

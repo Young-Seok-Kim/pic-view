@@ -13,8 +13,6 @@
 * **스마트 프레임 가이드 (CameraX Overlay)**
   * Android CameraX API를 활용하여 SurfaceView 위에 Canvas를 레이어로 오버레이.
   * 내장산, 구절초 지방정원 등 정읍 명소별 최적의 구도 가이드라인(3분할, 대칭, 프레임 내 프레임 등)을 화면에 제시하여 누구나 전문가 수준의 사진 촬영을 하도록 지원합니다.
-* **글로벌 다국어 익스텐션 (Localization)**
-  * 외래 관광객 유입 트렌드에 대응하여, 시스템 `strings.xml` 기반의 리소스 다국어(영어/중국어/일어) 처리를 인프라로 구축하여 글로벌 확장성을 확보했습니다.
 
 ---
 
@@ -23,6 +21,5 @@
 * **Language & OS**: Kotlin / Minimum SDK 26 (Oreo) 이상 타겟팅
 * **UI Framework**: Android Architecture Components (XML / ViewBinding / Material Design)
 * **Asynchronous / Networking**: Retrofit2 + Coroutine 기반의 REST API 비동기 파싱
-* **Database & BaaS**: Google Firebase Firestore (사용자 즐겨찾기 및 커뮤니티 데이터 동기화)
 * **Maps SDK**: Naver Map Android SDK (위치 기반 도보/차량 경로 시각화 및 마커 다이내믹 렌더링)
 * **Image Loading**: Glide Library (고화질 이미지 로딩 최적화 및 메모리 관리)

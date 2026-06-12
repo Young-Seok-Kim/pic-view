@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#F8FAFC"
+    android:clickable="true"
+    android:focusable="true">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="350dp"
+                app:cardCornerRadius="0dp"
+                app:cardElevation="0dp">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <androidx.viewpager2.widget.ViewPager2
+                        android:id="@+id/vp_detail_images"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <ProgressBar
+                        android:id="@+id/progressBar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:visibility="gone" />
+
+                    <ImageView
+                        android:id="@+id/iv_arrow_left"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="start|center_vertical"
+                        android:src="@drawable/baseline_chevron_left_24"
+                        android:visibility="gone" />
+
+                    <ImageView
+                        android:id="@+id/iv_arrow_right"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="end|center_vertical"
+                        android:src="@drawable/baseline_chevron_right_24"
+                        android:visibility="visible" />
+
+                </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:id="@+id/tv_detail_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="장소 이름"
+                    android:textColor="#0F172A"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_detail_address"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    tools:text="주소 정보가 여기에 표시됩니다."
+                    android:textColor="#64748B"
+                    android:textSize="16sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginVertical="24dp"
+                    android:background="#E2E8F0" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="추천 구도 팁"
+                    android:textColor="#334155"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_detail_tip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:lineSpacingExtra="4dp"
+                    tools:text="이곳은 삼분할 구도를 활용하여 배경과 인물을 배치할 때 가장 아름다운 사진을 얻을 수 있습니다. 황금 시간대(Golden Hour)를 활용해 보세요."
+                    android:textColor="#475569"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_start_guide"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|center"
+        android:layout_margin="24dp"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:backgroundTint="#10B981"
+        app:cornerRadius="16dp"
+        app:icon="@drawable/baseline_camera_alt_24"
+        app:iconGravity="textStart"
+        app:iconTint="#FFFFFF" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

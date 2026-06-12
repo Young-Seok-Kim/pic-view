@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.youngs.picview.ui.guide.GuideOverlayView
+        android:id="@+id/guideOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ImageButton
+        android:id="@+id/btn_gallery"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="40dp"
+        android:layout_marginBottom="55dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/baseline_photo_library_24"
+        android:scaleType="fitCenter"
+        android:contentDescription="갤러리 보기" />
+
+    <ImageButton
+        android:id="@+id/btn_capture"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="40dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/baseline_camera_alt_24"
+        android:scaleType="fitCenter"
+        android:contentDescription="촬영 버튼" />
+
+    <View
+        android:id="@+id/flash_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:visibility="gone"
+        android:alpha="0" />
+
+</FrameLayout>
