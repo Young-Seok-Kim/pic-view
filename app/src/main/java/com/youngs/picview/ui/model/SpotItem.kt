@@ -13,5 +13,8 @@ data class SpotItem(
     val title: String,
     val addr1: String,
     val tip: String,
-    val imageUrl: String
+    val imageUrl: String,
+    var score: Int = 0,
+    val mapx: String, // 경도
+    val mapy: String  // 위도
 ) : Serializable

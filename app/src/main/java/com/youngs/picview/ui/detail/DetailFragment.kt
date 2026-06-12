@@ -30,6 +30,11 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentDetailBinding.bind(view)
 
+        setListeners()
+    }
+
+    private fun setListeners() {
+
         val spot = arguments?.getSerializable("spot") as? SpotItem
 
         spot?.let { item ->
@@ -47,7 +52,25 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                 }
                 startActivity(intent)
             }
+
+            binding.btnNavigate.setOnClickListener {
+                // 1. 네이버 지도 앱 실행 스킴
+                val url = "nmap://route/car?dlat=${item.mapy}&dlng=${item.mapx}&dname=${java.net.URLEncoder.encode(item.title, "UTF-8")}&appname=com.youngs.picview"
+                val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url))
+                intent.addCategory(Intent.CATEGORY_BROWSABLE)
+
+                // 2. 앱 설치 여부 확인
+                val packageManager = requireContext().packageManager
+                if (intent.resolveActivity(packageManager) != null) {
+                    startActivity(intent)
+                } else {
+                    // 3. 앱이 없으면 네이버 지도 웹 페이지로 이동
+                    val webUrl = "https://map.naver.com/v5/directions/-/${item.mapx},${item.mapy},${java.net.URLEncoder.encode(item.title, "UTF-8")},,,/car"
+                    startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse(webUrl)))
+                }
+            }
         }
+
     }
 
     private fun loadImages(spot: SpotItem) {
@@ -113,7 +136,7 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                     )
 
                     Log.d("DETAIL_RESPONSE", response.toString())
-                    val overview = response.response?.body?.items?.item?.firstOrNull()?.overview
+                    val overview = response.response.body.items.item?.firstOrNull()?.overview
                         ?: "이 장소는 삼분할 구도를 활용해 인물과 배경을 조화롭게 담아보세요!"
                     detailCache[spot.contentId] = overview
 

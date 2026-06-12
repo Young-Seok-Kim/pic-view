@@ -8,6 +8,7 @@ import com.youngs.picview.R
 import com.youngs.picview.databinding.FragmentMainBinding
 import com.youngs.picview.ui.adapter.SpotAdapter
 import com.youngs.picview.ui.detail.DetailFragment
+import com.youngs.picview.ui.map.MapFragment
 import com.youngs.picview.ui.model.SpotItem
 import kotlin.getValue
 
@@ -30,7 +31,6 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     private fun setObserve() {
-
         val spotAdapter = SpotAdapter(emptyList()) { spot ->
             val detailFragment = DetailFragment().apply {
                 arguments = Bundle().apply {
@@ -45,36 +45,28 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         binding.rvPhotoSpots.adapter = spotAdapter
 
+        // 1. 날씨 및 골든아워 관찰 (중복 제거)
         viewModel.weatherData.observe(viewLifecycleOwner) { binding.tvWeatherStatus.text = it }
         viewModel.goldenHourData.observe(viewLifecycleOwner) { binding.tvGoldenHour.text = it }
+
+        // 2. 로딩 상태 관찰
         viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
             binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
         }
 
+        // 3. 필터링된 스팟 데이터 및 타이틀 관찰
         viewModel.filteredSpots.observe(viewLifecycleOwner) { filteredList ->
             spotAdapter.updateData(filteredList)
             binding.rvPhotoSpots.scrollToPosition(0)
-        }
 
-        viewModel.weatherData.observe(viewLifecycleOwner) { binding.tvWeatherStatus.text = it }
-        viewModel.goldenHourData.observe(viewLifecycleOwner) { binding.tvGoldenHour.text = it }
-
-        // 데이터가 로딩되어 뷰모델에 들어오면 자동으로 어댑터 갱신
-        viewModel.spotData.observe(viewLifecycleOwner) { spots ->
-            spotAdapter.updateData(spots)
-        }
-
-        viewModel.weatherData.observe(viewLifecycleOwner) { weather ->
-            binding.tvWeatherStatus.text = weather
-        }
-
-        viewModel.goldenHourData.observe(viewLifecycleOwner) { golden ->
-            binding.tvGoldenHour.text = golden
-        }
-
-        // 로딩 상태에 따라 프로그레스바 조절
-        viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
-            binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
+            val title = when (viewModel.getCurrentCategory()) {
+                SpotCategory.ALL -> "촬영지 추천"
+                SpotCategory.NATURE -> "자연 속 촬영지"
+                SpotCategory.CULTURE -> "문화가 있는 촬영지"
+                SpotCategory.LEPORTS -> "레포츠 촬영지"
+                SpotCategory.FOOD -> "맛집 촬영지"
+            }
+            binding.tvListTitle.text = title
         }
     }
 
@@ -84,6 +76,13 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         binding.btnCulture.setOnClickListener { viewModel.setCategory(SpotCategory.CULTURE) }
         binding.btnLeports.setOnClickListener { viewModel.setCategory(SpotCategory.LEPORTS) }
         binding.btnFood.setOnClickListener { viewModel.setCategory(SpotCategory.FOOD) }
+        binding.btnOpenNaverMap.setOnClickListener {
+            val mapFragment = MapFragment()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, mapFragment) // R.id.fragment_container는 메인 액티비티의 컨테이너 ID
+                .addToBackStack(null) // 뒤로가기 가능하게 설정
+                .commit()
+        }
     }
 
 

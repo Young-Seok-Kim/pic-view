@@ -1,44 +1,51 @@
 package com.youngs.picview.ui.main
 
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.youngs.picview.ui.model.SpotItem
 
 class MainViewModel : ViewModel() {
-    // UI가 관찰할 수 있는 데이터 홀더
+
     val weatherData = MutableLiveData<String>()
     val goldenHourData = MutableLiveData<String>()
+    val isLoading = MutableLiveData<Boolean>(true)
+
+    // 원본 데이터
     val spotData = MutableLiveData<List<SpotItem>>()
+
+    // MediatorLiveData로 변경하여 spotData 변화를 감지
+    val filteredSpots = MediatorLiveData<List<SpotItem>>()
+
+    private var currentSpotCategory = SpotCategory.ALL
 
     var cachedWeather: String? = null
     var cachedGoldenHour: String? = null
     var cachedSpots: List<SpotItem>? = null
 
-    val isLoading = MutableLiveData<Boolean>(true)
-
-    val filteredSpots = MutableLiveData<List<SpotItem>>()
-    private var currentSpotCategory = SpotCategory.ALL
-
-    fun setRawData(spots: List<SpotItem>) {
-        cachedSpots = spots
-        filterData() // 데이터 처음 들어왔을 때 필터링
+    init {
+        // spotData가 변경될 때마다 updateFilteredList 실행
+        filteredSpots.addSource(spotData) { updateFilteredList() }
     }
 
     fun setCategory(spotCategory: SpotCategory) {
         currentSpotCategory = spotCategory
-        filterData()
+        updateFilteredList()
     }
 
-    private fun filterData() {
-        val all = cachedSpots ?: return
+    private fun updateFilteredList() {
+        val all = spotData.value ?: return
 
         filteredSpots.value = when (currentSpotCategory) {
             SpotCategory.ALL -> all
-            // null 체크를 위해 safe call(?.) 후 비교 (null이면 false가 됨)
             SpotCategory.NATURE -> all.filter { it.contentTypeId == "12" }
             SpotCategory.CULTURE -> all.filter { it.contentTypeId == "14" }
             SpotCategory.LEPORTS -> all.filter { it.contentTypeId == "28" }
             SpotCategory.FOOD -> all.filter { it.contentTypeId == "39" }
         }
     }
+
+    fun getCurrentCategory() = currentSpotCategory
+
+    fun isCurrentlyGoldenHour(): Boolean = cachedGoldenHour?.contains("진행") == true
 }

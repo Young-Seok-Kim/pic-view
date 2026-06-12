@@ -15,6 +15,7 @@ import com.youngs.picview.ui.main.MainFragment
 import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.ui.main.PhotoScoreEngine
 import com.youngs.picview.ui.model.SpotItem
+import com.youngs.picview.ui.model.SpotScoreContext
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -106,33 +107,50 @@ class MainActivity : AppCompatActivity() {
                         else -> "내일 일출을 기다려보세요"
                     }
                 }
-
                 val response = RetrofitClient.tourApiService.getJeongeupSpots(BuildConfig.TOUR_API_KEY)
                 val rawSpots = response.response.body.items.item
 
-                viewModel.cachedSpots = rawSpots.map { item ->
-                    // API 응답 필드명 확인: 로그상 'contenttypeid'로 되어 있으므로
-                    // 데이터 클래스 매핑 시 해당 필드명을 정확히 사용하세요.
-                    val contentTypeId = item.contentTypeId
+                val isGolden = goldenText.contains("진행") // 여기서 판단
 
-                    val generatedTip = when (contentTypeId) {
-                        "12" -> "이 장소의 자연 경관을 살리기 위해 광각 렌즈나 삼분할 구도를 추천합니다."
-                        "14" -> "건물의 직선미와 대칭을 활용해 정적인 분위기를 담아보세요."
-                        "28" -> "역동적인 순간을 포착하기 위해 셔터 스피드를 확보하세요."
-                        else -> "배경과 피사체의 조화를 고려해 촬영해 보세요."
+                viewModel.cachedSpots = rawSpots.map { item ->
+                    val contentTypeId = item.contentTypeId ?: "0" // null일 경우 기본값 처리
+
+                    // 1. 카테고리별 특성 추측 (하드코딩 대신 로직으로 분류)
+                    val (inferredDirection, inferredBestTime) = when (contentTypeId) {
+                        "12" -> "WEST" to "SUNSET"    // 자연은 일몰/서쪽이 최고
+                        "14" -> "NONE" to "AFTERNOON" // 문화재는 낮이 밝음
+                        "28" -> "NONE" to "AFTERNOON" // 레포츠는 활동적인 낮 시간
+                        "39" -> "NONE" to "AFTERNOON" // 맛집은 점심/저녁 시간
+                        else -> "NONE" to "AFTERNOON"
                     }
 
-                    SpotItem(
+                    val spot = SpotItem(
                         contentId = item.contentid,
                         contentTypeId = contentTypeId,
                         title = item.title,
-                        addr1 = item.addr1 ?: "",
-                        tip = generatedTip,
-                        imageUrl = item.firstimage ?: ""
+                        addr1 = item.addr1,
+                        tip = getGeneratedTip(contentTypeId),
+                        imageUrl = item.firstimage ?: "",
+                        mapx = item.mapx,
+                        mapy = item.mapy
                     )
-                }.sortedByDescending { PhotoScoreEngine.calculateScore(it) } // 싱글톤 객체 바로 호출
 
-                viewModel.spotData.postValue(viewModel.cachedSpots!!)
+                    // 2. 점수 계산을 위한 컨텍스트 구성
+                    val context = SpotScoreContext(
+                        spot = spot,
+                        currentTemp = 20.0, // 실제 온도 데이터 사용 필요
+                        isGoldenHour = isGolden,
+                        userDistance = 0.0, // GPS 위치 기반 거리 계산 로직 사용 필요
+                        direction = inferredDirection, // 추론된 방향값 적용
+                        bestTime = inferredBestTime   // 추론된 최적 시간대 적용
+                    )
+
+                    // 점수 계산 및 할당
+                    spot.score = PhotoScoreEngine.calculateScore(context)
+                    spot
+                }.sortedByDescending { it.score }
+
+                viewModel.spotData.postValue(viewModel.cachedSpots)
 
                 // 4. 데이터 저장 및 LiveData 방출
                 val weatherResult = "정읍의 현재 기온, ${temp}℃"
@@ -150,6 +168,19 @@ class MainActivity : AppCompatActivity() {
                 viewModel.isLoading.postValue(false)
             }
         }
+    }
+
+    private fun getGeneratedTip(contentTypeId: String): String = when (contentTypeId) {
+        "12" -> "이 장소의 자연 경관을 살리기 위해 광각 렌즈나 삼분할 구도를 추천합니다."
+        "14" -> "건물의 직선미와 대칭을 활용해 정적인 분위기를 담아보세요."
+        "28" -> "역동적인 순간을 포착하기 위해 셔터 스피드를 확보하세요."
+        else -> "배경과 피사체의 조화를 고려해 촬영해 보세요."
+    }
+
+    // 골든아워 시간대 판별 (간단 로직)
+    private fun isNowGoldenHour(): Boolean {
+        val hour = java.time.LocalTime.now().hour
+        return hour in 17..19 // 예시: 오후 5시~7시를 골든아워로 간주
     }
 
     private fun parseTime(timeStr: String): LocalTime {
