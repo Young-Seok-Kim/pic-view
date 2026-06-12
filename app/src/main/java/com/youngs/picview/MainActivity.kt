@@ -13,6 +13,8 @@ import com.youngs.picview.data.api.RetrofitClient
 import com.youngs.picview.databinding.ActivityMainBinding
 import com.youngs.picview.ui.main.MainFragment
 import com.youngs.picview.ui.main.MainViewModel
+import com.youngs.picview.ui.main.PhotoScoreEngine
+import com.youngs.picview.ui.model.SpotItem
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -46,14 +48,6 @@ class MainActivity : AppCompatActivity() {
                 .commit()
         }
 
-//        preLoadData{
-//            // 로딩 완료 콜백 함수: 데이터가 다 들어왔을 때만 실행됨
-//            if (savedInstanceState == null) {
-//                supportFragmentManager.beginTransaction()
-//                    .replace(R.id.fragment_container, MainFragment())
-//                    .commit()
-//            }
-//        }
 
         setupWindowInsets()
     }
@@ -113,30 +107,32 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-//                val spotResponse = RetrofitClient.tourApiService.getJeongeupSpots(BuildConfig.TOUR_API_KEY)
-//                val scoreEngine = PhotoScoreEngine() // 점수 계산 엔진 인스턴스
+                val response = RetrofitClient.tourApiService.getJeongeupSpots(BuildConfig.TOUR_API_KEY)
+                val rawSpots = response.response.body.items.item
 
-//                viewModel.cachedSpots = spotResponse.response.body.items.item.map { item ->
-//                    // 1. contentTypeId를 활용한 스마트한 팁 생성
-//                    val generatedTip = when (item.contentTypeId) {
-//                        "12" -> "이 장소의 자연 경관을 살리기 위해 광각 렌즈나 삼분할 구도를 추천합니다." // 관광지
-//                        "14" -> "건물의 직선미와 대칭을 활용해 정적인 분위기를 담아보세요." // 문화시설
-//                        "28" -> "역동적인 순간을 포착하기 위해 셔터 스피드를 확보하세요." // 레포츠
-//                        else -> "배경과 피사체의 조화를 고려해 촬영해 보세요."
-//                    }
-//
-//                    SpotItem(
-//                        contentId = item.contentid,
-//                        contentTypeId = item.contentTypeId ?: "12",
-//                        title = item.title,
-//                        addr1 = item.addr1 ?: "",
-//                        tip = generatedTip,
-//                        imageUrl = item.firstimage ?: ""
-//                    )
-//                }.sortedByDescending { scoreEngine.calculateScore(it) } // 점수 높은 순으로 정렬 완료!
-//
-//                viewModel.spotData.postValue(viewModel.cachedSpots)
+                viewModel.cachedSpots = rawSpots.map { item ->
+                    // API 응답 필드명 확인: 로그상 'contenttypeid'로 되어 있으므로
+                    // 데이터 클래스 매핑 시 해당 필드명을 정확히 사용하세요.
+                    val typeId = item.contentTypeId
 
+                    val generatedTip = when (typeId) {
+                        "12" -> "이 장소의 자연 경관을 살리기 위해 광각 렌즈나 삼분할 구도를 추천합니다."
+                        "14" -> "건물의 직선미와 대칭을 활용해 정적인 분위기를 담아보세요."
+                        "28" -> "역동적인 순간을 포착하기 위해 셔터 스피드를 확보하세요."
+                        else -> "배경과 피사체의 조화를 고려해 촬영해 보세요."
+                    }
+
+                    SpotItem(
+                        contentId = item.contentid,
+                        contentTypeId = typeId,
+                        title = item.title,
+                        addr1 = item.addr1 ?: "",
+                        tip = generatedTip,
+                        imageUrl = item.firstimage ?: ""
+                    )
+                }.sortedByDescending { PhotoScoreEngine.calculateScore(it) } // 싱글톤 객체 바로 호출
+
+                viewModel.spotData.postValue(viewModel.cachedSpots!!)
 
                 // 4. 데이터 저장 및 LiveData 방출
                 val weatherResult = "정읍의 현재 기온, ${temp}℃"
