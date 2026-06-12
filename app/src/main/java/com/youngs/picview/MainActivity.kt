@@ -113,9 +113,9 @@ class MainActivity : AppCompatActivity() {
                 viewModel.cachedSpots = rawSpots.map { item ->
                     // API 응답 필드명 확인: 로그상 'contenttypeid'로 되어 있으므로
                     // 데이터 클래스 매핑 시 해당 필드명을 정확히 사용하세요.
-                    val typeId = item.contentTypeId
+                    val contentTypeId = item.contentTypeId
 
-                    val generatedTip = when (typeId) {
+                    val generatedTip = when (contentTypeId) {
                         "12" -> "이 장소의 자연 경관을 살리기 위해 광각 렌즈나 삼분할 구도를 추천합니다."
                         "14" -> "건물의 직선미와 대칭을 활용해 정적인 분위기를 담아보세요."
                         "28" -> "역동적인 순간을 포착하기 위해 셔터 스피드를 확보하세요."
@@ -124,7 +124,7 @@ class MainActivity : AppCompatActivity() {
 
                     SpotItem(
                         contentId = item.contentid,
-                        contentTypeId = typeId,
+                        contentTypeId = contentTypeId,
                         title = item.title,
                         addr1 = item.addr1 ?: "",
                         tip = generatedTip,

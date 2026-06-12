@@ -20,7 +20,7 @@ data class Items(
 
 data class TourItem(
     @SerializedName("contentid") val contentid: String,
-    @SerializedName("contentTypeId") val contentTypeId: String,
+    @SerializedName("contenttypeid") val contentTypeId: String?,
     @SerializedName("title") val title: String,
     @SerializedName("addr1") val addr1: String,
     @SerializedName("firstimage") val firstimage: String?,

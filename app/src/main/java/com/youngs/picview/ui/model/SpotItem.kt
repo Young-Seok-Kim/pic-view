@@ -9,7 +9,7 @@ import java.io.Serializable
  */
 data class SpotItem(
     val contentId : String,
-    val contentTypeId: String,
+    val contentTypeId: String?,
     val title: String,
     val addr1: String,
     val tip: String,
