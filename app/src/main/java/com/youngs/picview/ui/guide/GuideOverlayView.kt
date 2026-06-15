@@ -13,9 +13,10 @@ class GuideOverlayView @JvmOverloads constructor(
 
     private val paint = Paint().apply {
         color = Color.WHITE
-        strokeWidth = 5f
+        strokeWidth = 4f
         style = Paint.Style.STROKE
-        alpha = 150
+        alpha = 180
+        isAntiAlias = true
     }
 
     var guideType: GuideType = GuideType.DEFAULT
@@ -31,7 +32,7 @@ class GuideOverlayView @JvmOverloads constructor(
         when (guideType) {
             GuideType.THIRDS -> drawThirds(canvas, w, h)
             GuideType.CENTER -> drawCenter(canvas, w, h)
-            else -> drawDefault(canvas, w, h)
+            GuideType.DEFAULT -> drawDefault(canvas, w, h)
         }
     }
 
@@ -43,13 +44,15 @@ class GuideOverlayView @JvmOverloads constructor(
     }
 
     private fun drawCenter(canvas: Canvas, w: Float, h: Float) {
-        val size = 300f
+        val size = 250f
         canvas.drawRect(w / 2 - size, h / 2 - size, w / 2 + size, h / 2 + size, paint)
     }
 
     private fun drawDefault(canvas: Canvas, w: Float, h: Float) {
         val centerX = w / 2f
         val centerY = h / 2f
-        canvas.drawCircle(centerX, centerY, 400f, paint)
+        val lineLen = 60f
+        canvas.drawLine(centerX - lineLen, centerY, centerX + lineLen, centerY, paint)
+        canvas.drawLine(centerX, centerY - lineLen, centerX, centerY + lineLen, paint)
     }
 }

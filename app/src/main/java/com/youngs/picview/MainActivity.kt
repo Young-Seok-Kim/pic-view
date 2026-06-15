@@ -110,7 +110,7 @@ class MainActivity : AppCompatActivity() {
                 val response = RetrofitClient.tourApiService.getJeongeupSpots(BuildConfig.TOUR_API_KEY)
                 val rawSpots = response.response.body.items.item
 
-                val isGolden = goldenText.contains("진행") // 여기서 판단
+                val isGoldenHour = goldenText.contains("진행") // 여기서 판단
 
                 viewModel.cachedSpots = rawSpots.map { item ->
                     val contentTypeId = item.contentTypeId ?: "0" // null일 경우 기본값 처리
@@ -143,7 +143,7 @@ class MainActivity : AppCompatActivity() {
                     val context = SpotScoreContext(
                         spot = spot,
                         currentTemp = 20.0, // 실제 온도 데이터 사용 필요
-                        isGoldenHour = isGolden,
+                        isGoldenHour = isGoldenHour,
                         isRaining = isRaining,
                         userDistance = 0.0, // GPS 위치 기반 거리 계산 로직 사용 필요
                         direction = inferredDirection, // 추론된 방향값 적용
