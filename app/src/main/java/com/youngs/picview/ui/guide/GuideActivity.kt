@@ -58,12 +58,23 @@ class GuideActivity : AppCompatActivity() {
             .check()
 
         val spotName = intent.getStringExtra("SPOT_NAME") ?: ""
-        binding.guideOverlay.guideType = when {
+        val guideType = when {
             spotName.contains("산") || spotName.contains("정원") -> GuideOverlayView.GuideType.THIRDS
             spotName.contains("향교") || spotName.contains("기념탑") -> GuideOverlayView.GuideType.CENTER
             else -> GuideOverlayView.GuideType.DEFAULT
         }
+        setOnClickListener()
 
+        binding.guideOverlay.guideType = guideType
+        binding.tvGuideMessage.text = when (guideType) {
+            GuideOverlayView.GuideType.THIRDS -> "선이 교차하는 지점에 피사체를 배치하세요"
+            GuideOverlayView.GuideType.CENTER -> "피사체를 중앙 박스 안에 맞추세요"
+            else -> "중앙 원 안에 피사체를 배치하세요"
+        }
+
+    }
+
+    private fun setOnClickListener() {
         binding.btnCapture.setOnClickListener { takePhoto() }
 
         binding.btnGallery.setOnClickListener {

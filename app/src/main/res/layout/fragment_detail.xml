@@ -90,7 +90,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="추천 구도 팁"
+                android:text="장소 정보"
                 android:textColor="#334155"
                 android:textSize="18sp"
                 android:textStyle="bold" />

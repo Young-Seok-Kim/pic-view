@@ -98,6 +98,7 @@ dependencies {
     implementation("com.google.guava:guava:31.1-android")
 
     implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
 
     // 💡 권장: 이미지 로딩 Glide 컴파일러 (애노테이션 처리용)
     kapt("com.github.bumptech.glide:compiler:4.16.0")

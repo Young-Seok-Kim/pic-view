@@ -11,8 +11,11 @@ import com.youngs.picview.ui.detail.DetailFragment
 import com.youngs.picview.ui.map.MapFragment
 import com.youngs.picview.ui.model.SpotItem
 import kotlin.getValue
+import android.os.Parcelable
 
 class MainFragment : Fragment(R.layout.fragment_main) {
+    private var recyclerViewState: Parcelable? = null
+
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
 
@@ -21,6 +24,11 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     private val viewModel: MainViewModel by activityViewModels()
+    override fun onPause() {
+        super.onPause()
+        // 현재 스크롤 위치 저장
+        recyclerViewState = binding.rvPhotoSpots.layoutManager?.onSaveInstanceState()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -28,6 +36,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         setListeners()
         setObserve()
+        recyclerViewState?.let {
+            binding.rvPhotoSpots.layoutManager?.onRestoreInstanceState(it)
+        }
     }
 
     private fun setObserve() {
@@ -57,7 +68,6 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         // 3. 필터링된 스팟 데이터 및 타이틀 관찰
         viewModel.filteredSpots.observe(viewLifecycleOwner) { filteredList ->
             spotAdapter.updateData(filteredList)
-            binding.rvPhotoSpots.scrollToPosition(0)
 
             val title = when (viewModel.getCurrentCategory()) {
                 SpotCategory.ALL -> "촬영지 추천"

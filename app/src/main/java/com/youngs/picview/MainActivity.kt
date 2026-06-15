@@ -135,11 +135,16 @@ class MainActivity : AppCompatActivity() {
                         mapy = item.mapy
                     )
 
+                    val pty = weatherResponse.response.body.items.item
+                        .firstOrNull { it.category == "PTY" }?.obsrValue ?: "0"
+                    val isRaining = pty != "0" // 0이 아니면 강수/강설 중
+
                     // 2. 점수 계산을 위한 컨텍스트 구성
                     val context = SpotScoreContext(
                         spot = spot,
                         currentTemp = 20.0, // 실제 온도 데이터 사용 필요
                         isGoldenHour = isGolden,
+                        isRaining = isRaining,
                         userDistance = 0.0, // GPS 위치 기반 거리 계산 로직 사용 필요
                         direction = inferredDirection, // 추론된 방향값 적용
                         bestTime = inferredBestTime   // 추론된 최적 시간대 적용

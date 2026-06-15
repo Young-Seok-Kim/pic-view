@@ -1,16 +1,21 @@
 package com.youngs.picview.ui.map
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.geometry.LatLng
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Overlay
+import com.naver.maps.map.util.FusedLocationSource
 import com.youngs.picview.R
 import com.youngs.picview.databinding.FragmentMapBinding
 import com.youngs.picview.ui.main.MainViewModel
@@ -22,10 +27,13 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
     private var naverMap: NaverMap? = null
+    private lateinit var locationSource: FusedLocationSource
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentMapBinding.bind(view)
+
+        locationSource = FusedLocationSource(this, 1000)
 
         // MapFragment 로드
         val fm = childFragmentManager
@@ -36,9 +44,28 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String?>,
+        grantResults: IntArray
+    ) {
+        if (locationSource.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
+            if (!locationSource.isActivated) { // 권한 거부 시
+                naverMap?.locationTrackingMode = LocationTrackingMode.None
+            }
+            return
+        }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
     override fun onMapReady(map: NaverMap) {
         this.naverMap = map
+
+        map.locationSource = locationSource
         map.uiSettings.isLocationButtonEnabled = true
+
+        map.locationTrackingMode = LocationTrackingMode.Follow
 
         val infoWindow = InfoWindow()
         infoWindow.adapter = object : InfoWindow.DefaultTextAdapter(requireContext()) {
