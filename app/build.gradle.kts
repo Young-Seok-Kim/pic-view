@@ -109,6 +109,7 @@ dependencies {
 
     implementation(libs.tedpermission.normal)
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.swiperefreshlayout)
 
     // 💡 권장: 이미지 로딩 Glide 컴파일러 (애노테이션 처리용)
     kapt("com.github.bumptech.glide:compiler:4.16.0")

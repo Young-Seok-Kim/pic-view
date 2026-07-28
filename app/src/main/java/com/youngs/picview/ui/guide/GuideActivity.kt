@@ -30,6 +30,11 @@ import com.youngs.picview.databinding.ActivityGuideBinding
 
 class GuideActivity : AppCompatActivity() {
 
+    companion object {
+        const val EXTRA_SPOT_NAME = "SPOT_NAME"
+        const val EXTRA_SPOT_TYPE = "SPOT_TYPE"
+    }
+
     private lateinit var binding: ActivityGuideBinding
     private var imageCapture: ImageCapture? = null
 
@@ -74,23 +79,32 @@ class GuideActivity : AppCompatActivity() {
         setupGuide()
     }
 
-    /** 장소 이름에 맞는 구도 가이드를 화면에 반영합니다. */
+    /**
+     * 장소 종류에 맞는 구도 가이드를 화면에 반영합니다.
+     *
+     * 예전에는 장소 이름에 '산', '향교' 가 들어있는지로 판단했는데,
+     * 이름에 안 걸리면 엉뚱한 가이드가 나왔습니다.
+     * 앱 다른 화면과 같은 기준인 contentTypeId 로 판단합니다.
+     */
     private fun setupGuide() {
-        val spotName = intent.getStringExtra("SPOT_NAME") ?: ""
-        binding.tvSpotName.text = spotName
-        val guideType = when {
-            spotName.contains("산") || spotName.contains("정원") -> GuideOverlayView.GuideType.THIRDS
-            spotName.contains("향교") || spotName.contains("기념탑") -> GuideOverlayView.GuideType.CENTER
-            else -> GuideOverlayView.GuideType.DEFAULT
+        binding.tvSpotName.text = intent.getStringExtra(EXTRA_SPOT_NAME) ?: ""
+
+        val guideType = when (intent.getStringExtra(EXTRA_SPOT_TYPE)) {
+            "14" -> GuideOverlayView.GuideType.SYMMETRY // 문화시설 : 건축 대칭
+            "39" -> GuideOverlayView.GuideType.CENTER   // 음식점 : 근접 촬영
+            else -> GuideOverlayView.GuideType.THIRDS   // 자연·레포츠 등 풍경
         }
+
         setOnClickListener()
 
         binding.guideOverlay.guideType = guideType
-        binding.tvGuideMessage.text = when (guideType) {
-            GuideOverlayView.GuideType.THIRDS -> "선이 교차하는 지점에 피사체를 배치하세요"
-            GuideOverlayView.GuideType.CENTER -> "피사체를 중앙 박스 안에 맞추세요"
-            else -> "중앙 원 안에 피사체를 배치하세요"
-        }
+        binding.tvGuideMessage.setText(
+            when (guideType) {
+                GuideOverlayView.GuideType.THIRDS -> R.string.guide_thirds
+                GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_symmetry
+                GuideOverlayView.GuideType.CENTER -> R.string.guide_center
+            }
+        )
     }
 
     /**

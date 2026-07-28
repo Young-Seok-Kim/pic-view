@@ -1,6 +1,7 @@
 package com.youngs.picview
 
 import android.os.Bundle
+import android.os.SystemClock
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -17,6 +18,7 @@ import com.youngs.picview.ui.main.PhotoScoreEngine
 import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.ui.model.SpotScoreContext
 import com.youngs.picview.util.retryOrNull
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -62,14 +64,39 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** 로드 실패 후 '다시 시도' 를 눌렀을 때 캐시를 비우고 다시 받아옵니다. */
-    fun reloadData() {
+    override fun onResume() {
+        super.onResume()
+        // 앱을 켜 둔 채 시간이 지나면 골든아워·기온이 달라져 포토스코어가 바뀝니다.
+        // 오래 방치했다 돌아온 경우 조용히 다시 계산합니다.
+        val elapsed = SystemClock.elapsedRealtime() - viewModel.lastLoadedAt
+        if (viewModel.lastLoadedAt > 0L && elapsed > STALE_AFTER_MS) {
+            refresh(userInitiated = false)
+        }
+    }
+
+    /**
+     * 캐시를 비우고 날씨·일출·촬영지를 다시 받아옵니다.
+     *
+     * @param userInitiated 당겨서 새로고침이면 true. 목록 위 스피너를 띄웁니다.
+     *                      false 면 화면 전체 로딩 표시를 씁니다.
+     */
+    fun refresh(userInitiated: Boolean) {
+        if (viewModel.isLoading.value == true || viewModel.isRefreshing.value == true) return
+
         viewModel.cachedWeather = null
         viewModel.cachedGoldenHour = null
         viewModel.loadFailed.value = false
-        viewModel.isLoading.value = true
+
+        if (userInitiated) {
+            viewModel.isRefreshing.value = true
+        } else {
+            viewModel.isLoading.value = true
+        }
         preLoadData()
     }
+
+    /** 로드 실패 후 '다시 시도' 를 눌렀을 때. */
+    fun reloadData() = refresh(userInitiated = false)
 
     private fun preLoadData() {
         if (viewModel.cachedWeather != null) {
@@ -83,29 +110,44 @@ class MainActivity : AppCompatActivity() {
                 val dateStr = now.format(DateTimeFormatter.ofPattern("yyyyMMdd"))
                 val timeStr = now.minusHours(1).format(DateTimeFormatter.ofPattern("HHmm"))
 
-                // 세 API 는 서로 독립적으로 재시도하고, 하나가 실패해도
-                // 나머지는 그대로 화면에 보여 줍니다.
+                // 세 API 는 서로 의존하지 않으므로 동시에 호출합니다.
+                // 순차로 부르면 합계(약 12초)를 기다려야 하지만,
+                // 병렬로 부르면 가장 느린 하나(약 5초)만 기다리면 됩니다.
+                //
+                // 각각 독립적으로 재시도하고, 하나가 실패해도 나머지는
+                // 그대로 화면에 보여 줍니다.
                 // (예전에는 일출 API 가 timeout 나면 촬영지 목록까지 통째로 사라졌습니다)
+                val weatherAsync = async {
+                    retryOrNull("WEATHER_API") {
+                        RetrofitClient.weatherApiService.getUltraSrtNcst(
+                            serviceKey = BuildConfig.TOUR_API_KEY,
+                            baseDate = dateStr,
+                            baseTime = timeStr
+                        )
+                    }
+                }
+                val astroAsync = async {
+                    retryOrNull("ASTRO_API") {
+                        RetrofitClient.weatherApiService.getAreaRiseSetInfo(
+                            serviceKey = BuildConfig.TOUR_API_KEY,
+                            locdate = dateStr,
+                        )
+                    }
+                }
+                val spotsAsync = async {
+                    retryOrNull("TOUR_API") {
+                        RetrofitClient.tourApiService.getJeongeupSpots(BuildConfig.TOUR_API_KEY)
+                    }
+                }
 
                 // 1. 날씨
-                val weatherResponse = retryOrNull("WEATHER_API") {
-                    RetrofitClient.weatherApiService.getUltraSrtNcst(
-                        serviceKey = BuildConfig.TOUR_API_KEY,
-                        baseDate = dateStr,
-                        baseTime = timeStr
-                    )
-                }
-                val weatherItems = weatherResponse?.response?.body?.items?.item.orEmpty()
+                val weatherItems =
+                    weatherAsync.await()?.response?.body?.items?.item.orEmpty()
                 val temp = weatherItems.firstOrNull { it.category == "T1H" }?.obsrValue
                 val tempValue = temp?.toDoubleOrNull() ?: 20.0
 
                 // 2. 일출/일몰 (정읍 좌표 사용)
-                val astro = retryOrNull("ASTRO_API") {
-                    RetrofitClient.weatherApiService.getAreaRiseSetInfo(
-                        serviceKey = BuildConfig.TOUR_API_KEY,
-                        locdate = dateStr,
-                    )
-                }?.response?.body?.items?.item
+                val astro = astroAsync.await()?.response?.body?.items?.item
 
                 // 3. 골든아워 계산
                 val goldenText = astro?.let {
@@ -128,9 +170,7 @@ class MainActivity : AppCompatActivity() {
                 } ?: "일출·일몰 정보 없음"
 
                 // 4. 촬영지 목록
-                val rawSpots = retryOrNull("TOUR_API") {
-                    RetrofitClient.tourApiService.getJeongeupSpots(BuildConfig.TOUR_API_KEY)
-                }?.response?.body?.items?.item.orEmpty()
+                val rawSpots = spotsAsync.await()?.response?.body?.items?.item.orEmpty()
 
                 val isGoldenHour = goldenText.contains("진행") // 여기서 판단
 
@@ -194,6 +234,9 @@ class MainActivity : AppCompatActivity() {
                 viewModel.weatherData.postValue(weatherResult)
                 viewModel.goldenHourData.postValue(goldenText)
                 viewModel.loadFailed.postValue(rawSpots.isEmpty())
+                if (rawSpots.isNotEmpty()) {
+                    viewModel.lastLoadedAt = SystemClock.elapsedRealtime()
+                }
 
             } catch (e: Exception) {
                 Log.e("PRELOAD_ERROR", "사전 로딩 실패: ${e.message}")
@@ -202,6 +245,7 @@ class MainActivity : AppCompatActivity() {
                 viewModel.loadFailed.postValue(true)
             } finally {
                 viewModel.isLoading.postValue(false)
+                viewModel.isRefreshing.postValue(false)
             }
         }
     }
@@ -223,6 +267,11 @@ class MainActivity : AppCompatActivity() {
         val h = timeStr.trim().substring(0, 2).toInt()
         val m = timeStr.trim().substring(2, 4).toInt()
         return LocalTime.of(h, m)
+    }
+
+    companion object {
+        /** 이 시간이 지난 뒤 앱으로 돌아오면 데이터를 다시 받아옵니다. */
+        private const val STALE_AFTER_MS = 10 * 60 * 1000L
     }
 }
 

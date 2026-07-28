@@ -60,7 +60,8 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
         binding.btnStartGuide.setOnClickListener {
             val intent = Intent(requireContext(), GuideActivity::class.java).apply {
-                putExtra("SPOT_NAME", spot.title)
+                putExtra(GuideActivity.EXTRA_SPOT_NAME, spot.title)
+                putExtra(GuideActivity.EXTRA_SPOT_TYPE, spot.contentTypeId)
             }
             startActivity(intent)
         }

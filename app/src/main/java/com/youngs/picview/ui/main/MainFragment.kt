@@ -63,6 +63,10 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             binding.progressBar.isVisible = loading
         }
 
+        viewModel.isRefreshing.observe(viewLifecycleOwner) { refreshing ->
+            binding.swipeRefresh.isRefreshing = refreshing
+        }
+
         viewModel.filteredSpots.observe(viewLifecycleOwner) { filteredList ->
             spotAdapter.updateData(filteredList)
             renderListState(filteredList.isEmpty())
@@ -90,6 +94,11 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     private fun setListeners() {
+        binding.swipeRefresh.setColorSchemeResources(R.color.brand_500)
+        binding.swipeRefresh.setOnRefreshListener {
+            (activity as? MainActivity)?.refresh(userInitiated = true)
+        }
+
         binding.chipGroupCategory.setOnCheckedStateChangeListener { _, checkedIds ->
             val category = chipToCategory[checkedIds.firstOrNull()] ?: return@setOnCheckedStateChangeListener
             viewModel.setCategory(category)

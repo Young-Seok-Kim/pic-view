@@ -14,9 +14,12 @@ object RetrofitClient {
     private const val READ_TIMEOUT_SEC = 30L
 
     private val logging = HttpLoggingInterceptor().apply {
-        // 릴리즈 빌드에서는 응답 본문(및 serviceKey)을 로그에 남기지 않습니다.
+        // BASIC = URL, 응답코드, 소요시간만. 촬영지 목록 응답이 약 60KB 라
+        // BODY 로 두면 logcat 출력만으로 로딩이 눈에 띄게 느려집니다.
+        // 응답 본문을 봐야 할 때만 일시적으로 BODY 로 바꿔 쓰세요.
+        // 릴리즈 빌드에서는 serviceKey 노출을 막기 위해 아무것도 남기지 않습니다.
         level = if (BuildConfig.DEBUG) {
-            HttpLoggingInterceptor.Level.BODY
+            HttpLoggingInterceptor.Level.BASIC
         } else {
             HttpLoggingInterceptor.Level.NONE
         }

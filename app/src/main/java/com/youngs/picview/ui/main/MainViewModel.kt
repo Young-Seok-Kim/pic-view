@@ -11,8 +11,14 @@ class MainViewModel : ViewModel() {
     val goldenHourData = MutableLiveData<String>()
     val isLoading = MutableLiveData<Boolean>(true)
 
+    /** 사용자가 당겨서 새로고침한 경우. 스플래시 대신 목록 위 스피너를 씁니다. */
+    val isRefreshing = MutableLiveData(false)
+
     /** 촬영지 목록을 끝내 받아오지 못했는지. 화면에 '다시 시도' 를 띄우는 데 씁니다. */
     val loadFailed = MutableLiveData(false)
+
+    /** 마지막으로 데이터를 받아온 시각(elapsedRealtime). 자동 갱신 판단에 씁니다. */
+    var lastLoadedAt: Long = 0L
 
     // 원본 데이터
     val spotData = MutableLiveData<List<SpotItem>>()
