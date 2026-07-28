@@ -5,35 +5,54 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8FAFC">
+    android:background="@color/bg_page">
 
-    <androidx.core.widget.NestedScrollView
+    <!--
+      헤더(제목 + 촬영 환경)는 스크롤하면 접히고,
+      카테고리 필터 줄은 상단에 고정되어 언제든 바꿀 수 있게 했다.
+    -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="wrap_content"
+        android:background="@color/bg_page"
+        android:stateListAnimator="@null"
+        app:elevation="0dp"
+        app:liftOnScroll="false">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:paddingBottom="@dimen/space_l"
+            app:layout_scrollFlags="scroll|snap">
 
             <TextView
                 android:id="@+id/tv_main_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/screen_padding"
+                android:layout_marginTop="@dimen/space_l"
                 android:text="@string/app_name"
-                android:textColor="#0F172A"
-                android:textSize="28sp"
-                android:textStyle="bold" />
+                android:textAppearance="@style/Text.Display" />
+
+            <TextView
+                android:id="@+id/tv_tagline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/screen_padding"
+                android:layout_marginTop="2dp"
+                android:text="@string/app_tagline"
+                android:textAppearance="@style/Text.Caption" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/weatherCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
+                android:layout_marginHorizontal="@dimen/screen_padding"
+                android:layout_marginTop="@dimen/space_l"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="6dp"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
@@ -41,222 +60,228 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_weather_gradient"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:paddingHorizontal="@dimen/space_xl"
+                    android:paddingVertical="18dp">
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="15dp"
+                            android:layout_height="15dp"
+                            android:alpha="0.85"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_sun"
+                            app:tint="@color/white" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:alpha="0.8"
-                            android:text="현재 촬영 환경"
-                            android:textColor="#FFFFFF" />
+                            android:layout_marginStart="6dp"
+                            android:alpha="0.85"
+                            android:letterSpacing="0.04"
+                            android:text="@string/shooting_condition"
+                            android:textColor="@color/white"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_weather_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:letterSpacing="-0.02"
+                        android:text="@string/weather_loading"
+                        android:textColor="@color/white"
+                        android:textSize="23sp"
+                        android:textStyle="bold"
+                        tools:text="지금 정읍은 29.2℃" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_golden_pill"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="7dp">
+
+                        <View
+                            android:layout_width="7dp"
+                            android:layout_height="7dp"
+                            android:background="@drawable/dot_indicator_active"
+                            android:backgroundTint="@color/golden_300" />
 
                         <TextView
                             android:id="@+id/tv_golden_hour"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:text="골든아워까지 02:30"
-                            android:textColor="#F59E0B"
-                            android:textStyle="bold" />
-                    </RelativeLayout>
-
-                    <TextView
-                        android:id="@+id/tv_weather_status"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="내장산의 오늘, 맑음 ☀️"
-                        android:textColor="#FFFFFF"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
+                            android:layout_marginStart="8dp"
+                            android:text="@string/golden_hour_loading"
+                            android:textColor="@color/golden_200"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            tools:text="일몰까지 2시간 30분" />
+                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/layout_category_icons"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:layout_marginBottom="10dp"
-                android:orientation="horizontal"
-                android:weightSum="5">
+        <!-- 상단 고정 : 카테고리 필터 -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/bg_page"
+            android:paddingVertical="@dimen/space_s"
+            android:scrollbars="none">
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    <ImageButton
-                        android:id="@+id/btn_all"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="전체"
-                        android:scaleType="fitCenter"
-                        android:src="@android:drawable/ic_menu_agenda" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="전체"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    <ImageButton
-                        android:id="@+id/btn_nature"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="자연"
-                        android:scaleType="fitCenter"
-                        android:src="@android:drawable/ic_menu_gallery" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="자연"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    <ImageButton
-                        android:id="@+id/btn_culture"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="문화"
-                        android:scaleType="fitCenter"
-                        android:src="@android:drawable/ic_menu_slideshow" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="문화"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    <ImageButton
-                        android:id="@+id/btn_leports"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="레포츠"
-                        android:scaleType="fitCenter"
-                        android:src="@android:drawable/ic_menu_compass" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="레포츠"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    <ImageButton
-                        android:id="@+id/btn_food"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="음식점"
-                        android:scaleType="fitCenter"
-                        android:src="@android:drawable/ic_menu_today" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="음식점"
-                        android:textSize="12sp" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tv_list_title"
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chip_group_category"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="촬영지 추천"
-                android:textColor="#334155"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:paddingHorizontal="@dimen/screen_padding"
+                app:chipSpacingHorizontal="8dp"
+                app:selectionRequired="true"
+                app:singleLine="true"
+                app:singleSelection="true">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_photo_spots"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:orientation="horizontal"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/item_spot_card" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_all"
+                    style="@style/Chip.Category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="@string/category_all"
+                    app:chipIcon="@drawable/ic_cat_all" />
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btn_open_naver_map"
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:layout_marginTop="30dp"
-                android:layout_marginBottom="20dp"
-                app:cardBackgroundColor="#03C75A"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_nature"
+                    style="@style/Chip.Category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/category_nature"
+                    app:chipIcon="@drawable/ic_cat_nature" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:orientation="horizontal">
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_culture"
+                    style="@style/Chip.Category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/category_culture"
+                    app:chipIcon="@drawable/ic_cat_culture" />
 
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:src="@android:drawable/ic_menu_mylocation"
-                        app:tint="#FFFFFF" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_leports"
+                    style="@style/Chip.Category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/category_leports"
+                    app:chipIcon="@drawable/ic_cat_leports" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:text="내 주변 촬영지 지도에서 보기"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_food"
+                    style="@style/Chip.Category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/category_food"
+                    app:chipIcon="@drawable/ic_cat_food" />
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+    </com.google.android.material.appbar.AppBarLayout>
 
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+    <!-- ================= 촬영지 목록 ================= -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_photo_spots"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingTop="@dimen/space_s"
+        android:paddingBottom="96dp"
+        android:scrollbars="none"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:itemCount="3"
+        tools:listitem="@layout/item_spot_card" />
 
-    <ProgressBar
+    <!-- ================= 빈 상태 ================= -->
+    <LinearLayout
+        android:id="@+id/layout_empty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingVertical="64dp"
+        android:visibility="gone"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:visibility="gone">
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="@drawable/bg_empty_circle"
+            android:contentDescription="@null"
+            android:padding="18dp"
+            android:src="@drawable/baseline_image_24"
+            app:tint="@color/text_tertiary" />
+
+        <TextView
+            android:id="@+id/tv_empty_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_l"
+            android:text="@string/empty_title"
+            android:textColor="@color/text_secondary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_empty_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xs"
+            android:text="@string/empty_desc"
+            android:textAppearance="@style/Text.Caption" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_retry"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_l"
+            android:text="@string/retry"
+            android:visibility="gone"
+            app:cornerRadius="16dp" />
+    </LinearLayout>
+
+    <!-- ================= 지도 FAB (항상 노출) ================= -->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/btn_open_naver_map"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/space_l"
+        android:layout_marginBottom="20dp"
+        android:text="@string/open_map_short"
+        android:textColor="@color/white"
+        app:backgroundTint="@color/naver_green"
+        app:elevation="8dp"
+        app:icon="@drawable/ic_near_me"
+        app:iconTint="@color/white"
+        app:rippleColor="#33FFFFFF" />
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:visibility="gone" />
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:indicatorColor="@color/brand_500"
+        app:trackCornerRadius="4dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

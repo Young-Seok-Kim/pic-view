@@ -5,6 +5,8 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.geometry.LatLng
+import com.naver.maps.geometry.LatLngBounds
+import com.naver.maps.map.CameraUpdate
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -28,12 +30,25 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
     private val binding get() = _binding!!
     private var naverMap: NaverMap? = null
     private lateinit var locationSource: FusedLocationSource
+    private var hasFittedCamera = false
+
+    private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
+
+    /** 한반도 범위를 벗어나거나 값이 없는 좌표는 버립니다. */
+    private fun SpotItem.toLatLngOrNull(): LatLng? {
+        val lat = mapy.toDoubleOrNull() ?: return null
+        val lng = mapx.toDoubleOrNull() ?: return null
+        if (lat !in 33.0..39.0 || lng !in 124.0..132.0) return null
+        return LatLng(lat, lng)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentMapBinding.bind(view)
 
         locationSource = FusedLocationSource(this, 1000)
+
+        binding.btnMapBack.setOnClickListener { parentFragmentManager.popBackStack() }
 
         // MapFragment 로드
         val fm = childFragmentManager
@@ -65,7 +80,9 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
         map.locationSource = locationSource
         map.uiSettings.isLocationButtonEnabled = true
 
-        map.locationTrackingMode = LocationTrackingMode.Follow
+        // 내 위치는 표시하되 카메라를 따라가지는 않습니다.
+        // Follow 로 두면 정읍 밖에서 앱을 열었을 때 촬영지가 하나도 안 보입니다.
+        map.locationTrackingMode = LocationTrackingMode.NoFollow
 
         val infoWindow = InfoWindow()
         infoWindow.adapter = object : InfoWindow.DefaultTextAdapter(requireContext()) {
@@ -75,52 +92,62 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
         }
 
         viewModel.filteredSpots.observe(viewLifecycleOwner) { spots ->
-            // 2. 기존 마커들 삭제
+            // 기존 마커 정리 (마커를 두 번 만들면 지도에서 지워지지 않고 쌓입니다)
+            infoWindow.close()
             markers.forEach { it.map = null }
             markers.clear()
 
-            spots.forEach { spot ->
-                val marker = Marker() // apply 밖으로 빼서 명시적으로 제어
-                marker.position = LatLng(spot.mapy.toDouble(), spot.mapx.toDouble())
+            // 좌표가 비어 있거나 한반도 밖인 데이터가 섞여 있습니다.
+            // 걸러내지 않으면 (0,0) 마커 때문에 지도가 전 세계로 축소됩니다.
+            spots.mapNotNull { spot -> spot.toLatLngOrNull()?.let { spot to it } }
+                .forEach { (spot, position) ->
+                val marker = Marker()
+                marker.position = position
                 marker.captionText = spot.title
-                marker.map = naverMap // 여기서 직접 할당
+                marker.iconTintColor = ContextCompat.getColor(requireContext(), R.color.brand_500)
 
-                marker.onClickListener = Overlay.OnClickListener { overlay ->
+                // 88개가 기본 크기로 깔리면 서로 겹쳐 지도가 안 보입니다.
+                // 크기를 줄이고, 겹치는 마커와 캡션은 지도가 알아서 숨기게 합니다.
+                marker.width = dp(22)
+                marker.height = dp(30)
+                marker.isHideCollidedMarkers = true
+                marker.isHideCollidedCaptions = true
+                marker.captionMinZoom = 11.0
+                marker.captionTextSize = 11f
+
+                marker.tag = spot
+                marker.map = naverMap
+
+                marker.onClickListener = Overlay.OnClickListener {
                     infoWindow.open(marker)
                     true // 이벤트를 소비했음을 알림
                 }
                 markers.add(marker)
             }
 
-// 마커 생성 루프 내부
-            spots.forEach { spot ->
-                val marker = Marker()
-                marker.position = LatLng(spot.mapy.toDouble(), spot.mapx.toDouble())
-                marker.captionText = spot.title
-                marker.map = naverMap
+            binding.tvMapCount.text = getString(R.string.map_spot_count, spots.size)
 
-                // 1. 마커에 spot 데이터를 태그로 저장
-                marker.tag = spot
-
-                marker.onClickListener = Overlay.OnClickListener {
-                    infoWindow.open(marker)
-                    true
-                }
+            // 지도를 처음 열면 촬영지 전체가 한눈에 들어오도록 맞춥니다.
+            if (!hasFittedCamera && markers.isNotEmpty()) {
+                val bounds = LatLngBounds.Builder()
+                    .apply { markers.forEach { include(it.position) } }
+                    .build()
+                naverMap?.moveCamera(CameraUpdate.fitBounds(bounds, dp(56)))
+                hasFittedCamera = true
             }
 
-// 2. 정보창 클릭 리스너 (루프 밖으로 빼세요)
-            infoWindow.onClickListener = Overlay.OnClickListener { overlay ->
-                // 정보창에 연결된 마커에서 tag를 꺼내와 spot으로 변환
-                val spot = infoWindow.marker?.tag as? SpotItem
-
-                spot?.let { item ->
-                    val detailFragment = com.youngs.picview.ui.detail.DetailFragment().apply {
-                        arguments = Bundle().apply {
-                            putSerializable("spot", item)
-                        }
-                    }
+            // 정보창을 누르면 상세로 이동
+            infoWindow.onClickListener = Overlay.OnClickListener {
+                (infoWindow.marker?.tag as? SpotItem)?.let { item ->
                     parentFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, detailFragment)
+                        .setCustomAnimations(
+                            R.anim.slide_in_right, R.anim.fade_out,
+                            R.anim.fade_in, R.anim.slide_out_right
+                        )
+                        .replace(
+                            R.id.fragment_container,
+                            com.youngs.picview.ui.detail.DetailFragment.newInstance(item)
+                        )
                         .addToBackStack(null)
                         .commit()
                 }

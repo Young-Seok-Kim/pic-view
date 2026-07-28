@@ -1,44 +1,86 @@
 package com.youngs.picview.ui.main
 
-import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.ui.model.SpotScoreContext
+import kotlin.math.roundToInt
 
+/**
+ * 촬영지의 "지금 찍기 좋은 정도"를 0~100 으로 환산합니다.
+ *
+ * 이전 구현은 가중치를 곱셈으로 쌓아 골든아워에 300점대까지 튀었고,
+ * 그 결과 상위권이 전부 같은 점수처럼 보여 변별력이 없었습니다.
+ * 그래서 항목별 배점을 정해 더하는 방식으로 바꿨습니다.
+ *
+ * 배점(합계 100 기준)
+ *  - 장소 기본 매력도 : 34 ~ 44
+ *  - 정보 최신성      :  0 ~ 10
+ *  - 대표 사진 보유    :  0 ~ 4
+ *  - 빛(골든아워)     :  3 ~ 20
+ *  - 날씨 적합도      : -18 ~ +8
+ *  - 기온 쾌적도      :  0 ~ 8
+ *  - 거리             :  1 ~ 10
+ */
 object PhotoScoreEngine {
+
     fun calculateScore(context: SpotScoreContext): Int {
-        // 1. 기본 점수 (인기도/카테고리 기반)
-        var baseScore = 50.0
-        when (context.spot.contentTypeId) {
-            "12" -> baseScore += 30
-            "14" -> baseScore += 40
-            "28" -> baseScore += 10
-            "39" -> baseScore -= 10
-        }
+        val score = baseScore(context.spot.contentTypeId) +
+                freshnessScore(context.freshnessRank) +
+                photoScore(context.hasPhoto) +
+                lightScore(context) +
+                weatherScore(context) +
+                temperatureScore(context.currentTemp) +
+                distanceScore(context.userDistance)
 
-        // 2. 가중치 팩터 (1.0을 기본으로 하여 곱함)
-        var weatherFactor = 1.0
-        if (context.currentTemp in 15.0..25.0) weatherFactor += 0.2 // 날씨 좋으면 20% 보너스
+        return score.roundToInt().coerceIn(0, 100)
+    }
 
-        var goldenHourFactor = 1.0
-        if (context.isGoldenHour) {
-            goldenHourFactor += 1.0 // 골든아워면 2배
-            if (context.direction == "WEST") goldenHourFactor += 0.8 // 서쪽이면 추가 가중
-        }
+    /** 정보가 최근에 갱신된 곳일수록 높은 점수. 같은 카테고리 안에서 순위를 벌려 줍니다. */
+    private fun freshnessScore(rank: Double) = 10.0 * (1.0 - rank.coerceIn(0.0, 1.0))
 
+    private fun photoScore(hasPhoto: Boolean) = if (hasPhoto) 4.0 else 0.0
 
-        // 비가 올 때의 로직
-        if (context.isRaining) {
-            when (context.spot.contentTypeId) {
-                "14", "39" -> weatherFactor += 1.5 // 문화시설, 음식점은 비 올 때 가산점 대폭
-                "12" -> weatherFactor -= 0.7      // 자연 스팟은 비 올 때 감점
-            }
-        } else {
-            // 맑을 때의 로직
-            if (context.currentTemp in 15.0..25.0) weatherFactor += 0.2
-        }
+    /** 카테고리별 기본 매력도. */
+    private fun baseScore(contentTypeId: String?): Double = when (contentTypeId) {
+        "12" -> 44.0 // 관광지·자연
+        "14" -> 42.0 // 문화시설
+        "28" -> 37.0 // 레포츠
+        "39" -> 34.0 // 음식점
+        else -> 36.0
+    }
 
-        // 3. 수식 적용: (인기도 기반 점수) * (기상 가중치) * (골든아워 가중치)
-        val finalScore = (baseScore * weatherFactor * goldenHourFactor).toInt()
+    /** 빛 조건. 골든아워, 그중에서도 서향 스팟에 가장 높은 배점을 줍니다. */
+    private fun lightScore(context: SpotScoreContext): Double = when {
+        context.isGoldenHour && context.direction == "WEST" -> 20.0
+        context.isGoldenHour -> 14.0
+        context.bestTime == "AFTERNOON" -> 8.0
+        context.bestTime == "SUNSET" -> 3.0 // 지금은 아니지만 해질 무렵 다시 오면 좋은 곳
+        else -> 5.0
+    }
 
-        return finalScore
+    /** 강수 여부. 실내 위주 스팟은 비 올 때 오히려 유리합니다. */
+    private fun weatherScore(context: SpotScoreContext): Double = when {
+        !context.isRaining -> 8.0
+        context.spot.contentTypeId == "14" || context.spot.contentTypeId == "39" -> 10.0
+        context.spot.contentTypeId == "12" -> -18.0
+        else -> -10.0
+    }
+
+    /** 야외 활동 쾌적도. */
+    private fun temperatureScore(temp: Double): Double = when (temp) {
+        in 15.0..25.0 -> 8.0
+        in 8.0..30.0 -> 4.0
+        else -> 0.0
+    }
+
+    /**
+     * 접근성. 거리 정보가 아직 없으면(0.0) 중립값을 줍니다.
+     * 거리 단위는 km 입니다.
+     */
+    private fun distanceScore(distanceKm: Double): Double = when {
+        distanceKm <= 0.0 -> 5.0 // 미측정
+        distanceKm <= 2.0 -> 10.0
+        distanceKm <= 5.0 -> 8.0
+        distanceKm <= 10.0 -> 5.0
+        distanceKm <= 20.0 -> 3.0
+        else -> 1.0
     }
 }

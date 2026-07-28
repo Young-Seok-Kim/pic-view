@@ -16,7 +16,9 @@ interface TourApiService {
         @Query("MobileApp") mobileApp: String = "PicView",
         @Query("_type") type: String = "json",
         @Query("areaCode") areaCode: String = "37", // 전북
-        @Query("sigunguCode") sigunguCode: String = "13" // 정읍
+        @Query("sigunguCode") sigunguCode: String = "13", // 정읍
+        // C = 수정일순. 기본값(제목순)은 가나다순이라 추천 순서로 쓸 수 없습니다.
+        @Query("arrange") arrange: String = "C"
     ): TourResponse
 
     @GET("KorService2/detailImage2")

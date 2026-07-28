@@ -1,62 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="@color/black">
 
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!--
+      디버그 빌드에서만 쓰는 미리보기 대체 이미지.
+      스토어 스크린샷을 찍을 때 실제 카메라 대신 풍경 사진을 깔기 위한 용도로,
+      릴리즈 빌드에서는 절대 표시되지 않습니다.
+    -->
+    <ImageView
+        android:id="@+id/iv_demo_backdrop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@null"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
+
     <com.youngs.picview.ui.guide.GuideOverlayView
         android:id="@+id/guideOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <TextView
-        android:id="@+id/tvGuideMessage"
-        android:layout_width="wrap_content"
+    <!-- 상단 스크림 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_gravity="top"
+        android:background="@drawable/bg_scrim_top" />
+
+    <!-- 하단 스크림 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bg_scrim_bottom" />
+
+    <!-- ================= 상단 바 ================= -->
+    <LinearLayout
+        android:id="@+id/layout_top_bar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="top|center_horizontal"
-        android:layout_marginTop="60dp"
-        android:background="#80000000"
-        android:paddingHorizontal="20dp"
-        android:paddingVertical="10dp"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:elevation="4dp" />
+        android:layout_gravity="top"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/space_l"
+        android:paddingTop="@dimen/space_m">
 
-    <ImageButton
-        android:id="@+id/btn_gallery"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="bottom|start"
-        android:layout_marginStart="40dp"
-        android:layout_marginBottom="55dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/baseline_photo_library_24"
-        android:scaleType="fitCenter"
-        android:contentDescription="갤러리 보기" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-    <ImageButton
-        android:id="@+id/btn_capture"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="40dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/baseline_camera_alt_24"
-        android:scaleType="fitCenter"
-        android:contentDescription="촬영 버튼" />
+            <ImageView
+                android:id="@+id/btn_guide_back"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_glass_circle"
+                android:contentDescription="@string/cd_back"
+                android:padding="9dp"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/white" />
+
+            <TextView
+                android:id="@+id/tv_spot_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_m"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:shadowColor="#99000000"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="4"
+                android:textColor="@color/white"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                tools:text="내장산 국립공원" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvGuideMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/space_l"
+            android:background="@drawable/bg_pill_dark"
+            android:paddingHorizontal="18dp"
+            android:paddingVertical="10dp"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:text="선이 교차하는 지점에 피사체를 배치하세요" />
+    </LinearLayout>
+
+    <!-- ================= 하단 컨트롤 ================= -->
+    <FrameLayout
+        android:id="@+id/layout_bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:paddingHorizontal="36dp"
+        android:paddingTop="@dimen/space_xl"
+        android:paddingBottom="36dp">
+
+        <ImageButton
+            android:id="@+id/btn_gallery"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="start|center_vertical"
+            android:background="@drawable/bg_glass_circle"
+            android:contentDescription="@string/cd_gallery"
+            android:padding="12dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/baseline_photo_library_24"
+            app:tint="@color/white" />
+
+        <ImageButton
+            android:id="@+id/btn_capture"
+            android:layout_width="76dp"
+            android:layout_height="76dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/bg_shutter_button"
+            android:contentDescription="@string/cd_capture"
+            android:src="@android:color/transparent" />
+    </FrameLayout>
 
     <View
         android:id="@+id/flash_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#FFFFFF"
-        android:visibility="gone"
-        android:alpha="0" />
+        android:alpha="0"
+        android:background="@color/white"
+        android:visibility="gone" />
 
 </FrameLayout>

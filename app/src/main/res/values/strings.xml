@@ -1,3 +1,51 @@
 <resources>
     <string name="app_name">정읍 시선</string>
+    <string name="app_tagline">오늘, 정읍에서 가장 잘 나오는 곳</string>
+
+    <!-- 촬영 환경 카드 -->
+    <string name="shooting_condition">현재 촬영 환경</string>
+    <string name="weather_loading">날씨 정보를 불러오는 중…</string>
+    <string name="golden_hour_loading">계산 중…</string>
+
+    <!-- 카테고리 -->
+    <string name="category_all">전체</string>
+    <string name="category_nature">자연</string>
+    <string name="category_culture">문화</string>
+    <string name="category_leports">레포츠</string>
+    <string name="category_food">맛집</string>
+
+    <!-- 목록 -->
+    <string name="list_title_all">촬영지 추천</string>
+    <string name="list_title_nature">자연 속 촬영지</string>
+    <string name="list_title_culture">문화가 있는 촬영지</string>
+    <string name="list_title_leports">레포츠 촬영지</string>
+    <string name="list_title_food">맛집 촬영지</string>
+    <string name="list_subtitle">포토스코어가 높은 순서예요</string>
+    <string name="empty_title">이 카테고리엔 아직 촬영지가 없어요</string>
+    <string name="empty_desc">다른 카테고리를 골라보세요</string>
+    <string name="error_title">촬영지를 불러오지 못했어요</string>
+    <string name="error_desc">네트워크 상태를 확인한 뒤 다시 시도해 주세요</string>
+    <string name="retry">다시 시도</string>
+
+    <!-- 지도 -->
+    <string name="open_map">내 주변 촬영지 지도에서 보기</string>
+    <string name="open_map_short">지도에서 보기</string>
+    <string name="open_map_desc">현재 위치 기준으로 가까운 순서</string>
+
+    <string name="map_spot_count">촬영지 %1$d곳</string>
+
+    <!-- 상세 -->
+    <string name="detail_section_info">장소 정보</string>
+    <string name="detail_photo_score">포토스코어</string>
+    <string name="action_shoot">촬영하기</string>
+    <string name="action_navigate">길찾기</string>
+    <string name="cd_back">뒤로가기</string>
+    <string name="cd_prev_image">이전 사진</string>
+    <string name="cd_next_image">다음 사진</string>
+    <string name="no_image">등록된 사진이 없어요</string>
+
+    <!-- 촬영 가이드 -->
+    <string name="cd_capture">촬영 버튼</string>
+    <string name="cd_gallery">갤러리 보기</string>
+    <string name="cd_spot_thumbnail">촬영지 사진</string>
 </resources>

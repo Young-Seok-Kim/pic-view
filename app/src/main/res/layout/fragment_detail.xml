@@ -4,150 +4,270 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8FAFC"
+    android:background="@color/bg_page"
     android:clickable="true"
     android:focusable="true">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="100dp"> <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingBottom="104dp"
+        android:scrollbars="none">
 
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="350dp"
-            app:cardCornerRadius="0dp"
-            app:cardElevation="0dp">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
+            <!-- ================= 히어로 이미지 ================= -->
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="330dp"
+                android:background="@color/bg_image_placeholder">
 
                 <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/vp_detail_images"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
 
-                <ProgressBar
+                <!-- 사진이 없을 때 -->
+                <LinearLayout
+                    android:id="@+id/layout_no_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/baseline_image_24"
+                        app:tint="@color/text_tertiary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_m"
+                        android:text="@string/no_image"
+                        android:textAppearance="@style/Text.Caption" />
+                </LinearLayout>
+
+                <!-- 상단 스크림 (뒤로가기 버튼 가독성) -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="96dp"
+                    android:layout_gravity="top"
+                    android:background="@drawable/bg_scrim_top" />
+
+                <ImageView
+                    android:id="@+id/btn_back"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="top|start"
+                    android:layout_margin="@dimen/space_m"
+                    android:background="@drawable/bg_glass_circle"
+                    android:contentDescription="@string/cd_back"
+                    android:padding="9dp"
+                    android:src="@drawable/ic_arrow_back"
+                    app:tint="@color/white" />
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
                     android:id="@+id/progressBar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:visibility="gone" />
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    app:indicatorColor="@color/white" />
 
                 <ImageView
                     android:id="@+id/iv_arrow_left"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:layout_gravity="start|center_vertical"
+                    android:layout_marginStart="@dimen/space_m"
+                    android:background="@drawable/bg_glass_circle"
+                    android:contentDescription="@string/cd_prev_image"
+                    android:padding="6dp"
                     android:src="@drawable/baseline_chevron_left_24"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    app:tint="@color/white" />
 
                 <ImageView
                     android:id="@+id/iv_arrow_right"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="@dimen/space_m"
+                    android:background="@drawable/bg_glass_circle"
+                    android:contentDescription="@string/cd_next_image"
+                    android:padding="6dp"
                     android:src="@drawable/baseline_chevron_right_24"
-                    android:visibility="visible" />
+                    android:visibility="gone"
+                    app:tint="@color/white" />
 
+                <!-- 페이지 인디케이터 -->
+                <LinearLayout
+                    android:id="@+id/layout_indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginBottom="18dp"
+                    android:gravity="center"
+                    android:orientation="horizontal" />
             </FrameLayout>
-        </com.google.android.material.card.MaterialCardView>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="24dp">
-
-            <TextView
-                android:id="@+id/tv_detail_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#0F172A"
-                android:textSize="26sp"
-                android:textStyle="bold"
-                tools:text="장소 이름" />
-
-            <TextView
-                android:id="@+id/tv_detail_address"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textColor="#64748B"
-                android:textSize="16sp"
-                tools:text="주소 정보가 여기에 표시됩니다." />
-
-            <View
+            <!-- ================= 본문 ================= -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginVertical="24dp"
-                android:background="#E2E8F0" />
-
-            <TextView
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="장소 정보"
-                android:textColor="#334155"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:background="@color/bg_page"
+                android:orientation="vertical"
+                android:paddingHorizontal="24dp"
+                android:paddingTop="24dp">
 
-            <TextView
-                android:id="@+id/tv_detail_tip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:lineSpacingExtra="4dp"
-                android:textColor="#475569"
-                android:textSize="15sp"
-                tools:text="이곳은 삼분할 구도를 활용하여 배경과 인물을 배치할 때 가장 아름다운 사진을 얻을 수 있습니다." />
+                <!-- 포토스코어 배지 -->
+                <LinearLayout
+                    android:id="@+id/layout_detail_score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/space_m"
+                    android:background="@drawable/bg_score_chip"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="11dp"
+                    android:paddingVertical="6dp"
+                    tools:visibility="visible">
 
+                    <ImageView
+                        android:layout_width="13dp"
+                        android:layout_height="13dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_star"
+                        app:tint="@color/score_chip_icon" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:text="@string/detail_photo_score"
+                        android:textColor="@color/score_chip_text"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tv_detail_score"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:textColor="@color/score_chip_text"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        tools:text="92" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_detail_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="-0.02"
+                    android:textColor="@color/text_primary"
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    tools:text="내장산 국립공원" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_s"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginTop="2dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_place"
+                        app:tint="@color/text_tertiary" />
+
+                    <TextView
+                        android:id="@+id/tv_detail_address"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="15sp"
+                        tools:text="전북특별자치도 정읍시 내장산로 936" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginVertical="24dp"
+                    android:background="@color/divider" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/detail_section_info"
+                    android:textAppearance="@style/Text.SectionTitle" />
+
+                <TextView
+                    android:id="@+id/tv_detail_tip"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_m"
+                    android:lineSpacingExtra="6dp"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="15sp"
+                    tools:text="이곳은 삼분할 구도를 활용하여 배경과 인물을 배치할 때 가장 아름다운 사진을 얻을 수 있습니다." />
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+    <!-- ================= 하단 고정 액션바 ================= -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_margin="24dp"
+        android:background="@drawable/bg_bottom_bar"
+        android:elevation="12dp"
         android:orientation="horizontal"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="20dp"
         android:weightSum="2">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_start_guide"
+            style="@style/Button.Primary"
             android:layout_width="0dp"
-            android:layout_height="60dp"
-            android:layout_marginEnd="8dp"
+            android:layout_height="56dp"
+            android:layout_marginEnd="6dp"
             android:layout_weight="1"
-            android:text="촬영"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:backgroundTint="#10B981"
-            app:cornerRadius="16dp"
+            android:text="@string/action_shoot"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/brand_500"
             app:icon="@drawable/baseline_camera_alt_24"
-            app:iconGravity="textStart"
-            app:iconTint="#FFFFFF" />
+            app:iconTint="@color/white" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_navigate"
+            style="@style/Button.Primary"
             android:layout_width="0dp"
-            android:layout_height="60dp"
-            android:layout_marginStart="8dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="6dp"
             android:layout_weight="1"
-            android:text="길찾기"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:backgroundTint="#3B82F6"
-            app:cornerRadius="16dp"
-            app:icon="@android:drawable/ic_menu_directions"
-            app:iconGravity="textStart"
-            app:iconTint="#FFFFFF" />
+            android:text="@string/action_navigate"
+            android:textColor="@color/btn_secondary_text"
+            app:backgroundTint="@color/btn_secondary_bg"
+            app:icon="@drawable/ic_directions"
+            app:iconTint="@color/btn_secondary_text" />
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

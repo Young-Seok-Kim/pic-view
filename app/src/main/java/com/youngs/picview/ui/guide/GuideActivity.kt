@@ -10,6 +10,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
@@ -18,8 +19,12 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
+import com.youngs.picview.BuildConfig
 import com.youngs.picview.R
 import com.youngs.picview.databinding.ActivityGuideBinding
 
@@ -39,8 +44,17 @@ class GuideActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         binding = ActivityGuideBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        applyWindowInsets()
+
+        if (showDemoBackdropIfPresent()) {
+            // 데모 배경을 쓰는 동안에는 카메라를 켜지 않습니다.
+            setupGuide()
+            return
+        }
 
         TedPermission.create()
             .setPermissionListener(object : PermissionListener {
@@ -57,7 +71,13 @@ class GuideActivity : AppCompatActivity() {
             .setPermissions(Manifest.permission.CAMERA)
             .check()
 
+        setupGuide()
+    }
+
+    /** 장소 이름에 맞는 구도 가이드를 화면에 반영합니다. */
+    private fun setupGuide() {
         val spotName = intent.getStringExtra("SPOT_NAME") ?: ""
+        binding.tvSpotName.text = spotName
         val guideType = when {
             spotName.contains("산") || spotName.contains("정원") -> GuideOverlayView.GuideType.THIRDS
             spotName.contains("향교") || spotName.contains("기념탑") -> GuideOverlayView.GuideType.CENTER
@@ -71,11 +91,51 @@ class GuideActivity : AppCompatActivity() {
             GuideOverlayView.GuideType.CENTER -> "피사체를 중앙 박스 안에 맞추세요"
             else -> "중앙 원 안에 피사체를 배치하세요"
         }
-
     }
 
+    /**
+     * 스토어 스크린샷 촬영용. 디버그 빌드에서 앱 전용 외부 저장소에
+     * demo_backdrop.jpg 가 있으면 카메라 미리보기 대신 그 사진을 깔아 줍니다.
+     *
+     *   adb push 사진.jpg /sdcard/Android/data/com.youngs.picview/files/demo_backdrop.jpg
+     *
+     * 릴리즈 빌드에서는 항상 false 를 반환하므로 동작하지 않습니다.
+     */
+    private fun showDemoBackdropIfPresent(): Boolean {
+        if (!BuildConfig.DEBUG) return false
+
+        val file = java.io.File(getExternalFilesDir(null), "demo_backdrop.jpg")
+        if (!file.exists()) return false
+
+        val bitmap = android.graphics.BitmapFactory.decodeFile(file.absolutePath) ?: return false
+        binding.ivDemoBackdrop.setImageBitmap(bitmap)
+        binding.ivDemoBackdrop.visibility = android.view.View.VISIBLE
+        binding.previewView.visibility = android.view.View.GONE
+        return true
+    }
+
+    /** 상·하단 컨트롤이 상태바/제스처바에 가리지 않도록 인셋만큼 띄웁니다. */
+    private fun applyWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            binding.layoutTopBar.updatePadding(top = bars.top + dp(12))
+            binding.layoutBottomBar.updatePadding(bottom = bars.bottom + dp(36))
+            insets
+        }
+    }
+
+    private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
+
     private fun setOnClickListener() {
-        binding.btnCapture.setOnClickListener { takePhoto() }
+        binding.btnGuideBack.setOnClickListener { finish() }
+
+        binding.btnCapture.setOnClickListener {
+            // 셔터를 누른 느낌을 주는 짧은 스케일 피드백
+            it.animate().scaleX(0.88f).scaleY(0.88f).setDuration(80).withEndAction {
+                it.animate().scaleX(1f).scaleY(1f).setDuration(120).start()
+            }.start()
+            takePhoto()
+        }
 
         binding.btnGallery.setOnClickListener {
             // 💡 1. 갤러리 앱을 열기 위한 인텐트를 생성하되, 특정 URI 주소를 강제로 넣지 않습니다.

@@ -57,6 +57,8 @@ Thumbs.db
 # Keystore files (나중에 앱 배포할 때 서명 키 절대 유출 방지)
 *.jks
 *.keystore
+/keystore/
+keystore.properties
 
 # Secrets (TourAPI 등 API Key 보관용 추가 방어막)
 secrets.properties

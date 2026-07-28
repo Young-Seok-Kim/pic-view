@@ -11,6 +11,9 @@ class MainViewModel : ViewModel() {
     val goldenHourData = MutableLiveData<String>()
     val isLoading = MutableLiveData<Boolean>(true)
 
+    /** 촬영지 목록을 끝내 받아오지 못했는지. 화면에 '다시 시도' 를 띄우는 데 씁니다. */
+    val loadFailed = MutableLiveData(false)
+
     // 원본 데이터
     val spotData = MutableLiveData<List<SpotItem>>()
 

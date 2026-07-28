@@ -1,17 +1,19 @@
 package com.youngs.picview.ui.main
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.RecyclerView
+import com.youngs.picview.MainActivity
 import com.youngs.picview.R
 import com.youngs.picview.databinding.FragmentMainBinding
 import com.youngs.picview.ui.adapter.SpotAdapter
 import com.youngs.picview.ui.detail.DetailFragment
 import com.youngs.picview.ui.map.MapFragment
 import com.youngs.picview.ui.model.SpotItem
-import kotlin.getValue
-import android.os.Parcelable
 
 class MainFragment : Fragment(R.layout.fragment_main) {
     private var recyclerViewState: Parcelable? = null
@@ -19,14 +21,21 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
 
-    companion object {
-        private var cachedSpots: List<SpotItem>? = null
+    private val viewModel: MainViewModel by activityViewModels()
+
+    /** 카테고리 ↔ 칩 id 매핑. */
+    private val chipToCategory by lazy {
+        mapOf(
+            R.id.chip_all to SpotCategory.ALL,
+            R.id.chip_nature to SpotCategory.NATURE,
+            R.id.chip_culture to SpotCategory.CULTURE,
+            R.id.chip_leports to SpotCategory.LEPORTS,
+            R.id.chip_food to SpotCategory.FOOD
+        )
     }
 
-    private val viewModel: MainViewModel by activityViewModels()
     override fun onPause() {
         super.onPause()
-        // 현재 스크롤 위치 저장
         recyclerViewState = binding.rvPhotoSpots.layoutManager?.onSaveInstanceState()
     }
 
@@ -36,65 +45,101 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         setListeners()
         setObserve()
+        restoreCategorySelection()
+
         recyclerViewState?.let {
             binding.rvPhotoSpots.layoutManager?.onRestoreInstanceState(it)
         }
     }
 
     private fun setObserve() {
-        val spotAdapter = SpotAdapter(emptyList()) { spot ->
-            val detailFragment = DetailFragment().apply {
-                arguments = Bundle().apply {
-                    putSerializable("spot", spot)
-                }
-            }
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, detailFragment)
-                .addToBackStack(null)
-                .commit()
-        }
-
+        val spotAdapter = SpotAdapter { spot -> openDetail(spot) }
         binding.rvPhotoSpots.adapter = spotAdapter
 
-        // 1. 날씨 및 골든아워 관찰 (중복 제거)
         viewModel.weatherData.observe(viewLifecycleOwner) { binding.tvWeatherStatus.text = it }
         viewModel.goldenHourData.observe(viewLifecycleOwner) { binding.tvGoldenHour.text = it }
 
-        // 2. 로딩 상태 관찰
         viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
-            binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
+            binding.progressBar.isVisible = loading
         }
 
-        // 3. 필터링된 스팟 데이터 및 타이틀 관찰
         viewModel.filteredSpots.observe(viewLifecycleOwner) { filteredList ->
             spotAdapter.updateData(filteredList)
+            renderListState(filteredList.isEmpty())
+        }
 
-            val title = when (viewModel.getCurrentCategory()) {
-                SpotCategory.ALL -> "촬영지 추천"
-                SpotCategory.NATURE -> "자연 속 촬영지"
-                SpotCategory.CULTURE -> "문화가 있는 촬영지"
-                SpotCategory.LEPORTS -> "레포츠 촬영지"
-                SpotCategory.FOOD -> "맛집 촬영지"
-            }
-            binding.tvListTitle.text = title
+        // 목록을 아예 못 받아온 경우엔 '다시 시도' 를 띄웁니다.
+        viewModel.loadFailed.observe(viewLifecycleOwner) {
+            renderListState(viewModel.filteredSpots.value.isNullOrEmpty())
         }
     }
 
+    /** 목록 / 빈 상태 / 로드 실패 세 가지를 한 곳에서 정리합니다. */
+    private fun renderListState(isEmpty: Boolean) {
+        val failed = viewModel.loadFailed.value == true
+
+        binding.rvPhotoSpots.isVisible = !isEmpty
+        binding.layoutEmpty.isVisible = isEmpty
+        binding.btnOpenNaverMap.isVisible = !isEmpty
+
+        if (!isEmpty) return
+
+        binding.tvEmptyTitle.setText(if (failed) R.string.error_title else R.string.empty_title)
+        binding.tvEmptyDesc.setText(if (failed) R.string.error_desc else R.string.empty_desc)
+        binding.btnRetry.isVisible = failed
+    }
+
     private fun setListeners() {
-        binding.btnAll.setOnClickListener { viewModel.setCategory(SpotCategory.ALL) }
-        binding.btnNature.setOnClickListener { viewModel.setCategory(SpotCategory.NATURE) }
-        binding.btnCulture.setOnClickListener { viewModel.setCategory(SpotCategory.CULTURE) }
-        binding.btnLeports.setOnClickListener { viewModel.setCategory(SpotCategory.LEPORTS) }
-        binding.btnFood.setOnClickListener { viewModel.setCategory(SpotCategory.FOOD) }
+        binding.chipGroupCategory.setOnCheckedStateChangeListener { _, checkedIds ->
+            val category = chipToCategory[checkedIds.firstOrNull()] ?: return@setOnCheckedStateChangeListener
+            viewModel.setCategory(category)
+            binding.rvPhotoSpots.scrollToPosition(0)
+            binding.appbar.setExpanded(true, true)
+        }
+
+        // 목록을 내리면 FAB 를 라벨 없는 작은 형태로 접어 화면을 덜 가리게 한다.
+        binding.rvPhotoSpots.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 6) binding.btnOpenNaverMap.shrink()
+                else if (dy < -6) binding.btnOpenNaverMap.extend()
+            }
+        })
+
+        binding.btnRetry.setOnClickListener {
+            (activity as? MainActivity)?.reloadData()
+        }
+
         binding.btnOpenNaverMap.setOnClickListener {
-            val mapFragment = MapFragment()
             parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, mapFragment) // R.id.fragment_container는 메인 액티비티의 컨테이너 ID
-                .addToBackStack(null) // 뒤로가기 가능하게 설정
+                .setCustomAnimations(
+                    R.anim.slide_in_right, R.anim.fade_out,
+                    R.anim.fade_in, R.anim.slide_out_right
+                )
+                .replace(R.id.fragment_container, MapFragment())
+                .addToBackStack(null)
                 .commit()
         }
     }
 
+    /** 상세 화면에서 돌아왔을 때 이전에 고른 카테고리를 그대로 보여줍니다. */
+    private fun restoreCategorySelection() {
+        val current = viewModel.getCurrentCategory()
+        val chipId = chipToCategory.entries.first { it.value == current }.key
+        if (binding.chipGroupCategory.checkedChipId != chipId) {
+            binding.chipGroupCategory.check(chipId)
+        }
+    }
+
+    private fun openDetail(spot: SpotItem) {
+        parentFragmentManager.beginTransaction()
+            .setCustomAnimations(
+                R.anim.slide_in_right, R.anim.fade_out,
+                R.anim.fade_in, R.anim.slide_out_right
+            )
+            .replace(R.id.fragment_container, DetailFragment.newInstance(spot))
+            .addToBackStack(null)
+            .commit()
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
