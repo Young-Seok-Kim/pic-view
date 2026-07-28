@@ -125,7 +125,8 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
                 markers.add(marker)
             }
 
-            binding.tvMapCount.text = getString(R.string.map_spot_count, spots.size)
+            // 좌표가 없어 지도에 못 올린 곳은 개수에서도 빼야 숫자가 맞습니다.
+            binding.tvMapCount.text = getString(R.string.map_spot_count, markers.size)
 
             // 지도를 처음 열면 촬영지 전체가 한눈에 들어오도록 맞춥니다.
             if (!hasFittedCamera && markers.isNotEmpty()) {
