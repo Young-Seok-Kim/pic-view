@@ -1,13 +1,11 @@
 package com.youngs.picview.ui.calendar
 
+import com.youngs.picview.util.applyTopSystemBarInset
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DiffUtil
@@ -114,11 +112,7 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     }
 
     private fun applyTopInset() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.rootCalendar) { v, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.updatePadding(top = bars.top)
-            insets
-        }
+        binding.rootCalendar.applyTopSystemBarInset()
     }
 
     override fun onDestroyView() {

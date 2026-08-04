@@ -67,14 +67,14 @@
 
         <TextView
             android:id="@+id/tv_diary_entry_title"
-            style="@style/Text.Title"
+            style="@style/Text.Diary.Title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:text="단풍이 물들기 전, 정읍의 하루" />
 
         <TextView
             android:id="@+id/tv_diary_body"
-            style="@style/Text.Body"
+            style="@style/Text.Diary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_s"

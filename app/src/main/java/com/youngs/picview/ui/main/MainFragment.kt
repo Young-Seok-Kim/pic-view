@@ -1,5 +1,6 @@
 package com.youngs.picview.ui.main
 
+import com.youngs.picview.util.applyTopSystemBarInset
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
@@ -42,6 +43,10 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentMainBinding.bind(view)
+
+        // 헤더가 접히면 칩 줄이 화면 맨 위로 올라옵니다.
+        // AppBar 가 상태바를 피하지 않으면 그때 칩이 시계·배터리에 겹칩니다.
+        binding.appbar.applyTopSystemBarInset()
 
         setListeners()
         setObserve()

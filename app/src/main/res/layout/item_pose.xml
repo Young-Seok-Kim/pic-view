@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 촬영 화면의 포즈 카드. 가로 스크롤로 늘어놓습니다. -->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_pose"
+    android:layout_width="124dp"
+    android:layout_height="wrap_content"
+    android:checkable="true"
+    app:cardBackgroundColor="@color/pose_card_bg"
+    app:cardCornerRadius="@dimen/radius_card"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/pose_card_stroke"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/space_m">
+
+        <TextView
+            android:id="@+id/tv_pose_score"
+            style="@style/Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:background="@drawable/bg_pose_score"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:textColor="@color/score_chip_text"
+            android:textStyle="bold"
+            tools:text="92점" />
+
+        <TextView
+            android:id="@+id/tv_pose_emoji"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xs"
+            android:textSize="26sp"
+            tools:text="🚶" />
+
+        <TextView
+            android:id="@+id/tv_pose_label"
+            style="@style/Text.SectionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xs"
+            android:textColor="@color/pose_card_text"
+            tools:text="뒤돌아 걷기" />
+
+        <TextView
+            android:id="@+id/tv_pose_reason"
+            style="@style/Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:maxLines="2"
+            android:textColor="@color/pose_card_muted"
+            tools:text="부드러운 빛에 걸음이 자연스러워요" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

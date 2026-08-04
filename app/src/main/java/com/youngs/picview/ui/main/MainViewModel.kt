@@ -11,6 +11,16 @@ class MainViewModel : ViewModel() {
 
     val weatherData = MutableLiveData<String>()
     val goldenHourData = MutableLiveData<String>()
+
+    /**
+     * 관측 기온(℃). 받아오지 못하면 null 입니다.
+     *
+     * [weatherData] 는 화면에 그대로 띄우는 문장이라 상황에 따라 "지금 정읍은 24℃"
+     * 도 되고 "정읍의 촬영지" 도 됩니다. 홈의 기온 칸이 그 문장을 잘라 쓰면 문구를
+     * 손질할 때 엉뚱한 낱말이 기온 자리에 박히므로 숫자는 따로 들고 있습니다.
+     */
+    val temperatureC = MutableLiveData<Double?>(null)
+
     val isLoading = MutableLiveData<Boolean>(true)
 
     /** 사용자가 당겨서 새로고침한 경우. 스플래시 대신 목록 위 스피너를 씁니다. */

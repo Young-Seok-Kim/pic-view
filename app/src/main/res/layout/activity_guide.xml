@@ -104,36 +104,121 @@
     </LinearLayout>
 
     <!-- ================= 하단 컨트롤 ================= -->
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/layout_bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:paddingHorizontal="36dp"
-        android:paddingTop="@dimen/space_xl"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/space_l"
         android:paddingBottom="36dp">
 
-        <ImageButton
-            android:id="@+id/btn_gallery"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="start|center_vertical"
-            android:background="@drawable/bg_glass_circle"
-            android:contentDescription="@string/cd_gallery"
-            android:padding="12dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/baseline_photo_library_24"
-            app:tint="@color/white" />
+        <!-- ─────────── 포즈 추천 ─────────── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/screen_padding">
 
-        <ImageButton
-            android:id="@+id/btn_capture"
-            android:layout_width="76dp"
-            android:layout_height="76dp"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/bg_shutter_button"
-            android:contentDescription="@string/cd_capture"
-            android:src="@android:color/transparent" />
-    </FrameLayout>
+            <TextView
+                style="@style/Text.SectionTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/pose_section_title"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/tv_pose_sort"
+                style="@style/Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pose_sorted_by_light"
+                android:textColor="@color/golden_300" />
+        </LinearLayout>
+
+        <!-- 인원 : 포즈 점수가 인원에 따라 달라집니다 -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_group_people"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            android:paddingHorizontal="@dimen/screen_padding"
+            app:chipSpacingHorizontal="6dp"
+            app:selectionRequired="true"
+            app:singleLine="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_people_solo"
+                style="@style/Chip.Pose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/pose_group_solo" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_people_pair"
+                style="@style/Chip.Pose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pose_group_pair" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_people_small"
+                style="@style/Chip.Pose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pose_group_small" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_people_large"
+                style="@style/Chip.Pose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pose_group_large" />
+        </com.google.android.material.chip.ChipGroup>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_poses"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            android:clipToPadding="false"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/screen_padding"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_pose" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="36dp"
+            android:paddingTop="@dimen/space_l">
+
+            <ImageButton
+                android:id="@+id/btn_gallery"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="start|center_vertical"
+                android:background="@drawable/bg_glass_circle"
+                android:contentDescription="@string/cd_gallery"
+                android:padding="12dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/baseline_photo_library_24"
+                app:tint="@color/white" />
+
+            <ImageButton
+                android:id="@+id/btn_capture"
+                android:layout_width="76dp"
+                android:layout_height="76dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/bg_shutter_button"
+                android:contentDescription="@string/cd_capture"
+                android:src="@android:color/transparent" />
+        </FrameLayout>
+    </LinearLayout>
 
     <View
         android:id="@+id/flash_view"

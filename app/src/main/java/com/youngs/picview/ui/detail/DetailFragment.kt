@@ -141,6 +141,8 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
             val intent = Intent(requireContext(), GuideActivity::class.java).apply {
                 putExtra(GuideActivity.EXTRA_SPOT_NAME, spot.title)
                 putExtra(GuideActivity.EXTRA_SPOT_TYPE, spot.contentTypeId)
+                // 포즈 추천이 지금의 빛을 반영해야 하므로 함께 넘깁니다.
+                putExtra(GuideActivity.EXTRA_PHASE, mainViewModel.sunTimes.phaseNow().name)
             }
             startActivity(intent)
         }

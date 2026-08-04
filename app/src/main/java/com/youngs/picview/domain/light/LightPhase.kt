@@ -40,6 +40,19 @@ enum class LightPhase(
     /** 그 외. */
     NIGHT("야간", "삼각대가 필요해요", R.color.light_night);
 
+    /**
+     * 좁은 칸(홈의 현황 카드 등)에 넣는 짧은 이름.
+     * "일출 골든아워" 는 3분할 카드에서 잘리므로 앞머리만 씁니다.
+     */
+    val shortLabel: String
+        get() = when (this) {
+            BLUE_DAWN -> "새벽"
+            SUNRISE -> "일출"
+            SUNSET -> "일몰"
+            BLUE_DUSK -> "저녁"
+            else -> label
+        }
+
     /** 야외 촬영에 유리한 구간인지. 코스 배치에 씁니다. */
     val isOutdoorFriendly: Boolean
         get() = this != MIDDAY && this != NIGHT

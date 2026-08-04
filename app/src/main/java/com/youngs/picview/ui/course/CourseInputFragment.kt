@@ -1,11 +1,9 @@
 package com.youngs.picview.ui.course
 
+import com.youngs.picview.util.applyTopSystemBarInset
 import android.os.Bundle
 import android.view.View
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.youngs.picview.MainActivity
@@ -47,11 +45,7 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
     }
 
     private fun applyTopInset() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.scrollCourseInput) { v, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.updatePadding(top = bars.top)
-            insets
-        }
+        binding.scrollCourseInput.applyTopSystemBarInset()
     }
 
     // ─────────────────────── 오늘의 빛 ───────────────────────
