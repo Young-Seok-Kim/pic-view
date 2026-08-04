@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 시니어 간편 모드 3탭 (스펙 §17-4) -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/tab_home"
+        android:icon="@drawable/ic_nav_home"
+        android:title="@string/tab_home" />
+    <item
+        android:id="@+id/tab_course"
+        android:icon="@drawable/ic_nav_course"
+        android:title="@string/tab_senior_course" />
+    <item
+        android:id="@+id/tab_help"
+        android:icon="@drawable/ic_nav_help"
+        android:title="@string/tab_senior_help" />
+</menu>

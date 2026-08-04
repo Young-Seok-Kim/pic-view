@@ -94,7 +94,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     private fun setListeners() {
-        binding.swipeRefresh.setColorSchemeResources(R.color.brand_500)
+        binding.swipeRefresh.setColorSchemeResources(R.color.maple_500)
         binding.swipeRefresh.setOnRefreshListener {
             (activity as? MainActivity)?.refresh(userInitiated = true)
         }
@@ -119,14 +119,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         }
 
         binding.btnOpenNaverMap.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .setCustomAnimations(
-                    R.anim.slide_in_right, R.anim.fade_out,
-                    R.anim.fade_in, R.anim.slide_out_right
-                )
-                .replace(R.id.fragment_container, MapFragment())
-                .addToBackStack(null)
-                .commit()
+            (activity as? MainActivity)?.pushScreen(MapFragment())
         }
     }
 
@@ -140,14 +133,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     private fun openDetail(spot: SpotItem) {
-        parentFragmentManager.beginTransaction()
-            .setCustomAnimations(
-                R.anim.slide_in_right, R.anim.fade_out,
-                R.anim.fade_in, R.anim.slide_out_right
-            )
-            .replace(R.id.fragment_container, DetailFragment.newInstance(spot))
-            .addToBackStack(null)
-            .commit()
+        (activity as? MainActivity)?.pushScreen(DetailFragment.newInstance(spot))
     }
 
     override fun onDestroyView() {

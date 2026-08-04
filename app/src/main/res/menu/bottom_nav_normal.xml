@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 일반 모드 5탭 (NAVIGATION_FLOW §2) -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/tab_home"
+        android:icon="@drawable/ic_nav_home"
+        android:title="@string/tab_home" />
+    <item
+        android:id="@+id/tab_course"
+        android:icon="@drawable/ic_nav_course"
+        android:title="@string/tab_course" />
+    <item
+        android:id="@+id/tab_explore"
+        android:icon="@drawable/ic_nav_explore"
+        android:title="@string/tab_explore" />
+    <item
+        android:id="@+id/tab_diary"
+        android:icon="@drawable/ic_nav_diary"
+        android:title="@string/tab_diary" />
+    <item
+        android:id="@+id/tab_my"
+        android:icon="@drawable/ic_nav_my"
+        android:title="@string/tab_my" />
+</menu>

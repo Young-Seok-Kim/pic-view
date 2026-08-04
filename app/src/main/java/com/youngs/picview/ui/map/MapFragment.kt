@@ -104,7 +104,7 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
                 val marker = Marker()
                 marker.position = position
                 marker.captionText = spot.title
-                marker.iconTintColor = ContextCompat.getColor(requireContext(), R.color.brand_500)
+                marker.iconTintColor = ContextCompat.getColor(requireContext(), R.color.maple_500)
 
                 // 88개가 기본 크기로 깔리면 서로 겹쳐 지도가 안 보입니다.
                 // 크기를 줄이고, 겹치는 마커와 캡션은 지도가 알아서 숨기게 합니다.
@@ -140,17 +140,9 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
             // 정보창을 누르면 상세로 이동
             infoWindow.onClickListener = Overlay.OnClickListener {
                 (infoWindow.marker?.tag as? SpotItem)?.let { item ->
-                    parentFragmentManager.beginTransaction()
-                        .setCustomAnimations(
-                            R.anim.slide_in_right, R.anim.fade_out,
-                            R.anim.fade_in, R.anim.slide_out_right
-                        )
-                        .replace(
-                            R.id.fragment_container,
-                            com.youngs.picview.ui.detail.DetailFragment.newInstance(item)
-                        )
-                        .addToBackStack(null)
-                        .commit()
+                    (activity as? com.youngs.picview.MainActivity)?.pushScreen(
+                        com.youngs.picview.ui.detail.DetailFragment.newInstance(item)
+                    )
                 }
                 true
             }
