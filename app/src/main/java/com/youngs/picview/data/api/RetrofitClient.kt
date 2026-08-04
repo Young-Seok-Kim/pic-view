@@ -52,4 +52,20 @@ object RetrofitClient {
             .build()
             .create(WeatherApiService::class.java)
     }
+
+    /**
+     * Gemini.
+     *
+     * 나중에 키를 숨기는 프록시로 옮길 때 이 baseUrl 하나만 바꾸면 됩니다.
+     * (프록시가 /v1beta/models/... 경로를 그대로 중계하도록 만들 예정)
+     */
+    private const val GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/"
+    val geminiApiService: GeminiApiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(GEMINI_BASE_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(GeminiApiService::class.java)
+    }
 }
