@@ -3,6 +3,8 @@ package com.youngs.picview
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -72,6 +74,7 @@ class MainActivity : BaseActivity() {
         setupBottomNav()
         setupWindowInsets()
         setupBackStackListener()
+        setupBackHandling()
 
         if (savedInstanceState == null) {
             switchTab(R.id.tab_home)
@@ -109,10 +112,74 @@ class MainActivity : BaseActivity() {
             } else {
                 // 다른 탭으로 가기 전에 쌓인 상세 화면을 정리합니다.
                 clearBackStack()
+                if (!restoringTab) rememberTab(currentTabId)
                 switchTab(item.itemId)
             }
             true
         }
+    }
+
+    // ────────────────────────── 뒤로 가기 ──────────────────────────
+
+    /**
+     * 지나온 탭 이력. 뒤로 가기로 되짚어 갑니다.
+     *
+     * 이게 없으면 탭을 여러 번 옮겨 다니다 뒤로 가기를 누르는 순간
+     * 곧장 앱이 종료됩니다. 탭 앱에서는 사용자가 그걸 '종료'로 인식하지 않고
+     * '이전 화면으로 돌아가기'로 기대합니다.
+     */
+    private val tabHistory = ArrayDeque<Int>()
+
+    /** 뒤로 가기로 탭을 되돌리는 중인지. 이력이 다시 쌓이는 것을 막습니다. */
+    private var restoringTab = false
+
+    /** 홈에서 마지막으로 뒤로 가기를 누른 시각. 두 번 눌러야 종료되게 합니다. */
+    private var lastBackPressedAt = 0L
+
+    private fun rememberTab(tabId: Int) {
+        // 같은 탭이 연달아 쌓이면 뒤로 가기를 여러 번 눌러야 합니다.
+        if (tabHistory.lastOrNull() == tabId) return
+        tabHistory.addLast(tabId)
+        // 오래된 이력까지 무한정 들고 있을 필요는 없습니다.
+        if (tabHistory.size > MAX_TAB_HISTORY) tabHistory.removeFirst()
+    }
+
+    private fun setupBackHandling() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // 1. 상세·지도처럼 위에 덮인 화면이 있으면 그것부터 닫습니다.
+                if (supportFragmentManager.backStackEntryCount > 0) {
+                    supportFragmentManager.popBackStack()
+                    return
+                }
+
+                // 2. 지나온 탭이 있으면 그리로 돌아갑니다.
+                val previous = tabHistory.removeLastOrNull()
+                if (previous != null && previous != currentTabId) {
+                    restoringTab = true
+                    binding.navBottom.selectedItemId = previous
+                    restoringTab = false
+                    return
+                }
+
+                // 3. 더 돌아갈 곳이 없으면 종료. 다만 실수로 나가는 일이 잦아서
+                //    한 번 더 눌러야 실제로 닫히게 합니다.
+                val now = SystemClock.elapsedRealtime()
+                if (now - lastBackPressedAt > EXIT_CONFIRM_MS) {
+                    lastBackPressedAt = now
+                    Toast.makeText(
+                        this@MainActivity, R.string.exit_confirm, Toast.LENGTH_SHORT
+                    ).show()
+                    return
+                }
+
+                // isEnabled=false + onBackPressed() 로 넘기지 않습니다.
+                // 그 방식은 콜백을 끈 뒤 Activity 가 살아남으면(태스크만 백그라운드로
+                // 내려가는 경우) 콜백이 꺼진 채로 남아, 이후 모든 뒤로 가기가
+                // 확인 없이 곧장 앱을 나가버립니다.
+                finish()
+            }
+        })
     }
 
     private fun switchTab(itemId: Int) {
@@ -133,6 +200,7 @@ class MainActivity : BaseActivity() {
 
         tx.commitNow()
         currentTabId = itemId
+        updateBottomNavVisibility()
     }
 
     /**
@@ -241,11 +309,19 @@ class MainActivity : BaseActivity() {
 
     /** 상세 화면이 떠 있는 동안에는 탭바를 숨깁니다. */
     private fun setupBackStackListener() {
-        supportFragmentManager.addOnBackStackChangedListener {
-            val onRoot = supportFragmentManager.backStackEntryCount == 0
-            binding.navBottom.isVisible = onRoot
-            binding.navDivider.isVisible = onRoot
-        }
+        supportFragmentManager.addOnBackStackChangedListener { updateBottomNavVisibility() }
+    }
+
+    /**
+     * 탭바 표시 여부를 한 곳에서 정합니다.
+     *
+     * 백스택 콜백에만 맡기면, 탭 전환처럼 백스택이 변하지 않는 경로에서
+     * 숨겨진 상태가 그대로 남는 경우가 생깁니다.
+     */
+    private fun updateBottomNavVisibility() {
+        val onRoot = supportFragmentManager.backStackEntryCount == 0
+        binding.navBottom.isVisible = onRoot
+        binding.navDivider.isVisible = onRoot
     }
 
     // ─────────────────────────── 인셋 ───────────────────────────
@@ -462,6 +538,12 @@ class MainActivity : BaseActivity() {
     companion object {
         private const val STATE_TAB = "current_tab"
         private const val TAB_TAG_PREFIX = "tab_"
+
+        /** 뒤로 가기로 되짚을 탭 이력의 최대 길이. */
+        private const val MAX_TAB_HISTORY = 8
+
+        /** 이 시간 안에 뒤로 가기를 한 번 더 누르면 종료합니다. */
+        private const val EXIT_CONFIRM_MS = 2000L
 
         /** 이 시간이 지난 뒤 앱으로 돌아오면 데이터를 다시 받아옵니다. */
         private const val STALE_AFTER_MS = 10 * 60 * 1000L
