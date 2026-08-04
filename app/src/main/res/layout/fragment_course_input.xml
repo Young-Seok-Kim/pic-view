@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    출사 코스 입력.
+
+    일반 여행앱의 "예산·인원·맛집 태그" 대신 촬영 조건을 받습니다.
+    빛(언제) · 시간(얼마나) · 이동(어떻게) · 피사체(무엇을).
+-->
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scroll_course_input"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_page"
+    android:clipToPadding="false"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/screen_padding"
+        android:paddingBottom="@dimen/space_3xl">
+
+        <TextView
+            android:id="@+id/tv_course_heading"
+            style="@style/Text.Display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_2xl"
+            android:text="@string/course_input_title" />
+
+        <TextView
+            style="@style/Text.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xs"
+            android:text="@string/course_input_subtitle" />
+
+        <!-- ─────────── 오늘의 빛 ─────────── -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Card.Elevated"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xl"
+            app:cardBackgroundColor="@color/maple_50">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/space_l">
+
+                <TextView
+                    style="@style/Text.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/course_today_light"
+                    android:textColor="@color/maple_700" />
+
+                <TextView
+                    android:id="@+id/tv_sun_times"
+                    style="@style/Text.SectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_xs"
+                    android:textColor="@color/maple_800"
+                    tools:text="일출 05:47 · 일몰 19:39" />
+
+                <TextView
+                    android:id="@+id/tv_next_golden"
+                    style="@style/Text.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/maple_700"
+                    tools:text="다음 골든아워까지 3시간 12분" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ─────────── 언제 ─────────── -->
+        <TextView
+            style="@style/Text.SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xl"
+            android:text="@string/course_when" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chips_when"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            app:selectionRequired="true"
+            app:singleLine="false"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_when_now"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/course_when_now" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_when_sunrise"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/course_when_sunrise" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_when_morning"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/course_when_morning" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_when_sunset"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/course_when_sunset" />
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- ─────────── 얼마나 ─────────── -->
+        <TextView
+            style="@style/Text.SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xl"
+            android:text="@string/course_duration" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chips_duration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_duration_short"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/course_duration_short" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_duration_half"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/course_duration_half" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_duration_full"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/course_duration_full" />
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- ─────────── 이동 수단 ─────────── -->
+        <TextView
+            style="@style/Text.SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xl"
+            android:text="@string/course_travel" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chips_travel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_travel_car"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/course_travel_car" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_travel_transit"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/course_travel_transit" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_travel_walk"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/course_travel_walk" />
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- ─────────── 무엇을 ─────────── -->
+        <TextView
+            style="@style/Text.SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xl"
+            android:text="@string/course_subject" />
+
+        <TextView
+            style="@style/Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/course_subject_hint" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chips_subject"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            app:singleSelection="false">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_subject_landscape"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/subject_landscape" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_subject_architecture"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/subject_architecture" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_subject_food"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/subject_food" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_subject_night"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/subject_night" />
+        </com.google.android.material.chip.ChipGroup>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_make_course"
+            style="@style/Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_2xl"
+            android:text="@string/course_make" />
+
+        <TextView
+            android:id="@+id/tv_course_error"
+            style="@style/Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            android:gravity="center"
+            android:textColor="@color/maple_600"
+            android:visibility="gone"
+            tools:text="촬영지를 먼저 불러와야 해요"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

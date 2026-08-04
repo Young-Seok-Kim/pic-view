@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    빛 스케줄 타임라인의 한 정거장.
+
+    좌측에 시각과 연결선, 우측에 장소 카드.
+    골든아워 정거장은 노드 색과 배지로 강조합니다.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingHorizontal="@dimen/screen_padding">
+
+    <!-- ── 좌측 : 시각 + 노드 + 연결선 ── -->
+    <LinearLayout
+        android:layout_width="@dimen/timeline_time_width"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_stop_time"
+            style="@style/Text.ClockTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="19:09" />
+
+        <View
+            android:id="@+id/view_stop_node"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginTop="@dimen/space_xs"
+            android:background="@drawable/bg_timeline_node" />
+
+        <View
+            android:id="@+id/view_stop_line"
+            android:layout_width="@dimen/timeline_line_width"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="2dp"
+            android:background="@color/divider" />
+    </LinearLayout>
+
+    <!-- ── 우측 : 장소 카드 ── -->
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Card.Elevated"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_s"
+        android:layout_marginBottom="@dimen/space_m">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/space_l">
+
+            <!-- 이동 정보 : 첫 정거장은 숨김 -->
+            <TextView
+                android:id="@+id/tv_stop_travel"
+                style="@style/Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/space_xs"
+                tools:text="↳ 이동 20분 · 8.8km" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_stop_title"
+                    style="@style/Text.SectionTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    tools:text="내장산국립공원" />
+
+                <TextView
+                    android:id="@+id/tv_stop_score"
+                    style="@style/Text.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_score_chip"
+                    android:paddingHorizontal="@dimen/space_s"
+                    android:paddingVertical="2dp"
+                    android:textColor="@color/score_chip_text"
+                    android:textStyle="bold"
+                    tools:text="95" />
+            </LinearLayout>
+
+            <!-- 빛 조건 배지 -->
+            <TextView
+                android:id="@+id/tv_stop_phase"
+                style="@style/Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xs"
+                android:background="@drawable/bg_phase_badge"
+                android:paddingHorizontal="@dimen/space_s"
+                android:paddingVertical="3dp"
+                android:textStyle="bold"
+                tools:text="일몰 골든아워 · 서향" />
+
+            <TextView
+                android:id="@+id/tv_stop_reason"
+                style="@style/Text.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_s"
+                tools:text="단풍터널은 역광이 살아나는 늦은 오후가 절정이에요" />
+
+            <TextView
+                android:id="@+id/tv_stop_guide"
+                style="@style/Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xs"
+                android:textColor="@color/maple_600"
+                tools:text="📷 추천 구도 : 삼분할 격자" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</LinearLayout>
