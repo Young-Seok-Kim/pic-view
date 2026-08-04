@@ -131,6 +131,8 @@ docker load < picview-build.tar.gz                            # 받는 쪽
 | 증상 | 원인 / 해결 |
 |---|---|
 | `docker: command not found` | Docker Desktop 이 실행 중인지 확인 (고래 아이콘 초록불) |
+| Docker Desktop 이 "Starting…" 에서 안 넘어감 | **"가상 머신 플랫폼" 윈도우 기능이 꺼져 있을 때 생깁니다.** `wsl --status` 로 확인되고, 관리자 PowerShell 에서 `wsl --install --no-distribution` 후 재부팅하면 됩니다. 로그(`%LOCALAPPDATA%\Docker\log\host\com.docker.backend.exe.log`)에 `cannot toggle VM OTel collector, backend is not running` 이 반복되면 이 경우입니다 |
+| 안드로이드 에뮬레이터가 느려지거나 안 켜짐 | 위 기능(Hyper-V 기반)과 에뮬레이터 하이퍼바이저가 충돌할 수 있습니다. 무무 플레이어 설정에서 Hyper-V 호환 모드를 켜 보세요. **개발용 PC 에서는 도커를 켜지 않는 편이 안전합니다** — 이 컨테이너는 빌드 재현용이지 개발 루프용이 아닙니다 |
 | 첫 빌드가 아주 느림 | 정상입니다. 의존성을 받는 중이고 두 번째부터 빨라집니다 |
 | `build-output/` 이 비어 있음 | 빌드 실패입니다. 로그 마지막 부분을 확인하세요 |
 | `bad interpreter: ...^M` | `entrypoint.sh` 가 CRLF 로 받아진 경우. `.gitattributes` 가 막고 있으니 저장소를 다시 클론해 보세요 |
