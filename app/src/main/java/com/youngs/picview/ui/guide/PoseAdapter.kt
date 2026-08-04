@@ -45,8 +45,7 @@ class PoseAdapter(
         with(holder.binding) {
             tvPoseEmoji.text = item.pose.emoji
             tvPoseLabel.text = item.pose.label
-            tvPoseReason.text = item.reason
-            tvPoseScore.text = ctx.getString(R.string.pose_score_format, item.score)
+            tvPoseScore.text = item.score.toString()
 
             cardPose.setCardBackgroundColor(
                 ContextCompat.getColor(
