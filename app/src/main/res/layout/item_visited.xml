@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 다녀온 곳 한 건. 방문 시각과 그때의 빛 구간을 함께 보여 줍니다. -->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/space_m"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardBackgroundColor="@color/bg_card"
+    app:cardCornerRadius="@dimen/radius_card"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/card_stroke"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/space_m">
+
+        <ImageView
+            android:id="@+id/iv_visited"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="@color/bg_image_placeholder"
+            android:contentDescription="@string/cd_spot_thumbnail"
+            android:scaleType="centerCrop" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_m"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_visited_title"
+                style="@style/Text.SectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                tools:text="정읍사예술회관" />
+
+            <TextView
+                android:id="@+id/tv_visited_when"
+                style="@style/Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                tools:text="8월 4일 10:57 · 오전" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_visited_score"
+            style="@style/Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_score_chip"
+            android:paddingHorizontal="@dimen/space_s"
+            android:paddingVertical="2dp"
+            android:textColor="@color/score_chip_text"
+            android:textStyle="bold"
+            tools:text="★ 77" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

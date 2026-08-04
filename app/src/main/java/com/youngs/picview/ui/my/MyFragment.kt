@@ -41,6 +41,15 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
         binding.btnMyMissions.setOnClickListener {
             (activity as? MainActivity)?.pushScreen(MissionFragment())
         }
+
+        // 저장한 코스는 이 화면 아래에 이미 목록이 있으므로 거기로 내려 줍니다.
+        binding.layoutMyCourses.setOnClickListener {
+            binding.scrollMy.smoothScrollTo(0, binding.rvMyCourses.top)
+        }
+        // 다녀온 곳은 별도 목록 화면으로.
+        binding.layoutMyVisits.setOnClickListener {
+            (activity as? MainActivity)?.pushScreen(VisitedFragment())
+        }
         setupCourses()
         setupSeniorToggle()
         setupFontSize()
