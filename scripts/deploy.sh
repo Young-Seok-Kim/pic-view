@@ -34,6 +34,25 @@ for arg in "$@"; do
     esac
 done
 
+# ---- SDK 경로 확인 ----
+# 안드로이드 스튜디오 없이 클론하면 local.properties 가 없습니다.
+# (스튜디오는 프로젝트를 열 때 이 파일을 자동으로 만들어 줍니다)
+# 없으면 ANDROID_HOME 을 보고 대신 만들어 줍니다.
+if [ ! -f local.properties ]; then
+    if [ -z "${ANDROID_HOME:-}" ]; then
+        echo "★ local.properties 도 ANDROID_HOME 도 없습니다."
+        echo "  Android SDK 를 설치하고 환경변수를 설정하세요:"
+        echo "    ANDROID_HOME=C:\\Android\\Sdk"
+        echo "  자세한 내용은 README.md 의 '방법 B' 를 보세요."
+        exit 1
+    fi
+    echo "▶ local.properties 생성 (ANDROID_HOME 기준)"
+    # 윈도우 경로의 역슬래시·콜론은 properties 형식에 맞게 이스케이프해야 합니다.
+    printf 'sdk.dir=%s\n' \
+        "$(printf '%s' "$ANDROID_HOME" | sed 's/\\/\\\\/g; s/:/\\:/g')" \
+        > local.properties
+fi
+
 # ---- adb 찾기 ----
 if command -v adb >/dev/null 2>&1; then
     ADB=adb
