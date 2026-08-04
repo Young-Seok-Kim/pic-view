@@ -6,10 +6,18 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface WeatherApiService {
-    // 1. 주소 끝부분을 getUltraSrtNcst로 변경
+    /**
+     * 초단기실황. base_time 은 정시("HH00")를 넘기는 것이 원칙이지만
+     * 분이 섞여 있어도 기상청이 정시로 내림 처리해 줍니다.
+     * 다만 base_date 와 기준 시각이 어긋나면 NO_DATA(03) 가 오므로
+     * 호출부에서 두 값을 같은 시각에서 뽑아야 합니다.
+     *
+     * serviceKey 는 세 API 모두 encoded 옵션 없이 통일합니다.
+     * (디코딩 키를 쓰고 Retrofit 이 인코딩하도록 맡기는 방식)
+     */
     @GET("1360000/VilageFcstInfoService_2.0/getUltraSrtNcst")
     suspend fun getUltraSrtNcst(
-        @Query("serviceKey", encoded = true) serviceKey: String,
+        @Query("serviceKey") serviceKey: String,
         @Query("pageNo") pageNo: Int = 1,
         @Query("numOfRows") numOfRows: Int = 100,
         @Query("dataType") dataType: String = "JSON",
