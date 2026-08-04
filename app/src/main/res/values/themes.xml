@@ -1,20 +1,20 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- ================= 앱 기본 테마 ================= -->
+    <!-- ================= 앱 기본 테마 (단풍) ================= -->
     <style name="Base.Theme.PicView" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Primary : 브랜드 그린 -->
-        <item name="colorPrimary">@color/brand_500</item>
+        <!-- Primary : 단풍 레드 -->
+        <item name="colorPrimary">@color/maple_500</item>
         <item name="colorOnPrimary">@color/white</item>
-        <item name="colorPrimaryContainer">@color/brand_50</item>
-        <item name="colorOnPrimaryContainer">@color/brand_700</item>
+        <item name="colorPrimaryContainer">@color/maple_50</item>
+        <item name="colorOnPrimaryContainer">@color/maple_700</item>
 
-        <!-- Secondary : 딥 그린 -->
-        <item name="colorSecondary">@color/brand_600</item>
+        <!-- Secondary : 딥 단풍 -->
+        <item name="colorSecondary">@color/maple_600</item>
         <item name="colorOnSecondary">@color/white</item>
-        <item name="colorSecondaryContainer">@color/brand_100</item>
-        <item name="colorOnSecondaryContainer">@color/brand_800</item>
+        <item name="colorSecondaryContainer">@color/maple_100</item>
+        <item name="colorOnSecondaryContainer">@color/maple_800</item>
 
-        <!-- Tertiary : 골든아워 앰버 -->
+        <!-- Tertiary : 골든아워 -->
         <item name="colorTertiary">@color/golden_500</item>
         <item name="colorOnTertiary">@color/white</item>
         <item name="colorTertiaryContainer">@color/golden_100</item>
@@ -37,9 +37,32 @@
 
     <style name="Theme.PicView" parent="Base.Theme.PicView" />
 
+    <!--
+        ================= 시니어 간편 모드 =================
+        스펙 §17-2 기준. 색 대비를 AAA(7:1) 로 올리고 터치 타깃을 키웁니다.
+
+        글씨 크기는 여기서 지정하지 않습니다.
+        SeniorModeManager 가 Configuration.fontScale 로 앱 전체 sp 를
+        한 번에 배율 조정하기 때문입니다(보통 1.0 / 크게 1.25 / 매우 크게 1.6).
+        테마로 textSize 를 박으면 3단계 조절과 충돌합니다.
+    -->
+    <style name="Theme.PicView.Senior" parent="Theme.PicView">
+        <!-- 대비 강화 : 한 톤 진한 주색 -->
+        <item name="colorPrimary">@color/maple_600</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/maple_50</item>
+        <item name="colorOnPrimaryContainer">@color/maple_800</item>
+
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/text_primary</item>
+
+        <item name="materialButtonStyle">@style/Button.Senior</item>
+        <item name="materialCardViewStyle">@style/Card.Senior</item>
+    </style>
+
     <!-- ================= 스플래시 ================= -->
     <style name="Theme.PicView.Splash" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/brand_600</item>
+        <item name="windowSplashScreenBackground">@color/maple_600</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
         <item name="postSplashScreenTheme">@style/Theme.PicView</item>
     </style>
@@ -54,36 +77,56 @@
     <!-- ================= 텍스트 스타일 ================= -->
     <style name="Text.Display" parent="TextAppearance.Material3.HeadlineMedium">
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textSize">26sp</item>
+        <item name="android:textSize">@dimen/text_display</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">-0.02</item>
     </style>
 
+    <style name="Text.Title" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">@dimen/text_title</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">-0.015</item>
+    </style>
+
     <style name="Text.SectionTitle" parent="TextAppearance.Material3.TitleMedium">
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">@dimen/text_section</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">-0.01</item>
     </style>
 
     <style name="Text.Body" parent="TextAppearance.Material3.BodyMedium">
         <item name="android:textColor">@color/text_secondary</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">@dimen/text_body</item>
         <item name="android:lineSpacingExtra">4dp</item>
     </style>
 
     <style name="Text.Caption" parent="TextAppearance.Material3.BodySmall">
         <item name="android:textColor">@color/text_tertiary</item>
-        <item name="android:textSize">12sp</item>
+        <item name="android:textSize">@dimen/text_caption</item>
+    </style>
+
+    <!-- 빛 스케줄 타임라인의 시각 표기 (05:42 …) -->
+    <style name="Text.ClockTime" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textColor">@color/maple_500</item>
+        <item name="android:textSize">@dimen/text_section</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFeatureSettings">tnum</item>
     </style>
 
     <!-- ================= 컴포넌트 스타일 ================= -->
     <style name="Card.Elevated" parent="Widget.Material3.CardView.Elevated">
         <item name="cardBackgroundColor">@color/bg_card</item>
-        <item name="cardCornerRadius">20dp</item>
+        <item name="cardCornerRadius">@dimen/radius_card</item>
         <item name="cardElevation">0dp</item>
         <item name="strokeColor">@color/card_stroke</item>
         <item name="strokeWidth">1dp</item>
+    </style>
+
+    <style name="Card.Senior" parent="Card.Elevated">
+        <item name="cardCornerRadius">@dimen/radius_card_senior</item>
+        <item name="contentPadding">@dimen/space_senior</item>
     </style>
 
     <style name="Chip.Category" parent="Widget.Material3.Chip.Filter">
@@ -99,19 +142,51 @@
         <item name="iconStartPadding">2dp</item>
         <item name="checkedIconVisible">false</item>
         <item name="chipMinHeight">38dp</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">@dimen/text_body</item>
         <item name="android:textStyle">bold</item>
-        <item name="rippleColor">#330E7C66</item>
+        <item name="rippleColor">#33B23A1B</item>
+    </style>
+
+    <!-- 스타일 태그(#사진 #자연 …) — 아이콘 없는 형태 -->
+    <style name="Chip.Tag" parent="Chip.Category">
+        <item name="chipIconVisible">false</item>
+        <item name="chipMinHeight">36dp</item>
     </style>
 
     <style name="Button.Primary" parent="Widget.Material3.Button">
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/text_button</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">0</item>
-        <item name="cornerRadius">18dp</item>
+        <item name="android:minHeight">@dimen/touch_target</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
         <item name="iconGravity">textStart</item>
         <item name="iconPadding">8dp</item>
         <item name="iconSize">20dp</item>
+    </style>
+
+    <!-- 시니어 : 높이 68dp 이상 (스펙 §17-2) -->
+    <style name="Button.Senior" parent="Button.Primary">
+        <item name="android:minHeight">@dimen/touch_target_senior</item>
+        <item name="android:paddingTop">@dimen/space_l</item>
+        <item name="android:paddingBottom">@dimen/space_l</item>
+        <item name="cornerRadius">@dimen/radius_button_senior</item>
+    </style>
+
+    <!-- ================= 하단 탭 ================= -->
+    <style name="BottomNav" parent="Widget.Material3.BottomNavigationView">
+        <item name="android:background">@color/bg_bottom_nav</item>
+        <item name="itemIconTint">@color/nav_item_selector</item>
+        <item name="itemTextColor">@color/nav_item_selector</item>
+        <item name="itemActiveIndicatorStyle">@style/BottomNav.Indicator</item>
+        <item name="labelVisibilityMode">labeled</item>
+        <item name="itemIconSize">24dp</item>
+        <item name="elevation">0dp</item>
+    </style>
+
+    <style name="BottomNav.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/maple_50</item>
+        <item name="android:width">56dp</item>
+        <item name="android:height">32dp</item>
     </style>
 
 </resources>

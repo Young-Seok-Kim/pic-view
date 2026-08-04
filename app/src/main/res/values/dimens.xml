@@ -1,16 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    치수 토큰.
+
+    글자 크기(text_*)는 sp 로 두되, 시니어 모드는 여기서 값을 바꾸지 않습니다.
+    SeniorModeManager 가 Configuration.fontScale 로 앱 전체를 배율 조정하므로
+    이 값들은 "기준 1.0배" 크기입니다.
+-->
 <resources>
+    <!-- ============ 여백 ============ -->
     <dimen name="space_xs">4dp</dimen>
     <dimen name="space_s">8dp</dimen>
     <dimen name="space_m">12dp</dimen>
     <dimen name="space_l">16dp</dimen>
     <dimen name="space_xl">20dp</dimen>
     <dimen name="space_2xl">28dp</dimen>
+    <dimen name="space_3xl">36dp</dimen>
+    <!-- 시니어 모드 기본 여백 (스펙 §17-2 : 24~32dp) -->
+    <dimen name="space_senior">24dp</dimen>
 
     <dimen name="screen_padding">20dp</dimen>
-    <dimen name="radius_card">20dp</dimen>
-    <dimen name="radius_button">18dp</dimen>
+    <dimen name="screen_padding_senior">24dp</dimen>
 
+    <!-- ============ 라운드 ============ -->
+    <dimen name="radius_card">20dp</dimen>
+    <dimen name="radius_card_senior">24dp</dimen>
+    <dimen name="radius_button">18dp</dimen>
+    <dimen name="radius_button_senior">22dp</dimen>
+    <dimen name="radius_pill">999dp</dimen>
+
+    <!-- ============ 글자 크기 (배율 1.0 기준) ============ -->
+    <dimen name="text_display">26sp</dimen>
+    <dimen name="text_title">21sp</dimen>
+    <dimen name="text_section">17sp</dimen>
+    <dimen name="text_button">16sp</dimen>
+    <dimen name="text_body">14sp</dimen>
+    <dimen name="text_caption">12sp</dimen>
+
+    <!-- ============ 터치 타깃 ============ -->
+    <!-- 일반 48dp / 시니어 68dp (스펙 §17-2) -->
+    <dimen name="touch_target">48dp</dimen>
+    <dimen name="touch_target_senior">68dp</dimen>
+
+    <!-- ============ 하단 탭 ============ -->
+    <dimen name="bottom_nav_height">72dp</dimen>
+    <dimen name="bottom_nav_height_senior">96dp</dimen>
+
+    <!-- ============ 컴포넌트 ============ -->
     <dimen name="spot_card_width">170dp</dimen>
     <dimen name="spot_card_image_height">140dp</dimen>
+
+    <!-- 빛 스케줄 타임라인 : 좌측 시각 열 너비와 노드 크기 -->
+    <dimen name="timeline_time_width">58dp</dimen>
+    <dimen name="timeline_node_size">28dp</dimen>
+    <dimen name="timeline_line_width">2dp</dimen>
 </resources>

@@ -2,6 +2,211 @@
     <string name="app_name">정읍 시선</string>
     <string name="app_tagline">오늘, 정읍에서 가장 잘 나오는 곳</string>
 
+    <!-- 온보딩 -->
+    <string name="onboarding_skip">건너뛰기</string>
+    <string name="onboarding_next">다음</string>
+    <string name="onboarding_1_title">지금,
+가장 잘 나오는 곳</string>
+    <string name="onboarding_1_desc">날씨와 해의 위치를 실시간으로 계산해
+지금 사진이 가장 잘 나오는 정읍 촬영지를
+점수로 알려드려요.</string>
+    <string name="onboarding_2_title">해를 따라
+동선을 짭니다</string>
+    <string name="onboarding_2_desc">일출·일몰 시각과 스팟의 방위를 맞춰
+골든아워에 어디 있어야 하는지까지
+시간표로 만들어 드려요.</string>
+    <string name="onboarding_3_title">어떻게
+보실래요?</string>
+    <string name="onboarding_3_desc">언제든 MY 탭에서 바꿀 수 있어요.
+로그인이나 가입은 필요 없습니다.</string>
+    <string name="onboarding_start_senior">편하게 쓸게요 (큰 글씨)</string>
+    <string name="onboarding_start_normal">일반 모드로 시작</string>
+
+    <!-- 하단 탭 -->
+    <string name="tab_home">홈</string>
+    <string name="tab_course">코스</string>
+    <string name="tab_explore">탐색</string>
+    <string name="tab_diary">일기</string>
+    <string name="tab_my">MY</string>
+    <string name="tab_senior_course">내 코스</string>
+    <string name="tab_senior_help">도움</string>
+
+    <!-- 시니어 간편 모드 -->
+    <string name="senior_toggle_to_normal">일반 모드</string>
+    <string name="senior_toggle_to_senior">간편 모드</string>
+    <string name="senior_switch_title">간편 모드로 바꿀까요?</string>
+    <string name="senior_switch_desc">글씨와 버튼이 커지고 메뉴가 3개로 줄어듭니다.</string>
+    <string name="senior_switch_back_title">일반 모드로 돌아갈까요?</string>
+    <string name="senior_switch_back_desc">원래 화면으로 돌아갑니다.</string>
+    <string name="font_size_normal">보통</string>
+    <string name="font_size_large">크게</string>
+    <string name="font_size_xlarge">매우 크게</string>
+    <string name="confirm">확인</string>
+    <string name="cancel">취소</string>
+
+    <!-- 준비 중 화면 -->
+    <string name="coming_soon_title">준비 중이에요</string>
+    <string name="coming_soon_desc">곧 만나보실 수 있어요</string>
+
+    <!-- 출사 코스 : 입력 -->
+    <string name="course_input_title">오늘 어떻게\n찍으러 갈까요?</string>
+    <string name="course_input_subtitle">해의 위치에 맞춰 순서를 짜 드릴게요</string>
+    <string name="course_today_light">오늘의 빛</string>
+    <string name="course_when">언제 나가세요?</string>
+    <string name="course_when_now">지금부터</string>
+    <string name="course_when_sunrise">일출</string>
+    <string name="course_when_morning">오전</string>
+    <string name="course_when_sunset">일몰</string>
+    <string name="course_duration">얼마나 도실래요?</string>
+    <string name="course_duration_short">2시간</string>
+    <string name="course_duration_half">반나절</string>
+    <string name="course_duration_full">하루</string>
+    <string name="course_travel">어떻게 이동하세요?</string>
+    <string name="course_travel_car">자가용</string>
+    <string name="course_travel_transit">대중교통</string>
+    <string name="course_travel_walk">도보</string>
+    <string name="course_subject">무엇을 담고 싶으세요?</string>
+    <string name="course_subject_hint">고르지 않으면 전부 포함해요</string>
+    <string name="subject_landscape">풍경</string>
+    <string name="subject_architecture">건축·문화재</string>
+    <string name="subject_food">음식</string>
+    <string name="subject_night">야경</string>
+    <string name="course_make">빛 스케줄 만들기</string>
+    <string name="course_need_spots">촬영지를 아직 불러오지 못했어요. 잠시 후 다시 시도해 주세요</string>
+    <string name="course_no_result">조건에 맞는 촬영지를 찾지 못했어요. 시간이나 피사체를 넓혀보세요</string>
+
+    <!-- 출사 코스 : 결과 -->
+    <string name="course_result_title">오늘의 빛 스케줄</string>
+    <string name="course_timeline">코스 타임라인</string>
+    <string name="course_save">저장</string>
+    <string name="course_saved">내 코스에 저장했어요</string>
+    <string name="course_travel_format">↳ 이동 %1$d분 · %2$.1fkm</string>
+    <string name="course_guide_format">📷 추천 구도 · %1$s</string>
+    <string name="course_sun_format">🌅 일출 %1$s · 일몰 %2$s</string>
+    <string name="course_sun_unknown">🌅 일출·일몰 정보를 불러오지 못했어요</string>
+    <string name="course_next_golden">다음 골든아워까지 %1$d시간 %2$d분</string>
+    <string name="course_golden_now">지금 골든아워예요 · 바로 나가보세요</string>
+
+    <!-- 홈 -->
+    <string name="home_now_is">지금은</string>
+    <string name="home_day_light">오늘의 빛 흐름</string>
+    <string name="home_next_golden">🌇 골든아워까지 %1$d시간 %2$d분</string>
+    <string name="home_golden_tomorrow">🌅 내일 일출을 기다려보세요</string>
+    <string name="home_make_course">오늘의 빛 스케줄 만들기</string>
+    <string name="home_open_map">지도</string>
+    <string name="home_open_explore">촬영지 전체</string>
+    <string name="home_best_now">지금 찍기 좋은 곳</string>
+    <string name="home_see_all">전체보기 →</string>
+    <string name="home_score_format">★ %1$d</string>
+    <string name="home_best_phase_format">%1$s에 좋아요</string>
+    <string name="home_stat_temp">기온</string>
+    <string name="home_stat_light">빛 상태</string>
+    <string name="home_stat_spots">촬영지</string>
+
+    <!-- 상세 : 촬영 정보 · 오디오 가이드 -->
+    <string name="detail_shooting_info">촬영 정보</string>
+    <string name="detail_best_time_format">%1$s · %2$s</string>
+    <string name="detail_audio_play">오디오 가이드 듣기</string>
+    <string name="detail_audio_stop">재생 멈추기</string>
+    <string name="detail_audio_unavailable">이 기기에서는 음성 안내를 쓸 수 없어요</string>
+    <string name="detail_audio_speed">재생 속도 %1$s×</string>
+    <string name="detail_score_reason">이 점수가 나온 이유</string>
+    <string name="detail_score_expand">자세히 ▾</string>
+    <string name="detail_score_collapse">접기 ▴</string>
+    <string name="detail_factor_value">%1$s / %2$s</string>
+
+    <!-- MY 탭 -->
+    <string name="my_saved_courses">저장한 코스</string>
+    <string name="my_visited_spots">다녀온 곳</string>
+    <string name="my_saved_course_title">내 출사 코스</string>
+    <string name="my_no_course">아직 저장한 코스가 없어요.
+코스 탭에서 빛 스케줄을 만들고 저장해 보세요.</string>
+    <string name="my_delete_course">코스 삭제</string>
+    <string name="my_delete_confirm">\"%1$s\" 코스를 삭제할까요?</string>
+    <string name="my_accessibility">접근성</string>
+    <string name="my_senior_title">간편 모드</string>
+    <string name="my_senior_title_on">간편 모드 사용 중</string>
+    <string name="my_senior_desc">큰 글씨 · 큰 버튼 · 쉬운 메뉴
+어르신도 편하게 쓰는 정읍 출사</string>
+    <string name="my_senior_on">간편 모드로 전환하기 →</string>
+    <string name="my_senior_off">일반 모드로 돌아가기 →</string>
+    <string name="my_font_size">글씨 크기</string>
+    <string name="my_font_hint">앱 전체 글씨 크기가 바뀝니다. 시스템 설정이 더 크면 그쪽을 따릅니다.</string>
+    <string name="my_footer">정읍 시선 v%1$s
+관광 정보 출처 : 한국관광공사</string>
+    <string name="course_save_failed">저장하지 못했어요</string>
+
+    <!-- 시니어 화면 -->
+    <string name="senior_greeting">안녕하세요!</string>
+    <string name="senior_action_course">🗺  코스 추천받기</string>
+    <string name="senior_action_audio">🎧  오디오 가이드</string>
+    <string name="senior_action_help">📞  도움 요청하기</string>
+    <string name="senior_today_spot">오늘 추천 장소</string>
+    <string name="senior_help_title">도움이 필요하세요?</string>
+    <string name="senior_tourist_info">정읍시 관광안내소</string>
+    <string name="senior_tourist_number">063-539-5638</string>
+    <string name="senior_call_now">지금 바로 전화하기</string>
+    <string name="senior_call_119">🚨  119 응급신고</string>
+    <string name="senior_share_location">📍  현재 위치 보내기</string>
+    <string name="senior_call_confirm">%1$s 번으로 전화 화면을 열까요?</string>
+    <string name="senior_call_failed">전화 앱을 열 수 없어요</string>
+    <string name="senior_share_failed">공유할 수 있는 앱이 없어요</string>
+    <string name="senior_location_message">지금 %1$s 근처에 있어요.
+%2$s</string>
+    <string name="senior_location_unknown">정읍시에 있어요. 정확한 위치를 불러오지 못했어요.</string>
+
+    <!-- 출사 기록(일기) -->
+    <string name="diary_title">출사 기록</string>
+    <string name="diary_subtitle">다녀온 곳이 하루 단위로 모여요</string>
+    <string name="diary_empty_title">아직 기록이 없어요</string>
+    <string name="diary_empty_desc">촬영지 상세에서 \"다녀왔어요\"를 누르면
+이곳에 하루가 쌓입니다.</string>
+    <string name="diary_stats_format">%1$d곳 · 평균 %2$d</string>
+    <string name="diary_generate">✨ 일기 만들기</string>
+    <string name="diary_regenerate">다시 만들기</string>
+    <string name="diary_share">공유</string>
+    <string name="diary_share_tag">#정읍시선 #출사 #정읍</string>
+    <string name="detail_checkin">📍 다녀왔어요</string>
+    <string name="detail_checkin_done">출사 기록에 담았어요</string>
+    <string name="detail_checkin_already">오늘 이미 기록한 곳이에요</string>
+
+    <!-- 미션 & 배지 -->
+    <string name="mission_title">미션 &amp; 배지</string>
+    <string name="mission_entry">🏅 미션 &amp; 배지</string>
+    <string name="mission_summary">배지 %1$d / %2$d 개</string>
+    <string name="mission_summary_desc">다녀온 기록으로 자동 판정돼요</string>
+    <string name="mission_summary_empty">촬영지에서 \"다녀왔어요\"를 누르면 채워집니다</string>
+    <string name="mission_count">%1$d / %2$d</string>
+    <string name="mission_badge_earned">🏅 %1$s 획득</string>
+
+    <!-- 사계절 캘린더 -->
+    <string name="calendar_title">사계절 촬영 캘린더</string>
+    <string name="calendar_entry">📅 사계절 촬영 캘린더</string>
+    <string name="season_spring">🌸 봄</string>
+    <string name="season_summer">🌿 여름</string>
+    <string name="season_autumn">🍁 가을</string>
+    <string name="season_winter">❄️ 겨울</string>
+    <string name="calendar_dday">D-%1$d</string>
+    <string name="calendar_peak_now">지금이 절정</string>
+    <string name="calendar_period">%1$s ~ %2$s · 평년 기준</string>
+    <string name="calendar_period_subject">%1$s ~ %2$s · %3$s</string>
+    <string name="calendar_festivals">정읍 축제</string>
+    <string name="calendar_disclaimer">절정 시기는 그해 기후에 따라 며칠씩 달라질 수 있어요. 평년 기준으로 안내합니다.</string>
+
+    <!-- 포토스코어 항목 -->
+    <string name="factor_base">장소 매력도</string>
+    <string name="factor_freshness">정보 최신성</string>
+    <string name="factor_photo">대표 사진</string>
+    <string name="factor_light">빛 조건</string>
+    <string name="factor_weather">날씨 적합도</string>
+    <string name="factor_temp">기온 쾌적도</string>
+    <string name="factor_access">접근성</string>
+
+    <!-- 구도 가이드 이름 -->
+    <string name="guide_name_thirds">삼분할 격자</string>
+    <string name="guide_name_symmetry">좌우 대칭축</string>
+    <string name="guide_name_center">중앙 원</string>
+
     <!-- 촬영 환경 카드 -->
     <string name="shooting_condition">현재 촬영 환경</string>
     <string name="weather_loading">날씨 정보를 불러오는 중…</string>

@@ -62,7 +62,7 @@
                     android:layout_height="16dp"
                     android:contentDescription="@null"
                     android:src="@drawable/ic_place"
-                    app:tint="@color/brand_500" />
+                    app:tint="@color/maple_500" />
 
                 <TextView
                     android:id="@+id/tv_map_count"

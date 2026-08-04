@@ -1,74 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    정읍 시선 — 색 토큰
+
+    시안(Figma)의 '단풍(maple)' 팔레트 기준.
+    주색 #B23A1B, 배경은 흰색이 아니라 크림(#FDF6EF) 계열입니다.
+
+    ▸ 팔레트(maple_*, moss_*, sand_*)는 직접 쓰지 말고
+      아래 시맨틱 토큰(bg_*, text_*, chip_* …)을 통해 쓰세요.
+      values-night 에서 시맨틱만 재정의하면 다크 모드가 따라옵니다.
+-->
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- ============ 팔레트 : 브랜드(내장산의 숲) ============ -->
-    <color name="brand_50">#E7F4F1</color>
-    <color name="brand_100">#C4E6DE</color>
-    <color name="brand_200">#93D2C5</color>
-    <color name="brand_300">#57B8A6</color>
-    <color name="brand_400">#2A9C87</color>
-    <color name="brand_500">#0E7C66</color>
-    <color name="brand_600">#0B6553</color>
-    <color name="brand_700">#084F41</color>
-    <color name="brand_800">#06382F</color>
-    <color name="brand_900">#04241E</color>
+    <!-- ============ 팔레트 : 단풍(주색) ============ -->
+    <color name="maple_50">#FBEEE9</color>
+    <color name="maple_100">#F5D5C8</color>
+    <color name="maple_200">#E8AC93</color>
+    <color name="maple_300">#D9805E</color>
+    <color name="maple_400">#C75B36</color>
+    <color name="maple_500">#B23A1B</color>
+    <color name="maple_600">#9A3016</color>
+    <color name="maple_700">#7D2611</color>
+    <color name="maple_800">#5C1B0C</color>
+    <color name="maple_900">#3B1108</color>
 
-    <!-- ============ 팔레트 : 골든아워 ============ -->
-    <color name="golden_100">#FEF3C7</color>
-    <color name="golden_200">#FDE68A</color>
-    <color name="golden_300">#FCD34D</color>
-    <color name="golden_500">#F59E0B</color>
-    <color name="golden_600">#D97706</color>
-    <color name="golden_700">#B45309</color>
+    <!-- ============ 팔레트 : 이끼(보조 / 시니어 오디오) ============ -->
+    <color name="moss_50">#EEF1E8</color>
+    <color name="moss_100">#D6DEC7</color>
+    <color name="moss_300">#9CAE7C</color>
+    <color name="moss_500">#6B7F4B</color>
+    <color name="moss_600">#586A3D</color>
+    <color name="moss_700">#43512E</color>
 
-    <!-- ============ 팔레트 : 뉴트럴 ============ -->
-    <color name="ink_950">#080F1A</color>
-    <color name="ink_900">#0F172A</color>
-    <color name="ink_800">#1E293B</color>
-    <color name="ink_700">#334155</color>
-    <color name="ink_600">#475569</color>
-    <color name="ink_500">#64748B</color>
-    <color name="ink_400">#94A3B8</color>
-    <color name="ink_300">#CBD5E1</color>
-    <color name="ink_200">#E2E8F0</color>
-    <color name="ink_100">#F1F5F9</color>
-    <color name="ink_50">#F8FAFC</color>
+    <!-- ============ 팔레트 : 황금(골든아워 / 포토스코어) ============ -->
+    <color name="golden_100">#FDF0D5</color>
+    <color name="golden_200">#F9DFA8</color>
+    <color name="golden_300">#F2C86B</color>
+    <color name="golden_500">#E0A32E</color>
+    <color name="golden_600">#C08420</color>
+    <color name="golden_700">#946117</color>
+
+    <!-- ============ 팔레트 : 모래(뉴트럴, 웜톤) ============ -->
+    <color name="sand_950">#1A1512</color>
+    <color name="sand_900">#2A211C</color>
+    <color name="sand_800">#3D3128</color>
+    <color name="sand_700">#5A4A3E</color>
+    <color name="sand_600">#7A675A</color>
+    <color name="sand_500">#9B8878</color>
+    <color name="sand_400">#BBAA9B</color>
+    <color name="sand_300">#D6C9BC</color>
+    <color name="sand_200">#E8DED4</color>
+    <color name="sand_100">#F3ECE4</color>
+    <color name="sand_50">#FBF6F1</color>
 
     <!-- ============ 외부 브랜드 ============ -->
     <color name="naver_green">#03C75A</color>
+    <color name="kakao_yellow">#FEE500</color>
 
     <!-- ============ 시맨틱(라이트) : values-night 에서 재정의됨 ============ -->
-    <color name="bg_page">#F5F7F6</color>
+    <color name="bg_page">#FDF6EF</color>
     <color name="bg_card">#FFFFFF</color>
-    <color name="bg_card_muted">#F1F5F4</color>
-    <color name="bg_image_placeholder">#E4EAE8</color>
+    <color name="bg_card_muted">#F6EEE6</color>
+    <color name="bg_image_placeholder">#EBE0D6</color>
+    <color name="bg_bottom_nav">#FFFDFB</color>
 
-    <color name="text_primary">#0F172A</color>
-    <color name="text_secondary">#475569</color>
-    <color name="text_tertiary">#8494A6</color>
+    <color name="text_primary">#2A211C</color>
+    <color name="text_secondary">#5A4A3E</color>
+    <color name="text_tertiary">#9B8878</color>
     <color name="text_on_brand">#FFFFFF</color>
 
-    <color name="divider">#E5EAE8</color>
-    <color name="card_stroke">#E9EEEC</color>
+    <color name="divider">#EDE2D8</color>
+    <color name="card_stroke">#F0E6DC</color>
 
     <color name="chip_bg">#FFFFFF</color>
-    <color name="chip_bg_selected">#0E7C66</color>
-    <color name="chip_stroke">#E2E8F0</color>
-    <color name="chip_icon">#64748B</color>
+    <color name="chip_bg_selected">#B23A1B</color>
+    <color name="chip_stroke">#E8DED4</color>
+    <color name="chip_icon">#7A675A</color>
     <color name="chip_icon_selected">#FFFFFF</color>
-    <color name="chip_text">#64748B</color>
-    <color name="chip_text_selected">#0E7C66</color>
+    <color name="chip_text">#5A4A3E</color>
+    <color name="chip_text_selected">#FFFFFF</color>
 
-    <color name="score_chip_bg">#FEF3C7</color>
-    <color name="score_chip_icon">#D97706</color>
-    <color name="score_chip_text">#B45309</color>
+    <color name="score_chip_bg">#FDF0D5</color>
+    <color name="score_chip_icon">#C08420</color>
+    <color name="score_chip_text">#946117</color>
 
-    <color name="btn_secondary_bg">#E7F4F1</color>
-    <color name="btn_secondary_text">#0B6553</color>
+    <color name="btn_secondary_bg">#FBEEE9</color>
+    <color name="btn_secondary_text">#9A3016</color>
 
-    <color name="score_badge_bg">#E6111C2E</color>
+    <color name="score_badge_bg">#E62A211C</color>
     <color name="scrim_strong">#99000000</color>
     <color name="scrim_soft">#40000000</color>
+
+    <!-- ============ 빛 스케줄(출사 코스) 전용 ============ -->
+    <!-- 코스 타임라인에서 시간대를 색으로 구분합니다. -->
+    <color name="light_sunrise">#E8834A</color>
+    <color name="light_morning">#E0A32E</color>
+    <color name="light_midday">#9B8878</color>
+    <color name="light_sunset">#B23A1B</color>
+    <color name="light_night">#3D4A6B</color>
+
+    <!-- 하단 탭 -->
+    <color name="nav_item_active">#B23A1B</color>
+    <color name="nav_item_inactive">#9B8878</color>
 </resources>

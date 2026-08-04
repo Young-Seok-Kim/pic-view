@@ -2,18 +2,18 @@
 
     <style name="Base.Theme.PicView" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary : 다크에서는 한 톤 밝게 -->
-        <item name="colorPrimary">@color/brand_300</item>
-        <item name="colorOnPrimary">@color/brand_900</item>
-        <item name="colorPrimaryContainer">@color/brand_700</item>
-        <item name="colorOnPrimaryContainer">@color/brand_100</item>
+        <item name="colorPrimary">@color/maple_300</item>
+        <item name="colorOnPrimary">@color/maple_900</item>
+        <item name="colorPrimaryContainer">@color/maple_700</item>
+        <item name="colorOnPrimaryContainer">@color/maple_100</item>
 
-        <item name="colorSecondary">@color/brand_400</item>
-        <item name="colorOnSecondary">@color/brand_900</item>
-        <item name="colorSecondaryContainer">@color/brand_800</item>
-        <item name="colorOnSecondaryContainer">@color/brand_100</item>
+        <item name="colorSecondary">@color/maple_400</item>
+        <item name="colorOnSecondary">@color/maple_900</item>
+        <item name="colorSecondaryContainer">@color/maple_800</item>
+        <item name="colorOnSecondaryContainer">@color/maple_100</item>
 
         <item name="colorTertiary">@color/golden_300</item>
-        <item name="colorOnTertiary">@color/ink_950</item>
+        <item name="colorOnTertiary">@color/sand_950</item>
         <item name="colorTertiaryContainer">@color/golden_700</item>
         <item name="colorOnTertiaryContainer">@color/golden_100</item>
 

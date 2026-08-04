@@ -278,7 +278,7 @@
         android:layout_marginBottom="20dp"
         android:text="@string/open_map_short"
         android:textColor="@color/white"
-        app:backgroundTint="@color/naver_green"
+        app:backgroundTint="@color/maple_500"
         app:elevation="8dp"
         app:icon="@drawable/ic_near_me"
         app:iconTint="@color/white"
@@ -291,7 +291,7 @@
         android:layout_gravity="center"
         android:indeterminate="true"
         android:visibility="gone"
-        app:indicatorColor="@color/brand_500"
+        app:indicatorColor="@color/maple_500"
         app:trackCornerRadius="4dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
