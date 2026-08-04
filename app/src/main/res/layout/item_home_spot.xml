@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 홈의 '지금 찍기 좋은 곳' 가로 카드. -->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="@dimen/spot_card_width"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="@dimen/space_m"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardBackgroundColor="@color/bg_card"
+    app:cardCornerRadius="@dimen/radius_card"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/card_stroke"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/spot_card_image_height">
+
+            <ImageView
+                android:id="@+id/iv_home_spot"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/bg_image_placeholder"
+                android:contentDescription="@string/cd_spot_thumbnail"
+                android:scaleType="centerCrop" />
+
+            <TextView
+                android:id="@+id/tv_home_spot_score"
+                style="@style/Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="@dimen/space_s"
+                android:background="@drawable/bg_score_badge"
+                android:paddingHorizontal="@dimen/space_s"
+                android:paddingVertical="2dp"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                tools:text="★ 81" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tv_home_spot_title"
+            style="@style/Text.SectionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_m"
+            android:layout_marginHorizontal="@dimen/space_m"
+            android:ellipsize="end"
+            android:maxLines="1"
+            tools:text="내장산국립공원" />
+
+        <TextView
+            android:id="@+id/tv_home_spot_phase"
+            style="@style/Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xs"
+            android:layout_marginHorizontal="@dimen/space_m"
+            android:layout_marginBottom="@dimen/space_m"
+            android:background="@drawable/bg_phase_badge"
+            android:paddingHorizontal="@dimen/space_s"
+            android:paddingVertical="2dp"
+            android:textStyle="bold"
+            tools:text="일몰이 좋아요" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
