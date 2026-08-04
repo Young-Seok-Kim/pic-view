@@ -205,6 +205,144 @@
                         tools:text="전북특별자치도 정읍시 내장산로 936" />
                 </LinearLayout>
 
+                <!-- ============ 촬영 정보 (방위 · 최적 시간 · 구도) ============ -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Card.Elevated"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_xl"
+                    app:cardBackgroundColor="@color/maple_50"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/space_l">
+
+                        <TextView
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/detail_shooting_info"
+                            android:textColor="@color/maple_700" />
+
+                        <TextView
+                            android:id="@+id/tv_detail_best_time"
+                            style="@style/Text.SectionTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_xs"
+                            android:textColor="@color/maple_800"
+                            tools:text="일몰 골든아워 · 서향" />
+
+                        <TextView
+                            android:id="@+id/tv_detail_facts_note"
+                            style="@style/Text.Body"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textColor="@color/maple_700"
+                            tools:text="단풍터널은 역광이 살아나는 늦은 오후가 절정이에요" />
+
+                        <TextView
+                            android:id="@+id/tv_detail_guide"
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_m"
+                            android:background="@drawable/bg_pill_dark"
+                            android:paddingHorizontal="@dimen/space_m"
+                            android:paddingVertical="@dimen/space_xs"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            tools:text="📷 추천 구도 · 삼분할 격자" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ============ 오디오 가이드 ============ -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_audio_guide"
+                    style="@style/Button.Primary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_m"
+                    android:text="@string/detail_audio_play"
+                    app:backgroundTint="@color/moss_500"
+                    app:icon="@drawable/ic_audio"
+                    app:iconTint="@color/white" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_checkin"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="@color/maple_600"
+                        android:text="@string/detail_checkin" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_audio_speed"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_secondary"
+                        tools:text="재생 속도 1.0×" />
+                </LinearLayout>
+
+                <!-- ============ 포토스코어 근거 ============ -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginVertical="24dp"
+                    android:background="@color/divider" />
+
+                <LinearLayout
+                    android:id="@+id/layout_score_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/detail_score_reason"
+                        android:textAppearance="@style/Text.SectionTitle" />
+
+                    <TextView
+                        android:id="@+id/tv_score_toggle"
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/detail_score_expand"
+                        android:textColor="@color/maple_600" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_score_headline"
+                    style="@style/Text.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_xs"
+                    tools:text="지금 골든아워라 빛 조건에서 점수를 크게 받았어요" />
+
+                <LinearLayout
+                    android:id="@+id/layout_score_factors"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_m"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -252,7 +390,7 @@
             android:layout_weight="1"
             android:text="@string/action_shoot"
             android:textColor="@color/white"
-            app:backgroundTint="@color/brand_500"
+            app:backgroundTint="@color/maple_500"
             app:icon="@drawable/baseline_camera_alt_24"
             app:iconTint="@color/white" />
 
