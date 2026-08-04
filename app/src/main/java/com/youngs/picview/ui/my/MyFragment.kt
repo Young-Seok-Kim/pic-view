@@ -13,9 +13,8 @@ import com.youngs.picview.BuildConfig
 import com.youngs.picview.MainActivity
 import com.youngs.picview.R
 import com.youngs.picview.data.local.SavedCourseWithStops
-import com.youngs.picview.data.repository.toSpotItem
+import com.youngs.picview.ui.course.CourseResultFragment
 import com.youngs.picview.databinding.FragmentMyBinding
-import com.youngs.picview.ui.detail.DetailFragment
 import com.youngs.picview.ui.mission.MissionFragment
 import com.youngs.picview.util.AppPrefs
 import com.youngs.picview.util.FontStep
@@ -61,7 +60,7 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
 
     private fun setupCourses() {
         val adapter = SavedCourseAdapter(
-            onClick = { openFirstStop(it) },
+            onClick = { openCourse(it) },
             onDelete = { confirmDelete(it) }
         )
         binding.rvMyCourses.adapter = adapter
@@ -80,15 +79,10 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
         }
     }
 
-    /**
-     * 저장한 코스를 누르면 첫 정거장 상세로 갑니다.
-     * (저장된 코스를 타임라인으로 다시 여는 화면은 아직 없어서, 지금은
-     *  가장 쓸모 있는 동작으로 연결해 둡니다)
-     */
-    private fun openFirstStop(item: SavedCourseWithStops) {
-        val first = item.orderedStops.firstOrNull() ?: return
+    /** 저장한 코스를 누르면 그 코스의 빛 스케줄을 그대로 다시 엽니다. */
+    private fun openCourse(item: SavedCourseWithStops) {
         (activity as? MainActivity)?.pushScreen(
-            DetailFragment.newInstance(first.toSpotItem())
+            CourseResultFragment.forSaved(item.course.id)
         )
     }
 

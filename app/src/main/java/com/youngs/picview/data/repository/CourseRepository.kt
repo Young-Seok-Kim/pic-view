@@ -7,12 +7,14 @@ import com.youngs.picview.data.local.SavedCourseWithStops
 import com.youngs.picview.data.local.SavedStopEntity
 import com.youngs.picview.data.local.VisitLogEntity
 import com.youngs.picview.domain.course.CourseStop
+import com.youngs.picview.domain.light.SunTimes
 import com.youngs.picview.domain.course.ShootingCourse
 import com.youngs.picview.domain.light.LightPhase
 import com.youngs.picview.domain.spot.Facing
 import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.util.AppPrefs
+import com.youngs.picview.util.TravelMode
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalTime
 
@@ -152,3 +154,40 @@ fun SavedStopEntity.arriveTime(): LocalTime =
 
 /** 저장된 정거장에도 촬영 특성이 필요할 때(구도 이름 등). */
 fun SavedStopEntity.facts() = SpotFactsTable.of(title, contentTypeId)
+
+private fun Int.toLocalTimeOrNull(): LocalTime? =
+    if (this < 0) null else LocalTime.of(this / 60, this % 60)
+
+/** 저장된 정거장 → 도메인 모델. */
+fun SavedStopEntity.toCourseStop(): CourseStop {
+    val facts = facts()
+    val arrive = arriveTime()
+    return CourseStop(
+        spot = toSpotItem(),
+        facts = facts,
+        arriveAt = arrive,
+        leaveAt = arrive.plusMinutes(stayMinutes.toLong()),
+        phase = phase(),
+        travelMinutes = travelMinutes,
+        travelKm = travelKm,
+        reason = reason,
+        isHighlight = isHighlight
+    )
+}
+
+/**
+ * 저장한 코스 → 도메인 모델.
+ *
+ * 저장할 때 스팟 정보를 비정규화해 둔 덕분에 API 재호출 없이 그대로 복원됩니다.
+ * 코스 결과 화면이 '방금 만든 코스'와 '저장한 코스'를 같은 코드로 그릴 수 있습니다.
+ */
+fun SavedCourseWithStops.toShootingCourse(): ShootingCourse = ShootingCourse(
+    stops = orderedStops.map { it.toCourseStop() },
+    sun = SunTimes(
+        sunrise = course.sunriseMinute.toLocalTimeOrNull(),
+        sunset = course.sunsetMinute.toLocalTimeOrNull()
+    ),
+    travelMode = runCatching { TravelMode.valueOf(course.travelMode) }
+        .getOrDefault(TravelMode.CAR),
+    totalDistanceKm = course.totalKm
+)

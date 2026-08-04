@@ -136,6 +136,7 @@
     <string name="my_footer">정읍 시선 v%1$s
 관광 정보 출처 : 한국관광공사</string>
     <string name="course_save_failed">저장하지 못했어요</string>
+    <string name="course_saved_missing">코스를 불러오지 못했어요</string>
 
     <!-- 시니어 화면 -->
     <string name="senior_greeting">안녕하세요!</string>
