@@ -9,6 +9,7 @@ import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.util.LatLng
 import com.youngs.picview.util.distanceKmTo
 import com.youngs.picview.util.estimateTravelMinutes
+import com.youngs.picview.util.roadDistanceKm
 import java.time.Duration
 import java.time.LocalTime
 
@@ -278,8 +279,12 @@ object CoursePlanner {
         request: CourseRequest
     ): Travel {
         if (from == null) return Travel(0, 0.0)
-        val km = from.coords.distanceKmTo(to.coords)
-        return Travel(estimateTravelMinutes(km, request.travelMode), km)
+        val straight = from.coords.distanceKmTo(to.coords)
+        // 표시 거리도 시간과 같은 기준(도로 환산)으로 맞춥니다.
+        return Travel(
+            minutes = estimateTravelMinutes(straight, request.travelMode),
+            km = roadDistanceKm(straight)
+        )
     }
 
     private fun toStop(

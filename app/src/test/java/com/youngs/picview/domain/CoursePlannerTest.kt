@@ -163,6 +163,45 @@ class CoursePlannerTest {
     }
 
     @Test
+    fun `표시 거리와 소요 시간이 같은 기준으로 계산된다`() {
+        val request = CourseRequest(
+            startTime = LocalTime.of(9, 0),
+            endTime = LocalTime.of(21, 0),
+            travelMode = TravelMode.CAR,
+            maxStops = 5
+        )
+        val course = CoursePlanner.plan(allSpots, sun, request)
+
+        course.stops.filter { it.travelMinutes > 0 }.forEach { stop ->
+            // travelKm 은 도로 환산 거리여야 합니다.
+            // 직선거리를 그대로 보여 주면 "16.7km 인데 35분" 처럼
+            // 두 숫자의 기준이 어긋나 보입니다.
+            val impliedKm = stop.travelKm
+            val minutesFromKm = (impliedKm / TravelMode.CAR.averageKmh * 60.0) +
+                    TravelMode.CAR.fixedOverheadMinutes
+            assertTrue(
+                "${stop.spot.title}: ${stop.travelKm}km 인데 ${stop.travelMinutes}분 " +
+                        "(거리로 계산하면 ${minutesFromKm.toInt()}분)",
+                kotlin.math.abs(minutesFromKm - stop.travelMinutes) <= 1.5
+            )
+        }
+    }
+
+    @Test
+    fun `총 거리는 각 구간 거리의 합이다`() {
+        val request = CourseRequest(
+            startTime = LocalTime.of(9, 0),
+            endTime = LocalTime.of(21, 0),
+            travelMode = TravelMode.CAR,
+            maxStops = 5
+        )
+        val course = CoursePlanner.plan(allSpots, sun, request)
+        assertEquals(
+            course.stops.sumOf { it.travelKm }, course.totalDistanceKm, 0.001
+        )
+    }
+
+    @Test
     fun `요약 문구는 LLM 없이도 만들어진다`() {
         val request = CourseRequest(
             startTime = LocalTime.of(15, 0),

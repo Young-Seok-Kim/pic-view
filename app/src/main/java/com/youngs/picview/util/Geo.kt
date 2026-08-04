@@ -32,21 +32,32 @@ fun LatLng.distanceKmTo(other: LatLng): Double {
 }
 
 /**
- * 이동 소요 시간 추정(분).
+ * 직선거리를 실제 이동 거리(km)로 환산합니다.
  *
  * 카카오 모빌리티 길찾기를 붙이기 전까지 쓰는 근사치입니다.
- * 직선거리에 도로 우회 계수를 곱하고 평균 속도로 나눕니다.
- * 정읍 시내·근교 기준으로 잡은 값이라 시외로 나가면 오차가 커집니다.
+ *
+ * 화면에 보여 주는 거리와 소요 시간이 **같은 값에서 나와야** 합니다.
+ * 예전에는 거리는 직선(16.7km)으로 보여 주면서 시간은 우회 반영(22.5km 기준
+ * 35분)으로 계산해서, 두 숫자의 기준이 서로 달랐습니다.
  */
-fun estimateTravelMinutes(distanceKm: Double, mode: TravelMode): Int {
-    val roadDistance = distanceKm * ROAD_DETOUR_FACTOR
-    val minutes = roadDistance / mode.averageKmh * 60.0
+fun roadDistanceKm(straightLineKm: Double): Double = straightLineKm * ROAD_DETOUR_FACTOR
+
+/**
+ * 이동 소요 시간 추정(분).
+ *
+ * @param straightLineKm 직선거리. 내부에서 [roadDistanceKm] 로 환산해 계산합니다.
+ */
+fun estimateTravelMinutes(straightLineKm: Double, mode: TravelMode): Int {
+    val minutes = roadDistanceKm(straightLineKm) / mode.averageKmh * 60.0
     // 주차·도보 접근 같은 고정 비용
     return (minutes + mode.fixedOverheadMinutes).toInt().coerceAtLeast(mode.minMinutes)
 }
 
-/** 직선거리 대비 실제 도로 거리 배수. */
-private const val ROAD_DETOUR_FACTOR = 1.35
+/**
+ * 직선거리 대비 실제 도로 거리 배수.
+ * 정읍 시내·근교 기준으로 잡은 값이라 시외로 나가면 오차가 커집니다.
+ */
+const val ROAD_DETOUR_FACTOR = 1.35
 
 enum class TravelMode(
     val label: String,
