@@ -1,0 +1,6 @@
+# 컨텍스트는 docker/ 폴더뿐이지만, 실수로 뭔가 들어가지 않게 막아 둡니다.
+**/local.properties
+**/keystore.properties
+**/*.jks
+**/*.keystore
+**/.env

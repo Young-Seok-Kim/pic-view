@@ -66,3 +66,9 @@ secrets.properties
 
 # Kotlin 컴파일러 작업 디렉터리 (세션·에러 로그, 파일명에 난수가 붙어 매번 바뀜)
 /.kotlin/
+
+# 도커 빌드용 환경변수 (API 키 보관)
+/.env
+
+# 도커 컨테이너가 내보내는 빌드 산출물
+/build-output/
