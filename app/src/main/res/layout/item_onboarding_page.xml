@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 온보딩 한 장. 큰 심볼 + 제목 + 설명. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/space_3xl">
+
+    <FrameLayout
+        android:id="@+id/layout_onboarding_symbol"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:background="@drawable/bg_onboarding_circle">
+
+        <TextView
+            android:id="@+id/tv_onboarding_emoji"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="64sp"
+            tools:text="📸" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tv_onboarding_title"
+        style="@style/Text.Display"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_2xl"
+        android:gravity="center"
+        tools:text="지금, 가장 잘 나오는 곳" />
+
+    <TextView
+        android:id="@+id/tv_onboarding_desc"
+        style="@style/Text.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_m"
+        android:gravity="center"
+        android:lineSpacingExtra="6dp"
+        tools:text="날씨와 해의 위치를 실시간으로 계산해 지금 사진이 가장 잘 나오는 촬영지를 점수로 알려드려요." />
+
+</LinearLayout>
