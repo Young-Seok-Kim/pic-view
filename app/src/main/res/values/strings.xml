@@ -33,8 +33,8 @@
 
     <!-- 시니어 간편 모드 -->
     <string name="senior_toggle_to_normal">일반 모드</string>
-    <string name="senior_toggle_to_senior">간편 모드</string>
-    <string name="senior_switch_title">간편 모드로 바꿀까요?</string>
+    <string name="senior_toggle_to_senior">큰 글씨 모드</string>
+    <string name="senior_switch_title">큰 글씨 모드로 바꿀까요?</string>
     <string name="senior_switch_desc">글씨와 버튼이 커지고 메뉴가 3개로 줄어듭니다.</string>
     <string name="senior_switch_back_title">일반 모드로 돌아갈까요?</string>
     <string name="senior_switch_back_desc">원래 화면으로 돌아갑니다.</string>
@@ -125,11 +125,16 @@
     <string name="my_delete_course">코스 삭제</string>
     <string name="my_delete_confirm">\"%1$s\" 코스를 삭제할까요?</string>
     <string name="my_accessibility">접근성</string>
-    <string name="my_senior_title">간편 모드</string>
-    <string name="my_senior_title_on">간편 모드 사용 중</string>
+    <string name="visited_title">다녀온 곳</string>
+    <string name="visited_empty">아직 다녀온 곳이 없어요.
+촬영지 상세에서 \"다녀왔어요\"를 눌러보세요.</string>
+    <string name="visited_count">%1$d곳</string>
+    <string name="visited_when">%1$s · %2$s</string>
+    <string name="my_senior_title">큰 글씨 모드</string>
+    <string name="my_senior_title_on">큰 글씨 모드 사용 중</string>
     <string name="my_senior_desc">큰 글씨 · 큰 버튼 · 쉬운 메뉴
 어르신도 편하게 쓰는 정읍 출사</string>
-    <string name="my_senior_on">간편 모드로 전환하기 →</string>
+    <string name="my_senior_on">큰 글씨 모드로 전환하기 →</string>
     <string name="my_senior_off">일반 모드로 돌아가기 →</string>
     <string name="my_font_size">글씨 크기</string>
     <string name="my_font_hint">앱 전체 글씨 크기가 바뀝니다. 시스템 설정이 더 크면 그쪽을 따릅니다.</string>
