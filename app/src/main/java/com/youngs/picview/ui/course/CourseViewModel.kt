@@ -10,6 +10,7 @@ import com.youngs.picview.domain.course.CoursePlanner
 import com.youngs.picview.domain.course.CourseRequest
 import com.youngs.picview.domain.course.Narrators
 import com.youngs.picview.domain.course.ShootingCourse
+import com.youngs.picview.domain.course.TemplateNarrator
 import com.youngs.picview.domain.light.SunTimes
 import com.youngs.picview.ui.model.SpotItem
 import kotlinx.coroutines.launch
@@ -58,12 +59,16 @@ class CourseViewModel(app: Application) : AndroidViewModel(app) {
             return
         }
 
-        // 규칙 기반 요약을 먼저 보여 주고, LLM 문구가 오면 갈아끼웁니다.
-        // 이렇게 하면 LLM 이 느리거나 실패해도 화면이 비어 보이지 않습니다.
-        _narration.value = result.fallbackSummary()
         _narrating.value = true
 
         viewModelScope.launch {
+            // 규칙 기반 설명을 먼저 보여 주고, LLM 문구가 오면 갈아끼웁니다.
+            // 이렇게 하면 LLM 이 느리거나 실패해도 화면이 비어 보이지 않습니다.
+            //
+            // 여기에 fallbackSummary() 를 쓰면 안 됩니다. 그 문구는 아래 통계 칩
+            // ("5곳 · 5시간 29분 · 20km")에 이미 쓰이고 있어서, 같은 줄이
+            // 카드에 두 번 겹쳐 보입니다.
+            _narration.value = TemplateNarrator.narrate(result)
             // 널 가능성을 LiveData 대입 전에 끝내 둡니다.
             // 대입식에 nullable 값이 흘러 들어가면 lint 의 NullSafeMutableLiveData 가
             // 널 검사(`!= null`, `isNullOrBlank()`)를 따라가지 못해 오탐을 내고,
