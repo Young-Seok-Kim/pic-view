@@ -1,15 +1,13 @@
 package com.youngs.picview.ui.senior
 
+import com.youngs.picview.util.applyTopSystemBarInset
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.youngs.picview.MainActivity
@@ -46,11 +44,7 @@ class SeniorHelpFragment : Fragment(R.layout.fragment_senior_help), MainActivity
     }
 
     private fun applyTopInset() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.scrollSeniorHelp) { v, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.updatePadding(top = bars.top)
-            insets
-        }
+        binding.scrollSeniorHelp.applyTopSystemBarInset()
     }
 
     // ─────────────────────── 전화 ───────────────────────
@@ -66,7 +60,7 @@ class SeniorHelpFragment : Fragment(R.layout.fragment_senior_help), MainActivity
     }
 
     private fun confirmCall(title: String, number: String) {
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(title)
             .setMessage(getString(R.string.senior_call_confirm, number))
             .setPositiveButton(R.string.confirm) { _, _ -> dial(number) }
@@ -139,7 +133,7 @@ class SeniorHelpFragment : Fragment(R.layout.fragment_senior_help), MainActivity
     }
 
     private fun confirmBackToNormal() {
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.senior_switch_back_title)
             .setMessage(R.string.senior_switch_back_desc)
             .setPositiveButton(R.string.confirm) { _, _ ->

@@ -1,11 +1,9 @@
 package com.youngs.picview.ui.mission
 
+import com.youngs.picview.util.applyTopSystemBarInset
 import android.app.Application
 import android.os.Bundle
 import android.view.View
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.AndroidViewModel
@@ -57,11 +55,7 @@ class MissionFragment : Fragment(R.layout.fragment_mission) {
     }
 
     private fun applyTopInset() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.rootMission) { v, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.updatePadding(top = bars.top)
-            insets
-        }
+        binding.rootMission.applyTopSystemBarInset()
     }
 
     override fun onDestroyView() {

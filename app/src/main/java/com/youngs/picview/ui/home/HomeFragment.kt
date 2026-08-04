@@ -1,11 +1,9 @@
 package com.youngs.picview.ui.home
 
+import com.youngs.picview.util.applyTopSystemBarInset
 import android.os.Bundle
 import android.view.View
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.youngs.picview.MainActivity
@@ -18,6 +16,7 @@ import com.youngs.picview.ui.map.MapFragment
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlin.math.roundToInt
 
 /**
  * 홈 — "지금 빛이 어떤가"를 첫 화면에서 답합니다.
@@ -45,11 +44,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
     }
 
     private fun applyTopInset() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.scrollHome) { v, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.updatePadding(top = bars.top)
-            insets
-        }
+        binding.scrollHome.applyTopSystemBarInset()
     }
 
     private fun renderDate() {
@@ -80,9 +75,13 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
         }
 
         // 현재 촬영 조건
-        bindStat(binding.statTemp, "🌡", viewModel.weatherData.value.orEmpty()
-            .substringAfterLast(" ").ifBlank { "—" }, getString(R.string.home_stat_temp))
-        bindStat(binding.statSky, "☀", phase.label, getString(R.string.home_stat_light))
+        val temp = viewModel.temperatureC.value
+        bindStat(
+            binding.statTemp, "🌡",
+            if (temp != null) "${temp.roundToInt()}℃" else "—",
+            getString(R.string.home_stat_temp)
+        )
+        bindStat(binding.statSky, "☀", phase.shortLabel, getString(R.string.home_stat_light))
         bindStat(
             binding.statSpots, "📍",
             "${viewModel.spotData.value?.size ?: 0}", getString(R.string.home_stat_spots)
