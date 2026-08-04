@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    시니어 도움 탭 (스펙 §17-4 탭3 / §17-7).
+    긴급 연락 + 글씨 크기 + 모드 해제. 한 손으로 누를 수 있는 크기만 씁니다.
+-->
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scroll_senior_help"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_page"
+    android:clipToPadding="false"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/screen_padding_senior"
+        android:paddingBottom="@dimen/space_3xl">
+
+        <TextView
+            style="@style/Text.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_l"
+            android:text="@string/senior_help_title" />
+
+        <!-- ─────────── 관광안내소 ─────────── -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Card.Senior"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_l">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/Text.SectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/senior_tourist_info" />
+
+                <TextView
+                    style="@style/Text.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_xs"
+                    android:text="@string/senior_tourist_number" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_call_info"
+                    style="@style/Button.Senior"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_l"
+                    android:text="@string/senior_call_now"
+                    app:backgroundTint="@color/maple_500" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ─────────── 119 ─────────── -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_call_119"
+            style="@style/Button.Senior"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_m"
+            android:text="@string/senior_call_119"
+            app:backgroundTint="@color/maple_700" />
+
+        <!-- ─────────── 위치 공유 ─────────── -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_share_location"
+            style="@style/Button.Senior"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_m"
+            android:text="@string/senior_share_location"
+            app:backgroundTint="@color/moss_500" />
+
+        <!-- ─────────── 글씨 크기 ─────────── -->
+        <TextView
+            style="@style/Text.SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_2xl"
+            android:text="@string/my_font_size" />
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggle_senior_font"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_m"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_sfont_normal"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="@dimen/touch_target_senior"
+                android:text="@string/font_size_normal" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_sfont_large"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="@dimen/touch_target_senior"
+                android:text="@string/font_size_large" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_sfont_xlarge"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="@dimen/touch_target_senior"
+                android:text="@string/font_size_xlarge" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <!-- ─────────── 일반 모드로 ─────────── -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_back_to_normal"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_2xl"
+            android:minHeight="@dimen/touch_target_senior"
+            android:text="@string/my_senior_off"
+            android:textColor="@color/text_secondary" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

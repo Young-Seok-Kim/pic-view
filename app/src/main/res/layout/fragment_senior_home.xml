@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    시니어 홈 (스펙 §17-4 탭1).
+
+    화면당 액션을 3개로 제한하고 전부 대형 버튼으로 둡니다.
+    글자 크기는 여기서 지정하지 않습니다 — fontScale 이 앱 전체에 적용됩니다.
+-->
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scroll_senior_home"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_page"
+    android:clipToPadding="false"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/screen_padding_senior"
+        android:paddingBottom="@dimen/space_3xl">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_l"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/Text.Title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/app_name" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_senior_to_normal"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/touch_target"
+                android:text="@string/senior_toggle_to_normal" />
+        </LinearLayout>
+
+        <!-- ─────────── 오늘의 빛 (큰 카드) ─────────── -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_l"
+            app:cardBackgroundColor="@color/maple_600"
+            app:cardCornerRadius="@dimen/radius_card_senior"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/space_senior">
+
+                <TextView
+                    android:id="@+id/tv_senior_greeting"
+                    style="@style/Text.Title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text="@string/senior_greeting" />
+
+                <TextView
+                    android:id="@+id/tv_senior_weather"
+                    style="@style/Text.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_s"
+                    android:textColor="@color/white"
+                    tools:text="오늘 정읍 · 31℃ · 오전" />
+
+                <TextView
+                    android:id="@+id/tv_senior_light"
+                    style="@style/Text.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_xs"
+                    android:textColor="#E6FFFFFF"
+                    tools:text="측광이 좋은 시간이에요" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ─────────── 대형 버튼 3개 ─────────── -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_senior_course"
+            style="@style/Button.Senior"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_l"
+            android:text="@string/senior_action_course"
+            app:backgroundTint="@color/maple_500" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_senior_audio"
+            style="@style/Button.Senior"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_m"
+            android:text="@string/senior_action_audio"
+            app:backgroundTint="@color/moss_500" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_senior_help"
+            style="@style/Button.Senior"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_m"
+            android:text="@string/senior_action_help"
+            app:backgroundTint="@color/sand_600" />
+
+        <!-- ─────────── 오늘 추천 한 곳 ─────────── -->
+        <TextView
+            style="@style/Text.SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_2xl"
+            android:text="@string/senior_today_spot" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_senior_spot"
+            style="@style/Card.Senior"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_m"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_senior_spot_title"
+                    style="@style/Text.Title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="정읍사예술회관" />
+
+                <TextView
+                    android:id="@+id/tv_senior_spot_desc"
+                    style="@style/Text.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_s"
+                    tools:text="해가 진 직후 조명과 하늘이 함께 담기는 20분이 좋아요" />
+
+                <TextView
+                    android:id="@+id/tv_senior_spot_addr"
+                    style="@style/Text.Caption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_s"
+                    tools:text="전북특별자치도 정읍시 시기4길 13" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
