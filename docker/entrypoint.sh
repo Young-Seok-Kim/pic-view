@@ -2,6 +2,10 @@
 # ===========================================================
 #  빌드 컨테이너 진입점
 #
+#  이 컨테이너는 빌드만 합니다. 에뮬레이터 설치·실행은 호스트에서 합니다
+#  (scripts/deploy.sh 참고). 컨테이너에서 에뮬레이터에 붙지 않는 이유는
+#  docker/README.md 의 "왜 빌드 전용인가" 를 보세요.
+#
 #  호스트 소스(/src)를 컨테이너 작업 폴더(/workspace)로 복사한 뒤 빌드합니다.
 #  직접 마운트해서 쓰지 않는 이유:
 #    - local.properties 의 sdk.dir 이 윈도우 경로("C:\...")라 리눅스에서 깨집니다.
@@ -45,7 +49,9 @@ echo "[3/3] 빌드: $*"
 
 # 산출물을 호스트로 꺼냅니다(/out 이 마운트돼 있을 때만).
 if [ -d "$OUT" ]; then
-    find app/build/outputs \( -name '*.aab' -o -name '*.apk' \) -exec cp {} "$OUT/" \; 2>/dev/null || true
-    echo "산출물 → /out"
+    find app/build/outputs \( -name '*.aab' -o -name '*.apk' \) \
+        -exec cp {} "$OUT/" \; 2>/dev/null || true
+    echo
+    echo "산출물 → build-output/"
     ls -la "$OUT" 2>/dev/null || true
 fi
