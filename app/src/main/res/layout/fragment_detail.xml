@@ -357,11 +357,10 @@
 
                 <TextView
                     android:id="@+id/tv_detail_tip"
+                    style="@style/Text.Reading"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_m"
-                    android:lineSpacingExtra="6dp"
-                    android:textColor="@color/text_secondary"
                     android:textSize="15sp"
                     tools:text="이곳은 삼분할 구도를 활용하여 배경과 인물을 배치할 때 가장 아름다운 사진을 얻을 수 있습니다." />
             </LinearLayout>

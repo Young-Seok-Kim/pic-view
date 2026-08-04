@@ -103,4 +103,11 @@
     <!-- 하단 탭 -->
     <color name="nav_item_active">#B23A1B</color>
     <color name="nav_item_inactive">#9B8878</color>
+    <!-- ============ 촬영 화면 포즈 카드 (어두운 배경 위) ============ -->
+    <color name="pose_card_bg">#D91A1512</color>
+    <color name="pose_card_stroke">#33FFFFFF</color>
+    <color name="pose_card_text">#FFFFFFFF</color>
+    <color name="pose_card_muted">#B3E8DED4</color>
+    <color name="pose_card_bg_selected">#F2B23A1B</color>
+    <color name="pose_card_stroke_selected">#FFE0A32E</color>
 </resources>

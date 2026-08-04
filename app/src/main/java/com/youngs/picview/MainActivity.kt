@@ -483,6 +483,7 @@ class MainActivity : BaseActivity() {
                 }
 
                 viewModel.weatherData.postValue(weatherResult)
+                viewModel.temperatureC.postValue(temp?.toDoubleOrNull())
                 viewModel.goldenHourData.postValue(goldenText)
                 viewModel.loadFailed.postValue(spots.isEmpty())
                 if (spots.isNotEmpty()) {
@@ -494,6 +495,7 @@ class MainActivity : BaseActivity() {
             } catch (e: Exception) {
                 Log.e("PRELOAD_ERROR", "사전 로딩 실패: ${e.message}")
                 viewModel.weatherData.postValue("정보를 불러올 수 없습니다.")
+                viewModel.temperatureC.postValue(null)
                 viewModel.goldenHourData.postValue("정보 없음")
                 viewModel.loadFailed.postValue(true)
             } finally {

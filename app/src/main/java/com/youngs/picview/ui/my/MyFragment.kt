@@ -1,12 +1,10 @@
 package com.youngs.picview.ui.my
 
+import com.youngs.picview.util.applyTopSystemBarInset
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AlertDialog
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.youngs.picview.BuildConfig
@@ -58,11 +56,7 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
     }
 
     private fun applyTopInset() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.scrollMy) { v, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.updatePadding(top = bars.top)
-            insets
-        }
+        binding.scrollMy.applyTopSystemBarInset()
     }
 
     // ─────────────────────── 저장한 코스 ───────────────────────
@@ -96,7 +90,7 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
     }
 
     private fun confirmDelete(item: SavedCourseWithStops) {
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.my_delete_course)
             .setMessage(getString(R.string.my_delete_confirm, item.course.title))
             .setPositiveButton(R.string.confirm) { _, _ ->
@@ -120,7 +114,7 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
 
         binding.btnSeniorToggle.setOnClickListener {
             val enabling = !AppPrefs.isSeniorMode(requireContext())
-            AlertDialog.Builder(requireContext())
+            MaterialAlertDialogBuilder(requireContext())
                 .setTitle(
                     if (enabling) R.string.senior_switch_title
                     else R.string.senior_switch_back_title

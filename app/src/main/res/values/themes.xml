@@ -33,6 +33,146 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+
+        <!--
+            타이포그래피 : Pretendard (시안의 Inter 를 한글까지 덮는 대응 서체)
+            fontFamily 만 지정하면 Material 컴포넌트는 각자의 textAppearance 에
+            박힌 서체를 그대로 쓰므로, M3 타입스케일 15종을 모두 갈아끼웁니다.
+        -->
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.PicView.DisplayLarge</item>
+        <item name="textAppearanceDisplayMedium">@style/TextAppearance.PicView.DisplayMedium</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.PicView.DisplaySmall</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.PicView.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.PicView.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.PicView.HeadlineSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.PicView.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.PicView.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.PicView.TitleSmall</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.PicView.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.PicView.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.PicView.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.PicView.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.PicView.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.PicView.LabelSmall</item>
+
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.PicView.Dialog</item>
+    </style>
+
+    <!-- ================= 다이얼로그 ================= -->
+    <style name="ThemeOverlay.PicView.Dialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="alertDialogStyle">@style/MaterialAlertDialog.PicView</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialog.PicView.Title</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialog.PicView.Body</item>
+        <item name="buttonBarPositiveButtonStyle">@style/MaterialAlertDialog.PicView.PositiveButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/MaterialAlertDialog.PicView.NegativeButton</item>
+        <item name="colorSurface">@color/bg_card</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+    </style>
+
+    <style name="MaterialAlertDialog.PicView" parent="MaterialAlertDialog.Material3">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.PicView.Dialog</item>
+        <item name="backgroundInsetStart">@dimen/space_2xl</item>
+        <item name="backgroundInsetEnd">@dimen/space_2xl</item>
+    </style>
+
+    <style name="ShapeAppearance.PicView.Dialog" parent="ShapeAppearance.Material3.Corner.ExtraLarge">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/radius_card</item>
+    </style>
+
+    <style name="MaterialAlertDialog.PicView.Title" parent="MaterialAlertDialog.Material3.Title.Text">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">@dimen/text_title</item>
+        <item name="android:textStyle">bold</item>
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+    </style>
+
+    <style name="MaterialAlertDialog.PicView.Body" parent="MaterialAlertDialog.Material3.Body.Text">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">@dimen/text_body</item>
+        <item name="android:lineSpacingExtra">4dp</item>
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+    </style>
+
+    <style name="MaterialAlertDialog.PicView.PositiveButton" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/maple_500</item>
+        <item name="android:textSize">@dimen/text_button</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:minHeight">@dimen/touch_target</item>
+    </style>
+
+    <style name="MaterialAlertDialog.PicView.NegativeButton" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/text_tertiary</item>
+        <item name="android:textSize">@dimen/text_button</item>
+        <item name="android:minHeight">@dimen/touch_target</item>
+    </style>
+
+    <!-- ================= M3 타입스케일 : 서체만 교체 ================= -->
+    <style name="TextAppearance.PicView.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+    </style>
+    <style name="TextAppearance.PicView.DisplayMedium" parent="TextAppearance.Material3.DisplayMedium">
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+    </style>
+    <style name="TextAppearance.PicView.DisplaySmall" parent="TextAppearance.Material3.DisplaySmall">
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+    </style>
+    <style name="TextAppearance.PicView.HeadlineLarge" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+    </style>
+    <style name="TextAppearance.PicView.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+    </style>
+    <style name="TextAppearance.PicView.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+    </style>
+    <style name="TextAppearance.PicView.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+    </style>
+    <style name="TextAppearance.PicView.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+    </style>
+    <style name="TextAppearance.PicView.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+    </style>
+    <style name="TextAppearance.PicView.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+    </style>
+    <style name="TextAppearance.PicView.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+    </style>
+    <style name="TextAppearance.PicView.BodySmall" parent="TextAppearance.Material3.BodySmall">
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+    </style>
+    <style name="TextAppearance.PicView.LabelLarge" parent="TextAppearance.Material3.LabelLarge">
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+    </style>
+    <style name="TextAppearance.PicView.LabelMedium" parent="TextAppearance.Material3.LabelMedium">
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+    </style>
+    <style name="TextAppearance.PicView.LabelSmall" parent="TextAppearance.Material3.LabelSmall">
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
     </style>
 
     <style name="Theme.PicView" parent="Base.Theme.PicView" />
@@ -75,40 +215,75 @@
     </style>
 
     <!-- ================= 텍스트 스타일 ================= -->
-    <style name="Text.Display" parent="TextAppearance.Material3.HeadlineMedium">
+    <!--
+        히어로 제목만 마포백패킹(마포구 공공서체, 공공누리 1유형).
+        본문·라벨은 Pretendard 그대로 둡니다. 큰 글씨 모드에서 본문까지
+        디스플레이 서체가 되면 가독성이 떨어지기 때문입니다.
+    -->
+    <style name="Text.Display" parent="TextAppearance.PicView.HeadlineMedium">
+        <item name="fontFamily">@font/mapo_backpacking</item>
+        <item name="android:fontFamily">@font/mapo_backpacking</item>
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">@dimen/text_display</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:letterSpacing">-0.01</item>
     </style>
 
-    <style name="Text.Title" parent="TextAppearance.Material3.TitleLarge">
+    <style name="Text.Title" parent="TextAppearance.PicView.TitleLarge">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">@dimen/text_title</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">-0.015</item>
     </style>
 
-    <style name="Text.SectionTitle" parent="TextAppearance.Material3.TitleMedium">
+    <style name="Text.SectionTitle" parent="TextAppearance.PicView.TitleMedium">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">@dimen/text_section</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">-0.01</item>
     </style>
 
-    <style name="Text.Body" parent="TextAppearance.Material3.BodyMedium">
+    <style name="Text.Body" parent="TextAppearance.PicView.BodyMedium">
         <item name="android:textColor">@color/text_secondary</item>
         <item name="android:textSize">@dimen/text_body</item>
         <item name="android:lineSpacingExtra">4dp</item>
     </style>
 
-    <style name="Text.Caption" parent="TextAppearance.Material3.BodySmall">
+    <style name="Text.Caption" parent="TextAppearance.PicView.BodySmall">
         <item name="android:textColor">@color/text_tertiary</item>
         <item name="android:textSize">@dimen/text_caption</item>
     </style>
 
+    <!--
+        읽는 글 : 장소 개요처럼 문단으로 이어지는 본문.
+        KoPubWorld 바탕(전자출판용 세리프)으로 UI 라벨과 시각적으로 구분합니다.
+    -->
+    <style name="Text.Reading" parent="TextAppearance.PicView.BodyLarge">
+        <item name="fontFamily">@font/kopub_batang_light</item>
+        <item name="android:fontFamily">@font/kopub_batang_light</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">@dimen/text_body</item>
+        <item name="android:lineSpacingExtra">7dp</item>
+    </style>
+
+    <!--
+        일기 : 사용자가 다녀온 하루의 기록.
+        손글씨체를 써서 '앱이 만든 정보'가 아니라 '내가 쓴 글'로 읽히게 합니다.
+    -->
+    <style name="Text.Diary" parent="TextAppearance.PicView.BodyLarge">
+        <item name="fontFamily">@font/kyobo_handwriting</item>
+        <item name="android:fontFamily">@font/kyobo_handwriting</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:lineSpacingExtra">8dp</item>
+    </style>
+
+    <style name="Text.Diary.Title" parent="Text.Diary">
+        <item name="android:textColor">@color/maple_600</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+
     <!-- 빛 스케줄 타임라인의 시각 표기 (05:42 …) -->
-    <style name="Text.ClockTime" parent="TextAppearance.Material3.TitleMedium">
+    <style name="Text.ClockTime" parent="TextAppearance.PicView.TitleMedium">
         <item name="android:textColor">@color/maple_500</item>
         <item name="android:textSize">@dimen/text_section</item>
         <item name="android:textStyle">bold</item>
@@ -189,4 +364,19 @@
         <item name="android:height">32dp</item>
     </style>
 
+    <!--
+        촬영 화면의 인원 칩. 카메라 미리보기 위에 얹히므로
+        탐색 탭의 밝은 칩(Chip.Category)과 달리 어두운 배경을 씁니다.
+    -->
+    <style name="Chip.Pose" parent="Widget.Material3.Chip.Filter">
+        <item name="chipBackgroundColor">@color/pose_chip_bg_selector</item>
+        <item name="android:textColor">@color/pose_chip_text_selector</item>
+        <item name="chipStrokeColor">@color/pose_chip_stroke_selector</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipIconVisible">false</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="chipMinHeight">34dp</item>
+        <item name="android:textSize">@dimen/text_caption</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>

@@ -27,16 +27,34 @@ import com.gun0912.tedpermission.normal.TedPermission
 import com.youngs.picview.BuildConfig
 import com.youngs.picview.R
 import com.youngs.picview.databinding.ActivityGuideBinding
+import com.youngs.picview.domain.light.LightPhase
+import com.youngs.picview.domain.pose.GroupSize
+import com.youngs.picview.domain.pose.PoseRecommender
+import com.youngs.picview.domain.spot.Facing
+import com.youngs.picview.domain.spot.SpotFactsTable
 
 class GuideActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_SPOT_NAME = "SPOT_NAME"
         const val EXTRA_SPOT_TYPE = "SPOT_TYPE"
+
+        /** 지금의 빛 구간([LightPhase] 이름). 포즈 추천 순서를 정하는 데 씁니다. */
+        const val EXTRA_PHASE = "PHASE"
     }
 
     private lateinit var binding: ActivityGuideBinding
     private var imageCapture: ImageCapture? = null
+
+    private lateinit var poseAdapter: PoseAdapter
+
+    /** 이 장소의 방위. 실내면 하늘·역광 포즈를 후순위로 내립니다. */
+    private lateinit var facing: Facing
+
+    /** 지금의 빛. 화면이 떠 있는 동안은 바뀌지 않습니다. */
+    private lateinit var phase: LightPhase
+
+    private var groupSize: GroupSize = GroupSize.SOLO
 
     private val galleryLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -87,9 +105,12 @@ class GuideActivity : AppCompatActivity() {
      * 앱 다른 화면과 같은 기준인 contentTypeId 로 판단합니다.
      */
     private fun setupGuide() {
-        binding.tvSpotName.text = intent.getStringExtra(EXTRA_SPOT_NAME) ?: ""
+        val spotName = intent.getStringExtra(EXTRA_SPOT_NAME) ?: ""
+        val spotType = intent.getStringExtra(EXTRA_SPOT_TYPE)
 
-        val guideType = when (intent.getStringExtra(EXTRA_SPOT_TYPE)) {
+        binding.tvSpotName.text = spotName
+
+        val guideType = when (spotType) {
             "14" -> GuideOverlayView.GuideType.SYMMETRY // 문화시설 : 건축 대칭
             "39" -> GuideOverlayView.GuideType.CENTER   // 음식점 : 근접 촬영
             else -> GuideOverlayView.GuideType.THIRDS   // 자연·레포츠 등 풍경
@@ -105,6 +126,42 @@ class GuideActivity : AppCompatActivity() {
                 GuideOverlayView.GuideType.CENTER -> R.string.guide_center
             }
         )
+
+        setupPoses(spotName, spotType)
+    }
+
+    /**
+     * 포즈 추천.
+     *
+     * 순서를 고정하지 않고 [PoseRecommender] 가 지금의 빛·방위·인원으로 매번
+     * 다시 계산합니다. 한밤중에 "실루엣"이 1등으로 떠 있으면 안 되기 때문입니다.
+     */
+    private fun setupPoses(spotName: String, spotType: String?) {
+        phase = runCatching { LightPhase.valueOf(intent.getStringExtra(EXTRA_PHASE).orEmpty()) }
+            .getOrDefault(LightPhase.AFTERNOON)
+        facing = SpotFactsTable.of(spotName, spotType).facing
+
+        poseAdapter = PoseAdapter { selected ->
+            // 고른 포즈의 촬영 요령을 상단 안내 문구 자리에 띄웁니다.
+            binding.tvGuideMessage.text = selected.pose.tip
+        }
+        binding.rvPoses.adapter = poseAdapter
+
+        binding.chipGroupPeople.setOnCheckedStateChangeListener { _, checked ->
+            groupSize = when (checked.firstOrNull()) {
+                R.id.chip_people_pair -> GroupSize.PAIR
+                R.id.chip_people_small -> GroupSize.SMALL
+                R.id.chip_people_large -> GroupSize.LARGE
+                else -> GroupSize.SOLO
+            }
+            refreshPoses()
+        }
+
+        refreshPoses()
+    }
+
+    private fun refreshPoses() {
+        poseAdapter.submit(PoseRecommender.recommend(phase, facing, groupSize))
     }
 
     /**
