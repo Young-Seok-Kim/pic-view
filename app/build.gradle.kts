@@ -48,6 +48,11 @@ android {
             if (hasReleaseSigning) {
                 signingConfig = signingConfigs.getByName("release")
             }
+            // 직접 배포용 APK 에서 에뮬레이터 전용 ABI 를 뺍니다(99MB → 약 45MB).
+            // AAB 로 제출하면 구글이 알아서 더 잘게 쪼갭니다.
+            ndk {
+                abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+            }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -67,6 +72,33 @@ android {
     buildFeatures {
         viewBinding = true
         buildConfig = true
+    }
+
+    /*
+     * 네이버 지도 SDK 의 libnavermap.so 가 ABI 하나당 19~26MB 입니다.
+     * 4개 ABI 를 다 넣으면 APK 가 99MB 가 되므로 분리해서 내보냅니다.
+     *
+     * - Play Store 제출은 AAB(:bundleRelease). 구글이 기기 ABI 에 맞는 것만 내려줘
+     *   실제 다운로드는 30MB 내외가 됩니다.
+     * - 직접 배포용 APK(:assembleRelease)는 아래 abiFilters 로 실기기용 두 개만 담습니다.
+     *   x86/x86_64 는 에뮬레이터 전용이라 실사용자에게 필요 없습니다.
+     *   (에뮬레이터 테스트는 debug 빌드로 하며, debug 에는 이 필터가 걸리지 않습니다)
+     */
+    bundle {
+        abi { enableSplit = true }
+        density { enableSplit = true }
+        language {
+            // 한국어 전용 앱이라 언어 분리는 끕니다(분리해도 이득이 없고 QA 만 복잡해짐)
+            enableSplit = false
+        }
+    }
+
+    // Room 스키마를 파일로 남겨 마이그레이션 시 diff 를 볼 수 있게 합니다.
+    kapt {
+        arguments {
+            arg("room.schemaLocation", "$projectDir/schemas")
+            arg("room.incremental", "true")
+        }
     }
 }
 
@@ -107,6 +139,11 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.fragment.ktx)
 
+    // Room : 저장한 코스·방문 기록. 관광 데이터 자체는 캐싱하지 않습니다(공모전 규정)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
+
     implementation(libs.tedpermission.normal)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.swiperefreshlayout)
@@ -116,4 +153,7 @@ dependencies {
 }
 secrets {
     propertiesFileName = "local.properties"
+    // local.properties 에 없는 키는 여기서 채웁니다.
+    // 키가 없는 환경(다른 PC·CI)에서도 빌드가 통과하고, 해당 기능만 폴백합니다.
+    defaultPropertiesFileName = "local.defaults.properties"
 }
