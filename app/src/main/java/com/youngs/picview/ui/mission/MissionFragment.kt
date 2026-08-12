@@ -39,8 +39,16 @@ class MissionFragment : Fragment(R.layout.fragment_mission) {
         val adapter = MissionAdapter()
         binding.rvMissions.adapter = adapter
 
+        // 스탬프북은 미션과 같은 데이터를 격자로 보여 줍니다.
+        val stampAdapter = StampAdapter()
+        binding.rvStamps.adapter = stampAdapter
+
         viewModel.progress.observe(viewLifecycleOwner) { list ->
             adapter.submitList(list)
+            stampAdapter.submitList(list)
+            binding.tvStampCount.text = getString(
+                R.string.stamp_count_format, list.size, list.count { it.isComplete }
+            )
             renderSummary(list)
         }
     }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 찍힌 스탬프. 색은 코드에서 미션별로 칠합니다. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@color/maple_50" />
+    <stroke
+        android:width="2dp"
+        android:color="@color/maple_500" />
+</shape>

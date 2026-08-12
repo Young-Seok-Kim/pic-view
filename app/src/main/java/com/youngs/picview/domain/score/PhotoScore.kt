@@ -31,12 +31,12 @@ data class ScoreFactor(
 }
 
 enum class FactorKind(@StringRes val labelRes: Int) {
-    BASE_ATTRACTION(R.string.factor_base),
-    FRESHNESS(R.string.factor_freshness),
-    HAS_PHOTO(R.string.factor_photo),
+    SUBJECT(R.string.factor_subject),
     LIGHT(R.string.factor_light),
+    FACING(R.string.factor_facing),
+    SEASON(R.string.factor_season),
     WEATHER(R.string.factor_weather),
-    TEMPERATURE(R.string.factor_temp),
+    COMFORT(R.string.factor_comfort),
     ACCESSIBILITY(R.string.factor_access)
 }
 
@@ -57,16 +57,48 @@ data class PhotoScore(
      *
      * 대신 **만점 대비 달성률 × 배점 크기**로 봅니다.
      * 배점이 크면서 실제로 만점에 가까운 항목이 그 장소의 강점이기 때문입니다.
-     * 카테고리 기본 매력도는 어느 장소나 비슷해서 설명력이 없으니 제외합니다.
+     * 소재 폭은 유형별 고정값이라 설명력이 없으니 제외합니다.
      */
     val topFactor: ScoreFactor?
         get() = factors
-            .filter { it.kind != FactorKind.BASE_ATTRACTION }
+            .filter { it.kind != FactorKind.SUBJECT }
             .maxByOrNull { it.ratio * it.max }
 
     /** 점수를 깎은 항목(있으면). */
     val penalty: ScoreFactor?
         get() = factors.filter { it.earned < 0 }.minByOrNull { it.earned }
+
+    /**
+     * 점수를 설명하는 문장.
+     *
+     * 예전에는 항목 하나의 이유만 보여 줬습니다. 그래서 "비가 오지 않아요"
+     * 한 줄로 끝나 버려, 일곱 항목으로 계산해 놓고 정작 왜 이 점수인지는
+     * 알 수 없었습니다.
+     *
+     * 이제 **강점 두 개와 발목을 잡은 것 하나**를 엮습니다. 사람이 남에게
+     * 장소를 설명하는 방식("빛이 좋고 사진도 많은데, 다만 비가 와요")과
+     * 같습니다. 깎인 항목이 없으면 강점만 씁니다.
+     */
+    val summary: String
+        get() {
+            if (factors.isEmpty()) return ""
+
+            // 배점이 크면서 실제로 만점에 가까운 순.
+            // 소재 폭은 유형별 고정값이라 설명력이 없으므로 뺍니다.
+            val strengths = factors
+                .filter { it.kind != FactorKind.SUBJECT && it.earned > 0 }
+                .sortedByDescending { it.ratio * it.max }
+                .take(2)
+                .map { it.reason }
+
+            val drag = penalty?.reason
+
+            return when {
+                strengths.isEmpty() -> drag.orEmpty()
+                drag == null -> strengths.joinToString(" ")
+                else -> "${strengths.joinToString(" ")} 다만 $drag"
+            }
+        }
 
     companion object {
         val EMPTY = PhotoScore(0, emptyList())
