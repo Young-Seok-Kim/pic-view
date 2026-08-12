@@ -157,7 +157,7 @@
                         android:layout_marginStart="5dp"
                         android:text="@string/detail_photo_score"
                         android:textColor="@color/score_chip_text"
-                        android:textSize="12sp" />
+                        android:textSize="@dimen/text_caption" />
 
                     <TextView
                         android:id="@+id/tv_detail_score"
@@ -165,7 +165,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:textColor="@color/score_chip_text"
-                        android:textSize="13sp"
+                        android:textSize="@dimen/text_caption"
                         android:textStyle="bold"
                         tools:text="92" />
                 </LinearLayout>
@@ -176,7 +176,7 @@
                     android:layout_height="wrap_content"
                     android:letterSpacing="-0.02"
                     android:textColor="@color/text_primary"
-                    android:textSize="26sp"
+                    android:textSize="@dimen/text_display"
                     android:textStyle="bold"
                     tools:text="내장산 국립공원" />
 
@@ -201,7 +201,7 @@
                         android:layout_marginStart="6dp"
                         android:layout_weight="1"
                         android:textColor="@color/text_secondary"
-                        android:textSize="15sp"
+                        android:textSize="@dimen/text_body"
                         tools:text="전북특별자치도 정읍시 내장산로 936" />
                 </LinearLayout>
 
@@ -361,7 +361,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_m"
-                    android:textSize="15sp"
                     tools:text="이곳은 삼분할 구도를 활용하여 배경과 인물을 배치할 때 가장 아름다운 사진을 얻을 수 있습니다." />
             </LinearLayout>
         </LinearLayout>

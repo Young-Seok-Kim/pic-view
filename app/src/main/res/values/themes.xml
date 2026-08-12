@@ -216,9 +216,15 @@
 
     <!-- ================= 텍스트 스타일 ================= -->
     <!--
-        히어로 제목만 마포백패킹(마포구 공공서체, 공공누리 1유형).
-        본문·라벨은 Pretendard 그대로 둡니다. 큰 글씨 모드에서 본문까지
-        디스플레이 서체가 되면 가독성이 떨어지기 때문입니다.
+        제목 계열은 전부 마포백패킹(마포구 공공서체, 공공누리 1유형).
+
+        처음에는 히어로 한 줄에만 썼는데, 그러면 화면당 한 문장에서만 보여
+        서체를 쓴 티가 안 나고 나머지가 밋밋해 보였습니다. 제목 세 단계를
+        모두 이 서체로 묶어 "제목은 마포백패킹, 읽는 글과 라벨은 Pretendard"
+        라는 규칙이 화면에서 드러나게 했습니다.
+
+        본문까지 확장하지는 않습니다. 큰 글씨 모드에서 디스플레이 서체로 된
+        긴 문장은 오히려 읽기 어려워집니다.
     -->
     <style name="Text.Display" parent="TextAppearance.PicView.HeadlineMedium">
         <item name="fontFamily">@font/mapo_backpacking</item>
@@ -229,16 +235,18 @@
     </style>
 
     <style name="Text.Title" parent="TextAppearance.PicView.TitleLarge">
+        <item name="fontFamily">@font/mapo_backpacking</item>
+        <item name="android:fontFamily">@font/mapo_backpacking</item>
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">@dimen/text_title</item>
-        <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">-0.015</item>
     </style>
 
     <style name="Text.SectionTitle" parent="TextAppearance.PicView.TitleMedium">
+        <item name="fontFamily">@font/mapo_backpacking</item>
+        <item name="android:fontFamily">@font/mapo_backpacking</item>
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">@dimen/text_section</item>
-        <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">-0.01</item>
     </style>
 
@@ -257,17 +265,24 @@
         읽는 글 : 장소 개요처럼 문단으로 이어지는 본문.
         KoPubWorld 바탕(전자출판용 세리프)으로 UI 라벨과 시각적으로 구분합니다.
     -->
+    <!--
+        읽는 글 : 장소 개요처럼 문단으로 이어지는 본문.
+
+        한때 명조(KoPubWorld 바탕)를 썼지만 한글 명조는 화면에서 옛 문서
+        느낌이 강해 앱 전체와 겉돌았습니다. 서체를 늘리는 대신 Pretendard
+        하나로 두고 크기·줄간격·색으로만 본문과 UI 를 구분합니다.
+    -->
     <style name="Text.Reading" parent="TextAppearance.PicView.BodyLarge">
-        <item name="fontFamily">@font/kopub_batang_light</item>
-        <item name="android:fontFamily">@font/kopub_batang_light</item>
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">16sp</item>
         <!--
             긴 문단은 줄 간격이 좁으면 눈이 다음 줄을 놓칩니다.
-            본문 16sp 에 배수 1.6 이면 한글 문단에서 편하게 읽히는 폭입니다.
+            본문 16sp 에 배수 1.65 면 한글 문단에서 편하게 읽히는 폭입니다.
         -->
-        <item name="android:lineSpacingMultiplier">1.6</item>
-        <item name="android:letterSpacing">-0.005</item>
+        <item name="android:lineSpacingMultiplier">1.65</item>
+        <item name="android:letterSpacing">-0.012</item>
         <!-- 한글은 어절 단위로 끊어야 읽기 흐름이 끊기지 않습니다. -->
         <item name="android:breakStrategy" tools:targetApi="m">high_quality</item>
         <item name="android:hyphenationFrequency" tools:targetApi="m">none</item>

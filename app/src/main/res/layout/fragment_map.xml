@@ -28,7 +28,7 @@
             android:clickable="true"
             android:focusable="true"
             app:cardBackgroundColor="@color/bg_card"
-            app:cardCornerRadius="21dp"
+            app:cardCornerRadius="@dimen/radius_card"
             app:cardElevation="6dp"
             app:strokeWidth="0dp">
 
@@ -46,7 +46,7 @@
             android:layout_height="42dp"
             android:layout_marginStart="@dimen/space_s"
             app:cardBackgroundColor="@color/bg_card"
-            app:cardCornerRadius="21dp"
+            app:cardCornerRadius="@dimen/radius_card"
             app:cardElevation="6dp"
             app:strokeWidth="0dp">
 
@@ -70,7 +70,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:textColor="@color/text_primary"
-                    android:textSize="14sp"
+                    android:textSize="@dimen/text_body"
                     android:textStyle="bold" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
