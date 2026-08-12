@@ -216,22 +216,30 @@
 
     <!-- ================= 텍스트 스타일 ================= -->
     <!--
-        제목 계열은 전부 마포백패킹(마포구 공공서체, 공공누리 1유형).
+        ================= 서체 역할 =================
 
-        처음에는 히어로 한 줄에만 썼는데, 그러면 화면당 한 문장에서만 보여
-        서체를 쓴 티가 안 나고 나머지가 밋밋해 보였습니다. 제목 세 단계를
-        모두 이 서체로 묶어 "제목은 마포백패킹, 읽는 글과 라벨은 Pretendard"
-        라는 규칙이 화면에서 드러나게 했습니다.
+        한 서체를 제목 전체에 몰아 쓰면 화면이 단조로워지고, 반대로 종류를
+        늘리면 서로 충돌합니다. 크기 단계마다 역할을 나눠 배정했습니다.
 
-        본문까지 확장하지는 않습니다. 큰 글씨 모드에서 디스플레이 서체로 된
-        긴 문장은 오히려 읽기 어려워집니다.
+          Display      ONE Mobile Bold   화면을 여는 큰 제목. 기하학적이고
+                                         군더더기가 없어 앱을 현대적으로 만듭니다.
+          Title        마포백패킹         장소명·카드 제목. 둥글고 친근해서
+                                         관광 앱의 성격이 드러납니다.
+          SectionTitle Pretendard Bold   소제목. 본문 바로 위에 붙는 자리라
+                                         중립적인 편이 문단을 방해하지 않습니다.
+          Body/Label   Pretendard        읽는 글과 UI 라벨.
+          Diary        교보손글씨 2025    사용자가 쓴 글.
+          Stamp        그리운 체리한스푼   스탬프·배지 같은 놀이 요소.
+
+        본문에는 디스플레이 서체를 쓰지 않습니다. 큰 글씨 모드에서 긴 문장이
+        오히려 읽기 어려워지기 때문입니다.
     -->
     <style name="Text.Display" parent="TextAppearance.PicView.HeadlineMedium">
-        <item name="fontFamily">@font/mapo_backpacking</item>
-        <item name="android:fontFamily">@font/mapo_backpacking</item>
+        <item name="fontFamily">@font/one_mobile_bold</item>
+        <item name="android:fontFamily">@font/one_mobile_bold</item>
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">@dimen/text_display</item>
-        <item name="android:letterSpacing">-0.01</item>
+        <item name="android:letterSpacing">-0.02</item>
     </style>
 
     <style name="Text.Title" parent="TextAppearance.PicView.TitleLarge">
@@ -243,11 +251,20 @@
     </style>
 
     <style name="Text.SectionTitle" parent="TextAppearance.PicView.TitleMedium">
-        <item name="fontFamily">@font/mapo_backpacking</item>
-        <item name="android:fontFamily">@font/mapo_backpacking</item>
+        <item name="fontFamily">@font/pretendard</item>
+        <item name="android:fontFamily">@font/pretendard</item>
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">@dimen/text_section</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">-0.01</item>
+    </style>
+
+    <!-- 스탬프·배지처럼 놀이 성격이 있는 요소. -->
+    <style name="Text.Stamp" parent="TextAppearance.PicView.TitleMedium">
+        <item name="fontFamily">@font/griun_cherry</item>
+        <item name="android:fontFamily">@font/griun_cherry</item>
+        <item name="android:textColor">@color/maple_600</item>
+        <item name="android:textSize">@dimen/text_section</item>
     </style>
 
     <style name="Text.Body" parent="TextAppearance.PicView.BodyMedium">
