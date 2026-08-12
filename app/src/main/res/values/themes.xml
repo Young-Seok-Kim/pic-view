@@ -225,8 +225,8 @@
                                          화면을 여는 큰 제목. 둥글고 친근해서
                                          관광 앱의 성격이 드러납니다.
           Title        마포백패킹         장소명·카드 제목.
-          SectionTitle Pretendard Bold   소제목. 본문 바로 위에 붙는 자리라
-                                         중립적인 편이 문단을 방해하지 않습니다.
+          SectionTitle 이서윤체           소제목. Pretendard 로 두면 본문과 같은
+                                         집안이라 위계가 안 보였습니다.
           Body/Label   Pretendard        읽는 글과 UI 라벨.
           Diary        교보손글씨 2025    사용자가 쓴 글.
           Stamp        그리운 체리한스푼   스탬프·배지 같은 놀이 요소.
@@ -251,11 +251,10 @@
     </style>
 
     <style name="Text.SectionTitle" parent="TextAppearance.PicView.TitleMedium">
-        <item name="fontFamily">@font/pretendard</item>
-        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="fontFamily">@font/leeseoyun</item>
+        <item name="android:fontFamily">@font/leeseoyun</item>
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">@dimen/text_section</item>
-        <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">-0.01</item>
     </style>
 
