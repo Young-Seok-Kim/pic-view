@@ -22,6 +22,9 @@ import com.youngs.picview.R
 import com.youngs.picview.databinding.FragmentMapBinding
 import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.ui.model.SpotItem
+import android.graphics.PointF
+import androidx.annotation.DrawableRes
+import com.naver.maps.map.overlay.OverlayImage
 
 class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
     private val markers = mutableListOf<Marker>()
@@ -104,12 +107,18 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
                 val marker = Marker()
                 marker.position = position
                 marker.captionText = spot.title
-                marker.iconTintColor = ContextCompat.getColor(requireContext(), R.color.maple_500)
+
+                // 마커가 전부 같은 색이면 85개가 구분 없이 깔려서 지도만 봐서는
+                // 무엇이 있는 곳인지 알 수 없습니다. 분류별로 색과 아이콘을
+                // 달리해 한눈에 읽히게 합니다.
+                marker.icon = OverlayImage.fromResource(markerResFor(spot.contentTypeId))
+                // 핀의 아래 꼭짓점이 실제 좌표를 가리키게 합니다.
+                marker.anchor = PointF(0.5f, 1.0f)
 
                 // 88개가 기본 크기로 깔리면 서로 겹쳐 지도가 안 보입니다.
                 // 크기를 줄이고, 겹치는 마커와 캡션은 지도가 알아서 숨기게 합니다.
-                marker.width = dp(22)
-                marker.height = dp(30)
+                marker.width = dp(27)
+                marker.height = dp(36)
                 marker.isHideCollidedMarkers = true
                 marker.isHideCollidedCaptions = true
                 marker.captionMinZoom = 11.0
@@ -156,5 +165,20 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    /**
+     * 분류별 마커 그림.
+     *
+     * 관광공사 contentTypeId 를 그대로 씁니다. 앱의 다른 화면(탐색 탭 필터,
+     * 촬영 구도 판단)과 같은 기준이라 지도만 다른 규칙을 갖지 않습니다.
+     */
+    @DrawableRes
+    private fun markerResFor(contentTypeId: String?): Int = when (contentTypeId) {
+        "12", "25" -> R.drawable.marker_nature   // 관광지 · 여행코스
+        "14" -> R.drawable.marker_culture        // 문화시설
+        "28" -> R.drawable.marker_leports        // 레포츠
+        "39" -> R.drawable.marker_food           // 음식점
+        else -> R.drawable.marker_etc
     }
 }

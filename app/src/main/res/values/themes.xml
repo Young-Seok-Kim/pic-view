@@ -221,10 +221,10 @@
         한 서체를 제목 전체에 몰아 쓰면 화면이 단조로워지고, 반대로 종류를
         늘리면 서로 충돌합니다. 크기 단계마다 역할을 나눠 배정했습니다.
 
-          Display      ONE Mobile Bold   화면을 여는 큰 제목. 기하학적이고
-                                         군더더기가 없어 앱을 현대적으로 만듭니다.
-          Title        마포백패킹         장소명·카드 제목. 둥글고 친근해서
+          Display      마포백패킹         "정읍 시선"·"저녁 블루아워" 처럼
+                                         화면을 여는 큰 제목. 둥글고 친근해서
                                          관광 앱의 성격이 드러납니다.
+          Title        마포백패킹         장소명·카드 제목.
           SectionTitle Pretendard Bold   소제목. 본문 바로 위에 붙는 자리라
                                          중립적인 편이 문단을 방해하지 않습니다.
           Body/Label   Pretendard        읽는 글과 UI 라벨.
@@ -235,11 +235,11 @@
         오히려 읽기 어려워지기 때문입니다.
     -->
     <style name="Text.Display" parent="TextAppearance.PicView.HeadlineMedium">
-        <item name="fontFamily">@font/one_mobile_bold</item>
-        <item name="android:fontFamily">@font/one_mobile_bold</item>
+        <item name="fontFamily">@font/mapo_backpacking</item>
+        <item name="android:fontFamily">@font/mapo_backpacking</item>
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">@dimen/text_display</item>
-        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:letterSpacing">-0.01</item>
     </style>
 
     <style name="Text.Title" parent="TextAppearance.PicView.TitleLarge">
