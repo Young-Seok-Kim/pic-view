@@ -127,7 +127,6 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
     }
 
     private fun setupActions() {
-        binding.btnHomeMakeCourse.setOnClickListener { goToTab(R.id.tab_course) }
         binding.tvHomeBestMore.setOnClickListener { goToTab(R.id.tab_explore) }
         buildQuickActions()
     }
@@ -146,15 +145,17 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
         val container = binding.layoutQuickActions
         container.removeAllViews()
 
+        // 일기는 하단 탭에 이미 있어 타일까지 두면 같은 곳으로 가는 길이
+        // 두 개가 됩니다. 대신 이 화면의 주 행동인 빛 스케줄을 첫 칸에 둡니다.
         val actions = listOf(
-            QuickAction("🗺", R.string.home_open_map, R.color.qa_course) {
+            QuickAction("🌇", R.string.home_qa_course, R.color.qa_course) {
+                goToTab(R.id.tab_course)
+            },
+            QuickAction("🗺", R.string.home_open_map, R.color.qa_calendar) {
                 (activity as? MainActivity)?.pushScreen(MapFragment())
             },
-            QuickAction("📅", R.string.home_qa_calendar, R.color.qa_calendar) {
+            QuickAction("📅", R.string.home_qa_calendar, R.color.qa_diary) {
                 (activity as? MainActivity)?.pushScreen(CalendarFragment())
-            },
-            QuickAction("📓", R.string.tab_diary, R.color.qa_diary) {
-                goToTab(R.id.tab_diary)
             },
             QuickAction("🏅", R.string.home_qa_mission, R.color.qa_live) {
                 (activity as? MainActivity)?.pushScreen(MissionFragment())
