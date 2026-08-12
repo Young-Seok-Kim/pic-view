@@ -68,10 +68,10 @@
     <string name="course_travel_walk">도보</string>
     <string name="course_subject">무엇을 담고 싶으세요?</string>
     <string name="course_subject_hint">고르지 않으면 전부 포함해요</string>
-    <string name="subject_landscape">풍경</string>
-    <string name="subject_architecture">건축·문화재</string>
-    <string name="subject_food">음식</string>
-    <string name="subject_night">야경</string>
+    <string name="subject_landscape">#풍경</string>
+    <string name="subject_architecture">#건축·문화재</string>
+    <string name="subject_food">#맛집</string>
+    <string name="subject_night">#야경</string>
     <string name="course_make">빛 스케줄 만들기</string>
     <string name="course_need_spots">촬영지를 아직 불러오지 못했어요. 잠시 후 다시 시도해 주세요</string>
     <string name="course_no_result">조건에 맞는 촬영지를 찾지 못했어요. 시간이나 피사체를 넓혀보세요</string>
@@ -272,4 +272,22 @@
     <string name="pose_group_small">3~4인</string>
     <string name="pose_group_large">5인+</string>
     <string name="pose_score_format">%1$d점</string>
+    <!-- 코스 입력 : 날짜 · 인원 · 입장료 -->
+    <string name="course_date">여행 날짜</string>
+    <string name="course_date_icon">📅</string>
+    <string name="course_date_change">변경 ›</string>
+    <string name="course_date_format">yyyy.MM.dd (E)</string>
+    <string name="course_party">인원 구성</string>
+    <string name="course_party_solo">혼자</string>
+    <string name="course_party_couple">커플</string>
+    <string name="course_party_family">가족</string>
+    <string name="course_party_friends">친구</string>
+    <string name="course_travel_rail">KTX+렌트</string>
+
+    <!-- 스타일 태그 (시안 8종) -->
+    <string name="subject_nature">#자연</string>
+    <string name="subject_healing">#힐링</string>
+    <string name="subject_history">#역사</string>
+    <string name="subject_activity">#체험</string>
+    <string name="course_golden_on_date">🌅 그날 일출 %1$s · 일몰 %2$s</string>
 </resources>

@@ -31,6 +31,7 @@ import com.youngs.picview.ui.guide.GuideActivity
 import com.youngs.picview.ui.model.SpotItem
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
+import com.youngs.picview.util.OverviewFormatter
 
 class DetailFragment : Fragment(R.layout.fragment_detail) {
     private var _binding: FragmentDetailBinding? = null
@@ -397,7 +398,7 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
         val cachedTip = detailCache[spot.contentId]
         if (cachedTip != null) {
             audioText = cachedTip
-            _binding?.tvDetailTip?.text = cachedTip
+            _binding?.tvDetailTip?.text = OverviewFormatter.format(cachedTip)
             return
         }
 
@@ -415,7 +416,7 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                 detailCache[spot.contentId] = overview
 
                 audioText = overview
-                _binding?.tvDetailTip?.text = overview
+                _binding?.tvDetailTip?.text = OverviewFormatter.format(overview)
             } catch (e: Exception) {
                 Log.e("DETAIL_ERROR", "API 호출 실패: ", e)
                 _binding?.tvDetailTip?.text =

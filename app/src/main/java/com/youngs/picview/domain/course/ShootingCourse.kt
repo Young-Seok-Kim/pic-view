@@ -78,7 +78,15 @@ data class CourseRequest(
     val travelMode: TravelMode,
     /** 담고 싶은 피사체. 비어 있으면 전체. */
     val subjects: Set<Subject> = emptySet(),
-    val maxStops: Int = 5
+    val maxStops: Int = 5,
+    /**
+     * 인원 구성에 따른 체류 시간 배수.
+     *
+     * 혼자면 1.0, 가족이면 1.35 처럼 늘어납니다. 여럿이 움직이면 한 곳에
+     * 머무는 시간이 길어져 같은 시간에 도는 곳이 줄어듭니다. 배치 규칙 자체는
+     * 건드리지 않고 체류 시간에만 곱해, 빛 슬롯 계산은 그대로 둡니다.
+     */
+    val stayFactor: Double = 1.0
 ) {
     companion object {
         /** "지금부터 일몰까지" 같은 기본 반나절 코스. */
@@ -98,6 +106,14 @@ data class CourseRequest(
 enum class Subject(val label: String, val contentTypeIds: Set<String>) {
     LANDSCAPE("풍경", setOf("12", "28")),
     ARCHITECTURE("건축·문화재", setOf("14")),
-    FOOD("음식", setOf("39")),
-    NIGHT("야경", setOf("12", "14"))
+    FOOD("맛집", setOf("39")),
+    NIGHT("야경", setOf("12", "14")),
+
+    // 시안의 스타일 태그를 맞춘 항목들.
+    // 관광공사 분류가 12·14·28·39 넷뿐이라 유형이 겹치는 태그가 생기지만,
+    // 고른 태그의 합집합으로 후보를 좁히므로 조합에 따라 결과는 달라집니다.
+    NATURE("자연", setOf("12")),
+    HEALING("힐링", setOf("12", "14")),
+    HISTORY("역사", setOf("14")),
+    ACTIVITY("체험", setOf("28"))
 }
