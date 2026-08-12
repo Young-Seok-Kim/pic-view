@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 문화·역사 마커 : 색 핀 위에 분류 아이콘을 얹습니다. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/pin_culture" />
+    <item
+        android:drawable="@drawable/ic_cat_culture"
+        android:gravity="top|center_horizontal"
+        android:top="7dp"
+        android:width="20dp"
+        android:height="20dp" />
+</layer-list>
