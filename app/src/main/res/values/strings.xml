@@ -285,7 +285,6 @@
     <string name="subject_healing">#힐링</string>
     <string name="subject_history">#역사</string>
     <string name="subject_activity">#체험</string>
-    <string name="course_golden_on_date">🌅 일출 %1$s · 일몰 %2$s 기준으로 짭니다</string>
     <string name="course_that_day_light">그날의 빛</string>
     <string name="guide_photo_logged">사진이 오늘 기록에 담겼어요</string>
     <string name="diary_edit">고치기</string>

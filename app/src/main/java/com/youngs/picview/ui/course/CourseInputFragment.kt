@@ -160,11 +160,8 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
 
         val minutes = sun.minutesToNextGolden()
         binding.tvNextGolden.text = when {
-            !isToday && sun.hasData -> getString(
-                R.string.course_golden_on_date,
-                sun.sunrise!!.format(fmt),
-                sun.sunset!!.format(fmt)
-            )
+            // 다른 날짜를 골랐으면 바로 윗줄이 이미 그날의 일출·일몰을 보여 줍니다.
+            // 여기서 같은 시각을 다시 쓰면 카드에 같은 값이 두 번 나옵니다.
             !isToday -> ""
             sun.isGoldenHourNow() -> getString(R.string.course_golden_now)
             minutes != null -> getString(
