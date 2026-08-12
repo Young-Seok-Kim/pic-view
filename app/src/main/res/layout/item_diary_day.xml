@@ -57,6 +57,23 @@
             android:textColor="@color/maple_600"
             tools:text="10:16 정읍사예술회관 · 11:45 씨아전복 · 12:53 정읍문화원" />
 
+        <!--
+          그날 찍은 사진.
+          방문 기록에 붙은 사진만 나옵니다(촬영 화면에서 셔터를 누르면 붙습니다).
+          사진이 없는 날에는 줄 자체를 감춥니다.
+        -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_diary_photos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_m"
+            android:clipToPadding="false"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_diary_photo"
+            tools:visibility="visible" />
+
         <!-- 일기 본문 -->
         <View
             android:id="@+id/view_diary_divider"
@@ -96,6 +113,23 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 tools:text="✨ 일기 만들기" />
+
+            <!--
+              생성된 일기를 사용자가 고칠 수 있어야 합니다.
+              LLM 이 쓴 문장이 사실과 다르거나 말투가 안 맞을 수 있고,
+              무엇보다 "내 일기"라면 내가 고칠 수 있어야 합니다.
+            -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_diary_edit"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_s"
+                android:minHeight="@dimen/touch_target"
+                android:text="@string/diary_edit"
+                android:visibility="gone"
+                app:cornerRadius="@dimen/radius_button"
+                tools:visibility="visible" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_diary_share"

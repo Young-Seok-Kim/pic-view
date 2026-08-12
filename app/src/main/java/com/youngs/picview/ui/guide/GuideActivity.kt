@@ -32,6 +32,12 @@ import com.youngs.picview.domain.pose.GroupSize
 import com.youngs.picview.domain.pose.PoseRecommender
 import com.youngs.picview.domain.spot.Facing
 import com.youngs.picview.domain.spot.SpotFactsTable
+import androidx.lifecycle.lifecycleScope
+import com.youngs.picview.data.repository.CourseRepository
+import com.youngs.picview.ui.model.SpotItem
+import kotlinx.coroutines.launch
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
 
 class GuideActivity : AppCompatActivity() {
 
@@ -41,6 +47,9 @@ class GuideActivity : AppCompatActivity() {
 
         /** 지금의 빛 구간([LightPhase] 이름). 포즈 추천 순서를 정하는 데 씁니다. */
         const val EXTRA_PHASE = "PHASE"
+
+        /** 촬영한 사진을 방문 기록에 붙이기 위한 장소 식별자. */
+        const val EXTRA_CONTENT_ID = "CONTENT_ID"
     }
 
     private lateinit var binding: ActivityGuideBinding
@@ -238,11 +247,22 @@ class GuideActivity : AppCompatActivity() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
             val cameraProvider = cameraProviderFuture.get()
-            val preview = Preview.Builder().build().also {
-                it.setSurfaceProvider(binding.previewView.surfaceProvider)
-            }
+            // 미리보기 해상도를 기기가 고르게 두면, 카메라2 legacy 계층을 쓰는
+            // 구형 기기·에뮬레이터에서 활성 배열보다 큰 크기가 잡혀
+            // "previewSize must not be taller than activeArray" 로 죽습니다.
+            // 16:9 를 우선 요청해 그런 조합을 피합니다.
+            val resolution = ResolutionSelector.Builder()
+                .setAspectRatioStrategy(AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
+                .build()
+
+            val preview = Preview.Builder()
+                .setResolutionSelector(resolution)
+                .build()
+                .also { it.setSurfaceProvider(binding.previewView.surfaceProvider) }
+
             imageCapture = ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                .setResolutionSelector(resolution)
                 .build()
 
             try {
@@ -287,6 +307,7 @@ class GuideActivity : AppCompatActivity() {
                 val values = ContentValues().apply { put(MediaStore.Images.Media.IS_PENDING, 0) }
                 output.savedUri?.let { contentResolver.update(it, values, null, null) }
 
+                output.savedUri?.let { recordVisitWithPhoto(it) }
                 runOnUiThread { binding.btnCapture.isEnabled = true }
             }
             override fun onError(exception: ImageCaptureException) {
@@ -294,5 +315,39 @@ class GuideActivity : AppCompatActivity() {
                 Log.e("CAMERA_ERROR", "촬영 실패: ${exception.message}")
             }
         })
+    }
+
+    /**
+     * 촬영한 사진을 방문 기록에 남깁니다.
+     *
+     * 사진을 찍었다는 건 그 자리에 있었다는 뜻이라, 따로 "다녀왔어요"를 누르지
+     * 않아도 방문으로 봅니다. 이렇게 해야 촬영 → 기록 → 일기가 끊기지 않습니다.
+     */
+    private fun recordVisitWithPhoto(uri: Uri) {
+        val contentId = intent.getStringExtra(EXTRA_CONTENT_ID) ?: return
+        val name = intent.getStringExtra(EXTRA_SPOT_NAME) ?: return
+
+        lifecycleScope.launch {
+            runCatching {
+                CourseRepository(applicationContext).logCapture(
+                    spot = SpotItem(
+                        contentId = contentId,
+                        contentTypeId = intent.getStringExtra(EXTRA_SPOT_TYPE) ?: "",
+                        title = name,
+                        addr1 = "",
+                        tip = "",
+                        imageUrl = "",
+                        mapx = "",
+                        mapy = ""
+                    ),
+                    phase = phase,
+                    photoUri = uri.toString()
+                )
+            }.onSuccess {
+                Toast.makeText(
+                    this@GuideActivity, R.string.guide_photo_logged, Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 }

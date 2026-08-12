@@ -144,6 +144,8 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                 putExtra(GuideActivity.EXTRA_SPOT_TYPE, spot.contentTypeId)
                 // 포즈 추천이 지금의 빛을 반영해야 하므로 함께 넘깁니다.
                 putExtra(GuideActivity.EXTRA_PHASE, mainViewModel.sunTimes.phaseNow().name)
+                // 촬영한 사진을 이 장소의 방문 기록에 붙이기 위해 필요합니다.
+                putExtra(GuideActivity.EXTRA_CONTENT_ID, spot.contentId)
             }
             startActivity(intent)
         }

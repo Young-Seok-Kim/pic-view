@@ -80,7 +80,11 @@ class CourseRepository(context: Context) {
      *
      * @return 실제로 기록했으면 true
      */
-    suspend fun logVisit(spot: SpotItem, phase: LightPhase): Boolean {
+    suspend fun logVisit(
+        spot: SpotItem,
+        phase: LightPhase,
+        photoUri: String? = null
+    ): Boolean {
         val now = System.currentTimeMillis()
         val recent = visitDao.countRecent(spot.contentId, now - DEDUP_WINDOW_MS)
         if (recent > 0) return false
@@ -93,10 +97,26 @@ class CourseRepository(context: Context) {
                 score = spot.score,
                 imageUrl = spot.imageUrl,
                 phaseName = phase.name,
-                installId = AppPrefs.installId(appContext)
+                installId = AppPrefs.installId(appContext),
+                photoUri = photoUri
             )
         )
         return true
+    }
+
+    /**
+     * 촬영한 사진을 방문 기록에 붙입니다. 기록이 없으면 새로 만듭니다.
+     *
+     * 사진을 찍었다는 건 그 자리에 있었다는 뜻이므로, 따로 "다녀왔어요"를
+     * 누르지 않아도 방문으로 봅니다. 수동 버튼은 남겨 둡니다. 촬영하지 않고
+     * 눈으로만 보고 온 경우도 기록하고 싶을 수 있습니다.
+     *
+     * @return 새 기록을 만들었으면 true, 기존 기록에 사진만 붙였으면 false
+     */
+    suspend fun logCapture(spot: SpotItem, phase: LightPhase, photoUri: String): Boolean {
+        val attached = visitDao.attachPhoto(spot.contentId, photoUri)
+        if (attached > 0) return false
+        return logVisit(spot, phase, photoUri)
     }
 
     companion object {

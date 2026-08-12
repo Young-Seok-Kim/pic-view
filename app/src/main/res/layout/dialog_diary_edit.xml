@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 일기 고치기. 제목과 본문만 받습니다. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/space_xl"
+    android:paddingTop="@dimen/space_s">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_diary_title"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/diary_edit_title_hint"
+        app:boxCornerRadiusBottomEnd="@dimen/radius_button"
+        app:boxCornerRadiusBottomStart="@dimen/radius_button"
+        app:boxCornerRadiusTopEnd="@dimen/radius_button"
+        app:boxCornerRadiusTopStart="@dimen/radius_button">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_diary_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_diary_body"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_m"
+        android:hint="@string/diary_edit_body_hint"
+        app:boxCornerRadiusBottomEnd="@dimen/radius_button"
+        app:boxCornerRadiusBottomStart="@dimen/radius_button"
+        app:boxCornerRadiusTopEnd="@dimen/radius_button"
+        app:boxCornerRadiusTopStart="@dimen/radius_button">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_diary_body"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:gravity="top|start"
+            android:inputType="textMultiLine|textCapSentences"
+            android:lineSpacingExtra="6dp"
+            android:overScrollMode="always"
+            android:scrollbars="vertical" />
+    </com.google.android.material.textfield.TextInputLayout>
+</LinearLayout>

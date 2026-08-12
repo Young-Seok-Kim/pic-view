@@ -82,6 +82,24 @@ interface VisitDao {
     @Query("SELECT COUNT(DISTINCT contentId) FROM visit_log")
     fun observeVisitedSpotCount(): Flow<Int>
 
+
+    /**
+     * 이미 남아 있는 방문 기록에 사진을 붙입니다.
+     *
+     * 촬영 화면에서 셔터를 누르면 그 장소의 가장 최근 기록을 찾아 채웁니다.
+     * 사진이 이미 있으면 덮지 않습니다. 한 장소에서 여러 장을 찍었을 때
+     * 첫 장(대개 가장 공들인 것)이 남는 편이 자연스럽습니다.
+     */
+    @Query("""
+        UPDATE visit_log SET photoUri = :uri
+        WHERE id = (
+            SELECT id FROM visit_log
+            WHERE contentId = :contentId AND photoUri IS NULL
+            ORDER BY visitedAt DESC LIMIT 1
+        )
+    """)
+    suspend fun attachPhoto(contentId: String, uri: String): Int
+
     /** 같은 장소를 짧은 시간 안에 여러 번 기록하지 않도록 확인용. */
     @Query(
         "SELECT COUNT(*) FROM visit_log WHERE contentId = :contentId AND visitedAt >= :since"

@@ -12,11 +12,15 @@ import com.youngs.picview.domain.diary.DiaryDay
 import com.youngs.picview.domain.diary.toDiaryLocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import android.net.Uri
+import androidx.core.net.toUri
 
 /** 날짜별 출사 기록 목록. */
 class DiaryAdapter(
     private val onGenerate: (DiaryDay) -> Unit,
-    private val onShare: (DiaryDay) -> Unit
+    private val onShare: (DiaryDay) -> Unit,
+    private val onEdit: (DiaryDay) -> Unit,
+    private val onPhotoClick: (Uri) -> Unit
 ) : ListAdapter<DiaryDay, DiaryAdapter.DayViewHolder>(DIFF) {
 
     /** 일기를 만들고 있는 날짜. 해당 카드만 로딩 표시합니다. */
@@ -65,6 +69,18 @@ class DiaryAdapter(
             // 생성 중에는 버튼을 잠그고 스피너를 띄웁니다.
             layoutDiaryActions.isVisible = !generating
             progressDiary.isVisible = generating
+
+            btnDiaryEdit.isVisible = diary != null
+            btnDiaryEdit.setOnClickListener { onEdit(day) }
+
+            // 그날 찍은 사진. 촬영 화면에서 셔터를 누르면 방문 기록에 붙습니다.
+            val photos = day.visits.mapNotNull { it.photoUri?.toUri() }
+            rvDiaryPhotos.isVisible = photos.isNotEmpty()
+            if (photos.isNotEmpty()) {
+                val photoAdapter = rvDiaryPhotos.adapter as? DiaryPhotoAdapter
+                    ?: DiaryPhotoAdapter(onPhotoClick).also { rvDiaryPhotos.adapter = it }
+                photoAdapter.submit(photos)
+            }
 
             btnDiaryGenerate.setOnClickListener { onGenerate(day) }
             btnDiaryShare.setOnClickListener { onShare(day) }

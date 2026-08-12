@@ -291,4 +291,13 @@
     <string name="subject_activity">#체험</string>
     <string name="course_golden_on_date">🌅 일출 %1$s · 일몰 %2$s 기준으로 짭니다</string>
     <string name="course_that_day_light">그날의 빛</string>
+    <string name="guide_photo_logged">사진이 오늘 기록에 담겼어요</string>
+    <string name="diary_edit">고치기</string>
+    <string name="diary_edit_title">일기 고치기</string>
+    <string name="diary_edit_save">저장</string>
+    <string name="diary_edited">일기를 고쳤어요</string>
+    <string name="cd_diary_photo">그날 찍은 사진</string>
+    <string name="diary_edit_title_hint">제목</string>
+    <string name="diary_edit_body_hint">그날의 이야기</string>
+    <string name="diary_photo_open_failed">사진을 열 수 있는 앱이 없어요</string>
 </resources>
