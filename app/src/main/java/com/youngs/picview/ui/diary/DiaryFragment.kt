@@ -12,6 +12,9 @@ import com.youngs.picview.MainActivity
 import com.youngs.picview.R
 import com.youngs.picview.databinding.FragmentDiaryBinding
 import com.youngs.picview.domain.diary.DiaryDay
+import android.net.Uri
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.youngs.picview.databinding.DialogDiaryEditBinding
 
 /**
  * 출사 기록.
@@ -35,7 +38,9 @@ class DiaryFragment : Fragment(R.layout.fragment_diary), MainActivity.TabRoot {
 
         val adapter = DiaryAdapter(
             onGenerate = { viewModel.generate(it) },
-            onShare = { share(it) }
+            onShare = { share(it) },
+            onEdit = { showEditDialog(it) },
+            onPhotoClick = { openPhoto(it) }
         )
         binding.rvDiary.adapter = adapter
 
@@ -84,5 +89,51 @@ class DiaryFragment : Fragment(R.layout.fragment_diary), MainActivity.TabRoot {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    // ───────────────────── 일기 고치기 ─────────────────────
+
+    /**
+     * 생성된 일기를 사용자가 고칩니다.
+     *
+     * LLM 이 쓴 문장이 사실과 다르거나 말투가 안 맞을 수 있습니다. 무엇보다
+     * "내 일기"라면 내가 고칠 수 있어야 합니다. 고친 뒤에는 LLM 생성물로
+     * 세지 않습니다.
+     */
+    private fun showEditDialog(day: DiaryDay) {
+        val diary = day.diary ?: return
+        val view = layoutInflater.inflate(R.layout.dialog_diary_edit, null)
+        val binding = DialogDiaryEditBinding.bind(view)
+
+        binding.etDiaryTitle.setText(diary.title)
+        binding.etDiaryBody.setText(diary.body)
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.diary_edit_title)
+            .setView(view)
+            .setPositiveButton(R.string.diary_edit_save) { _, _ ->
+                val title = binding.etDiaryTitle.text?.toString().orEmpty()
+                val body = binding.etDiaryBody.text?.toString().orEmpty()
+                if (body.isBlank()) return@setPositiveButton
+
+                viewModel.saveEdit(day, title, body)
+                Toast.makeText(requireContext(), R.string.diary_edited, Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    /** 사진을 기본 뷰어로 엽니다. 앱 안에 뷰어를 또 만들 이유가 없습니다. */
+    private fun openPhoto(uri: Uri) {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "image/*")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        runCatching { startActivity(intent) }
+            .onFailure {
+                Toast.makeText(
+                    requireContext(), R.string.diary_photo_open_failed, Toast.LENGTH_SHORT
+                ).show()
+            }
     }
 }

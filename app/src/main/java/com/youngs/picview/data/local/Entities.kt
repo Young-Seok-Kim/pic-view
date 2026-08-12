@@ -90,5 +90,13 @@ data class VisitLogEntity(
     /** 그때의 빛 구간. 나중에 "일몰에 몇 번 나갔나" 같은 통계에 씁니다. */
     val phaseName: String,
     /** 익명 설치 식별자. 개인정보가 아니며 앱 삭제 시 사라집니다. */
-    val installId: String
+    val installId: String,
+    /**
+     * 이곳에서 직접 찍은 사진의 MediaStore URI.
+     *
+     * 촬영 화면에서 셔터를 누르면 채워집니다. 사진 자체는 갤러리에 두고
+     * 여기에는 가리키는 주소만 둡니다. 앱이 사진을 복사해 보관하면 용량이
+     * 두 배가 되고, 갤러리에서 지운 사진이 앱에만 남는 문제가 생깁니다.
+     */
+    val photoUri: String? = null
 )

@@ -33,4 +33,15 @@ class DiaryViewModel(app: Application) : AndroidViewModel(app) {
     fun delete(dateKey: String) {
         viewModelScope.launch { repository.delete(dateKey) }
     }
+
+    /**
+     * 사용자가 고친 일기를 저장합니다.
+     *
+     * 고친 뒤에는 `generatedByLlm` 을 false 로 둡니다. 이 값은 통계·디버깅용
+     * 이라 화면에는 안 나오지만, 사람이 손댄 글을 LLM 생성물로 세면 숫자가
+     * 틀립니다.
+     */
+    fun saveEdit(day: DiaryDay, title: String, body: String) {
+        viewModelScope.launch { repository.saveEdit(day, title, body) }
+    }
 }

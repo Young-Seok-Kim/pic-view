@@ -47,4 +47,25 @@ class DiaryRepository(context: Context) {
     }
 
     suspend fun delete(dateKey: String) = diaryDao.delete(dateKey)
+
+    /**
+     * 사용자가 고친 일기를 저장합니다.
+     *
+     * 새로 만들지 않고 기존 항목을 덮습니다(`dateKey` 가 하루의 키).
+     * `generatedByLlm` 은 false 로 둡니다. 사람이 손댄 글을 LLM 생성물로
+     * 세면 통계가 틀립니다.
+     */
+    suspend fun saveEdit(day: DiaryDay, title: String, body: String) {
+        val existing = diaryDao.byDate(day.dateKey)
+        diaryDao.upsert(
+            DiaryEntity(
+                id = existing?.id ?: 0,
+                dateKey = day.dateKey,
+                title = title.trim(),
+                body = body.trim(),
+                generatedByLlm = false,
+                createdAt = existing?.createdAt ?: System.currentTimeMillis()
+            )
+        )
+    }
 }
