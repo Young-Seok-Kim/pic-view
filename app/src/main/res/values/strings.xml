@@ -305,4 +305,7 @@
     <string name="home_qa_calendar">캘린더</string>
     <string name="home_qa_mission">미션</string>
     <string name="home_qa_course">빛 스케줄</string>
+    <string name="calendar_prev_month">이전 달</string>
+    <string name="calendar_next_month">다음 달</string>
+    <string name="calendar_month_format">yyyy년 M월</string>
 </resources>
