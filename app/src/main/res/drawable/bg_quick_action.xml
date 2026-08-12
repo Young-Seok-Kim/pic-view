@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 빠른 이동 타일 배경. 색은 코드에서 타일마다 칠합니다. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/qa_course" />
+    <corners android:radius="@dimen/radius_card" />
+</shape>

@@ -302,4 +302,6 @@
     <string name="factor_facing">방위</string>
     <string name="factor_season">계절</string>
     <string name="factor_comfort">머무는 여건</string>
+    <string name="home_qa_calendar">캘린더</string>
+    <string name="home_qa_mission">미션</string>
 </resources>

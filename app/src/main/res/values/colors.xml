@@ -125,4 +125,14 @@
     <color name="theme_food_container">#FFFAEED2</color>
     <color name="theme_etc">#FF7A6A5E</color>
     <color name="theme_etc_container">#FFEFEAE5</color>
+    <!--
+        ============ 빠른 이동 타일 ============
+        시안(🏠 HomeScreen QA_0~3)에서 뽑은 색입니다.
+        단풍 한 계열만 쓰던 화면에 올리브·오렌지·딥마룬을 더해
+        타일이 서로 구분되게 합니다.
+    -->
+    <color name="qa_course">#FFB23A1B</color>
+    <color name="qa_calendar">#FF6B7A3A</color>
+    <color name="qa_diary">#FFE37A2C</color>
+    <color name="qa_live">#FF7A1E10</color>
 </resources>

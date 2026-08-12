@@ -169,34 +169,20 @@
             android:layout_marginHorizontal="@dimen/screen_padding"
             android:text="@string/home_make_course" />
 
+        <!--
+          ─────────── 빠른 이동 ───────────
+          전에는 넓은 버튼 두 개였습니다. 버튼은 "누르면 뭔가 실행된다"는
+          신호라 화면 이동에는 무겁고, 두 개뿐이라 나머지 기능이 묻혔습니다.
+          시안(QA_0~3)처럼 색 타일 넷으로 바꿔 이동 지점이 한눈에 보이게 했습니다.
+        -->
         <LinearLayout
+            android:id="@+id/layout_quick_actions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_s"
+            android:layout_marginTop="@dimen/space_m"
             android:layout_marginHorizontal="@dimen/screen_padding"
-            android:orientation="horizontal">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_home_map"
-                style="@style/Button.Tonal"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:minHeight="@dimen/touch_target"
-                android:text="@string/home_open_map"
-                app:cornerRadius="@dimen/radius_button" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_home_calendar"
-                style="@style/Button.Tonal"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/space_s"
-                android:layout_weight="1"
-                android:minHeight="@dimen/touch_target"
-                android:text="@string/calendar_entry"
-                app:cornerRadius="@dimen/radius_button" />
-        </LinearLayout>
+            android:baselineAligned="false"
+            android:orientation="horizontal" />
 
         <!-- ─────────── 지금 찍기 좋은 곳 ─────────── -->
         <LinearLayout
