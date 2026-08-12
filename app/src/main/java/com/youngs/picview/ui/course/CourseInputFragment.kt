@@ -153,6 +153,11 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
         // "다음 골든아워까지 N분"은 오늘에만 뜻이 있습니다.
         // 다른 날짜를 골랐으면 남은 시간이 아니라 그날의 골든아워 시각을 알려야 합니다.
         val isToday = tripDate == LocalDate.now()
+
+        binding.tvLightHeading.setText(
+            if (isToday) R.string.course_today_light else R.string.course_that_day_light
+        )
+
         val minutes = sun.minutesToNextGolden()
         binding.tvNextGolden.text = when {
             !isToday && sun.hasData -> getString(
