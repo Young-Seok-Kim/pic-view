@@ -159,16 +159,6 @@
                 android:layout_weight="1" />
         </LinearLayout>
 
-        <!-- ─────────── 주요 액션 ─────────── -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_home_make_course"
-            style="@style/Button.Primary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_xl"
-            android:layout_marginHorizontal="@dimen/screen_padding"
-            android:text="@string/home_make_course" />
-
         <!--
           ─────────── 빠른 이동 ───────────
           전에는 넓은 버튼 두 개였습니다. 버튼은 "누르면 뭔가 실행된다"는
@@ -179,7 +169,7 @@
             android:id="@+id/layout_quick_actions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_m"
+            android:layout_marginTop="@dimen/space_xl"
             android:layout_marginHorizontal="@dimen/screen_padding"
             android:baselineAligned="false"
             android:orientation="horizontal" />
