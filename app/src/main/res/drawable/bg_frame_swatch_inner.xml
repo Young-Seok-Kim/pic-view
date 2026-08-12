@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 테마 색 견본. 색은 코드에서 칠합니다. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#FFE8622C" />
+    <corners android:radius="12dp" />
+</shape>

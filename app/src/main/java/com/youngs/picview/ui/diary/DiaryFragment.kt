@@ -15,6 +15,7 @@ import com.youngs.picview.domain.diary.DiaryDay
 import android.net.Uri
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.youngs.picview.databinding.DialogDiaryEditBinding
+import com.youngs.picview.ui.frame.PhotoFrameActivity
 
 /**
  * 출사 기록.
@@ -123,17 +124,26 @@ class DiaryFragment : Fragment(R.layout.fragment_diary), MainActivity.TabRoot {
             .show()
     }
 
-    /** 사진을 기본 뷰어로 엽니다. 앱 안에 뷰어를 또 만들 이유가 없습니다. */
+    /**
+     * 일기 사진을 누르면 포토 프레임으로 갑니다.
+     *
+     * 그냥 크게 보는 것보다 "이 사진으로 뭘 할 수 있는가"로 이어지는 편이
+     * 낫습니다. 찍고 → 기록되고 → 일기가 되고 → 프레임을 입혀 공유까지,
+     * 사진 한 장의 여정이 여기서 끝납니다.
+     */
     private fun openPhoto(uri: Uri) {
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, "image/*")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val day = viewModel.days.value?.firstOrNull { day ->
+            day.visits.any { it.photoUri == uri.toString() }
         }
-        runCatching { startActivity(intent) }
-            .onFailure {
-                Toast.makeText(
-                    requireContext(), R.string.diary_photo_open_failed, Toast.LENGTH_SHORT
-                ).show()
-            }
+        val visit = day?.visits?.firstOrNull { it.photoUri == uri.toString() }
+
+        startActivity(
+            PhotoFrameActivity.intent(
+                context = requireContext(),
+                photoUri = uri,
+                place = visit?.title.orEmpty(),
+                takenAt = visit?.visitedAt ?: System.currentTimeMillis()
+            )
+        )
     }
 }

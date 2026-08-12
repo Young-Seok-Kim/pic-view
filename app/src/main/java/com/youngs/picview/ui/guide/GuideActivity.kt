@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -26,6 +27,7 @@ import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import com.youngs.picview.BuildConfig
 import com.youngs.picview.R
+import com.youngs.picview.util.MediaStoreSaver
 import com.youngs.picview.databinding.ActivityGuideBinding
 import com.youngs.picview.domain.light.LightPhase
 import com.youngs.picview.domain.pose.GroupSize
@@ -100,7 +102,7 @@ class GuideActivity : AppCompatActivity() {
                 }
             })
             .setDeniedMessage("카메라 권한을 허용해야 촬영 가이드를 사용할 수 있습니다.")
-            .setPermissions(Manifest.permission.CAMERA)
+            .setPermissions(*requiredPermissions())
             .check()
 
         setupGuide()
@@ -243,6 +245,23 @@ class GuideActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * 촬영에 필요한 권한.
+     *
+     * 안드로이드 9 이하에서는 찍은 사진을 MediaStore 에 저장할 때도 쓰기 권한이
+     * 필요합니다. 이걸 빼면 셔터는 눌리는데 사진이 어디에도 남지 않습니다.
+     * 10 부터는 앱이 자기 사진을 권한 없이 저장할 수 있어 카메라만 받습니다.
+     */
+    private fun requiredPermissions(): Array<String> =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            arrayOf(Manifest.permission.CAMERA)
+        } else {
+            arrayOf(
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        }
+
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
@@ -289,13 +308,11 @@ class GuideActivity : AppCompatActivity() {
         }
 
         val name = "PicView_${System.currentTimeMillis()}.jpg"
-        val contentValues = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, name)
-            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-            // IS_PENDING = 1로 설정하여 저장이 완료되기 전까지 시스템이 파일을 읽지 못하게 함
-            put(MediaStore.Images.Media.IS_PENDING, 1)
-            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DCIM + "/PicView")
-        }
+
+        // RELATIVE_PATH·IS_PENDING 은 안드로이드 10(API 29)에 생긴 컬럼입니다.
+        // 9 이하에서 쓰면 "table files has no column named relative_path" 로
+        // insert 가 실패해, 셔터는 눌리는데 사진이 어디에도 남지 않습니다.
+        val contentValues = MediaStoreSaver.imageValues(name)
 
         val outputOptions = ImageCapture.OutputFileOptions.Builder(
             contentResolver, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues
@@ -303,9 +320,8 @@ class GuideActivity : AppCompatActivity() {
 
         imageCapture.takePicture(outputOptions, ContextCompat.getMainExecutor(this), object : ImageCapture.OnImageSavedCallback {
             override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                // 저장 완료 후 IS_PENDING = 0으로 변경하여 갤러리에 노출
-                val values = ContentValues().apply { put(MediaStore.Images.Media.IS_PENDING, 0) }
-                output.savedUri?.let { contentResolver.update(it, values, null, null) }
+                // 다 쓰고 나서 갤러리에 노출합니다(API 29+ 에서만 의미가 있습니다).
+                output.savedUri?.let { MediaStoreSaver.publish(this@GuideActivity, it) }
 
                 output.savedUri?.let { recordVisitWithPhoto(it) }
                 runOnUiThread { binding.btnCapture.isEnabled = true }

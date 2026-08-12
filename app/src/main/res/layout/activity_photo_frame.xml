@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  포토 프레임 (시안 5:2).
+  배경을 어둡게 둬야 폴라로이드의 밝은 종이가 떠 보입니다.
+-->
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_frame"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/frame_bg"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/space_2xl">
+
+        <!-- ─────────── 상단 바 ─────────── -->
+        <LinearLayout
+            android:id="@+id/layout_frame_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/screen_padding"
+            android:paddingTop="@dimen/space_m">
+
+            <ImageView
+                android:id="@+id/btn_frame_back"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_glass_circle"
+                android:contentDescription="@string/cd_back"
+                android:padding="9dp"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/white" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_m"
+                android:layout_weight="1"
+                android:text="@string/frame_title"
+                android:textAppearance="@style/Text.Title"
+                android:textColor="@color/white" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_frame_save"
+                style="@style/Button.Primary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:paddingHorizontal="@dimen/space_l"
+                android:text="@string/frame_save" />
+        </LinearLayout>
+
+        <!-- ─────────── 미리보기 ─────────── -->
+        <!--
+          미리보기.
+          만들어지는 그림이 정사각형이라 adjustViewBounds 로 비율을 따라가게 둡니다.
+          (0dp + constraintDimensionRatio 는 ConstraintLayout 전용이라
+           LinearLayout 안에서는 높이가 0 이 됩니다)
+        -->
+        <ImageView
+            android:id="@+id/iv_frame_preview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xl"
+            android:layout_marginHorizontal="@dimen/space_2xl"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/cd_frame_preview"
+            tools:src="@drawable/bg_image_placeholder" />
+
+        <!-- ─────────── 프레임 선택 ─────────── -->
+        <TextView
+            style="@style/Text.SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_2xl"
+            android:layout_marginHorizontal="@dimen/screen_padding"
+            android:text="@string/frame_pick"
+            android:textColor="@color/white" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_frames"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_m"
+            android:clipToPadding="false"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/screen_padding"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:itemCount="4"
+            tools:listitem="@layout/item_frame_swatch" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_frame_share"
+            style="@style/Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_2xl"
+            android:layout_marginHorizontal="@dimen/screen_padding"
+            android:text="@string/frame_share" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
