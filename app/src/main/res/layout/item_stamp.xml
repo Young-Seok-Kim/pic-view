@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 스탬프 한 칸. 찍힌 것과 안 찍힌 것을 배경 모양으로 구분합니다. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingVertical="@dimen/space_s">
+
+    <FrameLayout
+        android:id="@+id/layout_stamp_circle"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:background="@drawable/bg_stamp_empty">
+
+        <TextView
+            android:id="@+id/tv_stamp_emoji"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="28sp"
+            tools:text="🌅" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tv_stamp_badge"
+        style="@style/Text.Stamp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_xs"
+        android:gravity="center"
+        android:maxLines="2"
+        tools:text="새벽 사냥꾼" />
+
+    <TextView
+        android:id="@+id/tv_stamp_date"
+        style="@style/Text.Caption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:maxLines="1"
+        tools:text="8.12" />
+</LinearLayout>

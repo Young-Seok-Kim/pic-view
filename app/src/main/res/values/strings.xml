@@ -202,12 +202,8 @@
     <string name="calendar_disclaimer">절정 시기는 그해 기후에 따라 며칠씩 달라질 수 있어요. 평년 기준으로 안내합니다.</string>
 
     <!-- 포토스코어 항목 -->
-    <string name="factor_base">장소 매력도</string>
-    <string name="factor_freshness">정보 최신성</string>
-    <string name="factor_photo">대표 사진</string>
     <string name="factor_light">빛 조건</string>
     <string name="factor_weather">날씨 적합도</string>
-    <string name="factor_temp">기온 쾌적도</string>
     <string name="factor_access">접근성</string>
 
     <!-- 구도 가이드 이름 -->
@@ -300,4 +296,10 @@
     <string name="diary_edit_title_hint">제목</string>
     <string name="diary_edit_body_hint">그날의 이야기</string>
     <string name="diary_photo_open_failed">사진을 열 수 있는 앱이 없어요</string>
+    <string name="stamp_book">스탬프북</string>
+    <string name="stamp_count_format">%1$d개 중 %2$d개를 모았어요</string>
+    <string name="factor_subject">소재 폭</string>
+    <string name="factor_facing">방위</string>
+    <string name="factor_season">계절</string>
+    <string name="factor_comfort">머무는 여건</string>
 </resources>

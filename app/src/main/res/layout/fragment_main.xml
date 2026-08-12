@@ -284,14 +284,16 @@
         app:iconTint="@color/white"
         app:rippleColor="#33FFFFFF" />
 
-    <com.google.android.material.progressindicator.CircularProgressIndicator
+    <!--
+      로딩 표시. 기본 스피너 대신 빛 색 점 세 개가 물결처럼 이어집니다.
+      기다리는 동안에도 이 앱이 무엇을 다루는지가 드러납니다.
+    -->
+    <com.youngs.picview.ui.widget.LightLoaderView
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:indeterminate="true"
         android:visibility="gone"
-        app:indicatorColor="@color/maple_500"
-        app:trackCornerRadius="4dp" />
+        tools:visibility="visible" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

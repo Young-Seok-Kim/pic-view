@@ -220,9 +220,9 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
             return
         }
 
-        // 점수를 가장 많이 올린 항목(또는 깎은 항목)을 한 줄로 요약합니다.
-        val highlight = score.penalty ?: score.topFactor
-        binding.tvScoreHeadline.text = highlight?.reason.orEmpty()
+        // 강점 둘과 발목을 잡은 것 하나를 엮어 설명합니다.
+        // 항목 하나만 보여 주면 "비가 오지 않아요" 로 끝나 버립니다.
+        binding.tvScoreHeadline.text = score.summary
 
         container.removeAllViews()
         score.factors.forEach { factor ->

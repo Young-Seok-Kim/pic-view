@@ -367,9 +367,16 @@
         <item name="chipMinHeight">36dp</item>
     </style>
 
+    <!--
+        버튼 글자는 마포백패킹.
+        "오늘의 빛 스케줄 만들기" 처럼 앱의 목소리가 드러나는 자리라
+        본문용 Pretendard 보다 제목 서체가 어울립니다. 라벨이 짧아
+        디스플레이 서체를 써도 읽기 부담이 없습니다.
+    -->
     <style name="Button.Primary" parent="Widget.Material3.Button">
+        <item name="fontFamily">@font/mapo_backpacking</item>
+        <item name="android:fontFamily">@font/mapo_backpacking</item>
         <item name="android:textSize">@dimen/text_button</item>
-        <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:minHeight">@dimen/touch_target</item>
         <item name="cornerRadius">@dimen/radius_button</item>
@@ -417,5 +424,14 @@
         <item name="chipMinHeight">34dp</item>
         <item name="android:textSize">@dimen/text_caption</item>
         <item name="android:textStyle">bold</item>
+    </style>
+    <!-- 보조 버튼(지도·촬영 캘린더). 주 버튼과 같은 서체를 씁니다. -->
+    <style name="Button.Tonal" parent="Widget.Material3.Button.TonalButton">
+        <item name="fontFamily">@font/mapo_backpacking</item>
+        <item name="android:fontFamily">@font/mapo_backpacking</item>
+        <item name="android:textSize">@dimen/text_button</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:minHeight">@dimen/touch_target</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
     </style>
 </resources>

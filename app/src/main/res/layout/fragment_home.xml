@@ -178,7 +178,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_home_map"
-                style="@style/Widget.Material3.Button.TonalButton"
+                style="@style/Button.Tonal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -188,7 +188,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_home_calendar"
-                style="@style/Widget.Material3.Button.TonalButton"
+                style="@style/Button.Tonal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/space_s"
