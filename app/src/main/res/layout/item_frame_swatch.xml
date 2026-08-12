@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 프레임 테마 한 칸. 고른 것은 테두리로 표시합니다. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="10dp"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/layout_swatch"
+        android:layout_width="76dp"
+        android:layout_height="76dp"
+        android:background="@drawable/bg_frame_swatch"
+        android:clickable="true"
+        android:focusable="true">
+
+        <View
+            android:id="@+id/view_swatch_color"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_frame_swatch_inner" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tv_swatch_label"
+        style="@style/Text.Caption"
+        android:layout_width="76dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="#CCFFFFFF"
+        tools:text="내장산 단풍" />
+</LinearLayout>

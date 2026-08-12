@@ -135,4 +135,6 @@
     <color name="qa_calendar">#FF6B7A3A</color>
     <color name="qa_diary">#FFE37A2C</color>
     <color name="qa_live">#FF7A1E10</color>
+    <!-- 포토 프레임 화면 배경. 어두워야 폴라로이드 종이가 떠 보입니다. -->
+    <color name="frame_bg">#FF3A1710</color>
 </resources>

@@ -307,4 +307,13 @@
     <string name="calendar_prev_month">이전 달</string>
     <string name="calendar_next_month">다음 달</string>
     <string name="calendar_month_format">yyyy년 M월</string>
+    <string name="frame_title">포토 프레임</string>
+    <string name="frame_save">저장</string>
+    <string name="frame_pick">프레임 선택</string>
+    <string name="frame_share">SNS에 공유하기</string>
+    <string name="cd_frame_preview">프레임 미리보기</string>
+    <string name="frame_saved">갤러리에 저장했어요</string>
+    <string name="frame_save_failed">저장하지 못했어요</string>
+    <string name="frame_credit">정읍 시선 · 관광 정보 출처 한국관광공사</string>
+    <string name="frame_no_photo">사진을 불러오지 못했어요</string>
 </resources>

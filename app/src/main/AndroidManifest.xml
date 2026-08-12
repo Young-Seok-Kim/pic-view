@@ -4,6 +4,25 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
+
+    <!--
+      안드로이드 9(API 28) 이하에서 갤러리 사진을 읽으려면 필요합니다.
+      10(API 29)부터는 앱이 자기가 저장한 사진을 권한 없이 읽을 수 있어
+      maxSdkVersion 으로 잘라 둡니다. minSdk 가 26 이라 이 구간이 남아 있고,
+      없으면 일기의 사진 줄과 포토 프레임이 구형 기기에서 동작하지 않습니다.
+    -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
+    <!--
+      안드로이드 9 이하에서는 MediaStore 에 사진을 저장할 때도 권한이 필요합니다.
+      10 부터는 앱이 자기 사진을 권한 없이 저장할 수 있습니다.
+      이게 없으면 구형 기기에서 촬영과 포토 프레임 저장이 통째로 실패합니다.
+    -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
@@ -50,5 +69,21 @@
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.PicView.Camera" />
+        <!--
+          포토 프레임.
+          다른 앱에서 "공유 → 정읍 시선" 으로 사진을 보낼 수 있게 열어 둡니다.
+          갤러리에서 고른 사진에도 정읍 프레임을 입힐 수 있습니다.
+        -->
+        <activity
+            android:name=".ui.frame.PhotoFrameActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+        </activity>
+
     </application>
 </manifest>
