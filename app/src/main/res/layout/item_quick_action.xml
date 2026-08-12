@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  홈의 빠른 이동 타일. 시안(🏠 HomeScreen QA_0~3)의 85x78 타일을 옮긴 것입니다.
+  색은 코드에서 칠합니다.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/layout_qa_tile"
+        android:layout_width="match_parent"
+        android:layout_height="62dp"
+        android:background="@drawable/bg_quick_action"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground">
+
+        <TextView
+            android:id="@+id/tv_qa_emoji"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="24sp"
+            tools:text="🗺" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tv_qa_label"
+        style="@style/Text.Caption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="@color/text_primary"
+        android:textStyle="bold"
+        tools:text="지도" />
+</LinearLayout>
