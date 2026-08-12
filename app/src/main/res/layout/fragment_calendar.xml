@@ -150,6 +150,70 @@
                     android:text="@string/season_winter" />
             </com.google.android.material.chip.ChipGroup>
 
+            <!--
+              ─────────── 월 달력 ───────────
+              절정 기간이 며칠에 걸쳐 있는지는 목록만으로 감이 오지 않습니다.
+              "10월 19~21일" 이라고 읽는 것과 달력에서 그 사흘에 점이 찍힌 걸
+              보는 것은 다릅니다.
+            -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Card.Elevated"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_m"
+                android:layout_marginHorizontal="@dimen/screen_padding">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingVertical="@dimen/space_m">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="@dimen/space_l">
+
+                        <ImageView
+                            android:id="@+id/btn_month_prev"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/calendar_prev_month"
+                            android:padding="8dp"
+                            android:src="@drawable/baseline_chevron_left_24"
+                            app:tint="@color/text_secondary" />
+
+                        <TextView
+                            android:id="@+id/tv_month_label"
+                            style="@style/Text.Title"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            tools:text="2026년 10월" />
+
+                        <ImageView
+                            android:id="@+id/btn_month_next"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/calendar_next_month"
+                            android:padding="8dp"
+                            android:src="@drawable/baseline_chevron_right_24"
+                            app:tint="@color/text_secondary" />
+                    </LinearLayout>
+
+                    <com.youngs.picview.ui.calendar.MonthGridView
+                        android:id="@+id/view_month_grid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_s" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_calendar"
                 android:layout_width="match_parent"

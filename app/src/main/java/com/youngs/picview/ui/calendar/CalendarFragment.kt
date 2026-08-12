@@ -21,6 +21,8 @@ import com.youngs.picview.domain.season.SeasonHighlights
 import com.youngs.picview.ui.detail.DetailFragment
 import com.youngs.picview.ui.main.MainViewModel
 import java.time.LocalDate
+import java.time.YearMonth
+import java.time.MonthDay
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -52,13 +54,67 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         binding.chipsSeason.setOnCheckedStateChangeListener { _, checked ->
             val season = seasonOf(checked.firstOrNull()) ?: return@setOnCheckedStateChangeListener
             adapter.submitList(SeasonHighlights.of(season))
+            // 계절을 바꾸면 달력도 그 계절의 첫 달로 옮깁니다.
+            // 가을을 눌렀는데 달력이 1월에 머물면 점이 하나도 안 보입니다.
+            shownMonth = YearMonth.of(LocalDate.now().year, season.months.min())
+            renderMonth()
         }
+
+        setupMonthNav()
 
         // 지금 계절부터 보여 줍니다. 1월에 봄부터 보여 주면 쓸모가 없습니다.
         binding.chipsSeason.check(chipOf(Season.now()))
         adapter.submitList(SeasonHighlights.of(Season.now()))
+        renderMonth()
 
         renderHeadline()
+    }
+
+    // ─────────────────────── 월 달력 ───────────────────────
+
+    /** 달력이 보여 주는 달. */
+    private var shownMonth: YearMonth = YearMonth.now()
+
+    private fun setupMonthNav() {
+        binding.btnMonthPrev.setOnClickListener {
+            shownMonth = shownMonth.minusMonths(1)
+            renderMonth()
+        }
+        binding.btnMonthNext.setOnClickListener {
+            shownMonth = shownMonth.plusMonths(1)
+            renderMonth()
+        }
+    }
+
+    /**
+     * 달력을 다시 그립니다.
+     *
+     * 절정 기간에 해당하는 날짜에 점을 찍습니다. 절정이 달을 넘어가는 경우
+     * (예: 10/25~11/3)도 이 달에 걸치는 부분만 잘라 표시합니다.
+     */
+    private fun renderMonth() {
+        binding.tvMonthLabel.text = shownMonth.format(
+            DateTimeFormatter.ofPattern(getString(R.string.calendar_month_format), Locale.KOREAN)
+        )
+
+        val marked = mutableSetOf<Int>()
+        SeasonHighlights.ALL.forEach { highlight ->
+            val start = highlight.peakStart
+            val end = highlight.peakEnd
+            for (day in 1..shownMonth.lengthOfMonth()) {
+                val md = MonthDay.of(shownMonth.monthValue, day)
+                val inRange = if (start <= end) {
+                    md >= start && md <= end
+                } else {
+                    // 연말을 넘기는 구간(예: 12/20 ~ 1/10)
+                    md >= start || md <= end
+                }
+                if (inRange) marked += day
+            }
+        }
+
+        binding.viewMonthGrid.yearMonth = shownMonth
+        binding.viewMonthGrid.markedDays = marked
     }
 
     /** 지금 절정이거나 가장 임박한 피사체를 상단에 크게. */
