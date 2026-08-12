@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  주제 알약. 배경색은 코드에서 주제별로 칠합니다.
+  여기서는 모양만 정의합니다.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/theme_etc_container" />
+    <corners android:radius="@dimen/radius_pill" />
+</shape>

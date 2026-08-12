@@ -14,6 +14,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.youngs.picview.R
 import com.youngs.picview.databinding.ItemHomeSpotBinding
 import com.youngs.picview.domain.spot.SpotFactsTable
+import com.youngs.picview.domain.spot.SpotTheme
 import com.youngs.picview.ui.model.SpotItem
 
 /** 홈의 '지금 찍기 좋은 곳' 가로 목록. */
@@ -41,12 +42,24 @@ class HomeSpotAdapter(
             tvHomeSpotScore.isVisible = item.score > 0
 
             // 목록에서 "언제 오면 좋은지"를 바로 알려 줍니다.
+            // 긴 이름("일몰 골든아워")을 쓰면 카드 폭을 넘겨 두 줄로 접히므로
+            // 앞머리만 씁니다.
             tvHomeSpotPhase.text = context.getString(
-                R.string.home_best_phase_format, facts.bestPhase.label
+                R.string.home_best_phase_format, facts.bestPhase.shortLabel
             )
             tvHomeSpotPhase.setTextColor(phaseColor)
             tvHomeSpotPhase.background?.mutate()?.setColorFilter(
                 ColorUtils.setAlphaComponent(phaseColor, PHASE_BADGE_ALPHA),
+                PorterDuff.Mode.SRC_IN
+            )
+
+            // 주제 알약. 지도 마커와 같은 색을 써서 목록과 지도가 같은 언어를
+            // 쓰게 합니다(초록은 어디서나 자연).
+            val theme = SpotTheme.of(item.contentTypeId)
+            tvHomeSpotTheme.text = theme.label
+            tvHomeSpotTheme.setTextColor(ContextCompat.getColor(context, theme.colorRes))
+            tvHomeSpotTheme.background?.mutate()?.setColorFilter(
+                ContextCompat.getColor(context, theme.containerRes),
                 PorterDuff.Mode.SRC_IN
             )
 

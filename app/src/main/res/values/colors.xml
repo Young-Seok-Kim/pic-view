@@ -110,4 +110,19 @@
     <color name="pose_card_muted">#B3E8DED4</color>
     <color name="pose_card_bg_selected">#F2B23A1B</color>
     <color name="pose_card_stroke_selected">#FFE0A32E</color>
+    <!--
+        ============ 주제별 색 ============
+        지도 마커·목록 카드·필터가 같은 색을 씁니다.
+        container 는 밝은 배경 위 알약용(글자색은 진한 쪽).
+    -->
+    <color name="theme_nature">#FF3F7D4E</color>
+    <color name="theme_nature_container">#FFE6F0E8</color>
+    <color name="theme_culture">#FFB23A1B</color>
+    <color name="theme_culture_container">#FFF7E4DE</color>
+    <color name="theme_leports">#FF2F6DB5</color>
+    <color name="theme_leports_container">#FFE2ECF7</color>
+    <color name="theme_food">#FFB07A0E</color>
+    <color name="theme_food_container">#FFFAEED2</color>
+    <color name="theme_etc">#FF7A6A5E</color>
+    <color name="theme_etc_container">#FFEFEAE5</color>
 </resources>

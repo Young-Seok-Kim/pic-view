@@ -22,6 +22,7 @@ import com.youngs.picview.R
 import com.youngs.picview.databinding.FragmentMapBinding
 import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.ui.model.SpotItem
+import com.youngs.picview.domain.spot.SpotTheme
 import android.graphics.PointF
 import androidx.annotation.DrawableRes
 import com.naver.maps.map.overlay.OverlayImage
@@ -174,11 +175,6 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
      * 촬영 구도 판단)과 같은 기준이라 지도만 다른 규칙을 갖지 않습니다.
      */
     @DrawableRes
-    private fun markerResFor(contentTypeId: String?): Int = when (contentTypeId) {
-        "12", "25" -> R.drawable.marker_nature   // 관광지 · 여행코스
-        "14" -> R.drawable.marker_culture        // 문화시설
-        "28" -> R.drawable.marker_leports        // 레포츠
-        "39" -> R.drawable.marker_food           // 음식점
-        else -> R.drawable.marker_etc
-    }
+    private fun markerResFor(contentTypeId: String?): Int =
+        SpotTheme.of(contentTypeId).markerRes
 }
