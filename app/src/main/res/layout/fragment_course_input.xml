@@ -79,6 +79,107 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- ─────────── 여행 날짜 ─────────── -->
+        <TextView
+            style="@style/Text.SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xl"
+            android:text="@string/course_date" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_course_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/bg_card"
+            app:cardCornerRadius="@dimen/radius_card"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/card_stroke"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/touch_target"
+                android:orientation="horizontal"
+                android:paddingHorizontal="@dimen/space_l"
+                android:paddingVertical="@dimen/space_m">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/course_date_icon"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/tv_course_date"
+                    style="@style/Text.SectionTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_m"
+                    android:layout_weight="1"
+                    tools:text="2026.08.04 (화)" />
+
+                <TextView
+                    style="@style/Text.Body"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/course_date_change"
+                    android:textColor="@color/maple_500" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ─────────── 인원 구성 ─────────── -->
+        <TextView
+            style="@style/Text.SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xl"
+            android:text="@string/course_party" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chips_party"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            app:selectionRequired="true"
+            app:singleLine="false"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_party_solo"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/course_party_solo" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_party_couple"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/course_party_couple" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_party_family"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/course_party_family" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_party_friends"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/course_party_friends" />
+        </com.google.android.material.chip.ChipGroup>
+
         <!-- ─────────── 언제 ─────────── -->
         <TextView
             style="@style/Text.SectionTitle"
@@ -202,6 +303,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/course_travel_walk" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_travel_rail"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/course_travel_rail" />
         </com.google.android.material.chip.ChipGroup>
 
         <!-- ─────────── 무엇을 ─────────── -->
@@ -252,6 +360,34 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/subject_night" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_subject_nature"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/subject_nature" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_subject_healing"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/subject_healing" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_subject_history"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/subject_history" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_subject_activity"
+                style="@style/Chip.Tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/subject_activity" />
         </com.google.android.material.chip.ChipGroup>
 
         <com.google.android.material.button.MaterialButton

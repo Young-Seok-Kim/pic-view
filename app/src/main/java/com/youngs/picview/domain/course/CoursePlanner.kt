@@ -12,6 +12,7 @@ import com.youngs.picview.util.estimateTravelMinutes
 import com.youngs.picview.util.roadDistanceKm
 import java.time.Duration
 import java.time.LocalTime
+import kotlin.math.roundToLong
 
 /**
  * 출사 코스를 짭니다.
@@ -148,11 +149,12 @@ object CoursePlanner {
                         phase = nextAnchor.phase,
                         travel = travel,
                         reason = nextAnchor.reason,
-                        isHighlight = true
+                        isHighlight = true,
+                        request = request
                     )
                     previous = nextAnchor.candidate
                     cursor = nextAnchor.arriveAt.plusMinutes(
-                        nextAnchor.candidate.facts.stayMinutes.toLong()
+                        stayOf(nextAnchor.candidate, request)
                     )
                     continue
                 }
@@ -191,10 +193,11 @@ object CoursePlanner {
                 phase = sun.phaseAt(arriveAt),
                 travel = travel,
                 reason = reasonFor(pick.facts, sun.phaseAt(arriveAt)),
-                isHighlight = false
+                isHighlight = false,
+                request = request
             )
             previous = pick
-            cursor = arriveAt.plusMinutes(pick.facts.stayMinutes.toLong())
+            cursor = arriveAt.plusMinutes(stayOf(pick, request))
         }
 
         // 앵커가 아직 남았는데 슬롯을 못 채웠다면 뒤에 그대로 붙입니다.
@@ -203,7 +206,8 @@ object CoursePlanner {
             val travel = travelBetween(previous, anchor.candidate, request)
             stops += toStop(
                 anchor.candidate, anchor.arriveAt, anchor.phase,
-                travel, anchor.reason, isHighlight = true
+                travel, anchor.reason, isHighlight = true,
+                request = request
             )
             previous = anchor.candidate
         }
@@ -230,7 +234,7 @@ object CoursePlanner {
         return candidates
             .asSequence()
             .filter { it.spot.contentId !in used }
-            .filter { it.facts.stayMinutes <= slotMinutes + STAY_TOLERANCE }
+            .filter { stayOf(it, request) <= slotMinutes + STAY_TOLERANCE }
             .sortedWith(
                 // 1) 지금 빛에 맞는가 (한낮엔 실내, 그 외엔 야외)
                 compareByDescending<Candidate> { fitsPhase(it.facts, phase) }
@@ -293,18 +297,28 @@ object CoursePlanner {
         phase: LightPhase,
         travel: Travel,
         reason: String,
-        isHighlight: Boolean
+        isHighlight: Boolean,
+        request: CourseRequest
     ) = CourseStop(
         spot = candidate.spot,
         facts = candidate.facts,
         arriveAt = arriveAt,
-        leaveAt = arriveAt.plusMinutes(candidate.facts.stayMinutes.toLong()),
+        leaveAt = arriveAt.plusMinutes(stayOf(candidate, request)),
         phase = phase,
         travelMinutes = travel.minutes,
         travelKm = travel.km,
         reason = reason,
         isHighlight = isHighlight
     )
+
+    /**
+     * 이 장소에 머무는 시간(분).
+     *
+     * 스팟마다 정해 둔 기본 체류 시간에 인원 배수를 곱합니다. 가족이 함께면
+     * 같은 곳이라도 더 오래 걸리므로, 같은 시간에 도는 곳이 자연스럽게 줄어듭니다.
+     */
+    private fun stayOf(candidate: Candidate, request: CourseRequest): Long =
+        (candidate.facts.stayMinutes * request.stayFactor).roundToLong()
 
     private const val MIN_SLOT_MINUTES = 30L
 
