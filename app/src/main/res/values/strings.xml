@@ -335,5 +335,5 @@
     <string name="detail_visit_rest">쉬는 날</string>
     <string name="sun_arc_sunrise">일출 %1$s</string>
     <string name="sun_arc_sunset">일몰 %1$s</string>
-    <string name="sun_arc_daylight">%1$d시간 %2$d분</string>
+    <string name="sun_arc_daylight">%1$d시간 %2$d분 동안 빛이 머물러요</string>
 </resources>

@@ -83,23 +83,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
             else -> getString(R.string.home_golden_tomorrow)
         }
 
-        renderDaylightLength(sun)
         renderWeather()
-    }
-
-    /** 낮 길이. 일출·일몰이 다 있을 때만 보입니다. */
-    private fun renderDaylightLength(sun: SunTimes) {
-        val sunrise = sun.sunrise
-        val sunset = sun.sunset
-        val minutes = if (sunrise != null && sunset != null) {
-            (sunset.toSecondOfDay() - sunrise.toSecondOfDay()) / 60
-        } else 0
-
-        binding.tvDaylightLength.isVisible = minutes > 0
-        if (minutes > 0) {
-            binding.tvDaylightLength.text =
-                getString(R.string.sun_arc_daylight, minutes / 60, minutes % 60)
-        }
     }
 
     /**
