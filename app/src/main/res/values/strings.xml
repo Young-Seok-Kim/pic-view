@@ -326,4 +326,9 @@
     <string name="home_qa_map_desc">명소·포토존·맛집\n위치를 한눈에</string>
     <string name="home_qa_calendar_desc">출사 일정과\n축제·행사 일정 확인</string>
     <string name="home_qa_mission_desc">출사 미션 참여하고\n스탬프·배지 획득</string>
+    <string name="detail_visit_info">방문 정보</string>
+    <string name="detail_visit_fee">입장료</string>
+    <string name="detail_visit_parking">주차</string>
+    <string name="detail_visit_hours">운영 시간</string>
+    <string name="detail_visit_rest">쉬는 날</string>
 </resources>
