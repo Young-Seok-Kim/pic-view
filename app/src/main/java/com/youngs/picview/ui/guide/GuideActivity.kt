@@ -40,6 +40,8 @@ import com.youngs.picview.ui.model.SpotItem
 import kotlinx.coroutines.launch
 import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.core.view.isVisible
+import com.youngs.picview.domain.pose.Subject
 
 class GuideActivity : AppCompatActivity() {
 
@@ -66,6 +68,9 @@ class GuideActivity : AppCompatActivity() {
     private lateinit var phase: LightPhase
 
     private var groupSize: GroupSize = GroupSize.SOLO
+
+    /** 무엇을 찍는가. 인물이면 포즈 목록, 나머지면 촬영 요령이 나옵니다. */
+    private var subject: Subject = Subject.PERSON
 
     private val galleryLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -158,6 +163,8 @@ class GuideActivity : AppCompatActivity() {
         }
         binding.rvPoses.adapter = poseAdapter
 
+        buildSubjectChips()
+
         binding.chipGroupPeople.setOnCheckedStateChangeListener { _, checked ->
             groupSize = when (checked.firstOrNull()) {
                 R.id.chip_people_pair -> GroupSize.PAIR
@@ -169,6 +176,49 @@ class GuideActivity : AppCompatActivity() {
         }
 
         refreshPoses()
+    }
+
+    /**
+     * 피사체 칩.
+     *
+     * 코드에서 만드는 이유: 항목이 [Subject] 하나에만 정의돼 있어야
+     * 이모지·이름이 한 곳에서 관리됩니다. XML 에 또 적으면 둘이 어긋납니다.
+     */
+    private fun buildSubjectChips() {
+        val group = binding.chipGroupSubject
+        group.removeAllViews()
+
+        Subject.entries.forEach { item ->
+            val chip = layoutInflater.inflate(
+                R.layout.item_subject_chip, group, false
+            ) as com.google.android.material.chip.Chip
+            chip.text = "${item.emoji} ${item.label}"
+            chip.isChecked = item == subject
+            chip.setOnClickListener {
+                subject = item
+                applySubject()
+            }
+            group.addView(chip)
+        }
+    }
+
+    /**
+     * 고른 피사체에 맞춰 화면을 바꿉니다.
+     *
+     * 인물일 때만 포즈 목록과 인원 선택이 뜹니다. 풍경을 찍는데 "2인/3~4인"을
+     * 고르라고 하면 뜻이 없습니다.
+     */
+    private fun applySubject() {
+        val isPerson = subject == Subject.PERSON
+
+        binding.rvPoses.isVisible = isPerson
+        binding.layoutPeopleRow.isVisible = isPerson
+
+        if (isPerson) {
+            refreshPoses()
+        } else {
+            binding.tvGuideMessage.text = subject.tipFor(phase)
+        }
     }
 
     private fun refreshPoses() {
