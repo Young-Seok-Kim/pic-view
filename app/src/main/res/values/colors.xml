@@ -137,4 +137,7 @@
     <color name="qa_live">#FF7A1E10</color>
     <!-- 포토 프레임 화면 배경. 어두워야 폴라로이드 종이가 떠 보입니다. -->
     <color name="frame_bg">#FF3A1710</color>
+    <!-- 빛 흐름 아치 아래 언덕. 지평선을 만들어 호의 시작·끝을 받쳐 줍니다. -->
+    <color name="hill_far">#FFE7DED2</color>
+    <color name="hill_near">#FFD8CCBC</color>
 </resources>
