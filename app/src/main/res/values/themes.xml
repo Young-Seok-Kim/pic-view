@@ -361,6 +361,38 @@
         <item name="rippleColor">#33B23A1B</item>
     </style>
 
+    <!--
+        계절 칩.
+        고른 계절의 색으로 켜집니다. 넷 다 대표색이면 무엇을 골랐는지
+        색으로 알 수 없고, 겨울을 골랐는데 화면이 단풍색이 되는 어긋남도
+        생깁니다. 글자색·모양은 그대로 두고 배경만 갈아 끼웁니다.
+    -->
+    <style name="Chip.Season" parent="Chip.Tag" />
+
+    <style name="Chip.Season.Spring">
+        <item name="chipBackgroundColor">@color/chip_bg_spring</item>
+        <item name="chipStrokeColor">@color/chip_stroke_spring</item>
+        <item name="rippleColor">#33D96A93</item>
+    </style>
+
+    <style name="Chip.Season.Summer">
+        <item name="chipBackgroundColor">@color/chip_bg_summer</item>
+        <item name="chipStrokeColor">@color/chip_stroke_summer</item>
+        <item name="rippleColor">#333F8F5C</item>
+    </style>
+
+    <style name="Chip.Season.Autumn">
+        <item name="chipBackgroundColor">@color/chip_bg_autumn</item>
+        <item name="chipStrokeColor">@color/chip_stroke_autumn</item>
+        <item name="rippleColor">#33D9822B</item>
+    </style>
+
+    <style name="Chip.Season.Winter">
+        <item name="chipBackgroundColor">@color/chip_bg_winter</item>
+        <item name="chipStrokeColor">@color/chip_stroke_winter</item>
+        <item name="rippleColor">#335B93B8</item>
+    </style>
+
     <!-- 스타일 태그(#사진 #자연 …) — 아이콘 없는 형태 -->
     <style name="Chip.Tag" parent="Chip.Category">
         <item name="chipIconVisible">false</item>

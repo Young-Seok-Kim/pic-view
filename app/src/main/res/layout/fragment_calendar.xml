@@ -123,28 +123,28 @@
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_spring"
-                    style="@style/Chip.Tag"
+                    style="@style/Chip.Season.Spring"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/season_spring" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_summer"
-                    style="@style/Chip.Tag"
+                    style="@style/Chip.Season.Summer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/season_summer" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_autumn"
-                    style="@style/Chip.Tag"
+                    style="@style/Chip.Season.Autumn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/season_autumn" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_winter"
-                    style="@style/Chip.Tag"
+                    style="@style/Chip.Season.Winter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/season_winter" />

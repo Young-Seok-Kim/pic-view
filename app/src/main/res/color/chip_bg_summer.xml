@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 계절 칩 배경. 고를 때만 그 계절의 색이 켜집니다. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/season_summer" android:state_checked="true" />
+    <item android:color="@color/chip_bg" />
+</selector>
