@@ -21,6 +21,15 @@ class MainViewModel : ViewModel() {
      */
     val temperatureC = MutableLiveData<Double?>(null)
 
+    /**
+     * 체감온도(℃) · 상대습도(%). 기온과 같은 초단기실황 응답에서 함께 옵니다.
+     *
+     * 출사는 "몇 도인가"보다 "얼마나 버틸 수 있는가"가 중요해서 기온 옆에
+     * 붙여 둡니다. 관측값이 빠지면 null 이고, 그때는 화면에서 감춥니다.
+     */
+    val feelsLikeC = MutableLiveData<Double?>(null)
+    val humidityPercent = MutableLiveData<Double?>(null)
+
     val isLoading = MutableLiveData<Boolean>(true)
 
     /** 사용자가 당겨서 새로고침한 경우. 스플래시 대신 목록 위 스피너를 씁니다. */

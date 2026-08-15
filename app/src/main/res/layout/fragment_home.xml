@@ -112,12 +112,32 @@
                 android:orientation="vertical"
                 android:padding="@dimen/space_l">
 
-                <TextView
-                    style="@style/Text.Caption"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/space_s"
-                    android:text="@string/home_day_light" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/Text.Caption"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/home_day_light" />
+
+                    <!--
+                      낮 길이. 전에는 호 한가운데 문장으로 넣었는데, 그 자리는
+                      해가 지나가는 길이라 정오 무렵이면 해와 글자가 겹쳤습니다.
+                    -->
+                    <TextView
+                        android:id="@+id/tv_daylight_length"
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/maple_600"
+                        tools:text="13시간 31분" />
+                </LinearLayout>
 
                 <com.youngs.picview.ui.home.SunArcView
                     android:id="@+id/view_day_light"
@@ -126,38 +146,14 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- ─────────── 현재 촬영 조건 3카드 ─────────── -->
-        <LinearLayout
+        <!-- ─────────── 기온 ─────────── -->
+        <include
+            android:id="@+id/stat_weather"
+            layout="@layout/item_home_weather"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_m"
-            android:layout_marginHorizontal="@dimen/screen_padding"
-            android:baselineAligned="false"
-            android:orientation="horizontal">
-
-            <include
-                android:id="@+id/stat_temp"
-                layout="@layout/item_home_stat"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <include
-                android:id="@+id/stat_sky"
-                layout="@layout/item_home_stat"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/space_s"
-                android:layout_weight="1" />
-
-            <include
-                android:id="@+id/stat_spots"
-                layout="@layout/item_home_stat"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/space_s"
-                android:layout_weight="1" />
-        </LinearLayout>
+            android:layout_marginHorizontal="@dimen/screen_padding" />
 
         <!--
           ─────────── 빠른 이동 ───────────
