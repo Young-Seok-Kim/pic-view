@@ -20,6 +20,7 @@ import com.youngs.picview.data.model.ImageItem
 import com.youngs.picview.data.repository.CourseRepository
 import com.youngs.picview.databinding.FragmentDetailBinding
 import com.youngs.picview.databinding.ItemScoreFactorBinding
+import com.youngs.picview.databinding.ItemVisitRowBinding
 import com.youngs.picview.domain.score.ScoreFactor
 import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.ui.guide.GuideOverlayView
@@ -137,6 +138,7 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
         loadImages(spot)
         loadTip(spot)
+        loadVisitInfo(spot)
 
         binding.btnStartGuide.setOnClickListener {
             val intent = Intent(requireContext(), GuideActivity::class.java).apply {
@@ -174,6 +176,53 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                 else R.string.detail_checkin_already
                 Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    // ───────────────────── 방문 정보 ─────────────────────
+
+    /**
+     * 입장료·주차·운영시간.
+     *
+     * 관광공사 detailIntro2 의 값은 금액이 아니라 "무료" · "공연, 전시에 따라
+     * 다름" 같은 문장입니다. 숫자로 파싱하려 들면 대부분 실패하므로 그대로
+     * 보여 줍니다. 값이 하나도 없으면 섹션 자체를 감춥니다 — 빈 표가 있으면
+     * "정보가 없다"가 아니라 "앱이 고장났다"로 읽힙니다.
+     */
+    private fun loadVisitInfo(spot: SpotItem) {
+        val typeId = spot.contentTypeId
+        if (typeId.isNullOrBlank()) return
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val item = runCatching {
+                RetrofitClient.tourApiService.getDetailIntro(
+                    serviceKey = BuildConfig.TOUR_API_KEY,
+                    contentId = spot.contentId,
+                    contentTypeId = typeId
+                )
+            }.getOrNull()?.response?.body?.items?.item?.firstOrNull()
+
+            val binding = _binding ?: return@launch
+            if (item == null || !item.hasAnything) {
+                binding.layoutDetailVisit.isVisible = false
+                return@launch
+            }
+
+            val rows = listOfNotNull(
+                item.feeText?.let { getString(R.string.detail_visit_fee) to it },
+                item.parkingText?.let { getString(R.string.detail_visit_parking) to it },
+                item.hoursText?.let { getString(R.string.detail_visit_hours) to it },
+                item.restText?.let { getString(R.string.detail_visit_rest) to it }
+            )
+
+            binding.tableDetailVisit.removeAllViews()
+            rows.forEach { (label, value) ->
+                val row = ItemVisitRowBinding.inflate(layoutInflater, binding.tableDetailVisit, false)
+                row.tvVisitLabel.text = label
+                row.tvVisitValue.text = value
+                binding.tableDetailVisit.addView(row.root)
+            }
+            binding.layoutDetailVisit.isVisible = true
         }
     }
 

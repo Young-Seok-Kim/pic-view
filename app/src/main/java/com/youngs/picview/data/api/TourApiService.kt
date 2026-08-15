@@ -1,6 +1,7 @@
 package com.youngs.picview.data.api
 
 import com.youngs.picview.data.model.DetailCommonResponse
+import com.youngs.picview.data.model.DetailIntroResponse
 import com.youngs.picview.data.model.ImageResponse
 import com.youngs.picview.data.model.TourResponse
 import retrofit2.http.GET
@@ -41,4 +42,21 @@ interface TourApiService {
 //        @Query("overviewYN") overviewYN: String = "Y",
         @Query("_type") type: String = "json"
     ): DetailCommonResponse
+
+    /**
+     * 유형별 상세(이용요금·주차료 등).
+     *
+     * 응답 필드가 contentTypeId 마다 다릅니다. 요금은 관광지·문화시설이
+     * `usefee`, 레포츠가 `usefeeleports` 로 이름이 갈립니다.
+     * 값도 금액이 아니라 "무료" · "공연, 전시에 따라 다름" 같은 문장입니다.
+     */
+    @GET("KorService2/detailIntro2")
+    suspend fun getDetailIntro(
+        @Query("serviceKey") serviceKey: String,
+        @Query("contentId") contentId: String,
+        @Query("contentTypeId") contentTypeId: String,
+        @Query("MobileOS") mobileOS: String = "AND",
+        @Query("MobileApp") mobileApp: String = "PicView",
+        @Query("_type") type: String = "json"
+    ): DetailIntroResponse
 }
