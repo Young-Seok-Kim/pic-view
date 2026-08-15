@@ -37,6 +37,15 @@ data class WeatherItem(
     val category: String? = null,
     /** 실황 관측값. 실황 응답에서 값이 담기는 유일한 필드입니다. */
     val obsrValue: String? = null,
+    /**
+     * 예보 대상 날짜·시각·값. **단기예보 응답에만** 있습니다.
+     *
+     * 실황 응답에서는 셋 다 null 이라 nullable 로 둡니다. non-null 로 두면
+     * 실황을 파싱하는 순간 NPE 가 납니다(예전에 그랬습니다).
+     */
+    val fcstDate: String? = null,
+    val fcstTime: String? = null,
+    val fcstValue: String? = null,
     val nx: Int? = null,
     val ny: Int? = null
 )

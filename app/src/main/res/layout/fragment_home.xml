@@ -64,15 +64,40 @@
                   이 카드가 말하는 것이 인사말이 아니라 관측 결과라는 것을
                   먼저 알려야 아래 숫자들이 근거로 읽힙니다.
                 -->
-                <TextView
-                    android:id="@+id/tv_light_eyebrow"
-                    style="@style/Text.Caption"
-                    android:layout_width="wrap_content"
+                <!--
+                  머리말 줄 오른쪽에 하늘 상태를 답니다.
+                  맑음·흐림은 취향이 아니라 조건입니다. 맑으면 한낮 하늘이
+                  하얗게 날아가고, 흐리면 온 하늘이 소프트박스가 되어 인물과
+                  숲의 결이 삽니다. 빛 보고서 옆이 그 말을 할 자리입니다.
+                -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:letterSpacing="0.12"
-                    android:textColor="#99FFFFFF"
-                    android:textSize="10sp"
-                    android:text="@string/home_eyebrow_report" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_light_eyebrow"
+                        style="@style/Text.Caption"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:letterSpacing="0.12"
+                        android:textColor="#99FFFFFF"
+                        android:textSize="10sp"
+                        android:text="@string/home_eyebrow_report" />
+
+                    <TextView
+                        android:id="@+id/tv_light_sky"
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_pill_dark"
+                        android:paddingHorizontal="@dimen/space_s"
+                        android:paddingVertical="2dp"
+                        android:textColor="@color/white"
+                        tools:text="☀ 맑음" />
+                </LinearLayout>
 
                 <!--
                   지금 시각과 방금 지난 태양 사건.

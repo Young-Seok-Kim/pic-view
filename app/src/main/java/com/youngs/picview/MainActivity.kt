@@ -30,6 +30,8 @@ import com.youngs.picview.ui.main.MainFragment
 import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.domain.score.PhotoScoreEngine
 import com.youngs.picview.domain.weather.ApparentTemperature
+import com.youngs.picview.domain.weather.HourlyTemp
+import com.youngs.picview.domain.weather.SkyState
 import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.ui.model.SpotScoreContext
 import com.youngs.picview.util.AppPrefs
@@ -37,6 +39,7 @@ import com.youngs.picview.util.retryOrNull
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -395,6 +398,25 @@ class MainActivity : BaseActivity() {
                         )
                     }
                 }
+                // 단기예보는 02·05·08·11·14·17·20·23시 발표만 유효합니다.
+                // 그중 02시 발표가 그날 03시부터 사흘치를 담고 있어 하루 곡선을
+                // 한 번에 얻습니다. 02:10 이전이면 아직 안 올라왔으므로 전날
+                // 23시 발표를 씁니다(그쪽도 오늘 00시부터 담고 있습니다).
+                val beforeDawn = LocalDateTime.now().toLocalTime() < LocalTime.of(2, 10)
+                val fcstDate = LocalDate.now()
+                    .let { if (beforeDawn) it.minusDays(1) else it }
+                    .format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+                val fcstTime = if (beforeDawn) "2300" else "0200"
+
+                val forecastAsync = async {
+                    retryOrNull("FORECAST_API") {
+                        RetrofitClient.weatherApiService.getVilageFcst(
+                            serviceKey = BuildConfig.TOUR_API_KEY,
+                            baseDate = fcstDate,
+                            baseTime = fcstTime
+                        )
+                    }
+                }
                 val astroAsync = async {
                     retryOrNull("ASTRO_API") {
                         RetrofitClient.weatherApiService.getAreaRiseSetInfo(
@@ -490,6 +512,32 @@ class MainActivity : BaseActivity() {
                 }
 
                 viewModel.weatherData.postValue(weatherResult)
+                // 1-2. 오늘의 기온 곡선 · 하늘 상태
+                // 오늘 날짜는 base 가 아니라 지금에서 뽑습니다. base 는 00시대에
+                // 하루 전으로 밀리는데, 곡선은 어디까지나 오늘 것이어야 합니다.
+                val todayStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+                val fcstItems = forecastAsync.await()?.response?.body?.items?.item.orEmpty()
+                    .filter { it.fcstDate == todayStr }
+
+                val hourly = fcstItems
+                    .filter { it.category == "TMP" }
+                    .mapNotNull { item ->
+                        val hour = item.fcstTime?.take(2)?.toIntOrNull() ?: return@mapNotNull null
+                        val value = item.fcstValue?.toDoubleOrNull() ?: return@mapNotNull null
+                        HourlyTemp(hour, value)
+                    }
+                    .distinctBy { it.hour }
+                    .sortedBy { it.hour }
+                viewModel.hourlyTemps.postValue(hourly)
+
+                // 하늘 상태는 실황(PTY)에 지금 시각 예보(SKY)를 얹어 만듭니다.
+                // 실황에는 구름 양이 없어서 "비는 안 오는데 맑은지 흐린지"를
+                // 실황만으로는 알 수 없습니다.
+                val skyNow = fcstItems.firstOrNull {
+                    it.category == "SKY" && it.fcstTime?.take(2)?.toIntOrNull() == LocalTime.now().hour
+                }?.fcstValue
+                viewModel.skyState.postValue(SkyState.of(pty, skyNow))
+
                 val observed = temp?.toDoubleOrNull()
                 viewModel.temperatureC.postValue(observed)
                 viewModel.humidityPercent.postValue(humidity)
@@ -508,6 +556,8 @@ class MainActivity : BaseActivity() {
                 Log.e("PRELOAD_ERROR", "사전 로딩 실패: ${e.message}")
                 viewModel.weatherData.postValue("정보를 불러올 수 없습니다.")
                 viewModel.temperatureC.postValue(null)
+                viewModel.hourlyTemps.postValue(emptyList())
+                viewModel.skyState.postValue(null)
                 viewModel.feelsLikeC.postValue(null)
                 viewModel.humidityPercent.postValue(null)
                 viewModel.goldenHourData.postValue("정보 없음")

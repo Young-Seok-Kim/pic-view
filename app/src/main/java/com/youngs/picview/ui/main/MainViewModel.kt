@@ -30,6 +30,18 @@ class MainViewModel : ViewModel() {
     val feelsLikeC = MutableLiveData<Double?>(null)
     val humidityPercent = MutableLiveData<Double?>(null)
 
+    /** 하늘 상태. 맑음·흐림은 취향이 아니라 빛의 성질을 바꾸는 조건입니다. */
+    val skyState = MutableLiveData<com.youngs.picview.domain.weather.SkyState?>(null)
+
+    /**
+     * 오늘의 시간대별 기온(단기예보 TMP).
+     *
+     * 실황은 지금 한 시점만 줍니다. "몇 시에 나가면 좋나" 는 예보라야
+     * 답할 수 있어서 따로 받아 둡니다. 못 받으면 빈 목록이고 곡선은
+     * 그려지지 않습니다.
+     */
+    val hourlyTemps = MutableLiveData<List<com.youngs.picview.domain.weather.HourlyTemp>>(emptyList())
+
     val isLoading = MutableLiveData<Boolean>(true)
 
     /** 사용자가 당겨서 새로고침한 경우. 스플래시 대신 목록 위 스피너를 씁니다. */
