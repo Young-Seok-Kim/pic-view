@@ -29,6 +29,7 @@ import com.youngs.picview.ui.senior.SeniorHomeFragment
 import com.youngs.picview.ui.main.MainFragment
 import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.domain.score.PhotoScoreEngine
+import com.youngs.picview.domain.weather.ApparentTemperature
 import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.ui.model.SpotScoreContext
 import com.youngs.picview.util.AppPrefs
@@ -414,6 +415,12 @@ class MainActivity : BaseActivity() {
                 val temp = weatherItems.firstOrNull { it.category == "T1H" }?.obsrValue
                 val tempValue = temp?.toDoubleOrNull() ?: 20.0
                 val pty = weatherItems.firstOrNull { it.category == "PTY" }?.obsrValue ?: "0"
+                // 습도·풍속은 체감온도를 내는 데만 씁니다. 같은 응답에 들어 있어
+                // 추가 호출이 없습니다.
+                val humidity = weatherItems.firstOrNull { it.category == "REH" }
+                    ?.obsrValue?.toDoubleOrNull()
+                val wind = weatherItems.firstOrNull { it.category == "WSD" }
+                    ?.obsrValue?.toDoubleOrNull()
                 val isRaining = pty != "0"
 
                 // 2. 일출/일몰 → 골든아워
@@ -483,7 +490,12 @@ class MainActivity : BaseActivity() {
                 }
 
                 viewModel.weatherData.postValue(weatherResult)
-                viewModel.temperatureC.postValue(temp?.toDoubleOrNull())
+                val observed = temp?.toDoubleOrNull()
+                viewModel.temperatureC.postValue(observed)
+                viewModel.humidityPercent.postValue(humidity)
+                viewModel.feelsLikeC.postValue(
+                    observed?.let { ApparentTemperature.of(it, humidity, wind) }
+                )
                 viewModel.goldenHourData.postValue(goldenText)
                 viewModel.loadFailed.postValue(spots.isEmpty())
                 if (spots.isNotEmpty()) {
@@ -496,6 +508,8 @@ class MainActivity : BaseActivity() {
                 Log.e("PRELOAD_ERROR", "사전 로딩 실패: ${e.message}")
                 viewModel.weatherData.postValue("정보를 불러올 수 없습니다.")
                 viewModel.temperatureC.postValue(null)
+                viewModel.feelsLikeC.postValue(null)
+                viewModel.humidityPercent.postValue(null)
                 viewModel.goldenHourData.postValue("정보 없음")
                 viewModel.loadFailed.postValue(true)
             } finally {

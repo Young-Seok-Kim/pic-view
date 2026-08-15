@@ -4,6 +4,7 @@ import com.youngs.picview.util.applyTopSystemBarInset
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
+import com.youngs.picview.domain.light.SunTimes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.youngs.picview.MainActivity
@@ -82,29 +83,44 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
             else -> getString(R.string.home_golden_tomorrow)
         }
 
-        // 현재 촬영 조건
-        val temp = viewModel.temperatureC.value
-        bindStat(
-            binding.statTemp, "🌡",
-            if (temp != null) "${temp.roundToInt()}℃" else "—",
-            getString(R.string.home_stat_temp)
-        )
-        bindStat(binding.statSky, "☀", phase.shortLabel, getString(R.string.home_stat_light))
-        bindStat(
-            binding.statSpots, "📍",
-            "${viewModel.spotData.value?.size ?: 0}", getString(R.string.home_stat_spots)
-        )
+        renderDaylightLength(sun)
+        renderWeather()
     }
 
-    private fun bindStat(
-        stat: com.youngs.picview.databinding.ItemHomeStatBinding,
-        icon: String,
-        value: String,
-        label: String
-    ) {
-        stat.tvStatIcon.text = icon
-        stat.tvStatValue.text = value
-        stat.tvStatLabel.text = label
+    /** 낮 길이. 일출·일몰이 다 있을 때만 보입니다. */
+    private fun renderDaylightLength(sun: SunTimes) {
+        val sunrise = sun.sunrise
+        val sunset = sun.sunset
+        val minutes = if (sunrise != null && sunset != null) {
+            (sunset.toSecondOfDay() - sunrise.toSecondOfDay()) / 60
+        } else 0
+
+        binding.tvDaylightLength.isVisible = minutes > 0
+        if (minutes > 0) {
+            binding.tvDaylightLength.text =
+                getString(R.string.sun_arc_daylight, minutes / 60, minutes % 60)
+        }
+    }
+
+    /**
+     * 기온 · 체감 · 습도.
+     *
+     * 셋을 한 줄에 둡니다. 기온만으로는 "삼각대 들고 30분 서 있을 만한가"가
+     * 안 나옵니다. 여름엔 습도가, 겨울엔 바람이 그 답을 바꿉니다.
+     */
+    private fun renderWeather() {
+        val temp = viewModel.temperatureC.value
+        binding.statWeather.tvWeatherTemp.text =
+            if (temp != null) "${temp.roundToInt()}℃" else "—"
+
+        val feels = viewModel.feelsLikeC.value
+        val humidity = viewModel.humidityPercent.value
+        val parts = buildList {
+            if (feels != null) add(getString(R.string.home_feels_like, feels.roundToInt()))
+            if (humidity != null) add(getString(R.string.home_humidity, humidity.roundToInt()))
+        }
+        binding.statWeather.tvWeatherDetail.text = parts.joinToString("   ")
+        binding.statWeather.tvWeatherDetail.isVisible = parts.isNotEmpty()
     }
 
     // ─────────────────────── 목록 ───────────────────────
