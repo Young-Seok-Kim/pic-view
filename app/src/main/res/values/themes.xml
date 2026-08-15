@@ -242,6 +242,20 @@
         <item name="android:letterSpacing">-0.01</item>
     </style>
 
+    <!--
+        빛 보고서 제목 — "지금은 야간이에요."
+
+        Display 는 마포백패킹입니다. "정읍 시선" 같은 짧은 이름에는 둥근
+        맛이 살지만, 한 문장을 큰 글씨로 깔면 획이 굵어 뭉치고 관측 결과가
+        아니라 인사말처럼 읽힙니다. 이 자리만 Pretendard 로 바꿉니다.
+        브랜드 이름은 그대로 마포백패킹입니다.
+    -->
+    <style name="Text.Display.Report">
+        <item name="fontFamily">@font/pretendard_bold</item>
+        <item name="android:fontFamily">@font/pretendard_bold</item>
+        <item name="android:letterSpacing">-0.02</item>
+    </style>
+
     <style name="Text.Title" parent="TextAppearance.PicView.TitleLarge">
         <item name="fontFamily">@font/mapo_backpacking</item>
         <item name="android:fontFamily">@font/mapo_backpacking</item>

@@ -58,21 +58,44 @@
                 android:orientation="vertical"
                 android:padding="@dimen/space_xl">
 
+                <!--
+                  머리말.
+                  "지금은" 한 마디였던 자리를 보고서 제목처럼 바꿨습니다.
+                  이 카드가 말하는 것이 인사말이 아니라 관측 결과라는 것을
+                  먼저 알려야 아래 숫자들이 근거로 읽힙니다.
+                -->
                 <TextView
-                    android:id="@+id/tv_light_phase_label"
+                    android:id="@+id/tv_light_eyebrow"
                     style="@style/Text.Caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:letterSpacing="0.12"
+                    android:textColor="#99FFFFFF"
+                    android:textSize="10sp"
+                    android:text="@string/home_eyebrow_report" />
+
+                <!--
+                  지금 시각과 방금 지난 태양 사건.
+                  "야간"만으로는 밤이 시작된 참인지 새벽에 가까운지 알 수
+                  없습니다. "일몰 후 58분" 이 그 자리를 메웁니다.
+                -->
+                <TextView
+                    android:id="@+id/tv_light_now"
+                    style="@style/Text.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_xs"
                     android:textColor="#CCFFFFFF"
-                    tools:text="지금은" />
+                    tools:text="● 지금 20:20 · 일몰 후 58분" />
 
                 <TextView
                     android:id="@+id/tv_light_phase"
-                    style="@style/Text.Display"
+                    style="@style/Text.Display.Report"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_xs"
                     android:textColor="@color/white"
-                    tools:text="한낮" />
+                    tools:text="지금은 야간이에요." />
 
                 <TextView
                     android:id="@+id/tv_light_hint"
@@ -81,7 +104,20 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:textColor="#E6FFFFFF"
-                    tools:text="빛이 강해 실내가 유리해요" />
+                    tools:text="조명과 별빛을 담기 좋은 시간입니다." />
+
+                <!--
+                  다음 출사 적기.
+                  밤에 앱을 여는 사람이 알고 싶은 건 오늘이 끝났다는 사실이
+                  아니라 내일 몇 시에 나가야 하는가 입니다.
+                -->
+                <TextView
+                    android:id="@+id/tv_light_next"
+                    style="@style/Text.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#E6FFFFFF"
+                    tools:text="다음 출사 적기는 내일 05:21, 첫 푸른빛부터 시작돼요." />
 
                 <TextView
                     android:id="@+id/tv_next_golden"
@@ -94,7 +130,7 @@
                     android:paddingVertical="@dimen/space_xs"
                     android:textColor="@color/white"
                     android:textStyle="bold"
-                    tools:text="🌇 일몰 골든아워까지 9시간 0분" />
+                    tools:text="⏱ 다음 촬영 적기까지 8시간 40분" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -116,6 +152,15 @@
                     style="@style/Text.Caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:letterSpacing="0.12"
+                    android:textColor="@color/maple_600"
+                    android:textSize="10sp"
+                    android:text="@string/home_eyebrow_flow" />
+
+                <TextView
+                    style="@style/Text.SectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/space_s"
                     android:text="@string/home_day_light" />
 
@@ -123,6 +168,21 @@
                     android:id="@+id/view_day_light"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
+
+                <!--
+                  낮 길이.
+                  숫자가 아니라 문장으로 둡니다. 위의 그림이 이미 근거를 다
+                  보여 줬으니 여기서는 오늘 하루를 한 마디로 닫아 주면 됩니다.
+                -->
+                <TextView
+                    android:id="@+id/tv_daylight_line"
+                    style="@style/Text.Caption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_s"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    tools:text="13시간 31분 동안 빛이 머물러요" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
