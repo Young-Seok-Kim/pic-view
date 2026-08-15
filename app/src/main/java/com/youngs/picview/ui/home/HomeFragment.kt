@@ -211,6 +211,12 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
 
         binding.statWeather.tvWeatherNote.text = weatherNote(temp, feels)
         binding.statWeather.tvWeatherNote.isVisible = temp != null && feels != null
+
+        binding.statWeather.viewTempCurve.temps = viewModel.hourlyTemps.value.orEmpty()
+
+        val sky = viewModel.skyState.value
+        binding.tvLightSky.isVisible = sky != null
+        if (sky != null) binding.tvLightSky.text = "${sky.emoji} ${sky.label}"
     }
 
     /**
@@ -249,6 +255,9 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
         }
 
         viewModel.goldenHourData.observe(viewLifecycleOwner) { renderLight() }
+
+        // 예보는 실황·촬영지보다 늦게 도착할 수 있습니다. 도착하면 다시 그립니다.
+        viewModel.hourlyTemps.observe(viewLifecycleOwner) { renderWeather() }
     }
 
     private fun setupActions() {

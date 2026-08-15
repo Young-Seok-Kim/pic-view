@@ -110,6 +110,18 @@
         </LinearLayout>
 
         <!--
+          오늘의 기온 곡선.
+          숫자 하나로는 "지금 나가도 되나"까지만 답합니다. 출사는 시각을
+          고르는 일이라 "몇 시에 나가면 좋나"가 더 자주 필요합니다.
+          예보를 못 받으면 높이가 0 이 되어 자리를 차지하지 않습니다.
+        -->
+        <com.youngs.picview.ui.home.TempCurveView
+            android:id="@+id/view_temp_curve"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s" />
+
+        <!--
           한 줄 풀이.
           숫자 셋을 나란히 두면 "그래서 어떻다는 건가"가 남습니다. 기온과
           체감의 차이가 어디서 왔는지를 말해 주면 숫자가 판단이 됩니다.
