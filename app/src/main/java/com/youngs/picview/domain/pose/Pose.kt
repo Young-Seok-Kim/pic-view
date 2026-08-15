@@ -62,3 +62,50 @@ enum class GroupSize(val label: String) {
     SMALL("3~4인"),
     LARGE("5인+")
 }
+
+/**
+ * 무엇을 찍는가.
+ *
+ * 처음에는 인물만 다뤘는데, 출사에서 사람이 프레임에 없는 경우가 오히려
+ * 많습니다. 풍경만 담는 날도 있고, 내장산에서는 새와 다람쥐를, 쌍화차 거리에서는
+ * 음식을 찍습니다. 피사체가 바뀌면 필요한 조언이 통째로 달라집니다.
+ *
+ * 인물은 "어떻게 서지"가 문제라 포즈 목록이 나오고, 나머지는 "어떻게 담지"가
+ * 문제라 촬영 요령이 나옵니다.
+ */
+enum class Subject(val emoji: String, val label: String) {
+    PERSON("🧍", "인물"),
+    LANDSCAPE("🏞", "풍경"),
+    ANIMAL("🐦", "동물"),
+    FOOD("🍲", "음식");
+
+    /**
+     * 이 피사체를 담는 요령. 빛 구간에 따라 달라지는 것만 갈라 씁니다.
+     *
+     * 인물은 [Pose] 목록이 따로 있으므로 여기서는 쓰지 않습니다.
+     */
+    fun tipFor(phase: com.youngs.picview.domain.light.LightPhase): String = when (this) {
+        PERSON -> ""
+
+        LANDSCAPE -> when {
+            phase.isGolden -> "하늘을 3분의 1만 두고 땅을 넓게 담으세요. 지금 빛이 가장 부드럽습니다."
+            phase == com.youngs.picview.domain.light.LightPhase.MIDDAY ->
+                "빛이 강해 하늘이 하얗게 날아갑니다. 하늘을 적게 넣고 그늘의 결을 담으세요."
+            phase == com.youngs.picview.domain.light.LightPhase.NIGHT ->
+                "삼각대에 올리고 2~10초로 길게 여세요. 손으로는 흔들립니다."
+            else -> "수평선을 화면 3분할 선에 맞추면 안정적으로 보입니다."
+        }
+
+        ANIMAL -> when {
+            phase == com.youngs.picview.domain.light.LightPhase.NIGHT ->
+                "어두워서 움직임이 흐릅니다. 가만히 있을 때를 기다리세요."
+            else -> "눈높이를 낮춰 눈에 초점을 맞추세요. 앞쪽에 여백을 두면 시선이 살아납니다."
+        }
+
+        FOOD -> when {
+            phase == com.youngs.picview.domain.light.LightPhase.NIGHT ->
+                "조명을 정면에서 받으면 납작해집니다. 창가나 옆빛을 찾으세요."
+            else -> "창가에서 옆빛이나 역광으로 담으면 김과 윤기가 살아납니다."
+        }
+    }
+}
