@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 빠른 이동 타일 배경. 색은 코드에서 타일마다 칠합니다. -->
+<!--
+  빠른 이동 타일 배경.
+  그림이 위에 얹히므로 색은 그림이 없을 때 비치는 바탕 역할만 합니다.
+-->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="@color/qa_course" />
+    <solid android:color="@color/bg_card_muted" />
     <corners android:radius="@dimen/radius_card" />
 </shape>

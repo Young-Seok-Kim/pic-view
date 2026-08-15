@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  홈의 빠른 이동 타일. 시안(🏠 HomeScreen QA_0~3)의 85x78 타일을 옮긴 것입니다.
-  색은 코드에서 칠합니다.
+  홈의 빠른 이동 타일.
+
+  색 사각형 + 이모지였던 것을 그림 + 설명으로 바꿨습니다. 이모지는 기기마다
+  다르게 그려지고, 라벨 한 낱말만으로는 "캘린더에 뭐가 있는지"가 안 보였습니다.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -11,33 +13,45 @@
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/layout_qa_tile"
+    <ImageView
+        android:id="@+id/iv_qa_icon"
         android:layout_width="match_parent"
-        android:layout_height="62dp"
+        android:layout_height="0dp"
+        android:adjustViewBounds="true"
         android:background="@drawable/bg_quick_action"
         android:clickable="true"
+        android:contentDescription="@null"
         android:focusable="true"
-        android:foreground="?attr/selectableItemBackground">
-
-        <TextView
-            android:id="@+id/tv_qa_emoji"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textSize="24sp"
-            tools:text="🗺" />
-    </FrameLayout>
+        android:foreground="?attr/selectableItemBackground"
+        android:scaleType="centerCrop"
+        tools:layout_height="78dp"
+        tools:src="@drawable/qa_map" />
 
     <TextView
         android:id="@+id/tv_qa_label"
         style="@style/Text.Caption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="@dimen/space_s"
         android:gravity="center"
         android:maxLines="1"
         android:textColor="@color/text_primary"
         android:textStyle="bold"
         tools:text="지도" />
+
+    <!--
+      두 줄 설명. 라벨만으로는 무엇을 하는 곳인지 알기 어렵습니다.
+      네 칸이 나란히 서므로 줄 수를 2로 고정해 타일 높이를 맞춥니다.
+    -->
+    <TextView
+        android:id="@+id/tv_qa_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:gravity="center"
+        android:lineSpacingExtra="1dp"
+        android:lines="2"
+        android:textColor="@color/text_tertiary"
+        android:textSize="10sp"
+        tools:text="명소, 포토존,\n맛집 위치를 한눈에" />
 </LinearLayout>
