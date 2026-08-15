@@ -20,6 +20,7 @@ import kotlin.math.roundToInt
 import android.graphics.PorterDuff
 import android.view.ViewGroup
 import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import com.youngs.picview.databinding.ItemQuickActionBinding
@@ -148,43 +149,48 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
         // 일기는 하단 탭에 이미 있어 타일까지 두면 같은 곳으로 가는 길이
         // 두 개가 됩니다. 대신 이 화면의 주 행동인 빛 스케줄을 첫 칸에 둡니다.
         val actions = listOf(
-            QuickAction("🌇", R.string.home_qa_course, R.color.qa_course) {
-                goToTab(R.id.tab_course)
-            },
-            QuickAction("🗺", R.string.home_open_map, R.color.qa_calendar) {
-                (activity as? MainActivity)?.pushScreen(MapFragment())
-            },
-            QuickAction("📅", R.string.home_qa_calendar, R.color.qa_diary) {
-                (activity as? MainActivity)?.pushScreen(CalendarFragment())
-            },
-            QuickAction("🏅", R.string.home_qa_mission, R.color.qa_live) {
-                (activity as? MainActivity)?.pushScreen(MissionFragment())
-            }
+            QuickAction(
+                R.drawable.qa_course, R.string.home_qa_course, R.string.home_qa_course_desc
+            ) { goToTab(R.id.tab_course) },
+            QuickAction(
+                R.drawable.qa_map, R.string.home_open_map, R.string.home_qa_map_desc
+            ) { (activity as? MainActivity)?.pushScreen(MapFragment()) },
+            QuickAction(
+                R.drawable.qa_calendar, R.string.home_qa_calendar, R.string.home_qa_calendar_desc
+            ) { (activity as? MainActivity)?.pushScreen(CalendarFragment()) },
+            QuickAction(
+                R.drawable.qa_mission, R.string.home_qa_mission, R.string.home_qa_mission_desc
+            ) { (activity as? MainActivity)?.pushScreen(MissionFragment()) }
         )
+
+        // 타일 그림은 정사각형입니다. 화면 폭에서 여백과 칸 사이 간격을 뺀 뒤
+        // 넷으로 나눠 높이를 직접 정합니다. adjustViewBounds 만으로는
+        // 칸마다 높이가 조금씩 달라져 라벨 줄이 어긋납니다.
+        val gap = resources.getDimensionPixelSize(R.dimen.space_s)
+        val side = resources.getDimensionPixelSize(R.dimen.screen_padding)
+        val tile = (resources.displayMetrics.widthPixels - side * 2 - gap * 3) / actions.size
 
         actions.forEachIndexed { index, action ->
             val item = ItemQuickActionBinding.inflate(layoutInflater, container, false)
-            item.tvQaEmoji.text = action.emoji
+            item.ivQaIcon.setImageResource(action.iconRes)
+            item.ivQaIcon.layoutParams.height = tile
             item.tvQaLabel.setText(action.labelRes)
-            item.layoutQaTile.background?.mutate()?.setColorFilter(
-                ContextCompat.getColor(requireContext(), action.colorRes),
-                PorterDuff.Mode.SRC_IN
-            )
-            item.layoutQaTile.setOnClickListener { action.onClick() }
+            item.tvQaDesc.setText(action.descRes)
+            item.ivQaIcon.contentDescription = getString(action.labelRes)
+            item.ivQaIcon.setOnClickListener { action.onClick() }
 
             // 타일 사이 간격. 마지막 칸 뒤에는 넣지 않습니다.
             if (index < actions.lastIndex) {
-                (item.root.layoutParams as ViewGroup.MarginLayoutParams).marginEnd =
-                    resources.getDimensionPixelSize(R.dimen.space_s)
+                (item.root.layoutParams as ViewGroup.MarginLayoutParams).marginEnd = gap
             }
             container.addView(item.root)
         }
     }
 
     private data class QuickAction(
-        val emoji: String,
+        @DrawableRes val iconRes: Int,
         @StringRes val labelRes: Int,
-        @ColorRes val colorRes: Int,
+        @StringRes val descRes: Int,
         val onClick: () -> Unit
     )
 

@@ -316,4 +316,14 @@
     <string name="frame_save_failed">저장하지 못했어요</string>
     <string name="frame_credit">정읍 시선 · 관광 정보 출처 한국관광공사</string>
     <string name="frame_no_photo">사진을 불러오지 못했어요</string>
+    <!--
+      빠른 이동 타일의 두 줄 설명.
+      줄바꿈은 반드시 이스케이프(역슬래시 n)로 씁니다. XML 에 실제 줄바꿈을
+      넣으면 안드로이드가 공백 하나로 합쳐 버려, 타일 폭에 맞춰 아무 데서나
+      줄이 나뉩니다.
+    -->
+    <string name="home_qa_course_desc">정읍의 야경·야간\n행사 일정을 한눈에</string>
+    <string name="home_qa_map_desc">명소·포토존·맛집\n위치를 한눈에</string>
+    <string name="home_qa_calendar_desc">출사 일정과\n축제·행사 일정 확인</string>
+    <string name="home_qa_mission_desc">출사 미션 참여하고\n스탬프·배지 획득</string>
 </resources>
