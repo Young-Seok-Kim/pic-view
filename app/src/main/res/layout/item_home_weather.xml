@@ -6,6 +6,9 @@
     빛 상태는 바로 위 히어로 카드가 이미 큰 글씨로 말하고 있었고, 촬영지
     수(85)는 바뀌지 않는 숫자라 매일 같은 자리를 차지만 했습니다. 하나만
     남기고 폭을 다 주니 기온에 체감·습도를 함께 붙일 자리가 생겼습니다.
+
+    "오늘의 기온"이 아니라 "현재 기온"입니다. 값이 초단기실황, 즉 방금
+    관측된 한 시점의 값이라 하루 전체를 말하는 이름은 맞지 않습니다.
 -->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -22,35 +25,101 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:paddingHorizontal="@dimen/space_l"
         android:paddingVertical="@dimen/space_m">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/home_temp_icon"
-            android:textSize="20sp" />
+            android:baselineAligned="false"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/tv_weather_temp"
-            style="@style/Text.Title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/space_m"
-            tools:text="24℃" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/space_m"
+                android:text="@string/home_temp_icon"
+                android:textSize="20sp" />
 
-        <!-- 체감·습도는 보조 정보라 오른쪽 끝으로 밀어 기온과 시선을 나눕니다. -->
+            <!--
+              세 값을 같은 무게로 늘어놓습니다.
+              기온만 크게 두고 나머지를 곁들이로 두면 "지금 나가도 되나"를
+              가르는 것이 실은 습도·바람이라는 점이 가려집니다.
+            -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/Text.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/home_stat_temp" />
+
+                <TextView
+                    android:id="@+id/tv_weather_temp"
+                    style="@style/Text.SectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="24℃" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/Text.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/home_stat_feels" />
+
+                <TextView
+                    android:id="@+id/tv_weather_feels"
+                    style="@style/Text.SectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="27℃" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/Text.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/home_stat_humidity" />
+
+                <TextView
+                    android:id="@+id/tv_weather_humidity"
+                    style="@style/Text.SectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="91%" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!--
+          한 줄 풀이.
+          숫자 셋을 나란히 두면 "그래서 어떻다는 건가"가 남습니다. 기온과
+          체감의 차이가 어디서 왔는지를 말해 주면 숫자가 판단이 됩니다.
+        -->
         <TextView
-            android:id="@+id/tv_weather_detail"
+            android:id="@+id/tv_weather_note"
             style="@style/Text.Caption"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ellipsize="end"
-            android:gravity="end"
-            android:maxLines="1"
-            tools:text="체감 25℃   습도 58%" />
+            android:layout_marginTop="@dimen/space_s"
+            tools:text="습도가 높아 실제보다 3℃ 더 덥게 느껴져요" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

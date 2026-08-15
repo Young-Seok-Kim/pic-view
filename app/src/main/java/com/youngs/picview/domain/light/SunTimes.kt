@@ -94,6 +94,52 @@ data class SunTimes(
             .firstOrNull { it.start > from }
             ?.let { Duration.between(from, it.start).toMinutes() }
 
+    /**
+     * 다음 골든아워.
+     *
+     * [minutesToNextGolden] 은 오늘 남은 구간만 봅니다. 그래서 해가 진 뒤에는
+     * 언제나 null 이라 "오늘은 끝났습니다"까지만 말할 수 있었습니다. 정작
+     * 밤에 앱을 여는 사람이 알고 싶은 건 **내일 몇 시에 나가야 하나** 입니다.
+     * 여기서는 오늘 남은 것이 없으면 내일 일출 골든아워로 넘어갑니다.
+     */
+    fun nextGolden(from: LocalTime = LocalTime.now()): NextGolden? {
+        upcomingGoldenWindows(from).firstOrNull { it.start > from }?.let {
+            return NextGolden(
+                phase = it.phase,
+                start = it.start,
+                isTomorrow = false,
+                minutesAway = Duration.between(from, it.start).toMinutes()
+            )
+        }
+
+        val rise = sunrise ?: return null
+        val start = rise.minusMinutes(GOLDEN_MIN)
+        // 자정을 넘어가므로 "오늘 남은 시간 + 내일 새벽까지" 로 계산합니다.
+        val minutes = MINUTES_PER_DAY - from.toSecondOfDay() / 60L + start.toSecondOfDay() / 60L
+        return NextGolden(LightPhase.SUNRISE, start, isTomorrow = true, minutesAway = minutes)
+    }
+
+    /**
+     * 지금과 가장 가까운 태양 사건.
+     *
+     * "일몰 후 58분" 처럼 지금이 하루의 어디쯤인지를 한 마디로 말하는 데 씁니다.
+     * 일출·일몰 중 **더 가까운 쪽**을 고릅니다. 20:20 에 "일출 후 14시간" 은
+     * 맞는 말이지만 아무 도움이 안 되고, "일몰 후 58분" 이라야 방금 무슨 일이
+     * 있었는지가 읽힙니다.
+     */
+    fun nearestEvent(from: LocalTime = LocalTime.now()): SunEventGap? {
+        val candidates = buildList {
+            sunrise?.let { add(SunEvent.SUNRISE to it) }
+            sunset?.let { add(SunEvent.SUNSET to it) }
+        }
+        val (event, at) = candidates.minByOrNull {
+            kotlin.math.abs(Duration.between(from, it.second).toMinutes())
+        } ?: return null
+
+        val minutes = Duration.between(from, at).toMinutes()
+        return SunEventGap(event, kotlin.math.abs(minutes), isBefore = minutes > 0)
+    }
+
     /** 일출·일몰 정보가 없을 때의 대략 판정. */
     private fun fallbackPhase(time: LocalTime): LightPhase = when (time.hour) {
         in 0..4 -> LightPhase.NIGHT
@@ -107,6 +153,8 @@ data class SunTimes(
     }
 
     companion object {
+        private const val MINUTES_PER_DAY = 24 * 60
+
         /** 일출·일몰 전후 이 분(分)까지를 골든아워로 봅니다. */
         const val GOLDEN_MIN = 30L
 
@@ -128,6 +176,20 @@ data class SunTimes(
         }
     }
 }
+
+/** 태양 사건 두 가지. */
+enum class SunEvent { SUNRISE, SUNSET }
+
+/** 지금과 [event] 사이의 거리. [isBefore] 면 아직 오지 않은 것입니다. */
+data class SunEventGap(val event: SunEvent, val minutes: Long, val isBefore: Boolean)
+
+/** 다음 골든아워. [isTomorrow] 면 날짜가 넘어갑니다. */
+data class NextGolden(
+    val phase: LightPhase,
+    val start: LocalTime,
+    val isTomorrow: Boolean,
+    val minutesAway: Long
+)
 
 /** 골든아워 한 구간. */
 data class GoldenWindow(

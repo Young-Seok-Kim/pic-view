@@ -91,6 +91,27 @@
     <!-- 홈 -->
     <string name="home_now_is">지금은</string>
     <string name="home_day_light">오늘의 빛 흐름</string>
+    <string name="home_eyebrow_report">CURRENT LIGHT REPORT · JEONGEUP</string>
+    <string name="home_eyebrow_flow">LIGHT FLOW</string>
+    <!-- "지금 20:20" · "일몰 후 58분" 처럼 지금이 하루의 어디쯤인지 -->
+    <string name="home_now_at">지금 %1$s</string>
+    <string name="home_gap_before_sunrise">일출까지 %1$s</string>
+    <string name="home_gap_after_sunrise">일출 후 %1$s</string>
+    <string name="home_gap_before_sunset">일몰까지 %1$s</string>
+    <string name="home_gap_after_sunset">일몰 후 %1$s</string>
+    <string name="home_is_now">지금은 %1$s%2$s.</string>
+    <string name="home_copula_batchim">이에요</string>
+    <string name="home_copula_plain">예요</string>
+    <string name="home_subject_line">%1$s을 담기 좋은 시간입니다.</string>
+    <!-- 다음 출사 적기 -->
+    <string name="home_next_shoot">다음 출사 적기는 %1$s %2$s, %3$s</string>
+    <string name="home_next_today">오늘</string>
+    <string name="home_next_tomorrow">내일</string>
+    <string name="home_next_tail_sunrise">첫 푸른빛부터 시작돼요.</string>
+    <string name="home_next_tail_sunset">붉은 빛이 내려앉기 시작해요.</string>
+    <string name="home_until_shoot">⏱ 다음 촬영 적기까지 %1$s</string>
+    <string name="home_duration_hm">%1$d시간 %2$d분</string>
+    <string name="home_duration_m">%1$d분</string>
     <string name="home_next_golden">🌇 골든아워까지 %1$d시간 %2$d분</string>
     <string name="home_golden_tomorrow">🌅 내일 일출을 기다려보세요</string>
     <string name="home_make_course">오늘의 빛 스케줄 만들기</string>
@@ -100,7 +121,13 @@
     <string name="home_see_all">전체보기 →</string>
     <string name="home_score_format">★ %1$d</string>
     <string name="home_best_phase_format">%1$s에 좋아요</string>
-    <string name="home_stat_temp">기온</string>
+    <!-- 초단기실황은 한 시점의 관측값이라 "오늘"이 아니라 "현재" 입니다. -->
+    <string name="home_stat_temp">현재 기온</string>
+    <string name="home_stat_feels">체감온도</string>
+    <string name="home_stat_humidity">습도</string>
+    <string name="home_weather_hotter">습도가 높아 실제보다 %1$d℃ 더 덥게 느껴져요</string>
+    <string name="home_weather_colder">바람이 있어 실제보다 %1$d℃ 더 춥게 느껴져요</string>
+    <string name="home_weather_same">체감이 기온과 비슷해요</string>
     <string name="home_temp_icon">🌡</string>
     <!-- 체감·습도는 기온과 같은 관측(초단기실황)에서 옵니다. -->
     <string name="home_feels_like">체감 %1$d℃</string>

@@ -2,9 +2,15 @@ package com.youngs.picview.ui.home
 
 import com.youngs.picview.util.applyTopSystemBarInset
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.view.View
 import androidx.core.view.isVisible
+import com.youngs.picview.domain.light.LightPhase
+import com.youngs.picview.domain.light.SunEvent
 import com.youngs.picview.domain.light.SunTimes
+import com.youngs.picview.util.byBatchim
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.youngs.picview.MainActivity
@@ -15,6 +21,7 @@ import com.youngs.picview.ui.detail.DetailFragment
 import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.ui.map.MapFragment
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.math.roundToInt
@@ -65,25 +72,125 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
 
     private fun renderLight() {
         val sun = viewModel.sunTimes
-        val phase = sun.phaseNow()
+        val now = LocalTime.now()
+        val phase = sun.phaseAt(now)
 
-        binding.tvLightPhaseLabel.text = getString(R.string.home_now_is)
-        binding.tvLightPhase.text = phase.label
-        binding.tvLightHint.text = phase.hint
+        // 카드 바탕도 지금의 빛을 따라갑니다. 붉은 카드가 "야간"이라고
+        // 말하고 있으면 글자와 색이 서로 다른 말을 합니다.
+        binding.cardLight.setCardBackgroundColor(
+            ContextCompat.getColor(requireContext(), phase.heroColorRes)
+        )
+
+        binding.tvLightNow.text = buildNowLine(sun, now)
+        binding.tvLightPhase.text = buildPhaseHeadline(phase)
+        binding.tvLightHint.text = getString(R.string.home_subject_line, phase.subject)
 
         binding.viewDayLight.sunTimes = sun
 
-        val minutes = sun.minutesToNextGolden()
-        binding.tvNextGolden.text = when {
-            !sun.hasData -> getString(R.string.course_sun_unknown)
-            phase.isGolden -> getString(R.string.course_golden_now)
-            minutes != null -> getString(
-                R.string.home_next_golden, minutes / 60, minutes % 60
+        renderNextShoot(sun, now)
+        renderDaylight(sun)
+        renderWeather()
+    }
+
+    /**
+     * "지금은 **야간**이에요." — 구간 이름만 색을 올립니다.
+     *
+     * 문장 전체가 한 색이면 눈이 왼쪽부터 읽어 내려가야 답을 만납니다.
+     * 정작 궁금한 낱말은 가운데 하나뿐이라 그것만 띄웁니다.
+     *
+     * 어미는 받침에 따라 갈립니다. "야간이에요" 와 "일출 골든아워예요" 를
+     * 하나로 고정하면 여덟 구간 중 절반이 어색해집니다.
+     */
+    private fun buildPhaseHeadline(phase: LightPhase): CharSequence {
+        val text = getString(
+            R.string.home_is_now,
+            phase.label,
+            phase.label.byBatchim(
+                getString(R.string.home_copula_batchim),
+                getString(R.string.home_copula_plain)
             )
-            else -> getString(R.string.home_golden_tomorrow)
+        )
+        val start = text.indexOf(phase.label)
+        if (start < 0) return text
+
+        return SpannableString(text).apply {
+            setSpan(
+                ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.hero_accent)),
+                start, start + phase.label.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+    }
+
+    /** "지금 20:20 · 일몰 후 58분" — 앞의 점은 살아 있는 관측이라는 표시입니다. */
+    private fun buildNowLine(sun: SunTimes, now: LocalTime): String {
+        val head = "● " + getString(R.string.home_now_at, now.format(HOUR_MINUTE))
+        val gap = sun.nearestEvent(now) ?: return head
+
+        val text = durationText(gap.minutes)
+        val tail = when {
+            gap.event == SunEvent.SUNRISE && gap.isBefore -> R.string.home_gap_before_sunrise
+            gap.event == SunEvent.SUNRISE -> R.string.home_gap_after_sunrise
+            gap.isBefore -> R.string.home_gap_before_sunset
+            else -> R.string.home_gap_after_sunset
+        }
+        return "$head · " + getString(tail, text)
+    }
+
+    /**
+     * 다음 출사 적기.
+     *
+     * 문장과 남은 시간을 나눠 답니다. 문장은 "언제 무엇을", 알약은 "얼마나
+     * 남았나" 입니다. 둘을 한 줄에 합치면 길어져서 정작 시각이 안 읽힙니다.
+     */
+    private fun renderNextShoot(sun: SunTimes, now: LocalTime) {
+        val next = sun.nextGolden(now)
+        if (next == null) {
+            binding.tvLightNext.isVisible = false
+            binding.tvNextGolden.text = getString(R.string.course_sun_unknown)
+            return
         }
 
-        renderWeather()
+        binding.tvLightNext.isVisible = true
+        binding.tvLightNext.text = getString(
+            R.string.home_next_shoot,
+            getString(
+                if (next.isTomorrow) R.string.home_next_tomorrow else R.string.home_next_today
+            ),
+            next.start.format(HOUR_MINUTE),
+            getString(
+                if (next.phase == LightPhase.SUNRISE) R.string.home_next_tail_sunrise
+                else R.string.home_next_tail_sunset
+            )
+        )
+
+        binding.tvNextGolden.text = if (sun.phaseAt(now).isGolden) {
+            getString(R.string.course_golden_now)
+        } else {
+            getString(R.string.home_until_shoot, durationText(next.minutesAway))
+        }
+    }
+
+    /** 낮 길이. 일출·일몰이 다 있을 때만 보입니다. */
+    private fun renderDaylight(sun: SunTimes) {
+        val sunrise = sun.sunrise
+        val sunset = sun.sunset
+        val minutes = if (sunrise != null && sunset != null) {
+            (sunset.toSecondOfDay() - sunrise.toSecondOfDay()) / 60
+        } else 0
+
+        binding.tvDaylightLine.isVisible = minutes > 0
+        if (minutes > 0) {
+            binding.tvDaylightLine.text =
+                getString(R.string.sun_arc_daylight, minutes / 60, minutes % 60)
+        }
+    }
+
+    /** 한 시간이 안 되면 "분"만 씁니다. "0시간 58분"은 읽는 데 방해가 됩니다. */
+    private fun durationText(minutes: Long): String = if (minutes >= 60) {
+        getString(R.string.home_duration_hm, minutes / 60, minutes % 60)
+    } else {
+        getString(R.string.home_duration_m, minutes)
     }
 
     /**
@@ -94,17 +201,34 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
      */
     private fun renderWeather() {
         val temp = viewModel.temperatureC.value
-        binding.statWeather.tvWeatherTemp.text =
-            if (temp != null) "${temp.roundToInt()}℃" else "—"
-
         val feels = viewModel.feelsLikeC.value
         val humidity = viewModel.humidityPercent.value
-        val parts = buildList {
-            if (feels != null) add(getString(R.string.home_feels_like, feels.roundToInt()))
-            if (humidity != null) add(getString(R.string.home_humidity, humidity.roundToInt()))
+
+        binding.statWeather.tvWeatherTemp.text = temp?.let { "${it.roundToInt()}℃" } ?: "—"
+        binding.statWeather.tvWeatherFeels.text = feels?.let { "${it.roundToInt()}℃" } ?: "—"
+        binding.statWeather.tvWeatherHumidity.text =
+            humidity?.let { "${it.roundToInt()}%" } ?: "—"
+
+        binding.statWeather.tvWeatherNote.text = weatherNote(temp, feels)
+        binding.statWeather.tvWeatherNote.isVisible = temp != null && feels != null
+    }
+
+    /**
+     * 기온과 체감의 차이를 한 줄로 풀어 씁니다.
+     *
+     * 숫자 셋을 나란히 두면 "그래서 어떻다는 건가"가 남습니다. 차이가
+     * 어디서 왔는지(여름은 습도, 겨울은 바람) 말해 주면 숫자가 판단이 됩니다.
+     *
+     * 1℃ 차이는 말하지 않습니다. 반올림 때문에 생기는 값이라 근거가 약합니다.
+     */
+    private fun weatherNote(temp: Double?, feels: Double?): String {
+        if (temp == null || feels == null) return ""
+        val diff = (feels - temp).roundToInt()
+        return when {
+            diff >= 2 -> getString(R.string.home_weather_hotter, diff)
+            diff <= -2 -> getString(R.string.home_weather_colder, -diff)
+            else -> getString(R.string.home_weather_same)
         }
-        binding.statWeather.tvWeatherDetail.text = parts.joinToString("   ")
-        binding.statWeather.tvWeatherDetail.isVisible = parts.isNotEmpty()
     }
 
     // ─────────────────────── 목록 ───────────────────────
@@ -210,5 +334,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
     companion object {
         /** 홈에 노출할 상위 스팟 수. */
         private const val BEST_COUNT = 8
+
+        private val HOUR_MINUTE: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
     }
 }
