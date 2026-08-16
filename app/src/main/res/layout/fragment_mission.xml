@@ -83,11 +83,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                <com.youngs.picview.ui.mission.MissionSceneView
+                <!--
+                  정읍의 장면 — 해 · 구름 · 무지개다리 · 정자 · 물결.
+                  선화라 알파를 낮춰 배경으로 물러나 있게 합니다. 진하게
+                  두면 "장면 0 / 19" 와 무게가 같아져 둘 다 안 읽힙니다.
+                -->
+                <ImageView
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end|center_vertical"
-                    android:layout_marginEnd="@dimen/space_m" />
+                    android:layout_marginEnd="@dimen/space_s"
+                    android:adjustViewBounds="true"
+                    android:alpha="0.55"
+                    android:contentDescription="@null"
+                    android:src="@drawable/scene_mission_header" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
