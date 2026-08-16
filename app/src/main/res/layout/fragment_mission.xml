@@ -97,6 +97,40 @@
                         android:textColor="#E6FFFFFF"
                         tools:text="정읍에서 발견한 장면을 모아보세요" />
 
+                    <!--
+                      진행 막대.
+                      "0 / 19" 는 정확하지만 얼마만큼인지는 머리로 나눠야
+                      압니다. 막대가 그 나눗셈을 대신합니다.
+                    -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_m"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ProgressBar
+                            android:id="@+id/pb_mission_total"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="0dp"
+                            android:layout_height="6dp"
+                            android:layout_weight="1"
+                            android:max="100"
+                            android:progressBackgroundTint="#4DFFFFFF"
+                            android:progressTint="@color/white"
+                            tools:progress="30" />
+
+                        <TextView
+                            android:id="@+id/tv_mission_percent"
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/space_s"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            tools:text="30%" />
+                    </LinearLayout>
+
                     <!-- 유형별로 몇 장면을 모았는지. 무엇에 치우쳤는지 보입니다. -->
                     <com.google.android.material.chip.ChipGroup
                         android:id="@+id/chips_mission_tally"
@@ -137,9 +171,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:padding="@dimen/space_l">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
                     <FrameLayout
                         android:id="@+id/layout_today_badge"
@@ -190,6 +229,99 @@
                         android:text="@string/mission_go"
                         android:textColor="@color/maple_600"
                         android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!--
+                      추천 시간 · 구도 · 방향.
+                      미션 이름만으로는 언제 어디서 어떻게인지 모릅니다.
+                      셋을 한 줄에 두면 그대로 오늘의 계획이 됩니다.
+                      값은 상세 화면과 같은 계산에서 나옵니다.
+                    -->
+                    <LinearLayout
+                        android:id="@+id/layout_today_facts"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_m"
+                        android:background="@drawable/bg_detail_fact"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/space_m">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                style="@style/Text.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/mission_fact_time"
+                                android:textColor="@color/text_tertiary"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:id="@+id/tv_today_time"
+                                style="@style/Text.Body"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:textStyle="bold"
+                                tools:text="18:21-19:21" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                style="@style/Text.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/mission_fact_guide"
+                                android:textColor="@color/text_tertiary"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:id="@+id/tv_today_guide"
+                                style="@style/Text.Body"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:textStyle="bold"
+                                tools:text="⇆ 대칭" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                style="@style/Text.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/mission_fact_light"
+                                android:textColor="@color/text_tertiary"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:id="@+id/tv_today_light"
+                                style="@style/Text.Body"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:textStyle="bold"
+                                tools:text="☀ 저녁 사광" />
+                        </LinearLayout>
+                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -265,6 +397,106 @@
                 android:layout_marginHorizontal="@dimen/screen_padding"
                 tools:text="8개 중 2개를 모았어요" />
 
+            <!--
+              나의 기록.
+              미션이 "무엇을 할까" 라면 이 줄은 "지금까지 얼마나 했나"
+              입니다. 숫자 넷이면 충분합니다.
+            -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_m"
+                android:layout_marginHorizontal="@dimen/screen_padding"
+                android:background="@drawable/bg_detail_fact"
+                android:baselineAligned="false"
+                android:orientation="horizontal"
+                android:padding="@dimen/space_m">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_stat_scenes"
+                        style="@style/Text.SectionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="0 / 19" />
+
+                    <TextView
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/mission_stat_scenes" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_stat_stamps"
+                        style="@style/Text.SectionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="0" />
+
+                    <TextView
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/mission_stat_stamps" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_stat_places"
+                        style="@style/Text.SectionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="0" />
+
+                    <TextView
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/mission_stat_places" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_stat_season"
+                        style="@style/Text.SectionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="여름" />
+
+                    <TextView
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/mission_stat_season" />
+                </LinearLayout>
+            </LinearLayout>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_stamps"
                 android:layout_width="match_parent"
@@ -273,7 +505,7 @@
                 android:nestedScrollingEnabled="false"
                 android:paddingHorizontal="@dimen/screen_padding"
                 app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                app:spanCount="4"
+                app:spanCount="3"
                 tools:itemCount="8"
                 tools:listitem="@layout/item_stamp" />
         </LinearLayout>

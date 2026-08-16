@@ -34,6 +34,17 @@ data class Mission(
     val requirement: String,
     /** 진행 중일 때 다음 행동을 일러 주는 한 줄. */
     val nextHint: String,
+    /**
+     * 완료하면 받는 스탬프 이름.
+     *
+     * 스탬프 칸에 유형 이름("빛")만 달아 봤는데, 여덟 칸 중 둘이 똑같이
+     * "빛"이 되어 무엇을 모았는지 알 수 없었습니다. 수식어가 붙은 이름은
+     * 그 자체가 기억할 만한 것이 되기도 합니다 — "황금빛 수집가"를 받는
+     * 것과 "빛"을 받는 것은 다른 일입니다.
+     */
+    val badge: String,
+    /** 카드 아래 해시태그. 무엇에 관한 미션인지 한눈에 훑게 합니다. */
+    val tags: List<String> = emptyList(),
     val target: Int,
     val places: List<String> = emptyList(),
     val countOf: (List<VisitLogEntity>) -> Int
@@ -116,6 +127,8 @@ object Missions {
             title = "오늘의 빛 사냥꾼",
             requirement = "황금시간에 포토스코어 70점 이상인 곳에서 사진 2장 남기기",
             nextHint = "다음 황금시간에 한 장 더 남겨보세요",
+            badge = "황금빛 수집가",
+            tags = listOf("황금시간", "고득점", "빛"),
             target = 2,
             countOf = { visits ->
                 visits.withPhoto().count { phaseOf(it)?.isGolden == true && it.score >= 70 }
@@ -128,6 +141,8 @@ object Missions {
             title = "물에 비친 정읍",
             requirement = "물가에서 반사가 살아나는 장면 3장 남기기",
             nextHint = "바람이 잔잔한 이른 아침에 수면이 가장 잘 비칩니다",
+            badge = "수면의 관찰자",
+            tags = listOf("물가", "반사", "잔잔한 아침"),
             target = 3,
             places = WATER_PLACES,
             countOf = { visits ->
@@ -143,6 +158,8 @@ object Missions {
             title = "아침과 저녁의 차이",
             requirement = "같은 장소를 아침과 저녁에 각각 담아 빛의 변화 비교하기",
             nextHint = "아침에 찍은 곳을 저녁에 한 번 더 찾아가 보세요",
+            badge = "하루의 기록자",
+            tags = listOf("같은 장소", "아침", "저녁"),
             target = 2,
             countOf = { visits ->
                 // 장소별로 묶어, 아침과 저녁 사진을 **둘 다** 가진 곳을 찾습니다.
@@ -165,6 +182,8 @@ object Missions {
             title = "푸른 시간 수집가",
             requirement = "해 뜨기 전이나 진 직후 블루아워에 사진 1장 남기기",
             nextHint = "일몰 직후 25분 동안만 열리는 시간입니다",
+            badge = "블루아워 관찰자",
+            tags = listOf("블루아워", "짧은 시간", "삼각대"),
             target = 1,
             countOf = { visits ->
                 visits.withPhoto().count {
@@ -179,6 +198,8 @@ object Missions {
             title = "내장산 계절 관찰일지",
             requirement = "이번 계절의 내장산에서 나뭇잎·능선·길을 3장 남기기",
             nextHint = "같은 계절 안에 세 장을 모아야 변화가 보입니다",
+            badge = "계절 수집가",
+            tags = listOf("내장산", "계절", "관찰"),
             target = 3,
             places = listOf("내장산"),
             countOf = { visits ->
@@ -196,6 +217,8 @@ object Missions {
             title = "나만의 정읍 엽서",
             requirement = "찍은 사진 3장에 프레임을 입혀 나만의 정읍 완성하기",
             nextHint = "일기에서 사진을 눌러 프레임을 입혀보세요",
+            badge = "나만의 큐레이터",
+            tags = listOf("프레임", "엽서", "기록"),
             target = 3,
             countOf = { visits -> visits.withPhoto().size }
         ),
@@ -206,6 +229,8 @@ object Missions {
             title = "정읍의 오래된 장면",
             requirement = "무성서원·피향정·정읍사 문화공원 중 두 곳의 건축 디테일 담기",
             nextHint = "처마 끝과 기와의 결을 가까이 담아보세요",
+            badge = "유산 아카이버",
+            tags = listOf("무성서원", "피향정", "건축"),
             target = 2,
             places = HERITAGE_SITES,
             countOf = { visits ->
@@ -222,6 +247,8 @@ object Missions {
             title = "빛의 이동 경로",
             requirement = "하루 안에 서로 다른 촬영지 세 곳을 이어 담기",
             nextHint = "오전·오후·저녁으로 나눠 세 곳을 이어보세요",
+            badge = "빛의 길잡이",
+            tags = listOf("하루", "세 곳", "이동"),
             target = 3,
             countOf = { visits ->
                 // 하루 안에 몇 곳을 이었는지. 날짜별로 묶어 가장 많은 날을 씁니다.
