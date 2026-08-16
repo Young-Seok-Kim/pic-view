@@ -4,13 +4,23 @@ import com.youngs.picview.domain.light.LightPhase
 import com.youngs.picview.ui.guide.GuideOverlayView
 
 /** 촬영 시 피사체를 바라보는 방향. 골든아워 배치에 씁니다. */
-enum class Facing(val label: String) {
-    EAST("동향"),
-    WEST("서향"),
-    SOUTH("남향"),
-    NORTH("북향"),
+enum class Facing(val label: String, val bearing: Int? = null) {
+    EAST("동향", 90),
+    WEST("서향", 270),
+    SOUTH("남향", 180),
+    NORTH("북향", 0),
     INDOOR("실내"),
-    ANY("무관")
+    ANY("무관");
+
+    /**
+     * "서향 · 270°" 처럼 각도를 함께 씁니다.
+     *
+     * 각도는 추정치가 아니라 방위 이름 자체의 정의입니다(서 = 270°).
+     * 지형을 실측해 얻은 값이 아니므로 소수점까지 적지 않습니다.
+     * 실내·무관은 방향이 없으므로 이름만 씁니다.
+     */
+    val labelWithBearing: String
+        get() = bearing?.let { "$label · $it°" } ?: label
 }
 
 /**

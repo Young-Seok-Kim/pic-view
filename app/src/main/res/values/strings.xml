@@ -361,6 +361,26 @@
     <string name="detail_visit_hours">운영 시간</string>
     <string name="detail_visit_rest">쉬는 날</string>
     <!-- ============ 색감 필터 ============ -->
+    <!-- 출사지 상세 : 오늘의 촬영 적기 -->
+    <string name="detail_shoot_eyebrow">TODAY’S LIGHT WINDOW</string>
+    <string name="detail_shoot_window">오늘의 촬영 적기</string>
+    <string name="detail_fact_time">추천 촬영 시간</string>
+    <string name="detail_fact_facing">추천 방향</string>
+    <string name="detail_light_sub">%1$s · %2$s</string>
+    <string name="detail_window_range">%1$s–%2$s</string>
+    <string name="detail_now_at">현재 %1$s</string>
+    <string name="detail_window_today">오늘 %1$s–%2$s · %3$s</string>
+    <string name="detail_window_tomorrow">내일 %1$s–%2$s · %3$s</string>
+    <string name="detail_window_morning">아침 황금시간</string>
+    <string name="detail_window_evening">저녁 황금시간</string>
+    <string name="detail_light_line">일몰 %1$s · %2$s · %3$s</string>
+    <string name="detail_save_plan">출사 일정 저장</string>
+    <string name="detail_plan_saved">출사 일정을 저장했어요</string>
+    <string name="detail_plan_failed">저장하지 못했어요</string>
+    <string name="detail_score_title">오늘의 출사 적합도 %1$d점</string>
+    <string name="detail_info_expand">더 알아보기 ▾</string>
+    <string name="detail_info_collapse">접기 ▴</string>
+
     <string name="palette_title">색감 필터</string>
     <string name="frame_color">🎨 색감</string>
     <string name="palette_before">원본</string>

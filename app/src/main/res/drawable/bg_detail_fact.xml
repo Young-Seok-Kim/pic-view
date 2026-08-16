@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 촬영 시간·방향을 담는 작은 상자. 카드 안의 카드라 흰 바탕으로 띄웁니다. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/bg_card" />
+    <corners android:radius="12dp" />
+</shape>

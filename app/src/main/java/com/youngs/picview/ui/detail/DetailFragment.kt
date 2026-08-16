@@ -21,17 +21,24 @@ import com.youngs.picview.data.repository.CourseRepository
 import com.youngs.picview.databinding.FragmentDetailBinding
 import com.youngs.picview.databinding.ItemScoreFactorBinding
 import com.youngs.picview.databinding.ItemVisitRowBinding
+import com.youngs.picview.domain.course.CourseStop
+import com.youngs.picview.domain.course.ShootingCourse
+import com.youngs.picview.domain.light.LightPhase
+import com.youngs.picview.domain.light.SunTimes
 import com.youngs.picview.domain.score.ScoreFactor
+import com.youngs.picview.domain.spot.SpotFacts
 import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.ui.guide.GuideOverlayView
 import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.util.AppPrefs
+import com.youngs.picview.util.TravelMode
 import com.youngs.picview.util.TtsController
 import com.youngs.picview.ui.adapter.ImagePagerAdapter
 import com.youngs.picview.ui.guide.GuideActivity
 import com.youngs.picview.ui.model.SpotItem
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
+import java.time.LocalTime
 import com.youngs.picview.util.OverviewFormatter
 
 class DetailFragment : Fragment(R.layout.fragment_detail) {
@@ -57,6 +64,9 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
     private var audioText: String = ""
 
     private var factorsExpanded = false
+
+    /** 장소 설명 펼침 여부. 기본은 접힘입니다. */
+    private var infoExpanded = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -228,17 +238,107 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
     // ───────────────────── 촬영 정보 ─────────────────────
 
-    /** 이 장소를 언제·어느 방향에서·어떤 구도로 찍는지. 출사 앱의 핵심 정보입니다. */
+    /**
+     * 이 장소를 언제·어느 방향에서·어떤 구도로 찍는지.
+     *
+     * 화면을 다시 짜면서 그래프를 얹었습니다. 예전에는 "일몰 골든아워 ·
+     * 서향" 한 줄뿐이라 그것이 지금으로부터 얼마나 먼 이야기인지 알 수
+     * 없었습니다. 그래프가 지금 위치를 찍어 주고, 그 아래 문장이 몇 시부터
+     * 몇 시까지인지를 닫습니다.
+     */
     private fun renderShootingFacts(spot: SpotItem) {
         val facts = SpotFactsTable.of(spot.title, spot.contentTypeId)
+        val sun = mainViewModel.sunTimes
 
-        binding.tvDetailBestTime.text = getString(
-            R.string.detail_best_time_format, facts.bestPhase.label, facts.facing.label
+        binding.viewShootWindow.sunTimes = sun
+
+        val window = pickWindow(sun, facts.bestPhase)
+        binding.tvDetailBestTime.text = window?.let {
+            getString(R.string.detail_window_range, it.start.hhmm(), it.end.hhmm())
+        } ?: getString(R.string.course_sun_unknown)
+
+        binding.tvDetailLightLine.text = getString(
+            R.string.detail_light_sub,
+            getString(
+                if ((window?.phase ?: facts.bestPhase) == LightPhase.SUNRISE) {
+                    R.string.detail_window_morning
+                } else {
+                    R.string.detail_window_evening
+                }
+            ),
+            facts.bestPhase.lightCharacter
         )
+
+        binding.tvDetailFacing.text = facts.facing.labelWithBearing
+
         binding.tvDetailFactsNote.text = facts.note
         binding.tvDetailGuide.text = getString(
             R.string.course_guide_format, guideName(facts.guide)
         )
+
+        binding.btnSavePlan.setOnClickListener { savePlan(spot, facts) }
+    }
+
+    /**
+     * 보여 줄 골든아워 창을 고릅니다.
+     *
+     * 이 장소의 최적 구간이 골든아워면 그 창을 그대로 씁니다. 서향 고택에
+     * 아침 골든아워를 권하면 해를 등지고 서게 되니 맞지 않습니다.
+     * 최적 구간이 골든아워가 아니면(한낮이 좋은 실내 등) 오늘 남은 것 중
+     * 가까운 쪽을 씁니다.
+     */
+    private fun pickWindow(sun: SunTimes, best: LightPhase) =
+        sun.upcomingGoldenWindows(LocalTime.MIN).firstOrNull { it.phase == best }
+            ?: sun.upcomingGoldenWindows().firstOrNull()
+            ?: sun.upcomingGoldenWindows(LocalTime.MIN).firstOrNull()
+
+    private fun LocalTime.hhmm() = "%02d:%02d".format(hour, minute)
+
+    /**
+     * 이 장소 한 곳짜리 출사 일정을 저장합니다.
+     *
+     * 하단 CTA(촬영하기·길찾기)는 "지금 움직인다"이고 이건 "나중에 온다"라
+     * 성격이 다릅니다. 그래서 빛 카드 안에 뒀습니다.
+     *
+     * 새 저장소를 만들지 않고 기존 코스 저장을 그대로 씁니다. 정거장이
+     * 하나뿐인 코스일 뿐이라, 저장하면 코스 목록에 그대로 나타납니다.
+     */
+    private fun savePlan(spot: SpotItem, facts: SpotFacts) {
+        val sun = mainViewModel.sunTimes
+        val window = pickWindow(sun, facts.bestPhase)
+
+        val arrive = window?.start ?: LocalTime.of(9, 0)
+        val stop = CourseStop(
+            spot = spot,
+            facts = facts,
+            arriveAt = arrive,
+            leaveAt = window?.end ?: arrive.plusMinutes(60),
+            phase = window?.phase ?: facts.bestPhase,
+            travelMinutes = 0,
+            travelKm = 0.0,
+            reason = facts.note,
+            isHighlight = true
+        )
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val saved = runCatching {
+                CourseRepository(requireContext()).save(
+                    ShootingCourse(
+                        stops = listOf(stop),
+                        sun = sun,
+                        travelMode = TravelMode.CAR,
+                        totalDistanceKm = 0.0
+                    ),
+                    summary = binding.tvDetailBestTime.text.toString()
+                )
+            }.isSuccess
+
+            Toast.makeText(
+                requireContext(),
+                if (saved) R.string.detail_plan_saved else R.string.detail_plan_failed,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     private fun guideName(type: GuideOverlayView.GuideType): String = getString(
@@ -271,6 +371,7 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
         // 강점 둘과 발목을 잡은 것 하나를 엮어 설명합니다.
         // 항목 하나만 보여 주면 "비가 오지 않아요" 로 끝나 버립니다.
+        binding.tvScoreTitle.text = getString(R.string.detail_score_title, score.total)
         binding.tvScoreHeadline.text = score.summary
 
         container.removeAllViews()
@@ -280,6 +381,28 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
         header.setOnClickListener { toggleFactors() }
         applyFactorsVisibility()
+        setupInfoToggle()
+    }
+
+    /**
+     * 장소 설명은 접어 둡니다.
+     *
+     * 역사·건축 이야기는 길고 출사 결정에는 쓰이지 않습니다. 예전에는 이것이
+     * 화면 중반을 통째로 차지해 정작 점수와 촬영 정보를 아래로 밀어냈습니다.
+     */
+    private fun setupInfoToggle() {
+        binding.layoutInfoHeader.setOnClickListener {
+            infoExpanded = !infoExpanded
+            applyInfoVisibility()
+        }
+        applyInfoVisibility()
+    }
+
+    private fun applyInfoVisibility() {
+        binding.layoutInfoBody.isVisible = infoExpanded
+        binding.tvInfoToggle.setText(
+            if (infoExpanded) R.string.detail_info_collapse else R.string.detail_info_expand
+        )
     }
 
     private fun toggleFactors() {

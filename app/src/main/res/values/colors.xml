@@ -154,6 +154,9 @@
     <color name="scene_water">#4E657E</color>
     <color name="scene_tree">#7C9070</color>
 
+    <!-- 상세의 "이 장소만의 한 줄". 옆의 흰 상자와 달리 노란 기를 둡니다. -->
+    <color name="detail_note_bg">#FFF4E2C4</color>
+
     <!-- ============ 색감 필터 ============ -->
     <!-- 사진 위에 얹히는 화면이라 배경을 어둡게 둬야 색이 제대로 보입니다. -->
     <color name="palette_bg">#141014</color>

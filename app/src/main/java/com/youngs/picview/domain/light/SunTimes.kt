@@ -17,7 +17,15 @@ data class SunTimes(
     val sunrise: LocalTime?,
     val sunset: LocalTime?,
     /** 남중(태양이 가장 높은 시각). 없으면 일출·일몰의 중간으로 추정합니다. */
-    val meridian: LocalTime? = null
+    val meridian: LocalTime? = null,
+    /**
+     * 시민박명 시작·종료. 블루아워의 실제 경계입니다.
+     *
+     * 없으면 골든아워 바깥 [BLUE_MIN] 분으로 어림잡습니다. 어림값은 정읍
+     * 실측과 30분 가까이 어긋나므로 어디까지나 폴백입니다.
+     */
+    val civilDawn: LocalTime? = null,
+    val civilDusk: LocalTime? = null
 ) {
 
     val hasData: Boolean get() = sunrise != null && sunset != null
@@ -30,26 +38,39 @@ data class SunTimes(
             rise.plusSeconds(Duration.between(rise, set).seconds / 2)
         }
 
-    /** [time] 이 속한 빛 구간. */
+    /**
+     * [time] 이 속한 빛 구간.
+     *
+     * 경계를 세 번 고쳤습니다. 지금 모양이 이렇게 된 이유를 적어 둡니다.
+     *
+     * **블루아워는 시민박명으로 잡습니다.** 예전에는 골든아워 바깥 25분을
+     * 블루아워로 어림잡았는데, 그러면 블루아워가 일출보다 앞서 끝나고
+     * 그 뒤에 골든아워가 시작되는 순서가 됩니다. 실제로는 반대입니다.
+     * 하늘이 푸르게 밝아오다가(박명) 해가 뜨는 순간부터 금빛이 됩니다.
+     *
+     * **골든아워는 좌우 길이가 다릅니다.** 일출 쪽은 해가 뜬 **뒤** 45분,
+     * 일몰 쪽은 해가 지기 **전** 60분입니다. 해가 뜨기 전과 진 뒤는 금빛이
+     * 아니라 푸른빛이라 골든아워로 셀 수 없고, 저녁이 아침보다 긴 것은
+     * 낮 동안 데워진 대기의 먼지·수증기가 빛을 더 오래 붉게 흩기 때문입니다.
+     */
     fun phaseAt(time: LocalTime): LightPhase {
         val rise = sunrise
         val set = sunset
 
         if (rise == null || set == null) return fallbackPhase(time)
 
-        val toRise = Duration.between(time, rise).toMinutes()
-        val toSet = Duration.between(time, set).toMinutes()
+        val dawn = civilDawn ?: rise.minusMinutes(BLUE_MIN)
+        val dusk = civilDusk ?: set.plusMinutes(BLUE_MIN)
 
         return when {
-            // 일출 전후 GOLDEN_MIN 분
-            kotlin.math.abs(toRise) <= GOLDEN_MIN -> LightPhase.SUNRISE
-            kotlin.math.abs(toSet) <= GOLDEN_MIN -> LightPhase.SUNSET
+            // 박명 밖은 밤. 다른 무엇보다 먼저 걸러야 새벽 2시가 "오전"이 되지 않습니다.
+            time < dawn || time > dusk -> LightPhase.NIGHT
 
-            // 골든아워 바로 바깥의 블루아워
-            toRise in (GOLDEN_MIN + 1)..(GOLDEN_MIN + BLUE_MIN) -> LightPhase.BLUE_DAWN
-            -toSet in (GOLDEN_MIN + 1)..(GOLDEN_MIN + BLUE_MIN) -> LightPhase.BLUE_DUSK
+            time < rise -> LightPhase.BLUE_DAWN
+            time > set -> LightPhase.BLUE_DUSK
 
-            time < rise || time > set -> LightPhase.NIGHT
+            time <= rise.plusMinutes(GOLDEN_MORNING) -> LightPhase.SUNRISE
+            time >= set.minusMinutes(GOLDEN_EVENING) -> LightPhase.SUNSET
 
             else -> {
                 val noon = solarNoon
@@ -75,16 +96,12 @@ data class SunTimes(
     fun upcomingGoldenWindows(from: LocalTime = LocalTime.now()): List<GoldenWindow> =
         buildList {
             sunrise?.let { r ->
-                val end = r.plusMinutes(GOLDEN_MIN)
-                if (end >= from) add(
-                    GoldenWindow(LightPhase.SUNRISE, r.minusMinutes(GOLDEN_MIN), end, r)
-                )
+                val end = r.plusMinutes(GOLDEN_MORNING)
+                if (end >= from) add(GoldenWindow(LightPhase.SUNRISE, r, end, r))
             }
             sunset?.let { s ->
-                val end = s.plusMinutes(GOLDEN_MIN)
-                if (end >= from) add(
-                    GoldenWindow(LightPhase.SUNSET, s.minusMinutes(GOLDEN_MIN), end, s)
-                )
+                val start = s.minusMinutes(GOLDEN_EVENING)
+                if (s >= from) add(GoldenWindow(LightPhase.SUNSET, start, s, s))
             }
         }.sortedBy { it.start }
 
@@ -113,7 +130,8 @@ data class SunTimes(
         }
 
         val rise = sunrise ?: return null
-        val start = rise.minusMinutes(GOLDEN_MIN)
+        // 내일 골든아워는 해가 뜨는 순간부터입니다.
+        val start = rise
         // 자정을 넘어가므로 "오늘 남은 시간 + 내일 새벽까지" 로 계산합니다.
         val minutes = MINUTES_PER_DAY - from.toSecondOfDay() / 60L + start.toSecondOfDay() / 60L
         return NextGolden(LightPhase.SUNRISE, start, isTomorrow = true, minutesAway = minutes)
@@ -155,16 +173,41 @@ data class SunTimes(
     companion object {
         private const val MINUTES_PER_DAY = 24 * 60
 
-        /** 일출·일몰 전후 이 분(分)까지를 골든아워로 봅니다. */
-        const val GOLDEN_MIN = 30L
+        /**
+         * 골든아워 길이(분). 아침과 저녁이 다릅니다.
+         *
+         * 아침은 해가 뜬 **뒤** 45분, 저녁은 해가 지기 **전** 60분입니다.
+         * 저녁이 긴 것은 낮 동안 데워진 대기의 먼지·수증기가 빛을 더 오래
+         * 붉게 흩기 때문입니다. 사진 쪽에서 오래 쓰여 온 경험값입니다.
+         */
+        const val GOLDEN_MORNING = 45L
+        const val GOLDEN_EVENING = 60L
 
-        /** 골든아워 바깥으로 이 분(分)까지가 블루아워. */
-        const val BLUE_MIN = 25L
+        /**
+         * 시민박명 값을 못 받았을 때 쓰는 블루아워 어림 길이(분).
+         *
+         * 정읍 실측과 몇 분 차이라 폴백으로는 쓸 만하지만, 값이 오면
+         * 언제나 실측을 씁니다.
+         */
+        const val BLUE_MIN = 27L
 
         /** 남중 전후 이 분(分)을 한낮으로 봅니다. */
         const val MIDDAY_MIN = 90L
 
         val EMPTY = SunTimes(null, null, null)
+
+        /**
+         * 남중 시각. 이 API 만 HHMMSS 정수(123657 = 12:36:57)로 줍니다.
+         *
+         * 초는 버립니다. 남중은 "한낮 전후 90분" 을 가르는 데만 쓰여서
+         * 1초가 결과를 바꾸지 않습니다.
+         */
+        fun parseTransit(raw: Long?): LocalTime? {
+            val v = raw ?: return null
+            return runCatching {
+                LocalTime.of((v / 10000).toInt(), (v / 100 % 100).toInt())
+            }.getOrNull()
+        }
 
         /** "0543" 형태 문자열을 파싱합니다. 형식이 어긋나면 null. */
         fun parse(raw: String?): LocalTime? {

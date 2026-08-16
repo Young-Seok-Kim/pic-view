@@ -71,6 +71,24 @@ enum class LightPhase(
     val isOutdoorFriendly: Boolean
         get() = this != MIDDAY && this != NIGHT
 
+    /**
+     * 빛의 성격 한 낱말.
+     *
+     * [hint] 는 "삼각대가 필요해요" 처럼 대응을, [subject] 는 "조명과 별빛"
+     * 처럼 대상을 말합니다. 이 값은 **빛 자체가 어떻게 생겼는지**입니다.
+     * 상세 화면에서 "일몰 19:21 · 서향 · 따뜻한 사광" 처럼 방위와 나란히
+     * 놓여, 해가 어느 쪽에서 어떤 결로 들어오는지를 한 줄로 만듭니다.
+     */
+    val lightCharacter: String
+        get() = when (this) {
+            BLUE_DAWN, BLUE_DUSK -> "푸른 확산광"
+            SUNRISE, SUNSET -> "따뜻한 사광"
+            MORNING -> "결이 살아나는 측광"
+            MIDDAY -> "그림자가 짧은 정광"
+            AFTERNOON -> "길어지는 그림자"
+            NIGHT -> "점광원과 하늘빛"
+        }
+
     /** 골든아워인지. 포토스코어 가산에 씁니다. */
     val isGolden: Boolean
         get() = this == SUNRISE || this == SUNSET

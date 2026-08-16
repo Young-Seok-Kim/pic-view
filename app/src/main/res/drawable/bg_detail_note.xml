@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    이 장소만의 한 줄을 감싸는 바탕.
+    옆의 흰 상자들과 달리 노란 기를 둬야 "숫자가 아니라 조언"으로 읽힙니다.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/detail_note_bg" />
+    <corners android:radius="12dp" />
+</shape>
