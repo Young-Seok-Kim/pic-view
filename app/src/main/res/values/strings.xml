@@ -372,6 +372,8 @@
     <string name="mission_check">\u2713</string>
 
     <string name="detail_no_weather">관측 없음</string>
+    <string name="detail_missions_here">이 장소에서 바로 할 수 있어요</string>
+    <string name="detail_missions_more">전체 미션 \u203A</string>
     <string name="detail_live_weather">LIVE WEATHER · JEONGEUP</string>
     <string name="detail_sky_humidity">%1$s · %2$d%%</string>
     <string name="detail_live_note">체감 %1$d\u2103 · %2$s</string>

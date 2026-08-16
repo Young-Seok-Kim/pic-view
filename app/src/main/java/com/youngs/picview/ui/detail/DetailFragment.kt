@@ -14,10 +14,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.youngs.picview.BuildConfig
+import com.youngs.picview.MainActivity
 import com.youngs.picview.R
 import com.youngs.picview.data.api.RetrofitClient
 import com.youngs.picview.data.model.ImageItem
 import com.youngs.picview.data.repository.CourseRepository
+import com.youngs.picview.data.repository.DiaryRepository
 import com.youngs.picview.databinding.FragmentDetailBinding
 import com.youngs.picview.databinding.ItemScoreFactorBinding
 import com.youngs.picview.databinding.ItemVisitRowBinding
@@ -25,6 +27,7 @@ import com.youngs.picview.domain.course.CourseStop
 import com.youngs.picview.domain.course.ShootingCourse
 import com.youngs.picview.domain.light.LightPhase
 import com.youngs.picview.domain.light.SunTimes
+import com.youngs.picview.domain.mission.Missions
 import com.youngs.picview.domain.score.ScoreFactor
 import com.youngs.picview.domain.spot.SpotFacts
 import com.youngs.picview.domain.weather.SkyState
@@ -33,6 +36,7 @@ import com.youngs.picview.domain.weather.WeatherAdviser
 import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.ui.guide.GuideOverlayView
 import com.youngs.picview.ui.main.MainViewModel
+import com.youngs.picview.ui.mission.MissionFragment
 import com.youngs.picview.util.AppPrefs
 import com.youngs.picview.util.TravelMode
 import com.youngs.picview.util.TtsController
@@ -148,6 +152,7 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
         renderShootingFacts(spot)
         renderScoreBreakdown(spot)
+        renderPlaceMissions(spot)
         setupCheckin(spot)
 
         loadImages(spot)
@@ -302,6 +307,38 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
         renderLiveWeather(sky, advice)
         binding.btnSavePlan.setOnClickListener { savePlan(spot, facts) }
+    }
+
+    /**
+     * 이 장소에서 지금 할 수 있는 미션.
+     *
+     * 전체 미션을 다 보여 주지 않습니다. 스무 개 목록을 현장에서 훑게 하면
+     * 아무것도 안 합니다. 이 장소에서 할 수 있고, 아직 안 끝났고, 지금
+     * 빛에 맞는 것부터 최대 셋입니다.
+     *
+     * 같은 `missionId` 를 쓰므로 여기서 사진을 남기면 전체 미션의 진행률도
+     * 함께 올라갑니다. 두 화면이 따로 세면 어긋난 숫자가 남습니다.
+     */
+    private fun renderPlaceMissions(spot: SpotItem) {
+        val adapter = PlaceMissionAdapter { goToMissions() }
+        binding.rvPlaceMissions.adapter = adapter
+        binding.tvMissionsMore.setOnClickListener { goToMissions() }
+
+        val phase = mainViewModel.sunTimes.phaseNow()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            DiaryRepository(requireContext()).observeDays().collect { days ->
+                val visits = days.flatMap { it.visits }
+                val here = Missions.forPlace(spot.title, visits, phase)
+
+                binding.layoutPlaceMissions.isVisible = here.isNotEmpty()
+                adapter.submitList(here)
+            }
+        }
+    }
+
+    private fun goToMissions() {
+        (activity as? MainActivity)?.pushScreen(MissionFragment())
     }
 
     /**
