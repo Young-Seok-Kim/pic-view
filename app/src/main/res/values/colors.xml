@@ -170,6 +170,30 @@
     <color name="palette_bg">#141014</color>
     <color name="palette_card_bg">#241E24</color>
 
+    <!-- ============ 미션 유형 ============ -->
+    <!--
+      유형마다 색을 나눕니다. 미션이 여섯 개일 때는 목록이 그냥 목록이지만
+      스물 몇 개가 되면 "무엇을 해볼까"를 고르는 화면이 됩니다. 그때 색이
+      갈래를 먼저 알려 줍니다.
+
+      진한 색은 아이콘·진행 막대에, 옅은 색은 아이콘 원 바탕에 씁니다.
+      미완료는 옅은 바탕이라 목록 전체가 조용하고, 완료한 것만 진해집니다.
+    -->
+    <color name="mission_light">#D9A32E</color>
+    <color name="mission_light_soft">#FBEFD2</color>
+    <color name="mission_weather">#6E8AA6</color>
+    <color name="mission_weather_soft">#E3EBF2</color>
+    <color name="mission_season">#D0708F</color>
+    <color name="mission_season_soft">#F8E4EA</color>
+    <color name="mission_place">#6F9070</color>
+    <color name="mission_place_soft">#E4EFE2</color>
+    <color name="mission_compare">#9A6B4A</color>
+    <color name="mission_compare_soft">#F1E5DA</color>
+    <color name="mission_record">#8B7CB0</color>
+    <color name="mission_record_soft">#EBE6F5</color>
+    <color name="mission_share">#D98963</color>
+    <color name="mission_share_soft">#FAE6DC</color>
+
     <!-- ============ 계절 ============ -->
     <!--
       계절 칩을 고르면 그 계절의 색이 켜집니다. 넷 다 앱 대표색(단풍 빨강)
