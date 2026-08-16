@@ -20,6 +20,7 @@ import com.youngs.picview.data.api.RetrofitClient
 import com.youngs.picview.data.model.ImageItem
 import com.youngs.picview.data.repository.CourseRepository
 import com.youngs.picview.data.repository.DiaryRepository
+import com.google.android.material.chip.Chip
 import com.youngs.picview.databinding.FragmentDetailBinding
 import com.youngs.picview.databinding.ItemScoreFactorBinding
 import com.youngs.picview.databinding.ItemVisitRowBinding
@@ -29,6 +30,8 @@ import com.youngs.picview.domain.light.LightPhase
 import com.youngs.picview.domain.light.SunTimes
 import com.youngs.picview.domain.mission.Missions
 import com.youngs.picview.domain.score.ScoreFactor
+import com.youngs.picview.domain.spot.Facing
+import com.youngs.picview.domain.spot.ShotTokens
 import com.youngs.picview.domain.spot.SpotFacts
 import com.youngs.picview.domain.weather.SkyState
 import com.youngs.picview.domain.weather.WeatherAdvice
@@ -301,12 +304,45 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
             )
         } ?: getString(R.string.course_sun_unknown)
         binding.tvDetailFactsNote.text = advice.action
-        binding.tvDetailGuide.text = getString(
-            R.string.course_guide_format, guideName(advice.guide)
-        )
+        renderShotTokens(advice.guide, facts.facing, phase)
 
         renderLiveWeather(sky, advice)
         binding.btnSavePlan.setOnClickListener { savePlan(spot, facts) }
+    }
+
+    /**
+     * 구도 · 방향 · 빛을 같은 모양의 조각 셋으로 답니다.
+     *
+     * 예전에는 "📷 추천 구도 · 삼분할 격자" 알약 하나였습니다. 구도는
+     * 말했지만 방향과 빛은 위 문장 어딘가에 섞여 있어서, 현장에서 셋을
+     * 한꺼번에 떠올리기 어려웠습니다.
+     *
+     * 구도가 날씨에 따라 바뀌므로([WeatherAdviser]) 첫 조각도 함께 바뀝니다.
+     */
+    private fun renderShotTokens(
+        guide: GuideOverlayView.GuideType,
+        facing: Facing,
+        phase: LightPhase
+    ) {
+        val group = binding.chipsShotTokens
+        group.removeAllViews()
+
+        ShotTokens.setOf(guide, facing, phase).forEach { token ->
+            group.addView(
+                Chip(requireContext()).apply {
+                    text = token.text
+                    isClickable = false
+                    isCheckable = false
+                    chipBackgroundColor = null
+                    background = ContextCompat.getDrawable(context, R.drawable.bg_shot_token)
+                    setTextColor(ContextCompat.getColor(context, R.color.maple_700))
+                    textSize = 12f
+                    chipStrokeWidth = 0f
+                    chipMinHeight = resources.displayMetrics.density * 30
+                    setEnsureMinTouchTargetSize(false)
+                }
+            )
+        }
     }
 
     /**
