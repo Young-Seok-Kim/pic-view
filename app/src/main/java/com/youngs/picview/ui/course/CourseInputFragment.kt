@@ -226,8 +226,10 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
     private fun selectedStartTime(sun: SunTimes): LocalTime {
         val now = LocalTime.now()
         val picked = when (binding.chipsWhen.checkedChipId) {
+            // 일출 코스는 블루아워(시민박명)부터 잡습니다. 해가 뜬 뒤에
+            // 출발하면 가장 좋은 빛의 앞머리를 이동에 써 버립니다.
             R.id.chip_when_sunrise ->
-                sun.sunrise?.minusMinutes(SunTimes.GOLDEN_MIN) ?: LocalTime.of(5, 30)
+                sun.civilDawn ?: sun.sunrise?.minusMinutes(SunTimes.BLUE_MIN) ?: LocalTime.of(5, 30)
             R.id.chip_when_morning -> LocalTime.of(9, 0)
             R.id.chip_when_sunset ->
                 sun.sunset?.minusHours(3) ?: LocalTime.of(16, 0)

@@ -451,7 +451,11 @@ class MainActivity : BaseActivity() {
                 val sunTimes = SunTimes(
                     sunrise = SunTimes.parse(astro?.sunrise),
                     sunset = SunTimes.parse(astro?.sunset),
+                    // 남중은 meridian 이 아니라 suntransit(HHMMSS 정수)로 옵니다.
                     meridian = SunTimes.parse(astro?.meridian)
+                        ?: SunTimes.parseTransit(astro?.suntransit),
+                    civilDawn = SunTimes.parse(astro?.civilm),
+                    civilDusk = SunTimes.parse(astro?.civile)
                 )
                 viewModel.sunTimes = sunTimes
 

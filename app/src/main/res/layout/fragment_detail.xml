@@ -205,7 +205,14 @@
                         tools:text="전북특별자치도 정읍시 내장산로 936" />
                 </LinearLayout>
 
-                <!-- ============ 촬영 정보 (방위 · 최적 시간 · 구도) ============ -->
+                <!--
+                  ============ 오늘의 촬영 적기 ============
+
+                  이 카드를 사진·장소명 바로 다음으로 끌어올렸습니다. 예전에는
+                  긴 장소 설명이 먼저 나오고 촬영 정보가 그 아래 있었는데,
+                  상세 화면에서 구하는 답은 "이 집이 언제 지어졌나"가 아니라
+                  **"오늘 몇 시에 여기 오면 되나"** 입니다.
+                -->
                 <com.google.android.material.card.MaterialCardView
                     style="@style/Card.Elevated"
                     android:layout_width="match_parent"
@@ -224,26 +231,116 @@
                             style="@style/Text.Caption"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/detail_shooting_info"
-                            android:textColor="@color/maple_700" />
+                            android:letterSpacing="0.12"
+                            android:text="@string/detail_shoot_eyebrow"
+                            android:textColor="@color/maple_600"
+                            android:textSize="10sp" />
 
                         <TextView
-                            android:id="@+id/tv_detail_best_time"
                             style="@style/Text.SectionTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/detail_shoot_window"
+                            android:textColor="@color/maple_800" />
+
+                        <!--
+                          그래프를 읽기 전에 결론부터 말합니다.
+                          "저녁 황금시간 · 따뜻한 사광" 한 줄이면 그래프는
+                          근거를 확인하는 그림이 됩니다.
+                        -->
+                        <TextView
+                            android:id="@+id/tv_detail_light_line"
+                            style="@style/Text.Caption"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_xs"
-                            android:textColor="@color/maple_800"
-                            tools:text="일몰 골든아워 · 서향" />
+                            android:textColor="@color/maple_700"
+                            tools:text="저녁 황금시간 · 따뜻한 사광" />
 
+                        <com.youngs.picview.ui.detail.ShootingWindowView
+                            android:id="@+id/view_shoot_window"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_s" />
+
+                        <!--
+                          시간과 방향을 나란히 둡니다. 출사에서 이 둘은 한 쌍이라
+                          따로 읽으면 "몇 시에 어느 쪽을 보고 서야 하나"가 안 나옵니다.
+                        -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_m"
+                            android:baselineAligned="false"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="5dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_detail_fact"
+                                android:orientation="vertical"
+                                android:padding="@dimen/space_m">
+
+                                <TextView
+                                    style="@style/Text.Caption"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/detail_fact_time"
+                                    android:textColor="@color/maple_600"
+                                    android:textSize="10sp" />
+
+                                <TextView
+                                    android:id="@+id/tv_detail_best_time"
+                                    style="@style/Text.SectionTitle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:textColor="@color/maple_800"
+                                    tools:text="18:21-19:21" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="5dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_detail_fact"
+                                android:orientation="vertical"
+                                android:padding="@dimen/space_m">
+
+                                <TextView
+                                    style="@style/Text.Caption"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/detail_fact_facing"
+                                    android:textColor="@color/maple_600"
+                                    android:textSize="10sp" />
+
+                                <TextView
+                                    android:id="@+id/tv_detail_facing"
+                                    style="@style/Text.SectionTitle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:ellipsize="end"
+                                    android:maxLines="1"
+                                    android:textColor="@color/maple_800"
+                                    tools:text="서향 · 270" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- 이 장소만의 한 줄. 숫자가 못 하는 말을 합니다. -->
                         <TextView
                             android:id="@+id/tv_detail_facts_note"
                             style="@style/Text.Body"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:textColor="@color/maple_700"
-                            tools:text="단풍터널은 역광이 살아나는 늦은 오후가 절정이에요" />
+                            android:layout_marginTop="@dimen/space_s"
+                            android:background="@drawable/bg_detail_note"
+                            android:padding="@dimen/space_m"
+                            android:textColor="@color/maple_800"
+                            tools:text="자연 풍경은 해질 무렵 색이 가장 깊어져요" />
 
                         <TextView
                             android:id="@+id/tv_detail_guide"
@@ -256,51 +353,30 @@
                             android:paddingVertical="@dimen/space_xs"
                             android:textColor="@color/white"
                             android:textStyle="bold"
-                            tools:text="📷 추천 구도 · 삼분할 격자" />
+                            tools:text="추천 구도 · 삼분할 격자" />
+
+                        <!--
+                          촬영 전 계획을 위한 보조 행동이라 하단 CTA 가 아니라
+                          이 카드 안에 둡니다. 하단은 "지금 움직인다"(촬영·길찾기)
+                          자리이고, 여기는 "나중에 온다" 자리입니다.
+                        -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_save_plan"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_m"
+                            android:text="@string/detail_save_plan"
+                            android:textColor="@color/maple_700"
+                            app:strokeColor="@color/maple_300" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- ============ 오디오 가이드 ============ -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_audio_guide"
-                    style="@style/Button.Primary"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_m"
-                    android:text="@string/detail_audio_play"
-                    app:backgroundTint="@color/moss_500"
-                    app:icon="@drawable/ic_audio"
-                    app:iconTint="@color/white" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_checkin"
-                        style="@style/Widget.Material3.Button.TextButton"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textColor="@color/maple_600"
-                        android:text="@string/detail_checkin" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_audio_speed"
-                        style="@style/Widget.Material3.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_secondary"
-                        tools:text="재생 속도 1.0×" />
-                </LinearLayout>
-
-                <!-- ============ 포토스코어 근거 ============ -->
+                <!-- ============ 포토스코어 : 결과 한 줄 + 접이식 근거 ============ -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginVertical="24dp"
+                    android:layout_marginVertical="20dp"
                     android:background="@color/divider" />
 
                 <LinearLayout
@@ -311,11 +387,12 @@
                     android:orientation="horizontal">
 
                     <TextView
+                        android:id="@+id/tv_score_title"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/detail_score_reason"
-                        android:textAppearance="@style/Text.SectionTitle" />
+                        android:textAppearance="@style/Text.SectionTitle"
+                        tools:text="오늘의 출사 적합도 61점" />
 
                     <TextView
                         android:id="@+id/tv_score_toggle"
@@ -332,7 +409,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_xs"
-                    tools:text="지금 골든아워라 빛 조건에서 점수를 크게 받았어요" />
+                    tools:text="서향이라 해가 드는 방향이에요 다만 비 없이 맑아요" />
 
                 <LinearLayout
                     android:id="@+id/layout_score_factors"
@@ -343,53 +420,121 @@
                     android:visibility="gone"
                     tools:visibility="visible" />
 
+                <!--
+                  ============ 장소 정보 (접이식) ============
+
+                  역사·건축 설명은 길고, 출사 결정에는 쓰이지 않습니다. 예전에는
+                  이것이 화면 중반을 통째로 차지해 정작 점수와 촬영 정보를
+                  밀어냈습니다. 접어 두고 원하는 사람만 펴게 합니다.
+                  오디오 가이드도 이 설명을 읽어 주는 기능이라 같이 넣습니다.
+                -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginVertical="24dp"
+                    android:layout_marginVertical="20dp"
                     android:background="@color/divider" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/detail_section_info"
-                    android:textAppearance="@style/Text.SectionTitle" />
-
-                <TextView
-                    android:id="@+id/tv_detail_tip"
-                    style="@style/Text.Reading"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_m"
-                    tools:text="이곳은 삼분할 구도를 활용하여 배경과 인물을 배치할 때 가장 아름다운 사진을 얻을 수 있습니다." />
-
-                <!--
-                  ─────────── 방문 정보 ───────────
-                  입장료·주차·운영시간. 관광공사가 주는 값이 있을 때만 보입니다.
-                  값이 금액이 아니라 "무료" · "공연에 따라 다름" 같은 문장이라
-                  숫자로 파싱하지 않고 그대로 씁니다.
-                -->
                 <LinearLayout
-                    android:id="@+id/layout_detail_visit"
+                    android:id="@+id/layout_info_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_xl"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/detail_section_info"
+                        android:textAppearance="@style/Text.SectionTitle" />
+
+                    <TextView
+                        android:id="@+id/tv_info_toggle"
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/detail_info_expand"
+                        android:textColor="@color/maple_600" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_info_body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:visibility="gone"
                     tools:visibility="visible">
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/detail_visit_info"
-                        android:textAppearance="@style/Text.SectionTitle" />
-
-                    <TableLayout
-                        android:id="@+id/table_detail_visit"
+                        android:id="@+id/tv_detail_tip"
+                        style="@style/Text.Reading"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_m"
-                        android:stretchColumns="1" />
+                        tools:text="조선 중기 주택의 면모를 잘 갖추고 있는 이 집은..." />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_audio_guide"
+                        style="@style/Button.Primary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_m"
+                        android:text="@string/detail_audio_play"
+                        app:backgroundTint="@color/moss_500"
+                        app:icon="@drawable/ic_audio"
+                        app:iconTint="@color/white" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_checkin"
+                            style="@style/Widget.Material3.Button.TextButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/detail_checkin"
+                            android:textColor="@color/maple_600" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_audio_speed"
+                            style="@style/Widget.Material3.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_secondary"
+                            tools:text="재생 속도 1.0x" />
+                    </LinearLayout>
+
+                    <!--
+                      방문 정보 - 입장료·주차·운영시간.
+                      값이 금액이 아니라 "무료" · "공연에 따라 다름" 같은
+                      문장이라 숫자로 파싱하지 않고 그대로 씁니다.
+                    -->
+                    <LinearLayout
+                        android:id="@+id/layout_detail_visit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_xl"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        tools:visibility="visible">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/detail_visit_info"
+                            android:textAppearance="@style/Text.SectionTitle" />
+
+                        <TableLayout
+                            android:id="@+id/table_detail_visit"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_m"
+                            android:stretchColumns="1" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
