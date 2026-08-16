@@ -13,18 +13,18 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 /**
- * 미션 헤더의 장식 그림 — 해 · 정자 · 무지개다리 · 물.
+ * 미션 헤더의 선화 — 해 · 구름 · 무지개다리 · 정자 · 물결.
  *
- * "장면 0 / 19" 옆의 빈 자리를 채웁니다. 다만 아무 그림이나 넣으면 장식이
- * 되므로, **이 앱이 세는 장면이 무엇인지**를 그립니다. 해가 뜨고, 오래된
+ * "장면 0 / 19" 옆의 빈 자리를 채웁니다. 아무 그림이나 넣으면 장식이
+ * 되므로 **이 앱이 세는 장면이 무엇인지**를 그립니다. 해가 뜨고, 오래된
  * 지붕이 있고, 그 아래 물이 흐르는 것 — 정읍에서 모으게 되는 장면입니다.
  *
- * 선만 그리고 채우지 않습니다. 카드 바탕이 이미 진한 단풍색이라 면을
- * 칠하면 글자와 무게가 같아져 "장면 0 / 19" 가 안 읽힙니다. 흰색을 아주
- * 옅게 깔아 배경으로 물러나 있게 합니다.
+ * 시안은 PNG 였지만 Canvas 로 옮겨 그렸습니다. 그림 색이 카드 바탕색에
+ * 묶여 있어서, PNG 로 두면 카드 색을 바꿀 때마다 다시 뽑아야 합니다.
+ * 선 색을 흰색 알파로 두면 바탕이 무슨 색이든 같은 톤으로 얹힙니다.
  *
- * 이미지가 아니라 코드로 그리는 이유는 카드 색이 바뀌어도 따라오게 하기
- * 위해서입니다. PNG 로 두면 배경색이 바뀔 때마다 다시 뽑아야 합니다.
+ * 좌표는 0~1 로 적고 그릴 때 폭·높이를 곱합니다. 카드 크기가 달라져도
+ * 비율이 유지되고, 숫자를 읽을 때 "가로 3분의 1 지점" 처럼 읽힙니다.
  */
 class MissionSceneView @JvmOverloads constructor(
     context: Context,
@@ -32,125 +32,257 @@ class MissionSceneView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private val density = resources.displayMetrics.density
-    private fun dp(v: Float) = v * density
-
-    private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val line = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
         strokeJoin = Paint.Join.ROUND
         color = Color.WHITE
-        alpha = 82
+        alpha = 92
     }
-    private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val thin = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
         color = Color.WHITE
-        alpha = 46
+        alpha = 62
     }
 
     private val path = Path()
     private val rect = RectF()
 
+    private var w = 0f
+    private var h = 0f
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        // 폭을 주면 높이는 비율로 따라옵니다. 카드 안 장식이라 스스로
-        // 크기를 정하지 않고 놓인 자리에 맞춥니다.
+        // 카드 안 장식이라 스스로 크기를 정하지 않고 놓인 자리에 맞춥니다.
         val width = MeasureSpec.getSize(widthMeasureSpec)
-        setMeasuredDimension(width, resolveSize((width * 0.78f).toInt(), heightMeasureSpec))
+        setMeasuredDimension(width, resolveSize((width * 0.74f).toInt(), heightMeasureSpec))
     }
+
+    /** 0~1 좌표를 실제 픽셀로. */
+    private fun x(v: Float) = w * v
+    private fun y(v: Float) = h * v
 
     override fun onDraw(canvas: Canvas) {
-        val w = width.toFloat()
-        val h = height.toFloat()
+        w = width.toFloat()
+        h = height.toFloat()
         if (w <= 0f || h <= 0f) return
 
-        linePaint.strokeWidth = w * 0.016f
+        line.strokeWidth = w * 0.011f
+        thin.strokeWidth = w * 0.008f
 
-        drawSun(canvas, w * 0.60f, h * 0.20f, w * 0.085f)
-        drawPavilion(canvas, w * 0.74f, h * 0.62f, w * 0.30f)
-        drawBridge(canvas, w * 0.34f, h * 0.66f, w * 0.42f)
-        drawWater(canvas, w, h)
+        drawSun(canvas)
+        drawCloud(canvas, 0.74f, 0.20f, 0.30f)
+        drawCloud(canvas, 0.60f, 0.36f, 0.24f)
+        drawCloud(canvas, 0.22f, 0.44f, 0.17f)
+        drawBridge(canvas)
+        drawPavilion(canvas)
+        drawWater(canvas)
     }
 
-    /** 해. 동그라미 하나에 짧은 빛살 여덟. */
-    private fun drawSun(canvas: Canvas, cx: Float, cy: Float, r: Float) {
-        canvas.drawCircle(cx, cy, r, linePaint)
-        for (i in 0 until 8) {
-            val a = i * PI / 4
+    // ─────────────────────── 하늘 ───────────────────────
+
+    /** 해. 동그라미 하나에 빛살 열둘. */
+    private fun drawSun(canvas: Canvas) {
+        val cx = x(0.33f)
+        val cy = y(0.24f)
+        val r = w * 0.075f
+
+        canvas.drawCircle(cx, cy, r, line)
+        for (i in 0 until 12) {
+            val a = i * PI / 6
             canvas.drawLine(
-                cx + (r * 1.45f) * cos(a).toFloat(), cy + (r * 1.45f) * sin(a).toFloat(),
-                cx + (r * 2.1f) * cos(a).toFloat(), cy + (r * 2.1f) * sin(a).toFloat(),
-                linePaint
+                cx + (r * 1.4f) * cos(a).toFloat(), cy + (r * 1.4f) * sin(a).toFloat(),
+                cx + (r * 1.95f) * cos(a).toFloat(), cy + (r * 1.95f) * sin(a).toFloat(),
+                line
             )
         }
     }
 
     /**
+     * 구름.
+     *
+     * 아래가 평평하고 위가 뭉게뭉게한 모양입니다. 밑변을 옆으로 길게 빼면
+     * 구름이 멀리 떠 있는 것처럼 보여서 하늘에 깊이가 생깁니다.
+     */
+    private fun drawCloud(canvas: Canvas, cxRatio: Float, cyRatio: Float, widthRatio: Float) {
+        val cx = x(cxRatio)
+        val cy = y(cyRatio)
+        val cw = w * widthRatio
+        val ch = cw * 0.42f
+
+        path.reset()
+        path.moveTo(cx - cw * 0.42f, cy)
+        path.cubicTo(
+            cx - cw * 0.52f, cy - ch * 0.35f,
+            cx - cw * 0.30f, cy - ch * 0.72f,
+            cx - cw * 0.12f, cy - ch * 0.52f
+        )
+        path.cubicTo(
+            cx - cw * 0.04f, cy - ch * 1.05f,
+            cx + cw * 0.22f, cy - ch * 1.02f,
+            cx + cw * 0.24f, cy - ch * 0.48f
+        )
+        path.cubicTo(
+            cx + cw * 0.40f, cy - ch * 0.70f,
+            cx + cw * 0.52f, cy - ch * 0.28f,
+            cx + cw * 0.44f, cy
+        )
+        canvas.drawPath(path, line)
+
+        // 밑변 — 구름보다 길게 빼서 수평선처럼 보이게 합니다.
+        canvas.drawLine(cx - cw * 0.62f, cy, cx + cw * 0.62f, cy, line)
+    }
+
+    // ─────────────────────── 무지개다리 ───────────────────────
+
+    /**
+     * 무지개다리.
+     *
+     * 아치 · 상판 · 난간 세 겹입니다. 아치만 그리면 굴다리처럼 보이고,
+     * 난간의 작은 기둥이 있어야 사람이 건너는 다리로 읽힙니다.
+     */
+    private fun drawBridge(canvas: Canvas) {
+        val left = x(0.07f)
+        val right = x(0.60f)
+        val baseY = y(0.66f)
+        val deckRise = h * 0.20f
+        val cx = (left + right) / 2f
+
+        // 1) 아치 안쪽(물에 닿는 반원)
+        val archHalf = (right - left) * 0.36f
+        rect.set(cx - archHalf, baseY - archHalf * 0.98f, cx + archHalf, baseY + archHalf * 0.98f)
+        canvas.drawArc(rect, 180f, 180f, false, line)
+
+        // 2) 상판 — 아치보다 완만하게
+        path.reset()
+        path.moveTo(left, baseY)
+        path.quadTo(cx, baseY - deckRise * 1.5f, right, baseY)
+        canvas.drawPath(path, line)
+
+        // 3) 난간 — 상판을 따라 위로
+        val railGap = h * 0.075f
+        path.reset()
+        path.moveTo(left, baseY - railGap)
+        path.quadTo(cx, baseY - deckRise * 1.5f - railGap, right, baseY - railGap)
+        canvas.drawPath(path, line)
+
+        // 4) 난간 기둥. 위쪽 끝에 작은 구슬을 얹습니다.
+        for (t in listOf(0.06f, 0.28f, 0.5f, 0.72f, 0.94f)) {
+            val px = left + (right - left) * t
+            val deckY = quad(baseY, baseY - deckRise * 1.5f, baseY, t)
+            val railY = deckY - railGap
+            canvas.drawLine(px, deckY, px, railY, line)
+            canvas.drawCircle(px, railY - w * 0.012f, w * 0.012f, line)
+        }
+
+        // 5) 돌 이음매 — 아치를 따라 방사로 몇 줄만.
+        for (t in listOf(0.2f, 0.35f, 0.5f, 0.65f, 0.8f)) {
+            val a = PI * (1f + t)
+            val ix = cx + archHalf * cos(a).toFloat()
+            val iy = baseY + archHalf * 0.98f * sin(a).toFloat()
+            val deckY = quad(baseY, baseY - deckRise * 1.5f, baseY, t)
+            canvas.drawLine(ix, iy, cx + (right - left) * (t - 0.5f), deckY, thin)
+        }
+
+        // 6) 왼쪽 층계
+        canvas.drawLine(left, baseY, left - w * 0.03f, baseY, line)
+        canvas.drawLine(left - w * 0.03f, baseY, left - w * 0.03f, baseY - h * 0.05f, line)
+    }
+
+    /** 2차 베지어의 t 지점 값. 난간 기둥을 상판 위에 정확히 세우는 데 씁니다. */
+    private fun quad(p0: Float, p1: Float, p2: Float, t: Float): Float {
+        val u = 1 - t
+        return u * u * p0 + 2 * u * t * p1 + t * t * p2
+    }
+
+    // ─────────────────────── 정자 ───────────────────────
+
+    /**
      * 정자.
      *
-     * 처마가 위로 들린 곡선이 한옥 지붕을 한 획으로 말합니다. 기와 한 장씩
-     * 그리면 이 크기에서는 뭉쳐 보이기만 합니다.
+     * 처마가 위로 들린 팔작지붕, 꼭대기의 절병통, 기둥과 난간, 그리고
+     * 돌 기단입니다. 기와를 한 장씩 그리면 이 크기에서 뭉치므로 용마루에서
+     * 처마로 내려오는 선 몇 개로 대신합니다.
      */
-    private fun drawPavilion(canvas: Canvas, cx: Float, baseY: Float, size: Float) {
-        val half = size / 2f
+    private fun drawPavilion(canvas: Canvas) {
+        val cx = x(0.79f)
+        val baseY = y(0.66f)
+        val half = w * 0.19f
 
-        // 위 지붕
+        // 1) 절병통(지붕 꼭대기 장식)
+        val topY = y(0.30f)
+        canvas.drawCircle(cx, topY - h * 0.035f, w * 0.016f, line)
+        canvas.drawLine(cx, topY - h * 0.02f, cx, topY, line)
+
+        // 2) 지붕 — 가운데가 솟고 양 끝이 위로 들립니다.
         path.reset()
-        path.moveTo(cx - half, baseY - size * 0.62f)
-        path.quadTo(cx, baseY - size * 0.95f, cx + half, baseY - size * 0.62f)
-        path.quadTo(cx + half * 0.6f, baseY - size * 0.52f, cx, baseY - size * 0.55f)
-        path.quadTo(cx - half * 0.6f, baseY - size * 0.52f, cx - half, baseY - size * 0.62f)
-        path.close()
-        canvas.drawPath(path, fillPaint)
-        canvas.drawPath(path, linePaint)
+        path.moveTo(cx - half * 1.15f, topY + h * 0.115f)
+        path.quadTo(cx - half * 0.5f, topY - h * 0.015f, cx, topY)
+        path.quadTo(cx + half * 0.5f, topY - h * 0.015f, cx + half * 1.15f, topY + h * 0.115f)
+        canvas.drawPath(path, line)
 
-        // 아래 지붕 — 두 겹이라야 정자로 보입니다.
+        // 처마 끝이 위로 말리는 곡선
         path.reset()
-        path.moveTo(cx - half * 1.25f, baseY - size * 0.18f)
-        path.quadTo(cx, baseY - size * 0.48f, cx + half * 1.25f, baseY - size * 0.18f)
-        path.quadTo(cx + half * 0.7f, baseY - size * 0.08f, cx, baseY - size * 0.12f)
-        path.quadTo(cx - half * 0.7f, baseY - size * 0.08f, cx - half * 1.25f, baseY - size * 0.18f)
-        path.close()
-        canvas.drawPath(path, fillPaint)
-        canvas.drawPath(path, linePaint)
+        path.moveTo(cx - half * 1.15f, topY + h * 0.115f)
+        path.quadTo(cx - half * 1.32f, topY + h * 0.10f, cx - half * 1.30f, topY + h * 0.055f)
+        canvas.drawPath(path, line)
+        path.reset()
+        path.moveTo(cx + half * 1.15f, topY + h * 0.115f)
+        path.quadTo(cx + half * 1.32f, topY + h * 0.10f, cx + half * 1.30f, topY + h * 0.055f)
+        canvas.drawPath(path, line)
 
-        // 기둥 셋
-        for (offset in listOf(-0.55f, 0f, 0.55f)) {
-            val x = cx + half * offset
-            canvas.drawLine(x, baseY - size * 0.12f, x, baseY, linePaint)
+        // 지붕 아래 처마선
+        path.reset()
+        path.moveTo(cx - half * 1.15f, topY + h * 0.13f)
+        path.quadTo(cx, topY + h * 0.075f, cx + half * 1.15f, topY + h * 0.13f)
+        canvas.drawPath(path, line)
+
+        // 3) 기와 결 — 용마루에서 처마로 내려오는 선
+        for (i in -3..3) {
+            val t = i / 3f
+            val sx = cx + half * 0.16f * i
+            val ex = cx + half * 1.05f * t
+            canvas.drawLine(sx, topY + h * 0.012f, ex, topY + h * 0.115f, thin)
+        }
+
+        // 4) 몸체 — 기둥 넷과 창방
+        val bodyTop = topY + h * 0.145f
+        val bodyBottom = baseY - h * 0.055f
+        for (offset in listOf(-0.92f, -0.32f, 0.32f, 0.92f)) {
+            val px = cx + half * offset
+            canvas.drawLine(px, bodyTop, px, bodyBottom, line)
+        }
+        canvas.drawLine(cx - half, bodyTop + h * 0.02f, cx + half, bodyTop + h * 0.02f, thin)
+        canvas.drawLine(cx - half, bodyBottom - h * 0.03f, cx + half, bodyBottom - h * 0.03f, thin)
+
+        // 5) 돌 기단 — 두 단
+        canvas.drawLine(cx - half * 1.2f, bodyBottom, cx + half * 1.35f, bodyBottom, line)
+        canvas.drawLine(cx - half * 1.2f, baseY, cx + half * 1.35f, baseY, line)
+        canvas.drawLine(cx - half * 1.2f, bodyBottom, cx - half * 1.2f, baseY, line)
+        canvas.drawLine(cx + half * 1.35f, bodyBottom, cx + half * 1.35f, baseY, line)
+        for (i in 1..4) {
+            val px = cx - half * 1.2f + (half * 2.55f) * i / 5f
+            canvas.drawLine(px, bodyBottom, px, baseY, thin)
         }
     }
 
-    /** 무지개다리. 아치 하나와 그 위 난간. */
-    private fun drawBridge(canvas: Canvas, cx: Float, baseY: Float, span: Float) {
-        val half = span / 2f
-        val rise = span * 0.34f
+    // ─────────────────────── 물 ───────────────────────
 
-        // 아치 아래쪽(물에 닿는 반원)
-        rect.set(cx - half * 0.52f, baseY - rise * 0.5f, cx + half * 0.52f, baseY + rise * 0.5f)
-        canvas.drawArc(rect, 180f, 180f, false, linePaint)
-
-        // 상판
-        path.reset()
-        path.moveTo(cx - half, baseY)
-        path.quadTo(cx, baseY - rise, cx + half, baseY)
-        canvas.drawPath(path, linePaint)
-
-        // 난간 — 상판을 따라 조금 위로
-        path.reset()
-        path.moveTo(cx - half, baseY - span * 0.09f)
-        path.quadTo(cx, baseY - rise - span * 0.09f, cx + half, baseY - span * 0.09f)
-        canvas.drawPath(path, linePaint)
-    }
-
-    /** 물. 짧은 선 몇 개면 물결로 읽힙니다. */
-    private fun drawWater(canvas: Canvas, w: Float, h: Float) {
-        val lines = listOf(
-            Triple(0.06f, 0.30f, 0.80f),
-            Triple(0.40f, 0.72f, 0.87f),
-            Triple(0.12f, 0.34f, 0.93f),
-            Triple(0.52f, 0.88f, 0.96f)
+    /** 물결. 짧은 선 몇 개면 물로 읽힙니다. 흩어 놓아야 잔물결로 보입니다. */
+    private fun drawWater(canvas: Canvas) {
+        val dashes = listOf(
+            Triple(0.36f, 0.47f, 0.71f),
+            Triple(0.42f, 0.52f, 0.77f),
+            Triple(0.10f, 0.22f, 0.82f),
+            Triple(0.28f, 0.37f, 0.85f),
+            Triple(0.50f, 0.61f, 0.83f),
+            Triple(0.70f, 0.82f, 0.80f),
+            Triple(0.19f, 0.29f, 0.90f),
+            Triple(0.58f, 0.70f, 0.91f),
+            Triple(0.34f, 0.45f, 0.95f)
         )
-        lines.forEach { (from, to, y) ->
-            canvas.drawLine(w * from, h * y, w * to, h * y, linePaint)
+        dashes.forEach { (from, to, at) ->
+            canvas.drawLine(x(from), y(at), x(to), y(at), line)
         }
     }
 }

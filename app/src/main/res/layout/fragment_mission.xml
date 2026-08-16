@@ -84,7 +84,7 @@
                     android:layout_height="wrap_content">
 
                 <com.youngs.picview.ui.mission.MissionSceneView
-                    android:layout_width="132dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end|center_vertical"
                     android:layout_marginEnd="@dimen/space_m" />
