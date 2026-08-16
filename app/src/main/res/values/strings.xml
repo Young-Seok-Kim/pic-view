@@ -360,6 +360,20 @@
     <string name="detail_visit_parking">주차</string>
     <string name="detail_visit_hours">운영 시간</string>
     <string name="detail_visit_rest">쉬는 날</string>
+    <!-- ============ 색감 필터 ============ -->
+    <string name="palette_title">색감 필터</string>
+    <string name="frame_color">🎨 색감</string>
+    <string name="palette_before">원본</string>
+    <string name="palette_after">적용</string>
+    <string name="palette_strength">적용 세기</string>
+    <string name="palette_pick">정읍 색감 팔레트</string>
+    <string name="palette_pick_note">장소별 고유 색감을 한 번에 입힙니다</string>
+    <string name="palette_selected">✓ 선택</string>
+    <string name="palette_apply">적용하기</string>
+    <string name="percent_format">%1$d%%</string>
+    <string name="palette_no_photo">사진을 불러올 수 없습니다</string>
+    <string name="palette_hint">가운데 선을 좌우로 밀어 원본과 비교해 보세요</string>
+
     <string name="sun_arc_sunrise">일출 %1$s</string>
     <string name="sun_arc_sunset">일몰 %1$s</string>
     <string name="sun_arc_daylight">🌿  오늘은 %1$d시간 %2$d분 동안 빛이 머물러요</string>

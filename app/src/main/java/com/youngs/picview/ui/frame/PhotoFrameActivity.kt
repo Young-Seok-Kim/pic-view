@@ -10,6 +10,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
@@ -20,6 +21,7 @@ import com.youngs.picview.R
 import com.youngs.picview.databinding.ActivityPhotoFrameBinding
 import com.youngs.picview.domain.frame.FrameTheme
 import com.youngs.picview.domain.frame.PolaroidComposer
+import com.youngs.picview.ui.palette.ColorPaletteActivity
 import com.youngs.picview.util.MediaStoreSaver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -64,6 +66,23 @@ class PhotoFrameActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPhotoFrameBinding
 
+    /**
+     * 색감 필터에서 돌아오면 원본을 물들인 것으로 갈아 끼웁니다.
+     *
+     * 비트맵은 인텐트에 담기엔 커서 캐시 파일 경로로 주고받습니다.
+     */
+    private val colorFilter = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val path = result.data?.getStringExtra(ColorPaletteActivity.RESULT_PATH)
+            ?: return@registerForActivityResult
+        val graded = BitmapFactory.decodeFile(path) ?: return@registerForActivityResult
+
+        source?.recycle()
+        source = graded
+        renderPreview()
+    }
+
     private var source: Bitmap? = null
     private var composed: Bitmap? = null
     private var theme: FrameTheme = FrameTheme.MAPLE
@@ -92,6 +111,9 @@ class PhotoFrameActivity : AppCompatActivity() {
         setupSwatches()
         withStoragePermission { loadPhoto(uri) }
 
+        binding.btnFrameColor.setOnClickListener {
+            colorFilter.launch(ColorPaletteActivity.intent(this, uri))
+        }
         binding.btnFrameSave.setOnClickListener { save(share = false) }
         binding.btnFrameShare.setOnClickListener { save(share = true) }
     }

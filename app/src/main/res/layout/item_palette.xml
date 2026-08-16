@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    색감 팔레트 한 칸 (시안 13:2).
+
+    색 세 조각을 나란히 보여 주고 그 아래에 장소 이름을 답니다. 색만 보여
+    주면 "주황 필터"가 되고, 이름만 보여 주면 무슨 색인지 모릅니다.
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_palette"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:checkable="true"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardBackgroundColor="@color/palette_card_bg"
+    app:cardCornerRadius="@dimen/radius_card"
+    app:cardElevation="0dp"
+    app:strokeWidth="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/space_m">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:orientation="horizontal">
+
+            <View
+                android:id="@+id/view_swatch_1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_palette_swatch" />
+
+            <View
+                android:id="@+id/view_swatch_2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_palette_swatch" />
+
+            <View
+                android:id="@+id/view_swatch_3"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_palette_swatch" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_palette_label"
+            style="@style/Text.SectionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/white"
+            tools:text="내장산 단풍" />
+
+        <TextView
+            android:id="@+id/tv_palette_note"
+            style="@style/Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#99FFFFFF"
+            tools:text="붉게 물든 가을" />
+
+        <TextView
+            android:id="@+id/tv_palette_selected"
+            style="@style/Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="@dimen/space_s"
+            android:background="@drawable/bg_pill_selected"
+            android:paddingHorizontal="@dimen/space_m"
+            android:paddingVertical="3dp"
+            android:text="@string/palette_selected"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

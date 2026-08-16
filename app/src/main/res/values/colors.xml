@@ -154,6 +154,11 @@
     <color name="scene_water">#4E657E</color>
     <color name="scene_tree">#7C9070</color>
 
+    <!-- ============ 색감 필터 ============ -->
+    <!-- 사진 위에 얹히는 화면이라 배경을 어둡게 둬야 색이 제대로 보입니다. -->
+    <color name="palette_bg">#141014</color>
+    <color name="palette_card_bg">#241E24</color>
+
     <!-- ============ 계절 ============ -->
     <!--
       계절 칩을 고르면 그 계절의 색이 켜집니다. 넷 다 앱 대표색(단풍 빨강)
