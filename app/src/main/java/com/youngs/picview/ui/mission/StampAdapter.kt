@@ -39,13 +39,11 @@ class StampAdapter : ListAdapter<MissionProgress, StampAdapter.Holder>(DIFF) {
         val done = item.isComplete
 
         with(holder.binding) {
-            tvStampEmoji.text = item.mission.type.icon
-            // 안 찍힌 스탬프는 흐리게 둬서 찍힌 것과 한눈에 구분되게 합니다.
-            tvStampEmoji.alpha = if (done) 1f else 0.3f
-
-            layoutStampCircle.setBackgroundResource(
-                if (done) R.drawable.bg_stamp_filled else R.drawable.bg_stamp_empty
-            )
+            ivStampArt.setImageResource(item.mission.stampRes)
+            // 아직 못 받은 스탬프는 흐리게 둡니다. 아예 안 보이게 하면
+            // 무엇을 모을 수 있는지 알 수 없어서 모으고 싶어지지 않습니다.
+            // 무엇인지는 알아볼 만큼, 받은 것과는 확실히 갈릴 만큼.
+            ivStampArt.alpha = if (done) 1f else 0.28f
 
             // 미션 제목("내장산 계절 관찰일지")은 좁은 칸에 안 들어가고,
             // 유형 이름("빛")만 달면 여덟 칸 중 둘이 똑같아집니다.

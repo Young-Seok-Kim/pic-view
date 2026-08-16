@@ -1,5 +1,7 @@
 package com.youngs.picview.domain.mission
 
+import androidx.annotation.DrawableRes
+import com.youngs.picview.R
 import com.youngs.picview.data.local.VisitLogEntity
 import com.youngs.picview.domain.light.LightPhase
 import com.youngs.picview.domain.season.Season
@@ -45,6 +47,14 @@ data class Mission(
     val badge: String,
     /** 카드 아래 해시태그. 무엇에 관한 미션인지 한눈에 훑게 합니다. */
     val tags: List<String> = emptyList(),
+    /**
+     * 스탬프 그림.
+     *
+     * 유형 아이콘(☀·☁)은 갈래를 말하지만 같은 유형이 둘이면 스탬프가
+     * 똑같아집니다. 미션마다 다른 그림이라야 "무엇을 모았는지"가 보이고,
+     * 모으는 재미도 거기서 나옵니다.
+     */
+    @DrawableRes val stampRes: Int,
     val target: Int,
     val places: List<String> = emptyList(),
     val countOf: (List<VisitLogEntity>) -> Int
@@ -129,6 +139,7 @@ object Missions {
             nextHint = "다음 황금시간에 한 장 더 남겨보세요",
             badge = "황금빛 수집가",
             tags = listOf("황금시간", "고득점", "빛"),
+            stampRes = R.drawable.stamp_light_hunter,
             target = 2,
             countOf = { visits ->
                 visits.withPhoto().count { phaseOf(it)?.isGolden == true && it.score >= 70 }
@@ -143,6 +154,7 @@ object Missions {
             nextHint = "바람이 잔잔한 이른 아침에 수면이 가장 잘 비칩니다",
             badge = "수면의 관찰자",
             tags = listOf("물가", "반사", "잔잔한 아침"),
+            stampRes = R.drawable.stamp_water_mirror,
             target = 3,
             places = WATER_PLACES,
             countOf = { visits ->
@@ -160,6 +172,7 @@ object Missions {
             nextHint = "아침에 찍은 곳을 저녁에 한 번 더 찾아가 보세요",
             badge = "하루의 기록자",
             tags = listOf("같은 장소", "아침", "저녁"),
+            stampRes = R.drawable.stamp_morning_evening,
             target = 2,
             countOf = { visits ->
                 // 장소별로 묶어, 아침과 저녁 사진을 **둘 다** 가진 곳을 찾습니다.
@@ -184,6 +197,7 @@ object Missions {
             nextHint = "일몰 직후 25분 동안만 열리는 시간입니다",
             badge = "블루아워 관찰자",
             tags = listOf("블루아워", "짧은 시간", "삼각대"),
+            stampRes = R.drawable.stamp_blue_hour,
             target = 1,
             countOf = { visits ->
                 visits.withPhoto().count {
@@ -200,6 +214,7 @@ object Missions {
             nextHint = "같은 계절 안에 세 장을 모아야 변화가 보입니다",
             badge = "계절 수집가",
             tags = listOf("내장산", "계절", "관찰"),
+            stampRes = R.drawable.stamp_naejangsan_season,
             target = 3,
             places = listOf("내장산"),
             countOf = { visits ->
@@ -219,6 +234,7 @@ object Missions {
             nextHint = "일기에서 사진을 눌러 프레임을 입혀보세요",
             badge = "나만의 큐레이터",
             tags = listOf("프레임", "엽서", "기록"),
+            stampRes = R.drawable.stamp_postcard,
             target = 3,
             countOf = { visits -> visits.withPhoto().size }
         ),
@@ -231,6 +247,7 @@ object Missions {
             nextHint = "처마 끝과 기와의 결을 가까이 담아보세요",
             badge = "유산 아카이버",
             tags = listOf("무성서원", "피향정", "건축"),
+            stampRes = R.drawable.stamp_heritage,
             target = 2,
             places = HERITAGE_SITES,
             countOf = { visits ->
@@ -249,6 +266,7 @@ object Missions {
             nextHint = "오전·오후·저녁으로 나눠 세 곳을 이어보세요",
             badge = "빛의 길잡이",
             tags = listOf("하루", "세 곳", "이동"),
+            stampRes = R.drawable.stamp_light_route,
             target = 3,
             countOf = { visits ->
                 // 하루 안에 몇 곳을 이었는지. 날짜별로 묶어 가장 많은 날을 씁니다.
