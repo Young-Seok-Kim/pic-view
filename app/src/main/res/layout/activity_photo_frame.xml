@@ -48,6 +48,22 @@
                 android:textAppearance="@style/Text.Title"
                 android:textColor="@color/white" />
 
+            <!--
+              색감 필터로 가는 문.
+              프레임을 고르기 전에 색을 정하는 순서가 자연스럽습니다. 색을
+              바꾸면 어울리는 프레임도 달라지기 때문입니다.
+            -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_frame_color"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/space_xs"
+                android:minWidth="0dp"
+                android:paddingHorizontal="@dimen/space_m"
+                android:text="@string/frame_color"
+                android:textColor="@color/white" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_frame_save"
                 style="@style/Button.Primary"

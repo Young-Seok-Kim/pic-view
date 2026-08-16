@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    색감 필터 (시안 13:2).
+    배경을 어둡게 둬야 사진의 색이 화면 색에 물들지 않고 그대로 보입니다.
+-->
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_palette"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/palette_bg"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/space_2xl">
+
+        <!-- ─────────── 상단 바 ─────────── -->
+        <LinearLayout
+            android:id="@+id/layout_palette_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/screen_padding"
+            android:paddingTop="@dimen/space_m">
+
+            <ImageView
+                android:id="@+id/btn_palette_back"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_glass_circle"
+                android:contentDescription="@string/cd_back"
+                android:padding="9dp"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/white" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_m"
+                android:layout_weight="1"
+                android:text="@string/palette_title"
+                android:textAppearance="@style/Text.Title"
+                android:textColor="@color/white" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_palette_apply"
+                style="@style/Button.Primary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:paddingHorizontal="@dimen/space_l"
+                android:text="@string/palette_apply" />
+        </LinearLayout>
+
+        <!-- ─────────── 원본 / 적용 비교 ─────────── -->
+        <com.youngs.picview.ui.palette.BeforeAfterView
+            android:id="@+id/view_compare"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_l" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            android:gravity="center"
+            android:text="@string/palette_hint"
+            android:textColor="#80FFFFFF"
+            android:textSize="@dimen/text_caption" />
+
+        <!-- ─────────── 적용 세기 ─────────── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_l"
+            android:layout_marginHorizontal="@dimen/screen_padding"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/palette_strength"
+                android:textColor="#CCFFFFFF" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/slider_strength"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/space_s"
+                android:layout_weight="1"
+                android:stepSize="5"
+                android:value="70"
+                android:valueFrom="0"
+                android:valueTo="100"
+                app:labelBehavior="gone"
+                app:thumbColor="@color/white"
+                app:trackColorActive="@color/maple_500"
+                app:trackColorInactive="#33FFFFFF" />
+
+            <TextView
+                android:id="@+id/tv_strength"
+                style="@style/Text.SectionTitle"
+                android:layout_width="52dp"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:textColor="@color/white"
+                tools:text="70%" />
+        </LinearLayout>
+
+        <!-- ─────────── 팔레트 고르기 ─────────── -->
+        <TextView
+            style="@style/Text.SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xl"
+            android:layout_marginHorizontal="@dimen/screen_padding"
+            android:text="@string/palette_pick"
+            android:textColor="@color/white" />
+
+        <TextView
+            style="@style/Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/screen_padding"
+            android:text="@string/palette_pick_note"
+            android:textColor="#99FFFFFF" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_palettes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_m"
+            android:layout_marginHorizontal="11dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="2"
+            tools:itemCount="4"
+            tools:listitem="@layout/item_palette" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
