@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 완료 표시. 아이콘을 바꾸지 않고 체크만 덧붙입니다. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@color/maple_500" />
+</shape>

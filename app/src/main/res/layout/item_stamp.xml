@@ -35,8 +35,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_xs"
         android:gravity="center"
-        android:maxLines="2"
-        tools:text="새벽 사냥꾼" />
+        android:ellipsize="end"
+        android:maxLines="1"
+        tools:text="빛" />
 
     <TextView
         android:id="@+id/tv_stamp_date"

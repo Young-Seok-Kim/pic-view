@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 미션 & 배지. 방문 기록으로 자동 판정됩니다. -->
+<!--
+    미션 & 기록.
+
+    예전에는 "배지 2개 획득" 이 히어로였습니다. 그러면 이 화면이 수집판이
+    되고, 사용자가 다음에 무엇을 할지는 스스로 찾아야 했습니다.
+
+    지금은 **다음 촬영 행동을 고르는 화면**입니다. 위에서부터
+    장면 진행 → 오늘의 추천 → 유형 필터 → 전체 목록 순입니다.
+-->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -11,32 +19,31 @@
 
     <LinearLayout
         android:id="@+id/layout_mission_top"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="@dimen/space_m"
-        android:paddingVertical="@dimen/space_s"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:paddingHorizontal="@dimen/screen_padding"
+        android:paddingVertical="@dimen/space_m"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <ImageButton
+        <ImageView
             android:id="@+id/btn_mission_back"
-            android:layout_width="@dimen/touch_target"
-            android:layout_height="@dimen/touch_target"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/cd_back"
+            android:padding="9dp"
             android:src="@drawable/ic_arrow_back"
             app:tint="@color/text_primary" />
 
         <TextView
-            style="@style/Text.SectionTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/space_xs"
+            android:layout_marginStart="@dimen/space_s"
             android:layout_weight="1"
-            android:text="@string/mission_title" />
+            android:text="@string/mission_title"
+            android:textAppearance="@style/Text.Title" />
     </LinearLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -44,17 +51,21 @@
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:paddingBottom="@dimen/space_3xl"
-        app:layout_constraintTop_toBottomOf="@id/layout_mission_top"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/layout_mission_top">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- 획득 요약 -->
+            <!--
+              ─────────── 장면 진행 ───────────
+              "배지 2개" 가 아니라 "장면 3 / 17" 입니다. 배지는 받은 결과지만
+              장면은 남긴 사진이라, 세는 단위가 앱의 성격을 말합니다.
+            -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -75,7 +86,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
-                        tools:text="배지 2개 획득" />
+                        tools:text="장면 3 / 17" />
 
                     <TextView
                         android:id="@+id/tv_mission_summary_desc"
@@ -84,15 +95,160 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_xs"
                         android:textColor="#E6FFFFFF"
-                        tools:text="미션은 다녀온 기록으로 자동 판정돼요" />
+                        tools:text="정읍에서 발견한 장면을 모아보세요" />
+
+                    <!-- 유형별로 몇 장면을 모았는지. 무엇에 치우쳤는지 보입니다. -->
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chips_mission_tally"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_m"
+                        app:chipSpacingHorizontal="6dp"
+                        app:chipSpacingVertical="0dp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <!--
-              ─────────── 스탬프북 ───────────
-              아래 목록이 "무엇을 해야 하는지"를 설명한다면, 이 격자는
-              "얼마나 모았는지"를 한눈에 보여 줍니다. 같은 데이터입니다.
+              ─────────── 오늘의 추천 ───────────
+              목록 스물 몇 개 중에서 고르라고 하면 아무것도 안 고릅니다.
+              지금 빛에서 바로 할 수 있는 하나를 위로 꺼내 둡니다.
             -->
+            <TextView
+                android:id="@+id/tv_today_label"
+                style="@style/Text.SectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xl"
+                android:layout_marginHorizontal="@dimen/screen_padding"
+                android:text="@string/mission_today" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_today_mission"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_s"
+                android:layout_marginHorizontal="@dimen/screen_padding"
+                app:cardBackgroundColor="@color/maple_50"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/maple_300"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/space_l">
+
+                    <FrameLayout
+                        android:id="@+id/layout_today_badge"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/bg_mission_circle">
+
+                        <TextView
+                            android:id="@+id/tv_today_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:textSize="19sp"
+                            tools:text="☀" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/space_m"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_today_title"
+                            style="@style/Text.SectionTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:textColor="@color/maple_800"
+                            tools:text="오늘의 빛 사냥꾼" />
+
+                        <TextView
+                            android:id="@+id/tv_today_desc"
+                            style="@style/Text.Caption"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/maple_700"
+                            tools:text="18:21 서향 · 지금 촬영지에서 바로 시작" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_today_go"
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/mission_go"
+                        android:textColor="@color/maple_600"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!--
+              ─────────── 유형 필터 ───────────
+              미션이 스물 몇 개가 되면 목록이 아니라 탐색 화면이 됩니다.
+              "빛을 보러 갈까 계절을 보러 갈까" 가 먼저 정해집니다.
+            -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xl"
+                android:paddingHorizontal="@dimen/screen_padding"
+                android:scrollbars="none">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chips_mission_filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:chipSpacingHorizontal="6dp"
+                    app:selectionRequired="true"
+                    app:singleLine="true"
+                    app:singleSelection="true" />
+            </HorizontalScrollView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_missions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_m"
+                android:nestedScrollingEnabled="false"
+                android:paddingHorizontal="@dimen/screen_padding"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_mission" />
+
+            <TextView
+                android:id="@+id/tv_mission_empty"
+                style="@style/Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_2xl"
+                android:gravity="center"
+                android:text="@string/mission_filter_empty"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <!--
+              ─────────── 스탬프북 ───────────
+              위 목록이 "무엇을 할까" 라면 이 격자는 "얼마나 모았나" 입니다.
+              같은 데이터지만 목록을 훑지 않고 한눈에 봅니다.
+            -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/space_xl"
+                android:layout_marginHorizontal="@dimen/screen_padding"
+                android:background="@color/divider" />
+
             <TextView
                 style="@style/Text.SectionTitle"
                 android:layout_width="wrap_content"
@@ -107,7 +263,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/screen_padding"
-                tools:text="6개 중 2개를 모았어요" />
+                tools:text="8개 중 2개를 모았어요" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_stamps"
@@ -117,28 +273,9 @@
                 android:nestedScrollingEnabled="false"
                 android:paddingHorizontal="@dimen/screen_padding"
                 app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                app:spanCount="3"
-                tools:itemCount="6"
+                app:spanCount="4"
+                tools:itemCount="8"
                 tools:listitem="@layout/item_stamp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/space_xl"
-                android:layout_marginHorizontal="@dimen/screen_padding"
-                android:background="@color/divider" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_missions"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_l"
-                android:nestedScrollingEnabled="false"
-                android:paddingHorizontal="@dimen/screen_padding"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:itemCount="3"
-                tools:listitem="@layout/item_mission" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
