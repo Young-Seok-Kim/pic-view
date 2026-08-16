@@ -34,7 +34,7 @@ class MissionAdapter :
         )
 
         with(holder.binding) {
-            tvMissionEmoji.text = mission.emoji
+            tvMissionEmoji.text = mission.type.icon
             // 미완료 미션은 배지를 흐리게 둡니다. 다 똑같이 보이면 목표가 안 생깁니다.
             tvMissionEmoji.alpha = if (item.isComplete) 1f else 0.35f
             layoutMissionBadge.background?.mutate()
@@ -56,7 +56,7 @@ class MissionAdapter :
 
             tvMissionBadgeName.isVisible = item.isComplete
             tvMissionBadgeName.text = context.getString(
-                R.string.mission_badge_earned, mission.badge
+                R.string.mission_badge_earned, mission.type.doneVerb
             )
         }
     }

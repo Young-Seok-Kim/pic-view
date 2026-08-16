@@ -39,7 +39,7 @@ class StampAdapter : ListAdapter<MissionProgress, StampAdapter.Holder>(DIFF) {
         val done = item.isComplete
 
         with(holder.binding) {
-            tvStampEmoji.text = item.mission.emoji
+            tvStampEmoji.text = item.mission.type.icon
             // 안 찍힌 스탬프는 흐리게 둬서 찍힌 것과 한눈에 구분되게 합니다.
             tvStampEmoji.alpha = if (done) 1f else 0.3f
 
@@ -47,7 +47,7 @@ class StampAdapter : ListAdapter<MissionProgress, StampAdapter.Holder>(DIFF) {
                 if (done) R.drawable.bg_stamp_filled else R.drawable.bg_stamp_empty
             )
 
-            tvStampBadge.text = item.mission.badge
+            tvStampBadge.text = item.mission.title
             tvStampBadge.setTextColor(
                 ContextCompat.getColor(
                     context,
