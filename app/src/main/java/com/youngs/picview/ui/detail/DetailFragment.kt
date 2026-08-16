@@ -27,6 +27,9 @@ import com.youngs.picview.domain.light.LightPhase
 import com.youngs.picview.domain.light.SunTimes
 import com.youngs.picview.domain.score.ScoreFactor
 import com.youngs.picview.domain.spot.SpotFacts
+import com.youngs.picview.domain.weather.SkyState
+import com.youngs.picview.domain.weather.WeatherAdvice
+import com.youngs.picview.domain.weather.WeatherAdviser
 import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.ui.guide.GuideOverlayView
 import com.youngs.picview.ui.main.MainViewModel
@@ -39,6 +42,7 @@ import com.youngs.picview.ui.model.SpotItem
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import java.time.LocalTime
+import kotlin.math.roundToInt
 import com.youngs.picview.util.OverviewFormatter
 
 class DetailFragment : Fragment(R.layout.fragment_detail) {
@@ -249,34 +253,86 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
     private fun renderShootingFacts(spot: SpotItem) {
         val facts = SpotFactsTable.of(spot.title, spot.contentTypeId)
         val sun = mainViewModel.sunTimes
+        val sky = mainViewModel.skyState.value
 
         binding.viewShootWindow.sunTimes = sun
 
         val window = pickWindow(sun, facts.bestPhase)
+        val phase = window?.phase ?: facts.bestPhase
+
+        // 제목이 "오늘의 촬영 적기" 로 고정돼 있으면 아침·저녁 어느 쪽
+        // 이야기인지 그래프를 읽어야 압니다. 제목에서 바로 말합니다.
+        binding.tvShootWindowTitle.text = getString(
+            R.string.detail_window_title,
+            getString(
+                if (phase == LightPhase.SUNRISE) R.string.detail_window_morning
+                else R.string.detail_window_evening
+            )
+        )
+
         binding.tvDetailBestTime.text = window?.let {
             getString(R.string.detail_window_range, it.start.hhmm(), it.end.hhmm())
         } ?: getString(R.string.course_sun_unknown)
 
-        binding.tvDetailLightLine.text = getString(
-            R.string.detail_light_sub,
+        binding.tvDetailFacing.text = facts.facing.label
+
+        val feels = mainViewModel.feelsLikeC.value
+        binding.tvDetailFeels.text = feels?.let { "${it.roundToInt()}°" } ?: "—"
+
+        // 날씨가 구도를 바꿉니다. 흐린 날의 정면 촬영과 맑은 날의 넓은
+        // 풍경은 같은 장소에서도 다른 사진이 됩니다.
+        val advice = WeatherAdviser.of(sky, phase, facts.facing, facts.guide)
+
+        // 날씨 한 줄은 위 라이브 카드가 이미 말했습니다. 여기서는 일정만
+        // 말합니다. 같은 문장을 두 번 쓰면 카드가 둘인 이유가 사라집니다.
+        binding.tvDetailLightLine.text = window?.let {
             getString(
-                if ((window?.phase ?: facts.bestPhase) == LightPhase.SUNRISE) {
-                    R.string.detail_window_morning
-                } else {
-                    R.string.detail_window_evening
-                }
-            ),
-            facts.bestPhase.lightCharacter
-        )
-
-        binding.tvDetailFacing.text = facts.facing.labelWithBearing
-
-        binding.tvDetailFactsNote.text = facts.note
+                R.string.detail_window_next,
+                getString(
+                    if (phase == LightPhase.SUNRISE) R.string.detail_window_morning
+                    else R.string.detail_window_evening
+                ),
+                it.start.hhmm(), it.end.hhmm()
+            )
+        } ?: getString(R.string.course_sun_unknown)
+        binding.tvDetailFactsNote.text = advice.action
         binding.tvDetailGuide.text = getString(
-            R.string.course_guide_format, guideName(facts.guide)
+            R.string.course_guide_format, guideName(advice.guide)
         )
 
+        renderLiveWeather(sky, advice)
         binding.btnSavePlan.setOnClickListener { savePlan(spot, facts) }
+    }
+
+    /**
+     * 지금 이 자리의 날씨.
+     *
+     * 숫자만 두면 날씨 앱이 됩니다. 그 날씨가 사진을 어떻게 바꾸는지를
+     * 한 줄로 붙여야 출사 앱의 정보가 됩니다.
+     */
+    private fun renderLiveWeather(sky: SkyState?, advice: WeatherAdvice) {
+        val temp = mainViewModel.temperatureC.value
+        val feels = mainViewModel.feelsLikeC.value
+        val humidity = mainViewModel.humidityPercent.value
+
+        // 관측을 하나도 못 받았으면 카드를 감춥니다. 빈 껍데기가 남는 것보다
+        // 없는 편이 낫습니다.
+        binding.cardLiveWeather.isVisible = temp != null || sky != null
+
+        binding.tvLiveTemp.text = temp?.let { "${it.roundToInt()}°" } ?: "—"
+
+        val skyLabel = sky?.let { "${it.emoji} ${it.label}" } ?: getString(R.string.detail_no_weather)
+        binding.tvLiveSky.text = if (humidity != null) {
+            getString(R.string.detail_sky_humidity, skyLabel, humidity.roundToInt())
+        } else {
+            skyLabel
+        }
+
+        binding.tvLiveNote.text = if (feels != null) {
+            getString(R.string.detail_live_note, feels.roundToInt(), advice.headline)
+        } else {
+            advice.headline
+        }
     }
 
     /**

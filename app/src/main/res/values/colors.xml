@@ -157,6 +157,14 @@
     <!-- 상세의 "이 장소만의 한 줄". 옆의 흰 상자와 달리 노란 기를 둡니다. -->
     <color name="detail_note_bg">#FFF4E2C4</color>
 
+    <!--
+      상세의 라이브 날씨 카드.
+      아래 빛 카드가 밝은 살구색이라 같은 톤으로 두면 두 카드가 한 덩어리로
+      뭉쳐 보입니다. 어둡게 둬야 "지금 바깥 상태"라는 다른 성격이 읽힙니다.
+    -->
+    <color name="live_weather_bg">#FF2A2328</color>
+    <color name="live_weather_eyebrow">#FFD9A87C</color>
+
     <!-- ============ 색감 필터 ============ -->
     <!-- 사진 위에 얹히는 화면이라 배경을 어둡게 둬야 색이 제대로 보입니다. -->
     <color name="palette_bg">#141014</color>
