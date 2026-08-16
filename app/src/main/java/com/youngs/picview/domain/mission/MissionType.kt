@@ -28,7 +28,7 @@ enum class MissionType(
     LIGHT("빛", "☀", "빛을 발견했어요", R.color.mission_light, R.color.mission_light_soft),
     WEATHER("날씨", "☁", "색을 기록했어요", R.color.mission_weather, R.color.mission_weather_soft),
     SEASON("계절", "❀", "계절을 관찰했어요", R.color.mission_season, R.color.mission_season_soft),
-    PLACE("장소", "◈", "장면을 발견했어요", R.color.mission_place, R.color.mission_place_soft),
+    PLACE("장소", "⌖", "장면을 발견했어요", R.color.mission_place, R.color.mission_place_soft),
     COMPARE("비교", "⇄", "차이를 비교했어요", R.color.mission_compare, R.color.mission_compare_soft),
     RECORD("기록", "✎", "정읍을 완성했어요", R.color.mission_record, R.color.mission_record_soft),
     SHARE("공유", "↗", "오늘의 정읍을 소개했어요", R.color.mission_share, R.color.mission_share_soft)
