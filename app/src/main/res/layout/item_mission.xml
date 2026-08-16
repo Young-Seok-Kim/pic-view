@@ -116,6 +116,22 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_s"
                 tools:text="다음 황금시간에 한 장 더 남겨보세요" />
+
+            <!--
+              해시태그.
+              조건을 읽지 않고도 무엇에 관한 미션인지 훑게 합니다.
+              목록이 길어질수록 이 줄로 먼저 걸러 보게 됩니다.
+            -->
+            <TextView
+                android:id="@+id/tv_mission_tags"
+                style="@style/Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/text_tertiary"
+                tools:text="#황금시간  #고득점  #빛" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

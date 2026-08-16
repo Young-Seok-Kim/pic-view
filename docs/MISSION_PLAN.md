@@ -105,6 +105,31 @@
 - [x] **4단계 — 구도·방향 토큰** (완료)
   `[⇆ 대칭] [← 서쪽 빛] [☀ 저녁 사광]`. 구도는 날씨에 따라 바뀝니다.
 
+- [x] **5단계 — 참고 화면 반영** (완료)
+  스탬프에 수식어 붙은 배지 이름, 헤더 진행 막대 + %, 오늘의 추천에
+  시간·구도·빛 세 칸, 카드 해시태그, 나의 기록 통계 넷.
+
+---
+
+## 실시간 연동
+
+두 화면은 **같은 Room Flow**(`DiaryRepository.observeDays()`)를 구독합니다.
+방문 기록이 하나 쌓이면 장소별 미션과 전체 미션이 **동시에** 다시 계산돼
+따로 맞출 것이 없습니다. 참고 자료의 `MissionSyncStore`(localStorage +
+BroadcastChannel)가 웹에서 하던 일을 Room 이 그대로 합니다.
+
+| 참고 자료(웹) | 이 앱(안드로이드) |
+|---|---|
+| `missionSync.getProgress(id)` | `Missions.progress(visits)` |
+| `getPlaceMissions(placeId)` | `Missions.forPlace(title, visits, phase)` |
+| `completeEvidence(id, photoId)` | 방문 기록에 `photoUri` 저장 |
+| `BroadcastChannel` 로 탭 간 전파 | Room `Flow` 가 구독 중인 화면에 전파 |
+| 같은 증거 ID 중복 방지 | `distinctBy { contentId }` · `coerceAtMost(target)` |
+
+증거가 따로 없습니다. **사진이 곧 증거**입니다. 별도 완료 테이블을 두지
+않으므로 "완료 처리를 깜빡해서 배지가 안 나오는" 버그가 원천적으로
+없고, 사진을 지우면 진행도도 정직하게 되돌아갑니다.
+
 ---
 
 ## 하지 않기로 한 것

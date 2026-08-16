@@ -70,6 +70,9 @@ class MissionAdapter(
                 )
             )
 
+            tvMissionTags.isVisible = mission.tags.isNotEmpty()
+            tvMissionTags.text = mission.tags.joinToString("  ") { "#$it" }
+
             cardMission.strokeColor = ContextCompat.getColor(
                 context,
                 if (item.isComplete) type.colorRes else R.color.card_stroke

@@ -47,10 +47,10 @@ class StampAdapter : ListAdapter<MissionProgress, StampAdapter.Holder>(DIFF) {
                 if (done) R.drawable.bg_stamp_filled else R.drawable.bg_stamp_empty
             )
 
-            // 칸이 좁아 미션 제목("내장산 계절 관찰일지")은 두 줄로도 안
-            // 들어갑니다. 유형 이름을 답니다. 무엇을 모았는지는 아이콘 색과
-            // 함께 읽히고, 자세한 이름은 위 목록이 말합니다.
-            tvStampBadge.text = item.mission.type.label
+            // 미션 제목("내장산 계절 관찰일지")은 좁은 칸에 안 들어가고,
+            // 유형 이름("빛")만 달면 여덟 칸 중 둘이 똑같아집니다.
+            // 수식어가 붙은 배지 이름을 답니다.
+            tvStampBadge.text = item.mission.badge
             tvStampBadge.setTextColor(
                 ContextCompat.getColor(
                     context,
