@@ -362,6 +362,13 @@
     <string name="detail_visit_rest">쉬는 날</string>
     <!-- ============ 색감 필터 ============ -->
     <!-- 출사지 상세 : 오늘의 촬영 적기 -->
+    <string name="detail_no_weather">관측 없음</string>
+    <string name="detail_live_weather">LIVE WEATHER · JEONGEUP</string>
+    <string name="detail_sky_humidity">%1$s · %2$d%%</string>
+    <string name="detail_live_note">체감 %1$d\u2103 · %2$s</string>
+    <string name="detail_live_note_plain">%1$s</string>
+    <string name="detail_window_title">오늘의 %1$s</string>
+    <string name="detail_window_next">다음 추천 구간은 %1$s %2$s–%3$s 이에요</string>
     <string name="detail_shoot_eyebrow">TODAY’S LIGHT WINDOW</string>
     <string name="detail_shoot_window">오늘의 촬영 적기</string>
     <string name="detail_fact_time">추천 촬영 시간</string>
