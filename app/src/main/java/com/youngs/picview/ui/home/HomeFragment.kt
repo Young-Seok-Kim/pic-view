@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.view.View
 import androidx.core.view.isVisible
 import com.youngs.picview.domain.light.LightPhase
@@ -181,8 +182,32 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
 
         binding.tvDaylightLine.isVisible = minutes > 0
         if (minutes > 0) {
-            binding.tvDaylightLine.text =
-                getString(R.string.sun_arc_daylight, minutes / 60, minutes % 60)
+            binding.tvDaylightLine.text = highlightDuration(
+                getString(R.string.sun_arc_daylight, minutes / 60, minutes % 60),
+                "${minutes / 60}시간 ${minutes % 60}분"
+            )
+        }
+    }
+
+    /**
+     * 문장 안의 시간만 굵고 진하게.
+     *
+     * 문장 전체가 한 색이면 "13시간 29분"을 찾으려고 처음부터 읽어야 합니다.
+     * 나머지는 매일 같은 말이고 바뀌는 건 숫자뿐입니다.
+     */
+    private fun highlightDuration(text: String, duration: String): CharSequence {
+        val start = text.indexOf(duration)
+        if (start < 0) return text
+
+        return SpannableString(text).apply {
+            setSpan(
+                ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.maple_600)),
+                start, start + duration.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            setSpan(
+                StyleSpan(android.graphics.Typeface.BOLD),
+                start, start + duration.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
         }
     }
 

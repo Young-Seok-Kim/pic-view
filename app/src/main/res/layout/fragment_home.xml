@@ -202,12 +202,14 @@
                 <TextView
                     android:id="@+id/tv_daylight_line"
                     style="@style/Text.Caption"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
                     android:layout_marginTop="@dimen/space_s"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    tools:text="13시간 31분 동안 빛이 머물러요" />
+                    android:background="@drawable/bg_pill_soft"
+                    android:paddingHorizontal="@dimen/space_l"
+                    android:paddingVertical="@dimen/space_s"
+                    tools:text="🌿  오늘은 13시간 31분 동안 빛이 머물러요" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
