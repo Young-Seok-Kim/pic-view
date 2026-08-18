@@ -22,6 +22,7 @@ object AppPrefs {
     private const val KEY_FONT_STEP = "font_scale_step"
     private const val KEY_ONBOARDED = "onboarding_done"
     private const val KEY_INSTALL_ID = "install_id"
+    private const val KEY_FAVORITES = "favorite_spots"
 
     private fun prefs(context: Context): SharedPreferences =
         context.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -50,6 +51,27 @@ object AppPrefs {
 
     fun setFontStep(context: Context, step: FontStep) {
         prefs(context).edit().putString(KEY_FONT_STEP, step.name).apply()
+    }
+
+    /**
+     * 찜한 촬영지 contentId 집합.
+     *
+     * 상세 히어로의 하트 버튼이 씁니다. 계정이 없으므로 단말에만 남고,
+     * 목록 화면 노출 같은 확장은 이 집합을 읽는 쪽에서 결정합니다.
+     */
+    fun favoriteSpots(context: Context): Set<String> =
+        prefs(context).getStringSet(KEY_FAVORITES, emptySet()) ?: emptySet()
+
+    fun isFavorite(context: Context, contentId: String): Boolean =
+        contentId in favoriteSpots(context)
+
+    /** 찜을 토글하고, 토글 후 찜 상태를 돌려줍니다. */
+    fun toggleFavorite(context: Context, contentId: String): Boolean {
+        val current = favoriteSpots(context).toMutableSet()
+        val nowFavorite = !current.remove(contentId)
+        if (nowFavorite) current.add(contentId)
+        prefs(context).edit().putStringSet(KEY_FAVORITES, current).apply()
+        return nowFavorite
     }
 
     /**

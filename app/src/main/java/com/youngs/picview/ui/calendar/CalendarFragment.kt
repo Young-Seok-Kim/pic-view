@@ -54,9 +54,13 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         binding.chipsSeason.setOnCheckedStateChangeListener { _, checked ->
             val season = seasonOf(checked.firstOrNull()) ?: return@setOnCheckedStateChangeListener
             adapter.submitList(SeasonHighlights.of(season))
-            // 계절을 바꾸면 달력도 그 계절의 첫 달로 옮깁니다.
-            // 가을을 눌렀는데 달력이 1월에 머물면 점이 하나도 안 보입니다.
-            shownMonth = YearMonth.of(LocalDate.now().year, season.months.min())
+            // 계절을 바꾸면 달력도 그 계절로 옮깁니다. 가을을 눌렀는데 달력이
+            // 1월에 머물면 점이 하나도 안 보입니다. 지금이 그 계절 안이면
+            // 첫 달이 아니라 이번 달을 폅니다 — 8월에 여름을 열었는데 6월이
+            // 나오면 절정 점을 보러 두 번을 더 넘겨야 합니다.
+            val now = YearMonth.now()
+            shownMonth = if (now.monthValue in season.months) now
+                         else YearMonth.of(now.year, season.months.min())
             renderMonth()
         }
 

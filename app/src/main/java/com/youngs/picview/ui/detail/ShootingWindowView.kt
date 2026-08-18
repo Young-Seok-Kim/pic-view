@@ -2,6 +2,7 @@ package com.youngs.picview.ui.detail
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.DashPathEffect
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Typeface
@@ -28,6 +29,12 @@ import kotlin.math.sin
  * 그래서 해가 떠 있는 동안만 그립니다. 호의 왼쪽 끝이 일출, 오른쪽 끝이
  * 일몰이고, 그 위에 지금이 어디인지 점을 찍습니다. 밤 시간을 함께 그리면
  * 정작 답인 낮이 좁아집니다.
+ *
+ * 시안(상세 개편안)에 맞춰 라벨을 정리했습니다.
+ *  - 양 끝은 시각(굵게) 위에 이름(일출·일몰)을 아래로 — 두 줄.
+ *  - 호 꼭대기에 해 아이콘과 "한낮". 호가 무엇의 궤적인지 말해 줍니다.
+ *  - 지금 점에서 바닥까지 점선을 내리고 그 아래 "현재 hh:mm".
+ *    점선이 있으면 라벨이 점에서 떨어져 있어도 누구의 것인지 잃지 않습니다.
  */
 class ShootingWindowView @JvmOverloads constructor(
     context: Context,
@@ -53,32 +60,50 @@ class ShootingWindowView @JvmOverloads constructor(
     private val arcPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = dp(4f)
+        strokeCap = Paint.Cap.ROUND
     }
     private val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val timePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textSize = dp(12f)
         textAlign = Paint.Align.CENTER
     }
+    private val capPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        textSize = dp(10f)
+        textAlign = Paint.Align.CENTER
+    }
     private val nowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textSize = dp(12f)
         textAlign = Paint.Align.CENTER
+    }
+    private val dashPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = dp(1.2f)
+        pathEffect = DashPathEffect(floatArrayOf(dp(3f), dp(3f)), 0f)
+    }
+    private val sunPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = dp(1.3f)
     }
     private val arcRect = RectF()
 
     private val textTertiary = ContextCompat.getColor(context, R.color.text_tertiary)
     private val nowColor = ContextCompat.getColor(context, R.color.maple_600)
     private val cardColor = ContextCompat.getColor(context, R.color.maple_50)
+    private val middayColor = ContextCompat.getColor(context, R.color.light_midday)
 
     init {
         val font = ResourcesCompat.getFont(context, R.font.pretendard)
         val bold = Typeface.create(font, Typeface.BOLD)
         timePaint.typeface = bold
         nowPaint.typeface = bold
+        capPaint.typeface = font
+        dashPaint.color = nowColor
+        sunPaint.color = middayColor
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val width = MeasureSpec.getSize(widthMeasureSpec)
-        val height = (width * ARC_RISE_RATIO + dp(54f)).toInt()
+        val height = (width * ARC_RISE_RATIO + dp(PAD_TOP + PAD_BOTTOM)).toInt()
         setMeasuredDimension(width, resolveSize(height, heightMeasureSpec))
     }
 
@@ -86,8 +111,8 @@ class ShootingWindowView @JvmOverloads constructor(
         val span = daylightSpan() ?: return
 
         val w = width.toFloat()
-        val padH = dp(34f)               // 양 끝 시각이 잘리지 않을 만큼
-        val baseY = height - dp(38f)
+        val padH = dp(30f)               // 양 끝 시각이 잘리지 않을 만큼
+        val baseY = height - dp(PAD_BOTTOM)
         val halfWidth = (w - padH * 2) / 2f
         val rise = w * ARC_RISE_RATIO
         val cx = w / 2f
@@ -95,6 +120,7 @@ class ShootingWindowView @JvmOverloads constructor(
         arcRect.set(cx - halfWidth, baseY - rise, cx + halfWidth, baseY + rise)
 
         drawArc(canvas, span)
+        drawMidday(canvas, baseY, cx, rise)
         drawEnds(canvas, baseY, cx, halfWidth)
         drawNow(canvas, span, baseY, cx, halfWidth, rise)
     }
@@ -119,23 +145,59 @@ class ShootingWindowView @JvmOverloads constructor(
         }
     }
 
-    /** 양 끝의 일출·일몰 시각. 이름은 달지 않습니다 — 위치가 곧 이름입니다. */
+    /**
+     * 호 꼭대기의 해와 "한낮".
+     *
+     * 호가 태양의 궤적이라는 것을 그림 스스로 말하게 합니다. 꼭대기가
+     * 남중(한낮)이라는 것을 알고 나면 좌우 어디쯤이 몇 시인지 감이 잡힙니다.
+     */
+    private fun drawMidday(canvas: Canvas, baseY: Float, cx: Float, rise: Float) {
+        val top = baseY - rise
+        val sunCy = top - dp(25f)
+        val r = dp(4f)
+
+        sunPaint.style = Paint.Style.STROKE
+        canvas.drawCircle(cx, sunCy, r, sunPaint)
+        for (i in 0 until 8) {
+            val angle = i * PI / 4
+            val sx = cx + (r + dp(2f)) * cos(angle).toFloat()
+            val sy = sunCy + (r + dp(2f)) * sin(angle).toFloat()
+            val ex = cx + (r + dp(4.5f)) * cos(angle).toFloat()
+            val ey = sunCy + (r + dp(4.5f)) * sin(angle).toFloat()
+            canvas.drawLine(sx, sy, ex, ey, sunPaint)
+        }
+
+        capPaint.color = textTertiary
+        canvas.drawText(
+            context.getString(R.string.detail_arc_midday),
+            cx, top - dp(4f), capPaint
+        )
+    }
+
+    /**
+     * 양 끝의 일출·일몰 — 시각을 굵게, 이름을 그 아래에.
+     *
+     * 시각이 먼저입니다. 이 그림에서 구하는 답은 "일출이 있다"가 아니라
+     * "몇 시인가"라서, 큰 글자를 숫자에 줍니다.
+     */
     private fun drawEnds(canvas: Canvas, baseY: Float, cx: Float, halfWidth: Float) {
         dotPaint.color = ContextCompat.getColor(context, R.color.light_sunrise)
         canvas.drawCircle(cx - halfWidth, baseY, dp(3.5f), dotPaint)
         dotPaint.color = ContextCompat.getColor(context, R.color.light_night)
         canvas.drawCircle(cx + halfWidth, baseY, dp(3.5f), dotPaint)
 
-        // 이름을 함께 답니다. 숫자만 두면 왼쪽이 일출인지 지금인지 헷갈립니다.
         timePaint.color = textTertiary
-        val y = baseY + dp(18f)
+        capPaint.color = textTertiary
+        val timeY = baseY + dp(16f)
+        val nameY = baseY + dp(29f)
+
+        canvas.drawText(sunTimes.sunrise?.formatted() ?: "—", cx - halfWidth, timeY, timePaint)
         canvas.drawText(
-            context.getString(R.string.sun_arc_sunrise, sunTimes.sunrise?.formatted() ?: "—"),
-            cx - halfWidth, y, timePaint
+            context.getString(R.string.detail_arc_sunrise), cx - halfWidth, nameY, capPaint
         )
+        canvas.drawText(sunTimes.sunset?.formatted() ?: "—", cx + halfWidth, timeY, timePaint)
         canvas.drawText(
-            context.getString(R.string.sun_arc_sunset, sunTimes.sunset?.formatted() ?: "—"),
-            cx + halfWidth, y, timePaint
+            context.getString(R.string.detail_arc_sunset), cx + halfWidth, nameY, capPaint
         )
     }
 
@@ -157,18 +219,31 @@ class ShootingWindowView @JvmOverloads constructor(
         val x = cx + halfWidth * cos(angle).toFloat()
         val y = baseY + rise * sin(angle).toFloat()
 
+        // 점에서 바닥까지 점선. 라벨이 점 바로 아래가 아니어도 이 선이 잇습니다.
+        canvas.drawLine(x, y + dp(9f), x, baseY + dp(4f), dashPaint)
+
         // 카드색 테두리를 둘러 호 위에서도 점이 또렷하게 보이게 합니다.
         dotPaint.color = cardColor
         canvas.drawCircle(x, y, dp(8f), dotPaint)
         dotPaint.color = nowColor
         canvas.drawCircle(x, y, dp(5.5f), dotPaint)
 
-        // 글자가 카드 밖으로 나가지 않게 가둡니다.
+        // 같은 줄의 일출·일몰 시각과 겹치지 않게 가둡니다. 이른 아침이나
+        // 해질 무렵에는 지금 점이 끝에 붙는데, 화면 폭만 기준으로 하면
+        // "05:54" 위에 "현재 08:34"가 포개져 둘 다 못 읽게 됩니다.
         val text = context.getString(R.string.detail_now_at, nowTime.formatted())
-        val clampedX = x.coerceIn(nowPaint.measureText(text) / 2f + dp(4f), width - nowPaint.measureText(text) / 2f - dp(4f))
+        val halfText = nowPaint.measureText(text) / 2f
+        val endHalf = timePaint.measureText("00:00") / 2f
+        val gap = dp(8f)
+        val leftLimit = cx - halfWidth + endHalf + halfText + gap
+        val rightLimit = cx + halfWidth - endHalf - halfText - gap
+        val clampedX = x.coerceIn(
+            leftLimit.coerceAtLeast(halfText + dp(4f)),
+            rightLimit.coerceAtMost(width - halfText - dp(4f))
+        )
 
         nowPaint.color = nowColor
-        canvas.drawText(text, clampedX, baseY + dp(18f), nowPaint)
+        canvas.drawText(text, clampedX, baseY + dp(16f), nowPaint)
     }
 
     /** 낮의 시작(자정 기준 분)과 길이. 둘 중 하나라도 없으면 그릴 수 없습니다. */
@@ -188,5 +263,11 @@ class ShootingWindowView @JvmOverloads constructor(
     private companion object {
         const val STEP = 5
         const val ARC_RISE_RATIO = 0.16f
+
+        /** 호 위 여백 — 해 아이콘과 "한낮"이 앉는 자리. */
+        const val PAD_TOP = 36f
+
+        /** 호 아래 여백 — 시각 한 줄 + 이름 한 줄. */
+        const val PAD_BOTTOM = 36f
     }
 }

@@ -351,7 +351,7 @@
       넣으면 안드로이드가 공백 하나로 합쳐 버려, 타일 폭에 맞춰 아무 데서나
       줄이 나뉩니다.
     -->
-    <string name="home_qa_course_desc">정읍의 야경·야간\n행사 일정을 한눈에</string>
+    <string name="home_qa_course_desc">해의 위치에 맞춘\n출사 동선 시간표</string>
     <string name="home_qa_map_desc">명소·포토존·맛집\n위치를 한눈에</string>
     <string name="home_qa_calendar_desc">출사 일정과\n축제·행사 일정 확인</string>
     <string name="home_qa_mission_desc">출사 미션 참여하고\n스탬프·배지 획득</string>
@@ -404,6 +404,57 @@
     <string name="detail_plan_saved">출사 일정을 저장했어요</string>
     <string name="detail_plan_failed">저장하지 못했어요</string>
     <string name="detail_score_title">오늘의 출사 적합도 %1$d점</string>
+
+    <!-- 상세 개편(시안) — 호 라벨 -->
+    <string name="detail_arc_sunrise">일출</string>
+    <string name="detail_arc_sunset">일몰</string>
+    <string name="detail_arc_midday">한낮</string>
+
+    <!-- 상세 개편(시안) — 히어로·날씨 -->
+    <string name="cd_favorite">찜하기</string>
+    <string name="cd_share">공유하기</string>
+    <string name="detail_favorited">찜한 촬영지에 담았어요</string>
+    <string name="detail_unfavorited">찜을 해제했어요</string>
+    <string name="detail_share_text">%1$s\n%2$s\n추천 촬영 %3$s · 정읍 시선</string>
+    <string name="detail_feels_short">체감 %1$d℃</string>
+    <string name="detail_humidity_short">💧 습도 %1$d%%</string>
+
+    <!-- 상세 개편(시안) — 추천 촬영 대상 -->
+    <string name="detail_fact_subject">추천 촬영 대상</string>
+    <string name="detail_facing_light">%1$s 빛</string>
+
+    <!-- 상세 개편(시안) — 구도·방향·인물 탭 -->
+    <string name="detail_tab_composition">구도</string>
+    <string name="detail_tab_direction">방향</string>
+    <string name="detail_tab_people">인물</string>
+    <string name="guide_comp_title_thirds">삼분할 구도</string>
+    <string name="guide_comp_title_symmetry">대칭 구도</string>
+    <string name="guide_comp_title_center">중앙 구도</string>
+    <string name="guide_comp_desc_thirds">화면을 3x3으로 나누고\n교차점에 피사체를 놓아보세요</string>
+    <string name="guide_comp_desc_symmetry">가운데 축을 기준으로\n좌우가 거울처럼 맞게 서 보세요</string>
+    <string name="guide_comp_desc_center">피사체를 한가운데 두고\n배경을 비워 시선을 모아보세요</string>
+    <string name="guide_comp_when">추천 상황</string>
+    <string name="guide_comp_when_thirds">한옥과 수면, 하늘의 균형을 잡고 싶을 때 좋아요.</string>
+    <string name="guide_comp_when_symmetry">문·회랑처럼 좌우가 반듯한 건축 앞에서 좋아요.</string>
+    <string name="guide_comp_when_center">피사체 하나가 화면을 이끌어야 할 때 좋아요.</string>
+    <string name="guide_comp_alt">다른 구도 제안</string>
+    <string name="guide_dir_title">추천 방향</string>
+    <string name="guide_dir_headline">%1$s · %2$s</string>
+    <string name="guide_dir_desc_west">해가 지는 방향의 부드러운 빛으로 실루엣과 반사를 살릴 수 있어요.</string>
+    <string name="guide_dir_desc_east">해가 떠오르는 방향이라 이른 아침의 사광이 정면으로 들어와요.</string>
+    <string name="guide_dir_desc_south">하루 내내 고르게 채광이 들어 형태와 색이 안정적으로 나와요.</string>
+    <string name="guide_dir_desc_north">직사광이 비껴가는 방향이라 부드럽고 균일한 빛을 받아요.</string>
+    <string name="guide_dir_desc_indoor">실내 촬영지라 방향보다 창가의 빛을 찾는 것이 중요해요.</string>
+    <string name="guide_dir_desc_any">방향을 크게 타지 않는 곳이라 어느 쪽에서든 담을 수 있어요.</string>
+    <string name="guide_people_title">사람을 찍을 때</string>
+    <string name="guide_people_1_label">인물 위치</string>
+    <string name="guide_people_1_desc">화면 가로 1/3 지점에 인물을 세워보세요</string>
+    <string name="guide_people_2_label">카메라 거리</string>
+    <string name="guide_people_2_desc">3–5m 떨어져 배경까지 함께 담으세요</string>
+    <string name="guide_people_3_label">빛은 뒤쪽에서</string>
+    <string name="guide_people_3_desc">인물에 자연광이 감싸도록 해를 등지게 하세요</string>
+    <string name="action_shoot_start">촬영 시작</string>
+    <string name="my_replay_onboarding">앱 사용법 다시 보기</string>
     <string name="detail_info_expand">더 알아보기 ▾</string>
     <string name="detail_info_collapse">접기 ▴</string>
 
