@@ -1,8 +1,10 @@
 package com.youngs.picview.util
 
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 
 /**
@@ -20,6 +22,25 @@ fun View.applyTopSystemBarInset() {
     ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
         val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
         v.updatePadding(top = basePadding + bars.top)
+        insets
+    }
+    ViewCompat.requestApplyInsets(this)
+}
+
+/**
+ * 상태바 높이만큼 위쪽 마진을 더합니다.
+ *
+ * 사진이 상태바 뒤까지 깔리는 히어로 화면에서 씁니다. 배경은 그대로
+ * 끝까지 차야 하고 **버튼만** 내려와야 하므로, 패딩을 쓰면 버튼의
+ * 배경(유리 원)까지 같이 늘어나 버립니다.
+ */
+fun View.applyTopSystemBarInsetAsMargin() {
+    val baseMargin = (layoutParams as ViewGroup.MarginLayoutParams).topMargin
+    ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+        val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+        v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            topMargin = baseMargin + bars.top
+        }
         insets
     }
     ViewCompat.requestApplyInsets(this)

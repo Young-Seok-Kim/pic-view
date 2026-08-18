@@ -23,6 +23,7 @@ import com.youngs.picview.databinding.FragmentMapBinding
 import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.domain.spot.SpotTheme
+import com.youngs.picview.util.applyTopSystemBarInset
 import android.graphics.PointF
 import androidx.annotation.DrawableRes
 import com.naver.maps.map.overlay.OverlayImage
@@ -49,6 +50,9 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentMapBinding.bind(view)
+
+        // 지도는 상태바 뒤까지 깔리고, 떠 있는 버튼 줄만 아래로 내립니다.
+        binding.layoutMapTopbar.applyTopSystemBarInset()
 
         locationSource = FusedLocationSource(this, 1000)
 
