@@ -7,7 +7,16 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import com.youngs.picview.domain.guide.SiseonGuide
+import com.youngs.picview.domain.light.LightPhase
+import com.youngs.picview.domain.spot.SpotFactsTable
+import com.youngs.picview.ui.main.MainViewModel
+import com.youngs.picview.util.PlanQuickSave
+import kotlinx.coroutines.launch
+import java.time.LocalTime
 import com.youngs.picview.MainActivity
 import com.youngs.picview.R
 import com.youngs.picview.databinding.FragmentDiaryBinding
@@ -30,6 +39,7 @@ class DiaryFragment : Fragment(R.layout.fragment_diary), MainActivity.TabRoot {
     private val binding get() = _binding!!
 
     private val viewModel: DiaryViewModel by viewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -41,7 +51,8 @@ class DiaryFragment : Fragment(R.layout.fragment_diary), MainActivity.TabRoot {
             onGenerate = { viewModel.generate(it) },
             onShare = { share(it) },
             onEdit = { showEditDialog(it) },
-            onPhotoClick = { openPhoto(it) }
+            onPhotoClick = { openPhoto(it) },
+            onPrepareNext = { rec -> prepareNext(rec) }
         )
         binding.rvDiary.adapter = adapter
 
@@ -50,10 +61,83 @@ class DiaryFragment : Fragment(R.layout.fragment_diary), MainActivity.TabRoot {
             binding.layoutDiaryEmpty.isVisible = days.isEmpty()
             binding.rvDiary.isVisible = days.isNotEmpty()
             binding.layoutDiaryHeader.isVisible = days.isNotEmpty()
+            if (days.isNotEmpty()) adapter.nextRec = buildNextRec(days)
+        }
+
+        mainViewModel.spotData.observe(viewLifecycleOwner) {
+            val days = viewModel.days.value.orEmpty()
+            if (days.isNotEmpty()) adapter.nextRec = buildNextRec(days)
         }
 
         viewModel.generating.observe(viewLifecycleOwner) { key ->
             adapter.generatingKey = key
+        }
+    }
+
+    // ───────────────────── 시선이의 다음 추천 ─────────────────────
+
+    /**
+     * 오늘의 기록에서 다음 출사 한 곳을 고릅니다.
+     *
+     * 결정론 계산입니다 — 이미 다녀온 곳은 빼고, 물가(반사)를 먼저,
+     * 없으면 점수 높은 곳을 고릅니다. 반사를 먼저 미는 이유는 기록의
+     * 다음 걸음으로 가장 실패가 적은 구도라서입니다. 문장과 시각은
+     * 그 장소의 촬영 특성과 천문값에서 나옵니다.
+     */
+    private fun buildNextRec(days: List<DiaryDay>): DiaryAdapter.NextRec? {
+        val spots = mainViewModel.spotData.value.orEmpty()
+            .filter { it.imageUrl.isNotBlank() }
+        if (spots.isEmpty()) return null
+
+        val visited = days.firstOrNull()?.visits?.map { it.title }.orEmpty().toSet()
+        val candidates = spots.filterNot { it.title in visited }.ifEmpty { spots }
+
+        val spot = candidates.firstOrNull {
+            SiseonGuide.guideIdFor(SpotFactsTable.of(it.title, it.contentTypeId)) == "reflection"
+        } ?: candidates.maxByOrNull { it.score } ?: return null
+
+        val facts = SpotFactsTable.of(spot.title, spot.contentTypeId)
+        val guideId = SiseonGuide.guideIdFor(facts)
+        val guide = SiseonGuide.byId(guideId)
+
+        val sun = mainViewModel.sunTimes
+        val at = when (facts.bestPhase) {
+            LightPhase.BLUE_DAWN -> sun.civilDawn ?: sun.sunrise?.minusMinutes(25)
+            LightPhase.SUNRISE -> sun.sunrise
+            LightPhase.MORNING -> sun.sunrise?.plusMinutes(60)
+            LightPhase.MIDDAY -> LocalTime.of(11, 0)
+            LightPhase.AFTERNOON -> LocalTime.of(14, 0)
+            LightPhase.SUNSET -> sun.sunset?.minusMinutes(40)
+            LightPhase.BLUE_DUSK -> sun.sunset
+            LightPhase.NIGHT -> sun.civilDusk ?: sun.sunset?.plusMinutes(30)
+        }
+        val timeLabel = at?.let {
+            val hhmm = "%02d:%02d".format(it.hour, it.minute)
+            getString(
+                R.string.diary_next_time,
+                if (it >= LocalTime.now()) getString(R.string.home_spot_time_today, hhmm)
+                else getString(R.string.home_spot_time_tomorrow, hhmm)
+            )
+        } ?: getString(R.string.diary_next_time, facts.bestPhase.shortLabel)
+
+        return DiaryAdapter.NextRec(
+            spot = spot,
+            headline = SiseonGuide.nextHeadlineFor(guideId),
+            compLabel = guide.title,
+            timeLabel = "⏱ $timeLabel",
+            desc = facts.note
+        )
+    }
+
+    /** "이 계획으로 출사 준비하기" — 한 곳짜리 출사 일정으로 저장합니다. */
+    private fun prepareNext(rec: DiaryAdapter.NextRec) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val saved = PlanQuickSave.save(requireContext(), rec.spot, mainViewModel.sunTimes)
+            Toast.makeText(
+                requireContext(),
+                if (saved) R.string.detail_plan_saved else R.string.detail_plan_failed,
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 

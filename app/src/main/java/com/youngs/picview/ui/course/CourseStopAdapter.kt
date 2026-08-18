@@ -9,6 +9,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.youngs.picview.R
 import com.youngs.picview.databinding.ItemCourseStopBinding
 import com.youngs.picview.domain.course.CourseStop
@@ -43,6 +44,18 @@ class CourseStopAdapter(
             // 노드 색 = 그 시간의 빛 색. 타임라인을 훑기만 해도 하루 흐름이 보입니다.
             viewStopNode.background?.mutate()
                 ?.setColorFilter(phaseColor, PorterDuff.Mode.SRC_IN)
+
+            // 축이 빛 구간의 이름을 직접 말합니다(시안 — 여명·골든아워·석양).
+            tvStopPhaseWord.text = stop.phase.shortLabel
+            tvStopPhaseWord.setTextColor(phaseColor)
+
+            // 관광공사 API 대표 사진 그대로.
+            Glide.with(ivStopPhoto)
+                .load(stop.spot.imageUrl.takeIf { it.isNotBlank() })
+                .placeholder(R.drawable.bg_image_placeholder)
+                .error(R.drawable.bg_image_placeholder)
+                .centerCrop()
+                .into(ivStopPhoto)
 
             // 마지막 정거장은 아래로 이어지는 선을 그리지 않습니다.
             viewStopLine.isVisible = position < itemCount - 1

@@ -14,14 +14,37 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import android.net.Uri
 import androidx.core.net.toUri
+import com.bumptech.glide.Glide
+import com.google.android.material.chip.Chip
+import com.youngs.picview.util.AppPrefs
 
 /** 날짜별 출사 기록 목록. */
 class DiaryAdapter(
     private val onGenerate: (DiaryDay) -> Unit,
     private val onShare: (DiaryDay) -> Unit,
     private val onEdit: (DiaryDay) -> Unit,
-    private val onPhotoClick: (Uri) -> Unit
+    private val onPhotoClick: (Uri) -> Unit,
+    private val onPrepareNext: (NextRec) -> Unit
 ) : ListAdapter<DiaryDay, DiaryAdapter.DayViewHolder>(DIFF) {
+
+    /**
+     * 시선이의 다음 추천 (시안).
+     * 가장 최근 기록 카드에만 붙습니다. 프래그먼트가 촬영지 목록과
+     * 천문값으로 계산해 넣어 줍니다.
+     */
+    data class NextRec(
+        val spot: com.youngs.picview.ui.model.SpotItem,
+        val headline: String,
+        val compLabel: String,
+        val timeLabel: String,
+        val desc: String
+    )
+
+    var nextRec: NextRec? = null
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
 
     /** 일기를 만들고 있는 날짜. 해당 카드만 로딩 표시합니다. */
     var generatingKey: String? = null
@@ -84,10 +107,64 @@ class DiaryAdapter(
 
             btnDiaryGenerate.setOnClickListener { onGenerate(day) }
             btnDiaryShare.setOnClickListener { onShare(day) }
+
+            renderFeelings(this, day)
+            renderNextRec(this, position)
         }
     }
 
+    /** 오늘의 감정 칩. 누르면 그 날짜에 저장됩니다. */
+    private fun renderFeelings(binding: ItemDiaryDayBinding, day: DiaryDay) {
+        val context = binding.root.context
+        val selected = AppPrefs.diaryFeelings(context, day.dateKey)
+
+        binding.chipsDiaryFeelings.removeAllViews()
+        FEELINGS.forEach { labelRes ->
+            val label = context.getString(labelRes)
+            binding.chipsDiaryFeelings.addView(
+                Chip(context).apply {
+                    text = label
+                    isCheckable = true
+                    isChecked = label in selected
+                    setOnClickListener {
+                        AppPrefs.toggleDiaryFeeling(context, day.dateKey, label)
+                    }
+                }
+            )
+        }
+    }
+
+    /** 가장 최근 카드에만 다음 추천을 붙입니다. */
+    private fun renderNextRec(binding: ItemDiaryDayBinding, position: Int) {
+        val rec = nextRec.takeIf { position == 0 }
+        binding.layoutDiaryNext.isVisible = rec != null
+        rec ?: return
+
+        binding.tvNextHeadline.text = rec.headline
+        binding.tvNextTitle.text = rec.spot.title
+        binding.tvNextComp.text = rec.compLabel
+        binding.tvNextTime.text = rec.timeLabel
+        binding.tvNextDesc.text = rec.desc
+
+        Glide.with(binding.ivNextPhoto)
+            .load(rec.spot.imageUrl.takeIf { it.isNotBlank() })
+            .placeholder(R.drawable.bg_image_placeholder)
+            .error(R.drawable.bg_image_placeholder)
+            .centerCrop()
+            .into(binding.ivNextPhoto)
+
+        binding.btnNextPrepare.setOnClickListener { onPrepareNext(rec) }
+    }
+
     companion object {
+        /** 시안의 감정 넷. */
+        private val FEELINGS = listOf(
+            R.string.diary_feeling_warm,
+            R.string.diary_feeling_calm,
+            R.string.diary_feeling_full,
+            R.string.diary_feeling_flutter
+        )
+
         private val DATE: DateTimeFormatter =
             DateTimeFormatter.ofPattern("M월 d일 (E)", Locale.KOREAN)
         private val TIME: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")

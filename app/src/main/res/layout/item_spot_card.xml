@@ -1,122 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  탐색 '빛이 맞는 출사' 카드 (시안).
+
+  전 카드는 사진 위에 이름을 얹은 포스터형이었습니다. 시안은 사진과
+  글을 나눕니다 — 사진은 관광공사 실사진 그대로 두고, 아래에서
+  빛 신호 → 이름 → 이유 → 구도·거리 → 시선 가이드 순서로 답합니다.
+  "여기가 예쁘다"가 아니라 "지금 이 빛에 여기서 무엇을 찍나"의 순서입니다.
+-->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="200dp"
+    android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/screen_padding"
     android:layout_marginVertical="7dp"
     android:clickable="true"
     android:focusable="true"
-    app:cardBackgroundColor="@color/bg_image_placeholder"
+    app:cardBackgroundColor="@color/bg_card"
     app:cardCornerRadius="@dimen/radius_card"
-    app:cardElevation="3dp"
-    app:rippleColor="#33FFFFFF"
-    app:strokeWidth="0dp">
+    app:cardElevation="0dp"
+    app:rippleColor="#22000000"
+    app:strokeColor="@color/card_stroke"
+    app:strokeWidth="1dp">
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/iv_spot_image"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="164dp"
+            android:background="@color/bg_image_placeholder"
             android:contentDescription="@string/cd_spot_thumbnail"
             android:scaleType="centerCrop"
             tools:src="@tools:sample/backgrounds/scenic" />
 
-        <!-- 텍스트 가독성을 위한 하단 스크림 -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:layout_gravity="bottom"
-            android:background="@drawable/bg_scrim_bottom" />
-
-        <!-- 포토스코어 배지 -->
         <LinearLayout
-            android:id="@+id/layout_score"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="top|end"
-            android:layout_margin="12dp"
-            android:background="@drawable/bg_score_badge"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="6dp">
+            android:orientation="vertical"
+            android:padding="@dimen/space_l">
 
-            <ImageView
-                android:layout_width="13dp"
-                android:layout_height="13dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_star"
-                app:tint="@color/golden_300" />
-
+            <!-- 빛 신호 — 이 장소의 빛이 지금 어떤 얼굴인지 한 마디. -->
             <TextView
-                android:id="@+id/tv_spot_score"
+                android:id="@+id/tv_spot_signal"
+                style="@style/Text.Caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_caption"
+                android:background="@drawable/bg_phase_badge"
+                android:paddingHorizontal="@dimen/space_s"
+                android:paddingVertical="2dp"
+                android:textColor="@color/maple_600"
                 android:textStyle="bold"
-                tools:text="87" />
-        </LinearLayout>
-
-        <!-- 제목 / 주소 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:orientation="vertical"
-            android:paddingHorizontal="18dp"
-            android:paddingBottom="16dp">
+                tools:text="일몰 · 따뜻한 사광" />
 
             <TextView
                 android:id="@+id/tv_spot_title"
+                style="@style/Text.SectionTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xs"
                 android:ellipsize="end"
-                android:letterSpacing="-0.02"
                 android:maxLines="1"
-                android:shadowColor="#80000000"
-                android:shadowDx="0"
-                android:shadowDy="1"
-                android:shadowRadius="5"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_title"
-                android:textStyle="bold"
                 tools:text="내장산 국립공원" />
+
+            <TextView
+                android:id="@+id/tv_spot_reason"
+                style="@style/Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textColor="@color/text_secondary"
+                tools:text="단풍터널은 역광이 살아나는 늦은 오후가 절정이에요" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="@dimen/space_m"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <ImageView
-                    android:layout_width="13dp"
-                    android:layout_height="13dp"
-                    android:alpha="0.85"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_place"
-                    app:tint="@color/white" />
-
-                <TextView
-                    android:id="@+id/tv_spot_address"
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
                     android:layout_weight="1"
-                    android:alpha="0.85"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:textColor="@color/white"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_spot_guide_line"
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_secondary"
+                        tools:text="구도 삼분할 격자" />
+
+                    <TextView
+                        android:id="@+id/tv_spot_travel"
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_secondary"
+                        tools:text="🚗 차로 25분" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_spot_guide"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="0dp"
+                    android:minHeight="40dp"
+                    android:paddingHorizontal="@dimen/space_m"
+                    android:text="@string/home_guide_open"
+                    android:textColor="@color/maple_600"
                     android:textSize="@dimen/text_caption"
-                    tools:text="전북 정읍시 내장산로 936" />
+                    app:cornerRadius="@dimen/radius_button"
+                    app:strokeColor="@color/maple_300" />
             </LinearLayout>
         </LinearLayout>
-    </FrameLayout>
+    </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -23,6 +23,7 @@ object AppPrefs {
     private const val KEY_ONBOARDED = "onboarding_done"
     private const val KEY_INSTALL_ID = "install_id"
     private const val KEY_FAVORITES = "favorite_spots"
+    private const val KEY_DIARY_FEELING_PREFIX = "diary_feelings_"
 
     private fun prefs(context: Context): SharedPreferences =
         context.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -72,6 +73,25 @@ object AppPrefs {
         if (nowFavorite) current.add(contentId)
         prefs(context).edit().putStringSet(KEY_FAVORITES, current).apply()
         return nowFavorite
+    }
+
+    /**
+     * 그날의 감정 태그(시안 — 오늘의 감정).
+     *
+     * 일기 본문과 달리 감정은 고르는 것이라 글자로 안 쓰게 됩니다.
+     * 날짜 키별 집합으로 단말에만 남습니다.
+     */
+    fun diaryFeelings(context: Context, dateKey: String): Set<String> =
+        prefs(context).getStringSet(KEY_DIARY_FEELING_PREFIX + dateKey, emptySet()) ?: emptySet()
+
+    /** 감정을 토글하고 토글 후 집합을 돌려줍니다. */
+    fun toggleDiaryFeeling(context: Context, dateKey: String, feeling: String): Set<String> {
+        val current = diaryFeelings(context, dateKey).toMutableSet()
+        if (!current.remove(feeling)) current.add(feeling)
+        prefs(context).edit()
+            .putStringSet(KEY_DIARY_FEELING_PREFIX + dateKey, current)
+            .apply()
+        return current
     }
 
     /**

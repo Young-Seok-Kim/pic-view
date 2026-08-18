@@ -118,6 +118,27 @@
     <string name="home_open_map">지도</string>
     <string name="home_open_explore">촬영지 전체</string>
     <string name="home_best_now">지금 가면 좋은 곳</string>
+
+    <!-- 탐색 — 빛이 맞는 출사 (시안 LIGHT MATCH 탐색 화면) -->
+    <string name="explore_title">빛이 맞는 출사</string>
+    <string name="explore_sub">정읍 시선이 추천하는 오늘의 장소</string>
+    <string name="sort_reco">추천순</string>
+    <string name="sort_dist">거리순</string>
+    <string name="sort_light">빛 좋은 시간순</string>
+    <string name="map_expand">지도 확대</string>
+    <string name="cd_category_filter">카테고리 필터</string>
+    <string name="spot_travel_car">🚗 차로 %1$d분</string>
+    <string name="spot_guide_line">구도 %1$s</string>
+
+    <!-- 일기 — 감정과 다음 추천 (시안) -->
+    <string name="diary_feelings_label">오늘의 감정</string>
+    <string name="diary_next_eyebrow">시선이의 다음 추천</string>
+    <string name="diary_next_time">추천 시간 %1$s</string>
+    <string name="diary_next_prepare">이 계획으로 출사 준비하기</string>
+    <string name="diary_feeling_warm">♡ 따뜻해요</string>
+    <string name="diary_feeling_calm">≈ 평온해요</string>
+    <string name="diary_feeling_full">✦ 충만해요</string>
+    <string name="diary_feeling_flutter">❀ 설레어요</string>
     <string name="home_best_eyebrow">NEXT PHOTO · LIGHT MATCH</string>
     <string name="home_spot_time_today">오늘 %1$s</string>
     <string name="home_spot_time_tomorrow">내일 %1$s</string>
