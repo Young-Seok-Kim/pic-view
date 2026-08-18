@@ -14,6 +14,7 @@ import com.youngs.picview.data.local.SavedCourseWithStops
 import com.youngs.picview.ui.course.CourseResultFragment
 import com.youngs.picview.databinding.FragmentMyBinding
 import com.youngs.picview.ui.mission.MissionFragment
+import com.youngs.picview.ui.onboarding.OnboardingActivity
 import com.youngs.picview.util.AppPrefs
 import com.youngs.picview.util.FontStep
 
@@ -51,6 +52,11 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
         setupCourses()
         setupSeniorToggle()
         setupFontSize()
+
+        // 온보딩 다시 보기 — 처음 봤던 그 화면을 그대로 다시 띄웁니다.
+        binding.btnReplayOnboarding.setOnClickListener {
+            startActivity(OnboardingActivity.reviewIntent(requireContext()))
+        }
 
         binding.tvMyFooter.text = getString(R.string.my_footer, BuildConfig.VERSION_NAME)
     }

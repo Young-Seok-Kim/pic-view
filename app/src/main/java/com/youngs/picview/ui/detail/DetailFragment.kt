@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
+import com.bumptech.glide.Glide
 import com.youngs.picview.BuildConfig
 import com.youngs.picview.MainActivity
 import com.youngs.picview.R
@@ -22,6 +23,7 @@ import com.youngs.picview.data.repository.CourseRepository
 import com.youngs.picview.data.repository.DiaryRepository
 import com.google.android.material.chip.Chip
 import com.youngs.picview.databinding.FragmentDetailBinding
+import com.youngs.picview.databinding.ItemPeopleTipBinding
 import com.youngs.picview.databinding.ItemScoreFactorBinding
 import com.youngs.picview.databinding.ItemVisitRowBinding
 import com.youngs.picview.domain.course.CourseStop
@@ -175,6 +177,45 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
         }
 
         binding.btnNavigate.setOnClickListener { openNavigation(spot) }
+        setupFavorite(spot)
+        binding.btnShare.setOnClickListener { shareSpot(spot) }
+    }
+
+    // ───────────────────── 찜 · 공유 ─────────────────────
+
+    /** 하트 토글. 계정이 없으므로 단말(AppPrefs)에만 남습니다. */
+    private fun setupFavorite(spot: SpotItem) {
+        fun render(favorite: Boolean) {
+            binding.btnFavorite.setImageResource(
+                if (favorite) R.drawable.ic_heart_filled else R.drawable.ic_heart
+            )
+        }
+        render(AppPrefs.isFavorite(requireContext(), spot.contentId))
+
+        binding.btnFavorite.setOnClickListener {
+            val favorite = AppPrefs.toggleFavorite(requireContext(), spot.contentId)
+            render(favorite)
+            Toast.makeText(
+                requireContext(),
+                if (favorite) R.string.detail_favorited else R.string.detail_unfavorited,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    /** 장소명·주소·추천 시간을 문자 그대로 공유합니다. */
+    private fun shareSpot(spot: SpotItem) {
+        val text = getString(
+            R.string.detail_share_text,
+            spot.title,
+            spot.addr1,
+            binding.tvDetailBestTime.text
+        )
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text)
+        }
+        startActivity(Intent.createChooser(intent, spot.title))
     }
 
     // ───────────────────── 방문 기록 ─────────────────────
@@ -282,10 +323,16 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
             getString(R.string.detail_window_range, it.start.hhmm(), it.end.hhmm())
         } ?: getString(R.string.course_sun_unknown)
 
-        binding.tvDetailFacing.text = facts.facing.label
+        // "서향"은 지도의 말이고 "서향 빛"이 사진의 말입니다(시안 표기).
+        // 실내·무관은 빛의 방향이 없으므로 이름 그대로 둡니다.
+        binding.tvDetailFacing.text = if (facts.facing.bearing != null) {
+            getString(R.string.detail_facing_light, facts.facing.label)
+        } else {
+            facts.facing.label
+        }
 
-        val feels = mainViewModel.feelsLikeC.value
-        binding.tvDetailFeels.text = feels?.let { "${it.roundToInt()}°" } ?: "—"
+        // 가운데 칸은 시안대로 "이 시간에 무엇을 담게 되는가"입니다.
+        binding.tvDetailSubject.text = phase.subject
 
         // 날씨가 구도를 바꿉니다. 흐린 날의 정면 촬영과 맑은 날의 넓은
         // 풍경은 같은 장소에서도 다른 사진이 됩니다.
@@ -304,33 +351,78 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
             )
         } ?: getString(R.string.course_sun_unknown)
         binding.tvDetailFactsNote.text = advice.action
-        renderShotTokens(advice.guide, facts.facing, phase)
+        renderGuideTabs(facts, advice.guide, phase)
 
         renderLiveWeather(sky, advice)
         binding.btnSavePlan.setOnClickListener { savePlan(spot, facts) }
     }
 
     /**
-     * 구도 · 방향 · 빛을 같은 모양의 조각 셋으로 답니다.
+     * 구도 · 방향 · 인물 탭 (시안의 촬영 가이드).
      *
-     * 예전에는 "📷 추천 구도 · 삼분할 격자" 알약 하나였습니다. 구도는
-     * 말했지만 방향과 빛은 위 문장 어딘가에 섞여 있어서, 현장에서 셋을
-     * 한꺼번에 떠올리기 어려웠습니다.
+     * 예전에는 셋을 알약 세 개로 요약만 했습니다. 이름은 알려 주지만
+     * 현장에서 필요한 것은 "그래서 어떻게 서고 어디를 보나"라서,
+     * 탭 하나가 물음 하나에 답하도록 폈습니다.
      *
-     * 구도가 날씨에 따라 바뀌므로([WeatherAdviser]) 첫 조각도 함께 바뀝니다.
+     * 구도가 날씨에 따라 바뀌므로([WeatherAdviser]) 구도 탭 내용도 함께
+     * 바뀝니다.
      */
-    private fun renderShotTokens(
+    private fun renderGuideTabs(
+        facts: SpotFacts,
         guide: GuideOverlayView.GuideType,
-        facing: Facing,
         phase: LightPhase
     ) {
-        val group = binding.chipsShotTokens
-        group.removeAllViews()
+        binding.toggleGuideTabs.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (!isChecked) return@addOnButtonCheckedListener
+            binding.layoutGuideComposition.isVisible = checkedId == R.id.btn_tab_composition
+            binding.layoutGuideDirection.isVisible = checkedId == R.id.btn_tab_direction
+            binding.layoutGuidePeople.isVisible = checkedId == R.id.btn_tab_people
+        }
 
-        ShotTokens.setOf(guide, facing, phase).forEach { token ->
+        renderCompositionTab(guide)
+        renderDirectionTab(facts.facing, phase)
+        renderPeopleTab()
+    }
+
+    /** 구도 탭 — 이 장소 사진 위에 실제 가이드 선을 얹어 보여 줍니다. */
+    private fun renderCompositionTab(guide: GuideOverlayView.GuideType) {
+        binding.viewCompOverlay.guideType = guide
+
+        binding.tvCompTitle.setText(
+            when (guide) {
+                GuideOverlayView.GuideType.THIRDS -> R.string.guide_comp_title_thirds
+                GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_comp_title_symmetry
+                GuideOverlayView.GuideType.CENTER -> R.string.guide_comp_title_center
+            }
+        )
+        binding.tvCompDesc.setText(
+            when (guide) {
+                GuideOverlayView.GuideType.THIRDS -> R.string.guide_comp_desc_thirds
+                GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_comp_desc_symmetry
+                GuideOverlayView.GuideType.CENTER -> R.string.guide_comp_desc_center
+            }
+        )
+        binding.tvCompWhen.setText(
+            when (guide) {
+                GuideOverlayView.GuideType.THIRDS -> R.string.guide_comp_when_thirds
+                GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_comp_when_symmetry
+                GuideOverlayView.GuideType.CENTER -> R.string.guide_comp_when_center
+            }
+        )
+
+        // 다른 구도 제안 — 지금 것을 뺀 나머지 구도와, 각도·역광 계열 제안.
+        val alternatives =
+            GuideOverlayView.GuideType.entries
+                .filter { it != guide }
+                .map { ShotTokens.of(it).text } +
+                listOf("⛰ 낮은 각도", "◐ 실루엣")
+
+        val group = binding.chipsCompAlt
+        group.removeAllViews()
+        alternatives.forEach { label ->
             group.addView(
                 Chip(requireContext()).apply {
-                    text = token.text
+                    text = label
                     isClickable = false
                     isCheckable = false
                     chipBackgroundColor = null
@@ -342,6 +434,52 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                     setEnsureMinTouchTargetSize(false)
                 }
             )
+        }
+    }
+
+    /** 방향 탭 — 나침반 위에 촬영 방향을 켭니다. */
+    private fun renderDirectionTab(facing: Facing, phase: LightPhase) {
+        // 실내·무관은 가리킬 방위가 없습니다. 나침반을 빈 채로 두면
+        // "고장난 그림"으로 읽히므로 그림 자체를 뺍니다.
+        binding.viewFacingCompass.isVisible = facing.bearing != null
+        binding.viewFacingCompass.facing = facing
+
+        val timeWord = when (phase) {
+            LightPhase.SUNRISE, LightPhase.BLUE_DAWN -> "해뜰 무렵"
+            LightPhase.SUNSET, LightPhase.BLUE_DUSK -> "해질 무렵"
+            else -> phase.label
+        }
+        binding.tvDirHeadline.text =
+            getString(R.string.guide_dir_headline, facing.label, timeWord)
+
+        binding.tvDirDesc.setText(
+            when (facing) {
+                Facing.WEST -> R.string.guide_dir_desc_west
+                Facing.EAST -> R.string.guide_dir_desc_east
+                Facing.SOUTH -> R.string.guide_dir_desc_south
+                Facing.NORTH -> R.string.guide_dir_desc_north
+                Facing.INDOOR -> R.string.guide_dir_desc_indoor
+                Facing.ANY -> R.string.guide_dir_desc_any
+            }
+        )
+    }
+
+    /** 인물 탭 — 시안의 번호 팁 세 줄. */
+    private fun renderPeopleTab() {
+        val container = binding.layoutGuidePeople
+        if (container.childCount > 0) return
+
+        val tips = listOf(
+            R.string.guide_people_1_label to R.string.guide_people_1_desc,
+            R.string.guide_people_2_label to R.string.guide_people_2_desc,
+            R.string.guide_people_3_label to R.string.guide_people_3_desc
+        )
+        tips.forEachIndexed { index, (labelRes, descRes) ->
+            val row = ItemPeopleTipBinding.inflate(layoutInflater, container, false)
+            row.tvTipNumber.text = (index + 1).toString()
+            row.tvTipLabel.setText(labelRes)
+            row.tvTipDesc.setText(descRes)
+            container.addView(row.root)
         }
     }
 
@@ -401,10 +539,18 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
             skyLabel
         }
 
-        binding.tvLiveNote.text = if (feels != null) {
-            getString(R.string.detail_live_note, feels.roundToInt(), advice.headline)
-        } else {
-            advice.headline
+        // 체감·습도는 시안대로 오른쪽 숫자 열에 모읍니다. 왼쪽 문장에는
+        // 날씨가 사진을 어떻게 바꾸는지 한 줄만 남깁니다.
+        binding.tvLiveNote.text = advice.headline
+
+        binding.tvLiveFeels.isVisible = feels != null
+        feels?.let {
+            binding.tvLiveFeels.text = getString(R.string.detail_feels_short, it.roundToInt())
+        }
+        binding.tvLiveHumidity.isVisible = humidity != null
+        humidity?.let {
+            binding.tvLiveHumidity.text =
+                getString(R.string.detail_humidity_short, it.roundToInt())
         }
     }
 
@@ -469,14 +615,6 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
             ).show()
         }
     }
-
-    private fun guideName(type: GuideOverlayView.GuideType): String = getString(
-        when (type) {
-            GuideOverlayView.GuideType.THIRDS -> R.string.guide_name_thirds
-            GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_name_symmetry
-            GuideOverlayView.GuideType.CENTER -> R.string.guide_name_center
-        }
-    )
 
     // ───────────────────── 포토스코어 근거 ─────────────────────
 
@@ -642,6 +780,13 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
         binding.vpDetailImages.isVisible = true
         binding.layoutNoImage.isVisible = false
         binding.vpDetailImages.adapter = ImagePagerAdapter(list)
+
+        // 구도 탭의 예시 컷 — 이 장소의 첫 사진 위에 가이드 선을 얹습니다.
+        // 남의 장소 사진으로 설명하면 "여기서 이렇게"가 아니게 됩니다.
+        Glide.with(this)
+            .load(list.first().originImgUrl)
+            .centerCrop()
+            .into(binding.ivCompSample)
 
         buildIndicator(list.size)
         updatePageUi(0, list.size)

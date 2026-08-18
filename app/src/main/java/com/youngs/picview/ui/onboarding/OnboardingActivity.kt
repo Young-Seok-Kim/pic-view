@@ -71,7 +71,11 @@ class OnboardingActivity : AppCompatActivity() {
     }
 
     private fun setupActions() {
-        binding.btnOnboardingSkip.setOnClickListener { finishOnboarding(senior = false) }
+        binding.btnOnboardingSkip.setOnClickListener {
+            // 다시 보기로 왔으면 설정을 건드리지 않고 조용히 닫습니다.
+            if (intent.getBooleanExtra(EXTRA_REVIEW, false)) finish()
+            else finishOnboarding(senior = false)
+        }
 
         binding.btnOnboardingNext.setOnClickListener {
             binding.pagerOnboarding.currentItem = binding.pagerOnboarding.currentItem + 1
@@ -198,6 +202,18 @@ class OnboardingActivity : AppCompatActivity() {
             )
         )
 
+        private const val EXTRA_REVIEW = "review"
+
         fun intent(context: Context) = Intent(context, OnboardingActivity::class.java)
+
+        /**
+         * MY 탭의 "앱 사용법 다시 보기".
+         *
+         * 첫 실행과 같은 화면이지만, 건너뛰기가 모드를 바꾸거나 앱을 다시
+         * 시작하지 않고 그냥 닫힙니다 — 보러 온 것이지 설정하러 온 것이
+         * 아니라서입니다. 마지막 장의 모드 버튼은 그대로 동작합니다.
+         */
+        fun reviewIntent(context: Context): Intent =
+            intent(context).putExtra(EXTRA_REVIEW, true)
     }
 }

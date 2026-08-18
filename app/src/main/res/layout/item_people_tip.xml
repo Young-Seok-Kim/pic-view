@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 인물 탭의 번호 팁 한 줄: ① 라벨 + 설명 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    android:baselineAligned="false"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/tv_tip_number"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/bg_score_chip"
+        android:gravity="center"
+        android:textColor="@color/maple_700"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        tools:text="1" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_tip_label"
+            style="@style/Text.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/maple_700"
+            android:textStyle="bold"
+            tools:text="인물 위치" />
+
+        <TextView
+            android:id="@+id/tv_tip_desc"
+            style="@style/Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="화면 가로 1/3 지점에 인물을 세워보세요" />
+    </LinearLayout>
+</LinearLayout>

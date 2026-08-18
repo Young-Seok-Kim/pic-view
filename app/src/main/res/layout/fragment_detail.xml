@@ -21,10 +21,16 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- ================= 히어로 이미지 ================= -->
+            <!--
+              ================= 히어로 이미지 =================
+
+              시안(상세 개편안)대로 장소명·주소·점수를 사진 위에 얹습니다.
+              사진 아래 흰 여백에 두면 첫 화면에서 사진과 이름이 분리돼
+              "이 사진이 그 장소"라는 연결을 눈이 다시 만들어야 합니다.
+            -->
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="330dp"
+                android:layout_height="380dp"
                 android:background="@color/bg_image_placeholder">
 
                 <androidx.viewpager2.widget.ViewPager2
@@ -76,6 +82,47 @@
                     android:src="@drawable/ic_arrow_back"
                     app:tint="@color/white" />
 
+                <!-- 찜·공유·길찾기. 시안의 오른쪽 위 동그라미 버튼 자리입니다. -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|end"
+                    android:layout_margin="@dimen/space_m"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/btn_favorite"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_glass_circle"
+                        android:contentDescription="@string/cd_favorite"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_heart"
+                        app:tint="@color/white" />
+
+                    <ImageView
+                        android:id="@+id/btn_share"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="@dimen/space_s"
+                        android:background="@drawable/bg_glass_circle"
+                        android:contentDescription="@string/cd_share"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_share"
+                        app:tint="@color/white" />
+
+                    <ImageView
+                        android:id="@+id/btn_navigate"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="@dimen/space_s"
+                        android:background="@drawable/bg_glass_circle"
+                        android:contentDescription="@string/action_navigate"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_directions"
+                        app:tint="@color/white" />
+                </LinearLayout>
+
                 <com.google.android.material.progressindicator.CircularProgressIndicator
                     android:id="@+id/progressBar"
                     android:layout_width="wrap_content"
@@ -111,13 +158,106 @@
                     android:visibility="gone"
                     app:tint="@color/white" />
 
-                <!-- 페이지 인디케이터 -->
+                <!-- 아래 스크림 — 사진 위 글자가 어떤 사진에서도 읽히게. -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    android:layout_gravity="bottom"
+                    android:background="@drawable/bg_scrim_bottom" />
+
+                <!-- 장소명·주소·점수. 시안대로 사진 위에 얹습니다. -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="24dp"
+                    android:paddingBottom="20dp">
+
+                    <LinearLayout
+                        android:id="@+id/layout_detail_score"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/space_m"
+                        android:background="@drawable/bg_score_chip"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="11dp"
+                        android:paddingVertical="6dp"
+                        tools:visibility="visible">
+
+                        <ImageView
+                            android:layout_width="13dp"
+                            android:layout_height="13dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_star"
+                            app:tint="@color/score_chip_icon" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:text="@string/detail_photo_score"
+                            android:textColor="@color/score_chip_text"
+                            android:textSize="@dimen/text_caption" />
+
+                        <TextView
+                            android:id="@+id/tv_detail_score"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:textColor="@color/score_chip_text"
+                            android:textSize="@dimen/text_caption"
+                            android:textStyle="bold"
+                            tools:text="92" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_detail_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="-0.02"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_display"
+                        android:textStyle="bold"
+                        tools:text="내장산 국립공원" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_s"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_marginTop="2dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_place"
+                            app:tint="#CCFFFFFF" />
+
+                        <TextView
+                            android:id="@+id/tv_detail_address"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:layout_weight="1"
+                            android:textColor="#E6FFFFFF"
+                            android:textSize="@dimen/text_body"
+                            tools:text="전북특별자치도 정읍시 내장산로 936" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!--
+                  페이지 인디케이터. 가운데 아래는 이제 장소명이 차지하므로
+                  오른쪽 아래 구석으로 비켜 둡니다.
+                -->
                 <LinearLayout
                     android:id="@+id/layout_indicator"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|center_horizontal"
-                    android:layout_marginBottom="18dp"
+                    android:layout_gravity="top|center_horizontal"
+                    android:layout_marginTop="18dp"
                     android:gravity="center"
                     android:orientation="horizontal" />
             </FrameLayout>
@@ -130,80 +270,6 @@
                 android:orientation="vertical"
                 android:paddingHorizontal="24dp"
                 android:paddingTop="24dp">
-
-                <!-- 포토스코어 배지 -->
-                <LinearLayout
-                    android:id="@+id/layout_detail_score"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/space_m"
-                    android:background="@drawable/bg_score_chip"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="11dp"
-                    android:paddingVertical="6dp"
-                    tools:visibility="visible">
-
-                    <ImageView
-                        android:layout_width="13dp"
-                        android:layout_height="13dp"
-                        android:contentDescription="@null"
-                        android:src="@drawable/ic_star"
-                        app:tint="@color/score_chip_icon" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:text="@string/detail_photo_score"
-                        android:textColor="@color/score_chip_text"
-                        android:textSize="@dimen/text_caption" />
-
-                    <TextView
-                        android:id="@+id/tv_detail_score"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:textColor="@color/score_chip_text"
-                        android:textSize="@dimen/text_caption"
-                        android:textStyle="bold"
-                        tools:text="92" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/tv_detail_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:letterSpacing="-0.02"
-                    android:textColor="@color/text_primary"
-                    android:textSize="@dimen/text_display"
-                    android:textStyle="bold"
-                    tools:text="내장산 국립공원" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_s"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:layout_marginTop="2dp"
-                        android:contentDescription="@null"
-                        android:src="@drawable/ic_place"
-                        app:tint="@color/text_tertiary" />
-
-                    <TextView
-                        android:id="@+id/tv_detail_address"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:layout_weight="1"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="@dimen/text_body"
-                        tools:text="전북특별자치도 정읍시 내장산로 936" />
-                </LinearLayout>
 
                 <!--
                   ============ 지금 이 자리의 날씨 ============
@@ -264,15 +330,43 @@
                                 tools:text="체감 29℃ · 구름 사이로 짧은 빛이 들어와요" />
                         </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/tv_live_temp"
+                        <!--
+                          오른쪽 열 — 큰 온도 아래 체감·습도.
+                          시안대로 숫자 셋을 한 열에 모읍니다. 체감이 왼쪽 문장에
+                          섞여 있으면 "지금 몇 도인가"를 두 번 읽게 됩니다.
+                        -->
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/space_m"
-                            android:textColor="@color/white"
-                            android:textSize="@dimen/text_display"
-                            android:textStyle="bold"
-                            tools:text="26°" />
+                            android:gravity="end"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tv_live_temp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/text_display"
+                                android:textStyle="bold"
+                                tools:text="26°" />
+
+                            <TextView
+                                android:id="@+id/tv_live_feels"
+                                style="@style/Text.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="#B3FFFFFF"
+                                tools:text="체감 29℃" />
+
+                            <TextView
+                                android:id="@+id/tv_live_humidity"
+                                style="@style/Text.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="#B3FFFFFF"
+                                tools:text="💧 습도 82%" />
+                        </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -372,11 +466,16 @@
                                     tools:text="18:21-19:21" />
                             </LinearLayout>
 
+                            <!--
+                              가운데 칸은 시안대로 "추천 촬영 대상"입니다.
+                              체감온도는 위 날씨 카드가 이미 말하므로 여기서
+                              또 말하면 같은 숫자가 두 카드에 남습니다.
+                            -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginHorizontal="4dp"
-                                android:layout_weight="1"
+                                android:layout_weight="1.4"
                                 android:background="@drawable/bg_detail_fact"
                                 android:orientation="vertical"
                                 android:padding="@dimen/space_m">
@@ -385,17 +484,18 @@
                                     style="@style/Text.Caption"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="@string/home_stat_feels"
+                                    android:text="@string/detail_fact_subject"
                                     android:textColor="@color/maple_600"
                                     android:textSize="10sp" />
 
                                 <TextView
-                                    android:id="@+id/tv_detail_feels"
-                                    style="@style/Text.SectionTitle"
+                                    android:id="@+id/tv_detail_subject"
+                                    style="@style/Text.Body"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:textColor="@color/maple_800"
-                                    tools:text="29°" />
+                                    android:textStyle="bold"
+                                    tools:text="한옥 지붕선 / 실루엣" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -437,34 +537,202 @@
                             android:textColor="@color/maple_800"
                             tools:text="자연 풍경은 해질 무렵 색이 가장 깊어져요" />
 
-                        <!--
-                          촬영 제안 토큰.
-                          구도·방향·빛을 문장으로 흩어 놓으면 그때마다 다시
-                          해석해야 합니다. 같은 모양의 조각으로 묶어 두면
-                          한 번 배운 것을 계속 씁니다.
-                        -->
-                        <com.google.android.material.chip.ChipGroup
-                            android:id="@+id/chips_shot_tokens"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_m"
-                            app:chipSpacingHorizontal="6dp"
-                            app:chipSpacingVertical="0dp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                        <!--
-                          촬영 전 계획을 위한 보조 행동이라 하단 CTA 가 아니라
-                          이 카드 안에 둡니다. 하단은 "지금 움직인다"(촬영·길찾기)
-                          자리이고, 여기는 "나중에 온다" 자리입니다.
-                        -->
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btn_save_plan"
-                            style="@style/Widget.Material3.Button.OutlinedButton"
+                <!--
+                  ============ 촬영 가이드 : 구도 · 방향 · 인물 ============
+
+                  시안의 탭 셋입니다. 예전에는 구도·방향·빛이 알약 세 개로
+                  요약만 됐는데, 현장에서 필요한 것은 이름이 아니라
+                  "그래서 어떻게 서고 어디를 보나"입니다. 탭 하나가 물음
+                  하나에 답합니다.
+                -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Card.Elevated"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_l"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/space_l">
+
+                        <com.google.android.material.button.MaterialButtonToggleGroup
+                            android:id="@+id/toggle_guide_tabs"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_m"
-                            android:text="@string/detail_save_plan"
-                            android:textColor="@color/maple_700"
-                            app:strokeColor="@color/maple_300" />
+                            app:checkedButton="@id/btn_tab_composition"
+                            app:selectionRequired="true"
+                            app:singleSelection="true">
+
+                            <Button
+                                android:id="@+id/btn_tab_composition"
+                                style="?attr/materialButtonOutlinedStyle"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/detail_tab_composition" />
+
+                            <Button
+                                android:id="@+id/btn_tab_direction"
+                                style="?attr/materialButtonOutlinedStyle"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/detail_tab_direction" />
+
+                            <Button
+                                android:id="@+id/btn_tab_people"
+                                style="?attr/materialButtonOutlinedStyle"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/detail_tab_people" />
+                        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                        <!-- ── 구도 ── -->
+                        <LinearLayout
+                            android:id="@+id/layout_guide_composition"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_l"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:baselineAligned="false"
+                                android:orientation="horizontal">
+
+                                <!-- 이 장소 사진 위에 실제 가이드 선을 얹습니다. -->
+                                <FrameLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="132dp"
+                                    android:layout_weight="1">
+
+                                    <ImageView
+                                        android:id="@+id/iv_comp_sample"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="@color/bg_image_placeholder"
+                                        android:contentDescription="@null"
+                                        android:scaleType="centerCrop" />
+
+                                    <com.youngs.picview.ui.guide.GuideOverlayView
+                                        android:id="@+id/view_comp_overlay"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent" />
+                                </FrameLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/space_l"
+                                    android:layout_weight="1.1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:id="@+id/tv_comp_title"
+                                        style="@style/Text.SectionTitle"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        tools:text="삼분할 구도" />
+
+                                    <TextView
+                                        android:id="@+id/tv_comp_desc"
+                                        style="@style/Text.Body"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="@dimen/space_xs"
+                                        tools:text="화면을 3x3으로 나누고 교차점에 피사체를 놓아보세요" />
+
+                                    <TextView
+                                        style="@style/Text.Caption"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="@dimen/space_m"
+                                        android:text="@string/guide_comp_when"
+                                        android:textColor="@color/maple_600" />
+
+                                    <TextView
+                                        android:id="@+id/tv_comp_when"
+                                        style="@style/Text.Caption"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        tools:text="한옥과 수면, 하늘의 균형을 잡고 싶을 때 좋아요." />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <TextView
+                                style="@style/Text.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/space_l"
+                                android:text="@string/guide_comp_alt"
+                                android:textColor="@color/text_secondary" />
+
+                            <com.google.android.material.chip.ChipGroup
+                                android:id="@+id/chips_comp_alt"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/space_xs"
+                                app:chipSpacingHorizontal="6dp"
+                                app:chipSpacingVertical="0dp" />
+                        </LinearLayout>
+
+                        <!-- ── 방향 ── -->
+                        <LinearLayout
+                            android:id="@+id/layout_guide_direction"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_l"
+                            android:baselineAligned="false"
+                            android:orientation="horizontal"
+                            android:visibility="gone">
+
+                            <com.youngs.picview.ui.detail.FacingCompassView
+                                android:id="@+id/view_facing_compass"
+                                android:layout_width="96dp"
+                                android:layout_height="96dp"
+                                android:layout_gravity="center_vertical" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginStart="@dimen/space_l"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tv_dir_headline"
+                                    style="@style/Text.SectionTitle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    tools:text="서향 · 해질 무렵" />
+
+                                <TextView
+                                    android:id="@+id/tv_dir_desc"
+                                    style="@style/Text.Body"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/space_xs"
+                                    tools:text="해가 지는 방향의 부드러운 빛으로 실루엣과 반사를 살릴 수 있어요." />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- ── 인물 ── -->
+                        <LinearLayout
+                            android:id="@+id/layout_guide_people"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_l"
+                            android:orientation="vertical"
+                            android:visibility="gone" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -702,31 +970,36 @@
         android:paddingBottom="20dp"
         android:weightSum="2">
 
+        <!--
+          시안대로 "출사 일정 저장 · 촬영 시작" 한 쌍입니다. 길찾기는
+          히어로 오른쪽 위 동그라미로 옮겼습니다 — 하단은 "찍는 일"의
+          자리이고, 길찾기는 장소를 정하기 전의 일이라서입니다.
+        -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_save_plan"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:text="@string/detail_save_plan"
+            android:textColor="@color/maple_700"
+            app:icon="@drawable/ic_calendar"
+            app:iconTint="@color/maple_700"
+            app:strokeColor="@color/maple_300" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_start_guide"
             style="@style/Button.Primary"
             android:layout_width="0dp"
             android:layout_height="56dp"
-            android:layout_marginEnd="6dp"
+            android:layout_marginStart="6dp"
             android:layout_weight="1"
-            android:text="@string/action_shoot"
+            android:text="@string/action_shoot_start"
             android:textColor="@color/white"
             app:backgroundTint="@color/maple_500"
             app:icon="@drawable/baseline_camera_alt_24"
             app:iconTint="@color/white" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_navigate"
-            style="@style/Button.Primary"
-            android:layout_width="0dp"
-            android:layout_height="56dp"
-            android:layout_marginStart="6dp"
-            android:layout_weight="1"
-            android:text="@string/action_navigate"
-            android:textColor="@color/btn_secondary_text"
-            app:backgroundTint="@color/btn_secondary_bg"
-            app:icon="@drawable/ic_directions"
-            app:iconTint="@color/btn_secondary_text" />
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
