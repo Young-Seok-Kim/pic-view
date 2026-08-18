@@ -18,7 +18,7 @@ import com.youngs.picview.ui.model.SpotItem
 import java.time.LocalTime
 
 /**
- * 홈의 '빛이 맞는 출사' 가로 목록 (시안 LIGHT MATCH).
+ * 홈의 '지금 가면 좋은 곳' 가로 목록 (시안 LIGHT MATCH).
  *
  * 카드의 첫 줄이 점수가 아니라 **시각**입니다. 이 목록의 약속은
  * "여기가 좋다"가 아니라 "몇 시에 가면 빛이 맞는다"이고, 그 시각이

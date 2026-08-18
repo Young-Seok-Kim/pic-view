@@ -114,10 +114,10 @@
 
 **④ 그 아래**
 
-<img src="docs/screenshots/19-home-light-match.png" width="260" align="right" alt="빛이 맞는 출사" />
+<img src="docs/screenshots/19-home-light-match.png" width="260" align="right" alt="지금 가면 좋은 곳" />
 
 - **빠른 이동 타일 4개** — 빛 스케줄 · 지도 · 캘린더 · 미션
-- **빛이 맞는 출사 (LIGHT MATCH)** — 시안대로 개편한 추천 목록입니다.
+- **지금 가면 좋은 곳 (LIGHT MATCH)** — 시안대로 개편한 추천 목록입니다.
   카드의 첫 줄이 점수가 아니라 **시각**입니다 — `⏱ 오늘 18:39`,
   지나갔으면 `내일 06:54`로 넘겨 말합니다. 이 목록의 약속이
   "여기가 좋다"가 아니라 **"몇 시에 가면 빛이 맞는다"**이기 때문입니다.
