@@ -126,6 +126,7 @@
     <!-- 홈 → 시선 가이드 진입 배너 -->
     <string name="home_guide_eyebrow">JEONGEUP SISEON · GUIDE</string>
     <string name="home_guide_title">구도별 촬영 가이드를\n시선 가이드에서 확인해보세요.</string>
+    <string name="home_guide_highlight">시선 가이드</string>
     <string name="home_guide_sub">반사·실루엣·대칭·리딩라인까지 오늘의 빛에 맞는 촬영 방법을 자세히 안내합니다.</string>
     <string name="home_guide_open">시선 가이드 열기</string>
 

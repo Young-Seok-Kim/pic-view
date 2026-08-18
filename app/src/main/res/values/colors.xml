@@ -72,6 +72,9 @@
 
     <color name="divider">#EDE2D8</color>
     <color name="card_stroke">#F0E6DC</color>
+    <!-- LIGHT MATCH 시안의 파란 눈썹. 붉은 본문 팔레트 속에서
+         "여기는 다른 종류의 정보"라고 말하는 색입니다. -->
+    <color name="eyebrow_blue">#3B5BDB</color>
 
     <color name="chip_bg">#FFFFFF</color>
     <color name="chip_bg_selected">#B23A1B</color>

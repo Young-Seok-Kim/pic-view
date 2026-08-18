@@ -252,8 +252,9 @@
                 android:layout_height="wrap_content"
                 android:letterSpacing="0.12"
                 android:text="@string/home_best_eyebrow"
-                android:textColor="@color/maple_600"
-                android:textSize="10sp" />
+                android:textColor="@color/eyebrow_blue"
+                android:textSize="10sp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -329,16 +330,19 @@
                         android:layout_height="wrap_content"
                         android:letterSpacing="0.12"
                         android:text="@string/home_guide_eyebrow"
-                        android:textColor="@color/maple_600"
-                        android:textSize="10sp" />
+                        android:textColor="@color/eyebrow_blue"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_guide_banner_title"
                         style="@style/Text.SectionTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_xs"
                         android:text="@string/home_guide_title"
-                        android:textColor="@color/maple_800" />
+                        android:textColor="@color/maple_800"
+                        android:textSize="@dimen/text_title" />
 
                     <TextView
                         style="@style/Text.Caption"
