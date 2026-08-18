@@ -237,7 +237,7 @@
             android:baselineAligned="false"
             android:orientation="horizontal" />
 
-        <!-- ─────────── 빛이 맞는 출사 (시안 LIGHT MATCH) ─────────── -->
+        <!-- ─────────── 지금 가면 좋은 곳 (시안 LIGHT MATCH) ─────────── -->
         <LinearLayout
             android:id="@+id/layout_home_best"
             android:layout_width="match_parent"
