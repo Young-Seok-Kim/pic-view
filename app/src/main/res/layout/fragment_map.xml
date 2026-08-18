@@ -14,6 +14,7 @@
 
     <!-- 상단 플로팅 바 -->
     <LinearLayout
+        android:id="@+id/layout_map_topbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"

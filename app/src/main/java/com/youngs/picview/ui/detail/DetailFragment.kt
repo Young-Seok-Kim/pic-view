@@ -45,6 +45,7 @@ import com.youngs.picview.ui.mission.MissionFragment
 import com.youngs.picview.util.AppPrefs
 import com.youngs.picview.util.TravelMode
 import com.youngs.picview.util.TtsController
+import com.youngs.picview.util.applyTopSystemBarInsetAsMargin
 import com.youngs.picview.ui.adapter.ImagePagerAdapter
 import com.youngs.picview.ui.guide.GuideActivity
 import com.youngs.picview.ui.model.SpotItem
@@ -84,6 +85,12 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentDetailBinding.bind(view)
+
+        // 히어로 사진은 상태바 뒤까지 깔리는 게 맞지만, 그 위의 버튼과
+        // 페이지 점은 시계·배터리와 겹치면 안 됩니다. 마진으로 내립니다.
+        binding.btnBack.applyTopSystemBarInsetAsMargin()
+        binding.layoutHeroActions.applyTopSystemBarInsetAsMargin()
+        binding.layoutIndicator.applyTopSystemBarInsetAsMargin()
 
         binding.btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
 

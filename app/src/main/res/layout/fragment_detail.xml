@@ -84,6 +84,7 @@
 
                 <!-- 찜·공유·길찾기. 시안의 오른쪽 위 동그라미 버튼 자리입니다. -->
                 <LinearLayout
+                    android:id="@+id/layout_hero_actions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="top|end"
