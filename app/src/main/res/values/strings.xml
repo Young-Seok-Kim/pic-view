@@ -117,7 +117,67 @@
     <string name="home_make_course">오늘의 빛 스케줄 만들기</string>
     <string name="home_open_map">지도</string>
     <string name="home_open_explore">촬영지 전체</string>
-    <string name="home_best_now">지금 찍기 좋은 곳</string>
+    <string name="home_best_now">빛이 맞는 출사</string>
+    <string name="home_best_eyebrow">NEXT PHOTO · LIGHT MATCH</string>
+    <string name="home_spot_time_today">오늘 %1$s</string>
+    <string name="home_spot_time_tomorrow">내일 %1$s</string>
+    <string name="home_spot_plan_add">출사 계획에 담기</string>
+
+    <!-- 홈 → 시선 가이드 진입 배너 -->
+    <string name="home_guide_eyebrow">JEONGEUP SISEON · GUIDE</string>
+    <string name="home_guide_title">구도별 촬영 가이드를\n시선 가이드에서 확인해보세요.</string>
+    <string name="home_guide_sub">반사·실루엣·대칭·리딩라인까지 오늘의 빛에 맞는 촬영 방법을 자세히 안내합니다.</string>
+    <string name="home_guide_open">시선 가이드 열기</string>
+
+    <!-- 시선 가이드 화면 -->
+    <string name="siseon_eyebrow">촬영 전에 한 번만 확인하세요</string>
+    <string name="siseon_title">한 장을 더 잘 찍는 순서</string>
+    <string name="siseon_sub">장소와 빛을 보고, 지금 가장 찍기 좋은 장면을 고른 뒤 바로 움직여보세요.</string>
+    <string name="siseon_count">%1$d COMPOSITIONS</string>
+    <string name="siseon_today_eyebrow">TODAY\'S SHOT · %1$s</string>
+    <string name="siseon_today_line">%1$s에서 %2$s 구도로 찍어보세요.</string>
+    <string name="siseon_shoot_now">이대로 찍기</string>
+    <string name="siseon_compare_eyebrow">MY FRAME · COMPARE</string>
+    <string name="siseon_compare_title">내 사진을 가이드와 비교해보세요.</string>
+    <string name="siseon_compare_sub">같은 장소에서 찍은 사진을 올리면 구도와 피사체 배치를 나란히 확인할 수 있어요.</string>
+    <string name="siseon_upload">사진 업로드</string>
+    <string name="siseon_upload_change">사진 바꾸기</string>
+    <string name="siseon_compare_empty">사진을 업로드하면 이곳에서 가이드와 나란히 비교할 수 있어요.</string>
+    <string name="siseon_compare_caption_guide">가이드 · %1$s</string>
+    <string name="siseon_compare_caption_mine">내 사진</string>
+    <string name="siseon_tab_light">빛</string>
+    <string name="siseon_tab_action">움직임</string>
+    <string name="siseon_tab_check">체크</string>
+    <string name="siseon_direction">추천 방향</string>
+    <string name="siseon_tip_label">촬영 팁</string>
+    <string name="siseon_action_title">이렇게 움직여보세요</string>
+    <string name="siseon_action_sub">한 자리에서 끝내지 말고 아래 순서대로 3장을 비교해보세요.</string>
+    <string name="siseon_action_steps">01 현재 위치에서 한 장 · 02 두 걸음 가까이 · 03 좌우로 이동</string>
+    <string name="siseon_check_title">촬영 준비도</string>
+    <string name="siseon_check_sub">셔터를 누르기 전, 네 가지만 확인하면 됩니다.</string>
+    <string name="siseon_check_progress">%1$d/%2$d 완료</string>
+    <string name="siseon_check_done_note">이제 찍어도 좋아요.</string>
+    <string name="siseon_check_todo_note">프레임을 한 번만 더 확인해보세요.</string>
+    <string name="siseon_points_title">바로 적용할 촬영 포인트</string>
+    <string name="siseon_mission_start">실전 촬영 미션 시작</string>
+    <string name="cd_prev_comp">이전 구도</string>
+    <string name="cd_next_comp">다음 구도</string>
+
+    <!-- 시선 가이드 — 실전 미션 -->
+    <string name="mission_header">FIELD MISSION · %1$s</string>
+    <string name="mission_steps_title">현장에서 이렇게 해보세요</string>
+    <string name="mission_step_first">%1$s의 기준점을 먼저 찾기</string>
+    <string name="mission_step_last">같은 장면을 한 번 더 비교해보기</string>
+    <string name="mission_step_last_hint">현재 위치·두 걸음 가까이·좌우 이동으로 비교</string>
+    <string name="mission_capture_title">세 장을 비교해보세요</string>
+    <string name="mission_capture_sub">같은 장면을 세 위치에서 찍으면, 가장 좋은 거리와 방향을 직접 찾을 수 있어요.</string>
+    <string name="mission_added">%1$d/3 추가됨</string>
+    <string name="mission_checked">%1$d/3</string>
+    <string name="mission_add_photo">사진 추가</string>
+    <string name="mission_feedback_title">사진 사이의 차이</string>
+    <string name="mission_feedback_auto">자동 분석</string>
+    <string name="mission_complete">3장 비교 미션 완료하기</string>
+    <string name="mission_incomplete">세 위치의 사진을 모두 추가해 주세요</string>
     <string name="home_see_all">전체보기 →</string>
     <string name="home_score_format">★ %1$d</string>
     <string name="home_best_phase_format">%1$s에 좋아요</string>
