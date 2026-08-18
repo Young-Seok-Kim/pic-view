@@ -1,10 +1,8 @@
 package com.youngs.picview.ui.home
 
 import android.content.Context
-import android.graphics.PorterDuff
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -52,15 +50,9 @@ class HomeSpotAdapter(
             // 카드에서 읽은 말이 상세에서도 그대로 이어집니다.
             tvHomeSpotDesc.text = facts.note
 
-            // 주제 알약. 지도 마커와 같은 색을 써서 목록과 지도가 같은
-            // 언어를 쓰게 합니다(초록은 어디서나 자연).
-            val theme = SpotTheme.of(item.contentTypeId)
-            tvHomeSpotTheme.text = theme.label
-            tvHomeSpotTheme.setTextColor(ContextCompat.getColor(context, theme.colorRes))
-            tvHomeSpotTheme.background?.mutate()?.setColorFilter(
-                ContextCompat.getColor(context, theme.containerRes),
-                PorterDuff.Mode.SRC_IN
-            )
+            // 주제 칩 — 시안대로 사진 모서리의 흰 알약입니다. 색 대신
+            // 위치(사진 위)가 "이건 분류"라고 말합니다.
+            tvHomeSpotTheme.text = SpotTheme.of(item.contentTypeId).label
 
             Glide.with(ivHomeSpot)
                 .load(item.imageUrl.takeIf { it.isNotBlank() })

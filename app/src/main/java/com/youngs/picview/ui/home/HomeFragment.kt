@@ -328,6 +328,23 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
         binding.cardGuideEntry.setOnClickListener(openGuide)
         binding.btnGuideOpen.setOnClickListener(openGuide)
 
+        // 배너 제목에서 "시선 가이드" 낱말만 주황으로(시안 표기).
+        // 문장 전체가 한 색이면 어디를 누르라는 건지 눈이 다시 찾아야 합니다.
+        val bannerTitle = getString(R.string.home_guide_title)
+        val highlight = getString(R.string.home_guide_highlight)
+        val start = bannerTitle.indexOf(highlight)
+        if (start >= 0) {
+            binding.tvGuideBannerTitle.text = SpannableString(bannerTitle).apply {
+                setSpan(
+                    ForegroundColorSpan(
+                        ContextCompat.getColor(requireContext(), R.color.maple_500)
+                    ),
+                    start, start + highlight.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+        }
+
         buildQuickActions()
     }
 
