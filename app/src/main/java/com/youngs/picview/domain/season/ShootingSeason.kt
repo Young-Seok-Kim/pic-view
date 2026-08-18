@@ -2,6 +2,7 @@ package com.youngs.picview.domain.season
 
 import java.time.LocalDate
 import java.time.MonthDay
+import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 
 /** 사계절 구분. */
@@ -10,6 +11,21 @@ enum class Season(val label: String, val emoji: String, val months: Set<Int>) {
     SUMMER("여름", "🌿", setOf(6, 7, 8)),
     AUTUMN("가을", "🍁", setOf(9, 10, 11)),
     WINTER("겨울", "❄️", setOf(12, 1, 2));
+
+    /**
+     * 이 계절을 골랐을 때 달력이 펴야 하는 달.
+     *
+     * 다른 계절이면 그 계절의 첫 달로 넘어가되, **지금이 그 계절 안이면
+     * 이번 달**을 폅니다. 8월에 여름을 열었는데 6월이 나오면 절정 점을
+     * 보러 두 번을 더 넘겨야 합니다.
+     *
+     * 겨울의 "첫 달"은 12월이 아니라 1월입니다. 이 화면은 같은 해 달력을
+     * 보여 주므로, 5월에 겨울을 고른 사람이 보고 싶은 눈 절정은 지난
+     * 1~2월(같은 해)이 맞습니다.
+     */
+    fun monthToShow(now: YearMonth): YearMonth =
+        if (now.monthValue in months) now
+        else YearMonth.of(now.year, months.min())
 
     companion object {
         fun of(date: LocalDate): Season =

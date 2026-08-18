@@ -7,6 +7,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.LocalDate
+import java.time.YearMonth
 
 /**
  * 촬영 적기 판정 검증.
@@ -94,5 +95,32 @@ class SeasonTest {
         assertEquals(3, list.size)
         // 절정 중인 것이 먼저
         assertTrue(list.first().isPeakNow(LocalDate.of(2026, 8, 4)))
+    }
+
+    // ───────── 계절 선택 시 달력이 펴는 달 ─────────
+
+    @Test
+    fun `지금이 그 계절 안이면 이번 달을 편다`() {
+        // 8월에 여름을 열었는데 6월이 나오면 두 번을 더 넘겨야 한다
+        val aug = YearMonth.of(2026, 8)
+        assertEquals(aug, Season.SUMMER.monthToShow(aug))
+    }
+
+    @Test
+    fun `다른 계절이면 그 계절의 첫 달로 넘어간다`() {
+        val aug = YearMonth.of(2026, 8)
+        assertEquals(YearMonth.of(2026, 9), Season.AUTUMN.monthToShow(aug))
+        assertEquals(YearMonth.of(2026, 3), Season.SPRING.monthToShow(aug))
+    }
+
+    @Test
+    fun `해를 넘기는 겨울도 어긋나지 않는다`() {
+        // 12월과 1월 둘 다 겨울 안이므로 그 달 그대로
+        val dec = YearMonth.of(2026, 12)
+        assertEquals(dec, Season.WINTER.monthToShow(dec))
+        val jan = YearMonth.of(2027, 1)
+        assertEquals(jan, Season.WINTER.monthToShow(jan))
+        // 계절 밖(5월)에서 겨울을 고르면 같은 해 1월 — 달력은 같은 해를 본다
+        assertEquals(YearMonth.of(2026, 1), Season.WINTER.monthToShow(YearMonth.of(2026, 5)))
     }
 }
