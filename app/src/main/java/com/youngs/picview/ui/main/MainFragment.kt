@@ -4,18 +4,34 @@ import com.youngs.picview.util.applyTopSystemBarInset
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
+import android.widget.PopupMenu
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.RecyclerView
 import com.youngs.picview.MainActivity
 import com.youngs.picview.R
 import com.youngs.picview.databinding.FragmentMainBinding
+import com.youngs.picview.domain.guide.SiseonGuide
+import com.youngs.picview.domain.light.LightPhase
+import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.ui.adapter.SpotAdapter
 import com.youngs.picview.ui.detail.DetailFragment
+import com.youngs.picview.ui.guide.SiseonGuideActivity
 import com.youngs.picview.ui.map.MapFragment
 import com.youngs.picview.ui.model.SpotItem
+import com.youngs.picview.util.LatLng
+import com.youngs.picview.util.distanceKmTo
+import java.time.Duration
+import java.time.LocalTime
 
+/**
+ * 탐색 — 빛이 맞는 출사 (시안).
+ *
+ * 위에서부터 약도 → 정렬 → 장소 카드. 첫 줄의 물음이 "무엇을"이 아니라
+ * "어떤 순서로 볼까"입니다 — 추천순(포토스코어), 거리순(시내 기준),
+ * 빛 좋은 시간순(그 장소의 빛이 맞는 다음 시각이 가까운 순).
+ * 카테고리는 오른쪽 필터 버튼 뒤에 있습니다.
+ */
 class MainFragment : Fragment(R.layout.fragment_main) {
     private var recyclerViewState: Parcelable? = null
 
@@ -24,16 +40,10 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
     private val viewModel: MainViewModel by activityViewModels()
 
-    /** 카테고리 ↔ 칩 id 매핑. */
-    private val chipToCategory by lazy {
-        mapOf(
-            R.id.chip_all to SpotCategory.ALL,
-            R.id.chip_nature to SpotCategory.NATURE,
-            R.id.chip_culture to SpotCategory.CULTURE,
-            R.id.chip_leports to SpotCategory.LEPORTS,
-            R.id.chip_food to SpotCategory.FOOD
-        )
-    }
+    private enum class SortMode { RECO, DIST, LIGHT }
+    private var sortMode = SortMode.RECO
+
+    private lateinit var spotAdapter: SpotAdapter
 
     override fun onPause() {
         super.onPause()
@@ -44,13 +54,12 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentMainBinding.bind(view)
 
-        // 헤더가 접히면 칩 줄이 화면 맨 위로 올라옵니다.
+        // 헤더가 접히면 정렬 줄이 화면 맨 위로 올라옵니다.
         // AppBar 가 상태바를 피하지 않으면 그때 칩이 시계·배터리에 겹칩니다.
         binding.appbar.applyTopSystemBarInset()
 
         setListeners()
         setObserve()
-        restoreCategorySelection()
 
         recyclerViewState?.let {
             binding.rvPhotoSpots.layoutManager?.onRestoreInstanceState(it)
@@ -58,11 +67,11 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     private fun setObserve() {
-        val spotAdapter = SpotAdapter { spot -> openDetail(spot) }
+        spotAdapter = SpotAdapter(
+            onItemClick = { spot -> openDetail(spot) },
+            onGuideClick = { spot -> openGuide(spot) }
+        )
         binding.rvPhotoSpots.adapter = spotAdapter
-
-        viewModel.weatherData.observe(viewLifecycleOwner) { binding.tvWeatherStatus.text = it }
-        viewModel.goldenHourData.observe(viewLifecycleOwner) { binding.tvGoldenHour.text = it }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
             binding.progressBar.isVisible = loading
@@ -73,7 +82,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         }
 
         viewModel.filteredSpots.observe(viewLifecycleOwner) { filteredList ->
-            spotAdapter.updateData(filteredList)
+            spotAdapter.updateData(sorted(filteredList))
             renderListState(filteredList.isEmpty())
         }
 
@@ -83,13 +92,46 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         }
     }
 
+    // ───────────────────── 정렬 ─────────────────────
+
+    private fun sorted(list: List<SpotItem>): List<SpotItem> = when (sortMode) {
+        SortMode.RECO -> list.sortedByDescending { it.score }
+        SortMode.DIST -> list.sortedBy { spot ->
+            LatLng.parseOrNull(spot.mapy, spot.mapx)
+                ?.let { SpotAdapter.CITY_CENTER.distanceKmTo(it) }
+                ?: Double.MAX_VALUE
+        }
+        SortMode.LIGHT -> list.sortedBy { minutesUntilBestLight(it) }
+    }
+
+    /**
+     * 이 장소의 빛이 맞는 다음 시각까지 남은 분.
+     * 오늘 지나갔으면 내일 같은 시각으로 넘겨 셉니다.
+     */
+    private fun minutesUntilBestLight(spot: SpotItem): Long {
+        val sun = viewModel.sunTimes
+        val phase = SpotFactsTable.of(spot.title, spot.contentTypeId).bestPhase
+        val at: LocalTime = when (phase) {
+            LightPhase.BLUE_DAWN -> sun.civilDawn ?: sun.sunrise?.minusMinutes(25)
+            LightPhase.SUNRISE -> sun.sunrise
+            LightPhase.MORNING -> sun.sunrise?.plusMinutes(60)
+            LightPhase.MIDDAY -> LocalTime.of(11, 0)
+            LightPhase.AFTERNOON -> LocalTime.of(14, 0)
+            LightPhase.SUNSET -> sun.sunset?.minusMinutes(40)
+            LightPhase.BLUE_DUSK -> sun.sunset
+            LightPhase.NIGHT -> sun.civilDusk ?: sun.sunset?.plusMinutes(30)
+        } ?: return Long.MAX_VALUE
+
+        val diff = Duration.between(LocalTime.now(), at).toMinutes()
+        return if (diff >= 0) diff else diff + MINUTES_PER_DAY
+    }
+
     /** 목록 / 빈 상태 / 로드 실패 세 가지를 한 곳에서 정리합니다. */
     private fun renderListState(isEmpty: Boolean) {
         val failed = viewModel.loadFailed.value == true
 
         binding.rvPhotoSpots.isVisible = !isEmpty
         binding.layoutEmpty.isVisible = isEmpty
-        binding.btnOpenNaverMap.isVisible = !isEmpty
 
         if (!isEmpty) return
 
@@ -104,36 +146,50 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             (activity as? MainActivity)?.refresh(userInitiated = true)
         }
 
-        binding.chipGroupCategory.setOnCheckedStateChangeListener { _, checkedIds ->
-            val category = chipToCategory[checkedIds.firstOrNull()] ?: return@setOnCheckedStateChangeListener
-            viewModel.setCategory(category)
+        binding.chipGroupSort.setOnCheckedStateChangeListener { _, checkedIds ->
+            sortMode = when (checkedIds.firstOrNull()) {
+                R.id.chip_sort_dist -> SortMode.DIST
+                R.id.chip_sort_light -> SortMode.LIGHT
+                else -> SortMode.RECO
+            }
+            spotAdapter.updateData(sorted(viewModel.filteredSpots.value.orEmpty()))
             binding.rvPhotoSpots.scrollToPosition(0)
             binding.appbar.setExpanded(true, true)
         }
 
-        // 목록을 내리면 FAB 를 라벨 없는 작은 형태로 접어 화면을 덜 가리게 한다.
-        binding.rvPhotoSpots.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
-                if (dy > 6) binding.btnOpenNaverMap.shrink()
-                else if (dy < -6) binding.btnOpenNaverMap.extend()
-            }
-        })
+        binding.btnCategoryFilter.setOnClickListener { showCategoryMenu(it) }
 
         binding.btnRetry.setOnClickListener {
             (activity as? MainActivity)?.reloadData()
         }
 
-        binding.btnOpenNaverMap.setOnClickListener {
+        binding.cardMapPreview.setOnClickListener {
+            (activity as? MainActivity)?.pushScreen(MapFragment())
+        }
+        binding.btnMapExpand.setOnClickListener {
             (activity as? MainActivity)?.pushScreen(MapFragment())
         }
     }
 
-    /** 상세 화면에서 돌아왔을 때 이전에 고른 카테고리를 그대로 보여줍니다. */
-    private fun restoreCategorySelection() {
-        val current = viewModel.getCurrentCategory()
-        val chipId = chipToCategory.entries.first { it.value == current }.key
-        if (binding.chipGroupCategory.checkedChipId != chipId) {
-            binding.chipGroupCategory.check(chipId)
+    /** 카테고리 선택. 시안의 첫 줄을 정렬에 내주고 이쪽으로 옮겼습니다. */
+    private fun showCategoryMenu(anchor: View) {
+        val categories = listOf(
+            R.string.category_all to SpotCategory.ALL,
+            R.string.category_nature to SpotCategory.NATURE,
+            R.string.category_culture to SpotCategory.CULTURE,
+            R.string.category_leports to SpotCategory.LEPORTS,
+            R.string.category_food to SpotCategory.FOOD
+        )
+        PopupMenu(requireContext(), anchor).apply {
+            categories.forEachIndexed { index, (labelRes, _) ->
+                menu.add(0, index, index, getString(labelRes))
+            }
+            setOnMenuItemClickListener { item ->
+                viewModel.setCategory(categories[item.itemId].second)
+                binding.rvPhotoSpots.scrollToPosition(0)
+                true
+            }
+            show()
         }
     }
 
@@ -141,8 +197,24 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         (activity as? MainActivity)?.pushScreen(DetailFragment.newInstance(spot))
     }
 
+    private fun openGuide(spot: SpotItem) {
+        val facts = SpotFactsTable.of(spot.title, spot.contentTypeId)
+        startActivity(
+            SiseonGuideActivity.intent(
+                requireContext(),
+                spotTitle = spot.title,
+                contextId = SiseonGuide.contextIdFor(facts.bestPhase),
+                guideId = SiseonGuide.guideIdFor(facts)
+            )
+        )
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val MINUTES_PER_DAY = 24 * 60L
     }
 }

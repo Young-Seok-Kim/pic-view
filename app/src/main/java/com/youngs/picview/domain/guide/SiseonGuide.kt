@@ -203,6 +203,22 @@ object SiseonGuide {
      * 삼분할은 "무엇을 어디에 두나"의 문제라 장소가 말하게 합니다 —
      * 물가면 반사, 해질 무렵이면 실루엣, 그 외에는 리딩라인.
      */
+    /**
+     * 다음 출사 추천 카드의 머리 문장 (시안 — "다음에는 물빛을 따라가보세요").
+     * 추천 구도가 문장을 정합니다. 구도 이름을 그대로 쓰지 않는 이유는,
+     * "반사 구도를 써보세요"보다 "물빛을 따라가보세요"가 몸을 움직이게
+     * 하기 때문입니다.
+     */
+    fun nextHeadlineFor(guideId: String): String = when (guideId) {
+        "reflection" -> "다음에는 물빛을 따라가보세요"
+        "silhouette" -> "다음에는 빛을 등지고 서보세요"
+        "symmetry" -> "다음에는 대칭의 축을 찾아보세요"
+        "frame" -> "다음에는 장면 속 장면을 만들어보세요"
+        "leading" -> "다음에는 선의 끝을 따라가보세요"
+        "low" -> "다음에는 시선을 낮춰보세요"
+        else -> "다음에는 새로운 시선을 시험해보세요"
+    }
+
     fun guideIdFor(facts: SpotFacts): String = when (facts.guide) {
         GuideOverlayView.GuideType.SYMMETRY -> "symmetry"
         GuideOverlayView.GuideType.CENTER -> "frame"

@@ -36,14 +36,11 @@ import com.youngs.picview.databinding.ItemQuickActionBinding
 import com.youngs.picview.ui.mission.MissionFragment
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
-import com.youngs.picview.data.repository.CourseRepository
-import com.youngs.picview.domain.course.CourseStop
-import com.youngs.picview.domain.course.ShootingCourse
 import com.youngs.picview.domain.guide.SiseonGuide
 import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.ui.guide.SiseonGuideActivity
 import com.youngs.picview.ui.model.SpotItem
-import com.youngs.picview.util.TravelMode
+import com.youngs.picview.util.PlanQuickSave
 import kotlinx.coroutines.launch
 
 /**
@@ -353,38 +350,8 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
      * 상세 화면의 저장과 같은 저장소(코스 목록)에 쌓입니다.
      */
     private fun savePlan(spot: SpotItem) {
-        val facts = SpotFactsTable.of(spot.title, spot.contentTypeId)
-        val sun = viewModel.sunTimes
-        val window = sun.upcomingGoldenWindows(LocalTime.MIN)
-            .firstOrNull { it.phase == facts.bestPhase }
-            ?: sun.upcomingGoldenWindows(LocalTime.MIN).firstOrNull()
-
-        val arrive = window?.start ?: LocalTime.of(9, 0)
-        val stop = CourseStop(
-            spot = spot,
-            facts = facts,
-            arriveAt = arrive,
-            leaveAt = window?.end ?: arrive.plusMinutes(60),
-            phase = window?.phase ?: facts.bestPhase,
-            travelMinutes = 0,
-            travelKm = 0.0,
-            reason = facts.note,
-            isHighlight = true
-        )
-
         viewLifecycleOwner.lifecycleScope.launch {
-            val saved = runCatching {
-                CourseRepository(requireContext()).save(
-                    ShootingCourse(
-                        stops = listOf(stop),
-                        sun = sun,
-                        travelMode = TravelMode.CAR,
-                        totalDistanceKm = 0.0
-                    ),
-                    summary = spot.title
-                )
-            }.isSuccess
-
+            val saved = PlanQuickSave.save(requireContext(), spot, viewModel.sunTimes)
             Toast.makeText(
                 requireContext(),
                 if (saved) R.string.detail_plan_saved else R.string.detail_plan_failed,
