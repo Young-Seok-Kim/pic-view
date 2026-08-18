@@ -1,0 +1,460 @@
+package com.youngs.picview.ui.guide
+
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.CheckBox
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.chip.Chip
+import com.youngs.picview.R
+import com.youngs.picview.databinding.ActivitySiseonGuideBinding
+import com.youngs.picview.databinding.DialogSiseonMissionBinding
+import com.youngs.picview.databinding.ItemGuidePhotoBinding
+import com.youngs.picview.databinding.ItemMissionSlotBinding
+import com.youngs.picview.domain.guide.SiseonGuide
+import com.youngs.picview.domain.guide.SiseonGuideItem
+import com.youngs.picview.util.applyTopSystemBarInset
+import kotlin.math.abs
+
+/**
+ * 시선 가이드 — 구도 14종을 한 장씩 넘기며 배우고 바로 써 보는 화면.
+ *
+ * 웹 시안(GuidePage.tsx)의 안드로이드 판입니다. 구도명 라벨 + 사진
+ * 캐러셀, 내 사진 비교, 구도·빛·움직임·체크 탭, 실전 미션(체크 셋 +
+ * 세 위치 사진 비교 + 자동 분석)이 시안의 흐름 그대로 들어 있습니다.
+ *
+ * 홈에서 오면 그 장소의 이름·사진·빛 상태·추천 구도가 함께 넘어와
+ * "오늘의 추천 한 장"이 그 장소의 말로 시작합니다.
+ */
+class SiseonGuideActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivitySiseonGuideBinding
+
+    private var selectedIndex = 0
+    private var contextId = "sunset"
+    private var spotTitle: String? = null
+
+    private val checkState = BooleanArray(SiseonGuide.checklist.size)
+
+    // ── 미션 상태. 다이얼로그가 닫혀도 이어서 볼 수 있게 화면이 들고 있습니다.
+    private var missionBinding: DialogSiseonMissionBinding? = null
+    private val missionChecks = BooleanArray(3)
+    private val missionPhotos = arrayOfNulls<Uri>(3)
+    private var pendingSlot = -1
+
+    private val comparePicker =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            uri ?: return@registerForActivityResult
+            binding.layoutCompareEmpty.isVisible = false
+            binding.layoutCompareGrid.isVisible = true
+            binding.btnCompareUpload.setText(R.string.siseon_upload_change)
+            Glide.with(this).load(uri).centerCrop().into(binding.ivCompareMine)
+        }
+
+    private val missionPicker =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            val slot = pendingSlot
+            pendingSlot = -1
+            if (uri == null || slot !in missionPhotos.indices) return@registerForActivityResult
+            missionPhotos[slot] = uri
+            renderMissionSlots()
+        }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        binding = ActivitySiseonGuideBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.layoutGuideHeader.applyTopSystemBarInset()
+
+        spotTitle = intent.getStringExtra(EXTRA_SPOT_TITLE)
+        contextId = intent.getStringExtra(EXTRA_CONTEXT) ?: "sunset"
+        selectedIndex = SiseonGuide.items.indexOf(
+            SiseonGuide.byId(intent.getStringExtra(EXTRA_GUIDE_ID))
+        )
+
+        binding.btnGuideBack.setOnClickListener { finish() }
+        binding.tvGuideCount.text = getString(R.string.siseon_count, SiseonGuide.items.size)
+
+        setupCarousel()
+        setupContextChips()
+        setupTools()
+        setupChecklist()
+
+        binding.btnCompareUpload.setOnClickListener { comparePicker.launch("image/*") }
+        binding.btnShootNow.setOnClickListener { openMission() }
+        binding.btnMissionStart.setOnClickListener { openMission() }
+
+        renderSelected()
+        renderContext()
+    }
+
+    // ───────────────────── 캐러셀 ─────────────────────
+
+    private fun setupCarousel() {
+        binding.vpGuide.adapter = PhotoAdapter(SiseonGuide.items)
+        binding.vpGuide.setCurrentItem(selectedIndex, false)
+        binding.vpGuide.registerOnPageChangeCallback(
+            object : androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    selectedIndex = position
+                    renderSelected()
+                }
+            }
+        )
+        binding.btnGuidePrev.setOnClickListener { moveGuide(-1) }
+        binding.btnGuideNext.setOnClickListener { moveGuide(1) }
+    }
+
+    private fun moveGuide(direction: Int) {
+        val count = SiseonGuide.items.size
+        binding.vpGuide.setCurrentItem((selectedIndex + direction + count) % count, true)
+    }
+
+    private class PhotoAdapter(private val items: List<SiseonGuideItem>) :
+        RecyclerView.Adapter<PhotoAdapter.Holder>() {
+
+        class Holder(val binding: ItemGuidePhotoBinding) : RecyclerView.ViewHolder(binding.root)
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = Holder(
+            ItemGuidePhotoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
+
+        override fun getItemCount() = items.size
+
+        override fun onBindViewHolder(holder: Holder, position: Int) {
+            holder.binding.ivGuidePhoto.setImageResource(items[position].imageRes)
+        }
+    }
+
+    // ───────────────────── 구도 선택 반영 ─────────────────────
+
+    private fun renderSelected() {
+        val item = SiseonGuide.items[selectedIndex]
+        binding.tvGuideEnglish.text = item.english
+        binding.tvGuideKorean.text = item.title
+        binding.tvGuideDesc.text = item.description
+        binding.tvPanelDirection.text = item.direction
+        binding.tvPanelTip.text = item.tip
+        binding.tvGuideTips.text = item.tips.joinToString("\n") { "• $it" }
+        binding.tvCompareGuideCaption.text =
+            getString(R.string.siseon_compare_caption_guide, item.title)
+        binding.ivCompareGuide.setImageResource(item.imageRes)
+
+        val signal = SiseonGuide.signalOf(item.id)
+        binding.tvSignalLabel.text = signal.label
+        binding.tvSignalTitle.text = signal.title
+        binding.tvSignalValue.text = signal.value
+        binding.tvSignalHint.text = signal.hint
+        binding.tvSignalDetail.text = signal.detail
+
+        renderTodayLine()
+    }
+
+    private fun renderContext() {
+        val context = SiseonGuide.contextById(contextId)
+        binding.tvLightLabel.text = context.label
+        binding.tvLightTitle.text = context.title
+        binding.tvLightHint.text = context.hint
+        binding.tvLightDetail.text = context.detail
+        renderTodayLine()
+    }
+
+    /** 오늘의 추천 한 장. 홈에서 온 장소가 있으면 그 이름으로 말합니다. */
+    private fun renderTodayLine() {
+        val item = SiseonGuide.items[selectedIndex]
+        val context = SiseonGuide.contextById(contextId)
+        binding.tvTodayEyebrow.text =
+            getString(R.string.siseon_today_eyebrow, context.chipLabel)
+        binding.tvTodayLine.text = getString(
+            R.string.siseon_today_line,
+            spotTitle ?: "지금 있는 곳",
+            item.title
+        )
+        binding.tvTodayMeta.text = "${context.value} · ${context.hint}"
+    }
+
+    private fun setupContextChips() {
+        SiseonGuide.contexts.forEach { context ->
+            binding.chipsGuideContext.addView(
+                Chip(this).apply {
+                    id = android.view.View.generateViewId()
+                    text = context.chipLabel
+                    isCheckable = true
+                    isChecked = context.id == contextId
+                    tag = context.id
+                }
+            )
+        }
+        binding.chipsGuideContext.setOnCheckedStateChangeListener { group, checked ->
+            val chip = checked.firstOrNull()?.let { group.findViewById<Chip>(it) }
+            contextId = (chip?.tag as? String) ?: contextId
+            renderContext()
+        }
+    }
+
+    // ───────────────────── 구도·빛·움직임·체크 탭 ─────────────────────
+
+    private fun setupTools() {
+        binding.toggleGuideTools.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (!isChecked) return@addOnButtonCheckedListener
+            binding.panelComposition.isVisible = checkedId == R.id.btn_tool_composition
+            binding.panelLight.isVisible = checkedId == R.id.btn_tool_light
+            binding.panelAction.isVisible = checkedId == R.id.btn_tool_action
+            binding.panelCheck.isVisible = checkedId == R.id.btn_tool_check
+        }
+    }
+
+    private fun setupChecklist() {
+        SiseonGuide.checklist.forEachIndexed { index, item ->
+            binding.layoutCheckList.addView(
+                CheckBox(this).apply {
+                    text = item
+                    setOnCheckedChangeListener { _, checked ->
+                        checkState[index] = checked
+                        renderCheckProgress()
+                    }
+                }
+            )
+        }
+        renderCheckProgress()
+    }
+
+    private fun renderCheckProgress() {
+        val done = checkState.count { it }
+        val total = checkState.size
+        val percent = done * 100 / total
+        binding.tvCheckPercent.text = "$percent%"
+        binding.progressCheck.setProgressCompat(percent, true)
+        binding.tvCheckCaption.text = getString(R.string.siseon_check_progress, done, total) +
+            " · " + getString(
+                if (done == total) R.string.siseon_check_done_note
+                else R.string.siseon_check_todo_note
+            )
+    }
+
+    // ───────────────────── 실전 미션 ─────────────────────
+
+    private fun openMission() {
+        val item = SiseonGuide.items[selectedIndex]
+        val context = SiseonGuide.contextById(contextId)
+
+        missionChecks.fill(false)
+        missionPhotos.fill(null)
+
+        val sheet = DialogSiseonMissionBinding.inflate(layoutInflater)
+        missionBinding = sheet
+
+        sheet.tvMissionHeader.text = getString(R.string.mission_header, item.title)
+        sheet.tvMissionCtxLabel.text = context.label
+        sheet.tvMissionCtxTitle.text = context.title
+        sheet.tvMissionGoal.text = context.detail
+
+        // 현장 체크 세 줄 — 구도의 기준점, 지금 빛의 할 일, 비교 한 번 더.
+        val steps = listOf(
+            getString(R.string.mission_step_first, item.title) to item.tip,
+            context.title to context.hint,
+            getString(R.string.mission_step_last) to getString(R.string.mission_step_last_hint)
+        )
+        sheet.layoutMissionSteps.removeAllViews()
+        steps.forEachIndexed { index, (title, hint) ->
+            sheet.layoutMissionSteps.addView(
+                CheckBox(this).apply {
+                    text = "$title\n$hint"
+                    setOnCheckedChangeListener { _, checked ->
+                        missionChecks[index] = checked
+                        renderMissionProgress()
+                    }
+                }
+            )
+        }
+
+        sheet.layoutMissionSlots.removeAllViews()
+        SiseonGuide.missionSlots.forEachIndexed { index, label ->
+            val slot = ItemMissionSlotBinding.inflate(layoutInflater, sheet.layoutMissionSlots, false)
+            slot.tvSlotNumber.text = "0${index + 1}"
+            slot.tvSlotLabel.text = label
+            slot.frameSlot.setOnClickListener {
+                pendingSlot = index
+                missionPicker.launch("image/*")
+            }
+            (slot.root.layoutParams as? ViewGroup.MarginLayoutParams)?.let { params ->
+                if (index > 0) params.marginStart = resources.getDimensionPixelSize(R.dimen.space_s)
+            }
+            sheet.layoutMissionSlots.addView(slot.root)
+        }
+
+        val dialog = BottomSheetDialog(this)
+        dialog.setContentView(sheet.root)
+        dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        dialog.behavior.skipCollapsed = true
+        dialog.setOnDismissListener { missionBinding = null }
+        sheet.btnMissionClose.setOnClickListener { dialog.dismiss() }
+        sheet.btnMissionComplete.setOnClickListener { dialog.dismiss() }
+
+        renderMissionSlots()
+        renderMissionProgress()
+        dialog.show()
+    }
+
+    private fun renderMissionSlots() {
+        val sheet = missionBinding ?: return
+        missionPhotos.forEachIndexed { index, uri ->
+            val slot = sheet.layoutMissionSlots.getChildAt(index) ?: return@forEachIndexed
+            val photo = slot.findViewById<android.widget.ImageView>(R.id.iv_slot_photo)
+            val empty = slot.findViewById<android.view.View>(R.id.layout_slot_empty)
+            photo.isVisible = uri != null
+            empty.isVisible = uri == null
+            uri?.let { Glide.with(this).load(it).centerCrop().into(photo) }
+        }
+        sheet.tvMissionPhotoCount.text =
+            getString(R.string.mission_added, missionPhotos.count { it != null })
+
+        if (missionPhotos.all { it != null }) {
+            renderMissionFeedback()
+        }
+        renderMissionProgress()
+    }
+
+    private fun renderMissionProgress() {
+        val sheet = missionBinding ?: return
+        sheet.tvMissionCheckCount.text =
+            getString(R.string.mission_checked, missionChecks.count { it })
+
+        val ready = missionChecks.all { it } && missionPhotos.all { it != null }
+        sheet.btnMissionComplete.isEnabled = ready
+        sheet.btnMissionComplete.setText(
+            if (ready) R.string.mission_complete else R.string.mission_incomplete
+        )
+    }
+
+    // ───────────────────── 세 장 자동 분석 ─────────────────────
+
+    /**
+     * 세 사진의 밝기·색온도·밝기 중심을 견줘 말로 바꿉니다.
+     * 웹 시안의 buildPhotoFeedback 을 그대로 옮겼습니다 — 96px로 줄인
+     * 픽셀만 훑으므로 사진 크기와 무관하게 즉시 끝납니다.
+     */
+    private fun renderMissionFeedback() {
+        val sheet = missionBinding ?: return
+        val metrics = missionPhotos.map { uri -> analyze(uri ?: return) }
+
+        val (first, second, third) = metrics
+        val brightnessShift = second.brightness - first.brightness
+        val finalShift = third.brightness - second.brightness
+        val direction = when {
+            third.centerX - first.centerX > 0.08 -> "오른쪽"
+            third.centerX - first.centerX < -0.08 -> "왼쪽"
+            else -> "중앙"
+        }
+        val warmth = when {
+            third.warmth - first.warmth > 0.08 -> "따뜻한 색이 더 강해졌고"
+            third.warmth - first.warmth < -0.08 -> "푸른 색감이 더 강해졌고"
+            else -> "색감 변화가 크지 않고"
+        }
+        val brightnessText = when {
+            abs(finalShift) < 0.05 -> "밝기가 안정적으로 유지됐어요"
+            finalShift > 0 -> "마지막 사진에서 빛이 더 열렸어요"
+            else -> "마지막 사진에서 그림자가 더 깊어졌어요"
+        }
+        val secondLine = when {
+            brightnessShift > 0.05 -> "밝아졌어요"
+            brightnessShift < -0.05 -> "어두워졌어요"
+            else -> "비슷해요"
+        }
+
+        sheet.tvMissionFeedback.text = listOf(
+            "01 가까이 이동하며 화면의 밝기 중심이 ${direction}으로 이동했어요.",
+            "02 두 걸음 가까이 온 사진은 피사체가 더 크게 느껴지고, 첫 사진보다 밝기가 $secondLine.",
+            "03 좌우 이동 결과는 $warmth $brightnessText. 균형이 가장 좋은 컷을 대표로 골라보세요."
+        ).joinToString("\n")
+        sheet.layoutMissionFeedback.isVisible = true
+    }
+
+    private data class PhotoMetrics(
+        val brightness: Double,
+        val warmth: Double,
+        val centerX: Double
+    )
+
+    private fun analyze(uri: Uri): PhotoMetrics {
+        val bitmap = loadScaled(uri) ?: return PhotoMetrics(0.0, 0.0, 0.5)
+        var total = 0.0
+        var weightedX = 0.0
+        var red = 0L
+        var blue = 0L
+        var count = 0
+        val size = bitmap.width.coerceAtMost(bitmap.height)
+        var y = 0
+        while (y < size) {
+            var x = 0
+            while (x < size) {
+                val pixel = bitmap.getPixel(x, y)
+                val r = (pixel shr 16) and 0xFF
+                val g = (pixel shr 8) and 0xFF
+                val b = pixel and 0xFF
+                val light = (r * 0.299 + g * 0.587 + b * 0.114) / 255.0
+                total += light
+                weightedX += x * light
+                red += r
+                blue += b
+                count += 1
+                x += 4
+            }
+            y += 4
+        }
+        if (count == 0 || total == 0.0) return PhotoMetrics(0.0, 0.0, 0.5)
+        return PhotoMetrics(
+            brightness = total / count,
+            warmth = (red - blue).toDouble() / (count * 255.0),
+            centerX = weightedX / (total * size)
+        )
+    }
+
+    private fun loadScaled(uri: Uri): Bitmap? = runCatching {
+        contentResolver.openInputStream(uri)?.use { stream ->
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            BitmapFactory.decodeStream(stream, null, bounds)
+            val sample = (bounds.outWidth / 96).coerceAtLeast(1)
+            contentResolver.openInputStream(uri)?.use { second ->
+                BitmapFactory.decodeStream(
+                    second, null,
+                    BitmapFactory.Options().apply { inSampleSize = sample }
+                )
+            }
+        }
+    }.getOrNull()
+
+    companion object {
+        private const val EXTRA_SPOT_TITLE = "spot_title"
+        private const val EXTRA_CONTEXT = "context_id"
+        private const val EXTRA_GUIDE_ID = "guide_id"
+
+        /**
+         * @param spotTitle 홈에서 고른 장소 이름 (없으면 일반 문구)
+         * @param contextId 빛 상황 칩 id — [SiseonGuide.contextIdFor]
+         * @param guideId   첫 구도 id — [SiseonGuide.guideIdFor]
+         */
+        fun intent(
+            context: Context,
+            spotTitle: String? = null,
+            contextId: String? = null,
+            guideId: String? = null
+        ): Intent = Intent(context, SiseonGuideActivity::class.java)
+            .putExtra(EXTRA_SPOT_TITLE, spotTitle)
+            .putExtra(EXTRA_CONTEXT, contextId)
+            .putExtra(EXTRA_GUIDE_ID, guideId)
+    }
+}

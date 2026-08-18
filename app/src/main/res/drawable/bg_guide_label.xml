@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 캐러셀 사진 위 구도명 라벨 바탕. 어떤 사진 위에서도 글자가 읽히게. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#59000000" />
+    <corners android:radius="12dp" />
+</shape>

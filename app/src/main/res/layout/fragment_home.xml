@@ -237,30 +237,45 @@
             android:baselineAligned="false"
             android:orientation="horizontal" />
 
-        <!-- ─────────── 지금 찍기 좋은 곳 ─────────── -->
+        <!-- ─────────── 빛이 맞는 출사 (시안 LIGHT MATCH) ─────────── -->
         <LinearLayout
             android:id="@+id/layout_home_best"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_2xl"
             android:layout_marginHorizontal="@dimen/screen_padding"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
             <TextView
-                style="@style/Text.SectionTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/home_best_now" />
-
-            <TextView
-                android:id="@+id/tv_home_best_more"
                 style="@style/Text.Caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/home_see_all"
-                android:textColor="@color/maple_600" />
+                android:letterSpacing="0.12"
+                android:text="@string/home_best_eyebrow"
+                android:textColor="@color/maple_600"
+                android:textSize="10sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/Text.SectionTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/home_best_now" />
+
+                <TextView
+                    android:id="@+id/tv_home_best_more"
+                    style="@style/Text.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/home_see_all"
+                    android:textColor="@color/maple_600" />
+            </LinearLayout>
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -274,6 +289,80 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="3"
             tools:listitem="@layout/item_home_spot" />
+
+        <!--
+          ─────────── 시선 가이드 진입 배너 ───────────
+
+          사진 목록이 "어디를"에 답했으니 그 바로 아래에서 "어떻게"로
+          잇습니다. 위 카드에서 고른 곳이 있든 없든, 오늘의 빛에 맞는
+          구도 설명은 시선 가이드 한 화면이 전담합니다.
+        -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_guide_entry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xl"
+            android:layout_marginHorizontal="@dimen/screen_padding"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/maple_50"
+            app:cardCornerRadius="@dimen/radius_card"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/space_l">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="0.12"
+                        android:text="@string/home_guide_eyebrow"
+                        android:textColor="@color/maple_600"
+                        android:textSize="10sp" />
+
+                    <TextView
+                        style="@style/Text.SectionTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_xs"
+                        android:text="@string/home_guide_title"
+                        android:textColor="@color/maple_800" />
+
+                    <TextView
+                        style="@style/Text.Caption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_xs"
+                        android:text="@string/home_guide_sub"
+                        android:textColor="@color/maple_700" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_guide_open"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_m"
+                    android:minWidth="0dp"
+                    android:text="@string/home_guide_open"
+                    android:textColor="@color/maple_600"
+                    app:backgroundTint="@color/bg_card"
+                    app:cornerRadius="@dimen/radius_button"
+                    app:strokeColor="@color/maple_300" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <ProgressBar
             android:id="@+id/progress_home"

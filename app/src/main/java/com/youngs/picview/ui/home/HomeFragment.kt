@@ -34,6 +34,17 @@ import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import com.youngs.picview.databinding.ItemQuickActionBinding
 import com.youngs.picview.ui.mission.MissionFragment
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
+import com.youngs.picview.data.repository.CourseRepository
+import com.youngs.picview.domain.course.CourseStop
+import com.youngs.picview.domain.course.ShootingCourse
+import com.youngs.picview.domain.guide.SiseonGuide
+import com.youngs.picview.domain.spot.SpotFactsTable
+import com.youngs.picview.ui.guide.SiseonGuideActivity
+import com.youngs.picview.ui.model.SpotItem
+import com.youngs.picview.util.TravelMode
+import kotlinx.coroutines.launch
 
 /**
  * 홈 — "지금 빛이 어떤가"를 첫 화면에서 답합니다.
@@ -48,6 +59,9 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
     private val binding get() = _binding!!
 
     private val viewModel: MainViewModel by activityViewModels()
+
+    /** 지금 목록의 맨 위 장소. 시선 가이드가 이 장소의 말로 시작합니다. */
+    private var topSpot: SpotItem? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -265,13 +279,19 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
     // ─────────────────────── 목록 ───────────────────────
 
     private fun setupBestSpots() {
-        val adapter = HomeSpotAdapter { spot ->
-            (activity as? MainActivity)?.pushScreen(DetailFragment.newInstance(spot))
-        }
+        val adapter = HomeSpotAdapter(
+            sunTimes = { viewModel.sunTimes },
+            onClick = { spot ->
+                (activity as? MainActivity)?.pushScreen(DetailFragment.newInstance(spot))
+            },
+            onPlanClick = { spot -> savePlan(spot) }
+        )
         binding.rvHomeBest.adapter = adapter
 
         viewModel.spotData.observe(viewLifecycleOwner) { spots ->
-            adapter.submitList(spots.orEmpty().take(BEST_COUNT))
+            val best = spots.orEmpty().take(BEST_COUNT)
+            adapter.submitList(best)
+            topSpot = best.firstOrNull()
             renderLight()
         }
 
@@ -287,7 +307,73 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
 
     private fun setupActions() {
         binding.tvHomeBestMore.setOnClickListener { goToTab(R.id.tab_explore) }
+
+        // 시선 가이드로. 맨 위 추천 장소가 있으면 그 장소의 빛·구도로
+        // 시작하고, 없으면 가이드의 기본 장면으로 엽니다.
+        val openGuide = View.OnClickListener {
+            val spot = topSpot
+            val intent = if (spot != null) {
+                val facts = SpotFactsTable.of(spot.title, spot.contentTypeId)
+                SiseonGuideActivity.intent(
+                    requireContext(),
+                    spotTitle = spot.title,
+                    contextId = SiseonGuide.contextIdFor(facts.bestPhase),
+                    guideId = SiseonGuide.guideIdFor(facts)
+                )
+            } else {
+                SiseonGuideActivity.intent(requireContext())
+            }
+            startActivity(intent)
+        }
+        binding.cardGuideEntry.setOnClickListener(openGuide)
+        binding.btnGuideOpen.setOnClickListener(openGuide)
+
         buildQuickActions()
+    }
+
+    /**
+     * 카드의 "출사 계획에 담기" — 한 곳짜리 출사 일정으로 바로 저장합니다.
+     * 상세 화면의 저장과 같은 저장소(코스 목록)에 쌓입니다.
+     */
+    private fun savePlan(spot: SpotItem) {
+        val facts = SpotFactsTable.of(spot.title, spot.contentTypeId)
+        val sun = viewModel.sunTimes
+        val window = sun.upcomingGoldenWindows(LocalTime.MIN)
+            .firstOrNull { it.phase == facts.bestPhase }
+            ?: sun.upcomingGoldenWindows(LocalTime.MIN).firstOrNull()
+
+        val arrive = window?.start ?: LocalTime.of(9, 0)
+        val stop = CourseStop(
+            spot = spot,
+            facts = facts,
+            arriveAt = arrive,
+            leaveAt = window?.end ?: arrive.plusMinutes(60),
+            phase = window?.phase ?: facts.bestPhase,
+            travelMinutes = 0,
+            travelKm = 0.0,
+            reason = facts.note,
+            isHighlight = true
+        )
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val saved = runCatching {
+                CourseRepository(requireContext()).save(
+                    ShootingCourse(
+                        stops = listOf(stop),
+                        sun = sun,
+                        travelMode = TravelMode.CAR,
+                        totalDistanceKm = 0.0
+                    ),
+                    summary = spot.title
+                )
+            }.isSuccess
+
+            Toast.makeText(
+                requireContext(),
+                if (saved) R.string.detail_plan_saved else R.string.detail_plan_failed,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     /**

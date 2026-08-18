@@ -1,0 +1,744 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ================= 시선 가이드 =================
+
+  웹 시안(GuidePage.tsx)을 화면 하나로 옮겼습니다. 순서가 곧 사용
+  순서입니다 — 오늘의 추천 한 장 → 구도 캐러셀 → 내 사진 비교 →
+  구도·빛·움직임·체크 탭 → 실전 미션.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_page"
+    android:orientation="vertical">
+
+    <!-- 헤더 -->
+    <LinearLayout
+        android:id="@+id/layout_guide_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/space_m"
+        android:paddingVertical="@dimen/space_s">
+
+        <ImageView
+            android:id="@+id/btn_guide_back"
+            android:layout_width="@dimen/touch_target"
+            android:layout_height="@dimen/touch_target"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/cd_back"
+            android:padding="12dp"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/text_primary" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/siseon_eyebrow"
+                android:textColor="@color/maple_600" />
+
+            <TextView
+                style="@style/Text.SectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/siseon_title" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_guide_count"
+            style="@style/Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:letterSpacing="0.08"
+            android:textColor="@color/text_tertiary"
+            android:textSize="10sp"
+            tools:text="14 COMPOSITIONS" />
+    </LinearLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/screen_padding"
+            android:paddingBottom="@dimen/space_2xl">
+
+            <TextView
+                style="@style/Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/siseon_sub"
+                android:textColor="@color/text_secondary" />
+
+            <!-- ───── 오늘의 추천 한 장 ───── -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_l"
+                app:cardBackgroundColor="@color/maple_50"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_l">
+
+                    <TextView
+                        android:id="@+id/tv_today_eyebrow"
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="0.12"
+                        android:textColor="@color/maple_600"
+                        android:textSize="10sp"
+                        tools:text="TODAY'S SHOT · 일몰" />
+
+                    <TextView
+                        android:id="@+id/tv_today_line"
+                        style="@style/Text.SectionTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_xs"
+                        android:textColor="@color/maple_800"
+                        tools:text="동진강 수변에서 반사 구도로 찍어보세요." />
+
+                    <TextView
+                        android:id="@+id/tv_today_meta"
+                        style="@style/Text.Caption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_xs"
+                        android:textColor="@color/maple_700"
+                        tools:text="일몰 무렵 · 낮은 빛이 길게 들어오는 상황" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_shoot_now"
+                        style="@style/Button.Primary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_m"
+                        android:text="@string/siseon_shoot_now"
+                        app:backgroundTint="@color/maple_500"
+                        app:icon="@drawable/baseline_camera_alt_24"
+                        app:iconTint="@color/white" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 상황(빛) 칩 — 웹 시안의 '상황 바꾸기' -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_m"
+                android:overScrollMode="never"
+                android:scrollbars="none">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chips_guide_context"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:chipSpacingHorizontal="6dp"
+                    app:selectionRequired="true"
+                    app:singleLine="true"
+                    app:singleSelection="true" />
+            </HorizontalScrollView>
+
+            <!-- ───── 구도 캐러셀 ───── -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="260dp"
+                android:layout_marginTop="@dimen/space_l"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <androidx.viewpager2.widget.ViewPager2
+                        android:id="@+id/vp_guide"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <!-- 구도명 라벨. 사진이 바뀌면 함께 바뀝니다. -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top|center_horizontal"
+                        android:layout_marginTop="@dimen/space_m"
+                        android:background="@drawable/bg_guide_label"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="@dimen/space_l"
+                        android:paddingVertical="@dimen/space_s">
+
+                        <TextView
+                            android:id="@+id/tv_guide_english"
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.24"
+                            android:textColor="#CCFFFFFF"
+                            android:textSize="10sp"
+                            tools:text="REFLECTION" />
+
+                        <TextView
+                            android:id="@+id/tv_guide_korean"
+                            style="@style/Text.SectionTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/white"
+                            tools:text="반사" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/btn_guide_prev"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="start|center_vertical"
+                        android:layout_marginStart="@dimen/space_m"
+                        android:background="@drawable/bg_glass_circle"
+                        android:contentDescription="@string/cd_prev_comp"
+                        android:padding="6dp"
+                        android:src="@drawable/baseline_chevron_left_24"
+                        app:tint="@color/white" />
+
+                    <ImageView
+                        android:id="@+id/btn_guide_next"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="end|center_vertical"
+                        android:layout_marginEnd="@dimen/space_m"
+                        android:background="@drawable/bg_glass_circle"
+                        android:contentDescription="@string/cd_next_comp"
+                        android:padding="6dp"
+                        android:src="@drawable/baseline_chevron_right_24"
+                        app:tint="@color/white" />
+                </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/tv_guide_desc"
+                style="@style/Text.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_m"
+                android:textColor="@color/text_secondary"
+                tools:text="수면이나 젖은 바닥에 생기는 빛의 반사를 함께 담아보세요." />
+
+            <!-- ───── 내 사진 비교 ───── -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Card.Elevated"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_l"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_l">
+
+                    <TextView
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="0.12"
+                        android:text="@string/siseon_compare_eyebrow"
+                        android:textColor="@color/maple_600"
+                        android:textSize="10sp" />
+
+                    <TextView
+                        style="@style/Text.SectionTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/siseon_compare_title" />
+
+                    <TextView
+                        style="@style/Text.Caption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_xs"
+                        android:text="@string/siseon_compare_sub"
+                        android:textColor="@color/text_secondary" />
+
+                    <!-- 업로드 전 -->
+                    <LinearLayout
+                        android:id="@+id/layout_compare_empty"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_m"
+                        android:background="@drawable/bg_detail_fact"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="@dimen/space_l">
+
+                        <ImageView
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/baseline_image_24"
+                            app:tint="@color/text_tertiary" />
+
+                        <TextView
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_s"
+                            android:gravity="center"
+                            android:text="@string/siseon_compare_empty"
+                            android:textColor="@color/text_secondary" />
+                    </LinearLayout>
+
+                    <!-- 업로드 후 -->
+                    <LinearLayout
+                        android:id="@+id/layout_compare_grid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_m"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal"
+                        android:visibility="gone"
+                        tools:visibility="visible">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/space_s"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:id="@+id/iv_compare_guide"
+                                android:layout_width="match_parent"
+                                android:layout_height="120dp"
+                                android:background="@color/bg_image_placeholder"
+                                android:contentDescription="@null"
+                                android:scaleType="centerCrop" />
+
+                            <TextView
+                                android:id="@+id/tv_compare_guide_caption"
+                                style="@style/Text.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/space_xs"
+                                android:textColor="@color/text_secondary"
+                                tools:text="가이드 · 반사" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/space_s"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:id="@+id/iv_compare_mine"
+                                android:layout_width="match_parent"
+                                android:layout_height="120dp"
+                                android:background="@color/bg_image_placeholder"
+                                android:contentDescription="@null"
+                                android:scaleType="centerCrop" />
+
+                            <TextView
+                                style="@style/Text.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/space_xs"
+                                android:text="@string/siseon_compare_caption_mine"
+                                android:textColor="@color/text_secondary" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_compare_upload"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_m"
+                        android:text="@string/siseon_upload"
+                        android:textColor="@color/maple_600"
+                        app:cornerRadius="@dimen/radius_button"
+                        app:icon="@drawable/baseline_image_24"
+                        app:iconTint="@color/maple_600"
+                        app:strokeColor="@color/maple_300" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ───── 구도 · 빛 · 움직임 · 체크 ───── -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Card.Elevated"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_l"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_l">
+
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/toggle_guide_tools"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:checkedButton="@id/btn_tool_composition"
+                        app:selectionRequired="true"
+                        app:singleSelection="true">
+
+                        <Button
+                            android:id="@+id/btn_tool_composition"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/detail_tab_composition" />
+
+                        <Button
+                            android:id="@+id/btn_tool_light"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/siseon_tab_light" />
+
+                        <Button
+                            android:id="@+id/btn_tool_action"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/siseon_tab_action" />
+
+                        <Button
+                            android:id="@+id/btn_tool_check"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/siseon_tab_check" />
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                    <!-- 구도 -->
+                    <LinearLayout
+                        android:id="@+id/panel_composition"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_l"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_detail_fact"
+                            android:orientation="vertical"
+                            android:padding="@dimen/space_m">
+
+                            <TextView
+                                style="@style/Text.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/siseon_direction"
+                                android:textColor="@color/maple_600"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:id="@+id/tv_panel_direction"
+                                style="@style/Text.Body"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textStyle="bold"
+                                tools:text="측광" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_s"
+                            android:background="@drawable/bg_detail_fact"
+                            android:orientation="vertical"
+                            android:padding="@dimen/space_m">
+
+                            <TextView
+                                style="@style/Text.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/siseon_tip_label"
+                                android:textColor="@color/maple_600"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:id="@+id/tv_panel_tip"
+                                style="@style/Text.Body"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textStyle="bold"
+                                tools:text="반사면을 화면 아래 절반에 배치" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- 빛 -->
+                    <LinearLayout
+                        android:id="@+id/panel_light"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_l"
+                        android:background="@drawable/bg_detail_fact"
+                        android:orientation="vertical"
+                        android:padding="@dimen/space_m"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/tv_light_label"
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.12"
+                            android:textColor="@color/maple_600"
+                            android:textSize="10sp"
+                            tools:text="GOLDEN HOUR" />
+
+                        <TextView
+                            android:id="@+id/tv_light_title"
+                            style="@style/Text.SectionTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            tools:text="금빛을 따라가세요" />
+
+                        <TextView
+                            android:id="@+id/tv_light_hint"
+                            style="@style/Text.Caption"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_secondary"
+                            tools:text="낮은 빛이 길게 들어오는 상황" />
+
+                        <TextView
+                            android:id="@+id/tv_light_detail"
+                            style="@style/Text.Body"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_s"
+                            tools:text="지붕선·수면·나뭇가지에 닿은 따뜻한 빛을 따라 이동해보세요." />
+                    </LinearLayout>
+
+                    <!-- 움직임 -->
+                    <LinearLayout
+                        android:id="@+id/panel_action"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_l"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            style="@style/Text.SectionTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/siseon_action_title" />
+
+                        <TextView
+                            style="@style/Text.Caption"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_xs"
+                            android:text="@string/siseon_action_sub"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            style="@style/Text.Body"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_m"
+                            android:background="@drawable/bg_detail_fact"
+                            android:padding="@dimen/space_m"
+                            android:text="@string/siseon_action_steps" />
+                    </LinearLayout>
+
+                    <!-- 체크 -->
+                    <LinearLayout
+                        android:id="@+id/panel_check"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_l"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    style="@style/Text.SectionTitle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/siseon_check_title" />
+
+                                <TextView
+                                    style="@style/Text.Caption"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/siseon_check_sub"
+                                    android:textColor="@color/text_secondary" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tv_check_percent"
+                                style="@style/Text.SectionTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/maple_600"
+                                tools:text="50%" />
+                        </LinearLayout>
+
+                        <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/progress_check"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_s"
+                            app:indicatorColor="@color/maple_500"
+                            app:trackColor="@color/maple_100"
+                            app:trackCornerRadius="3dp" />
+
+                        <TextView
+                            android:id="@+id/tv_check_caption"
+                            style="@style/Text.Caption"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_xs"
+                            android:textColor="@color/text_secondary"
+                            tools:text="2/4 완료 · 프레임을 한 번만 더 확인해보세요." />
+
+                        <LinearLayout
+                            android:id="@+id/layout_check_list"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_s"
+                            android:orientation="vertical" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ───── 바로 적용할 촬영 포인트 ───── -->
+            <TextView
+                style="@style/Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_l"
+                android:text="@string/siseon_points_title"
+                android:textColor="@color/maple_600" />
+
+            <TextView
+                android:id="@+id/tv_guide_tips"
+                style="@style/Text.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xs"
+                android:lineSpacingExtra="4dp"
+                tools:text="• 물결이 잔잔할 때 촬영하기\n• 실제 장면과 반사 경계 맞추기" />
+
+            <!-- ───── 구도별 한 걸음 더 (시그널) ───── -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_l"
+                app:cardBackgroundColor="@color/live_weather_bg"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_l">
+
+                    <TextView
+                        android:id="@+id/tv_signal_label"
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="0.12"
+                        android:textColor="@color/live_weather_eyebrow"
+                        android:textSize="10sp"
+                        tools:text="SURFACE SIGNAL" />
+
+                    <TextView
+                        android:id="@+id/tv_signal_title"
+                        style="@style/Text.SectionTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        tools:text="반사면을 찾아보세요" />
+
+                    <TextView
+                        android:id="@+id/tv_signal_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_xs"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_title"
+                        android:textStyle="bold"
+                        tools:text="물결이 잔잔한 순간" />
+
+                    <TextView
+                        android:id="@+id/tv_signal_hint"
+                        style="@style/Text.Caption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="#B3FFFFFF"
+                        tools:text="실제 장면과 반사 경계가 만나는 지점" />
+
+                    <TextView
+                        android:id="@+id/tv_signal_detail"
+                        style="@style/Text.Body"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_s"
+                        android:textColor="#E6FFFFFF"
+                        tools:text="수면의 밝은 반사광이 피사체 아래에 이어지는 위치를 찾으세요." />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_mission_start"
+                style="@style/Button.Primary"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="@dimen/space_l"
+                android:text="@string/siseon_mission_start"
+                app:backgroundTint="@color/maple_500"
+                app:icon="@drawable/baseline_camera_alt_24"
+                app:iconTint="@color/white" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

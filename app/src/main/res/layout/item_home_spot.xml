@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 홈의 '지금 찍기 좋은 곳' 가로 카드. -->
+<!--
+  홈의 '빛이 맞는 출사' 가로 카드 (시안 LIGHT MATCH).
+
+  전 카드는 "★ 점수 + 주제/시간 알약"이었습니다. 시안은 점수 대신
+  **몇 시에 가면 되는지**를 주황 글씨로 맨 위에 둡니다 — 이 목록의
+  정렬 기준(빛이 맞는 순간이 가까운 곳)과 카드의 첫 줄이 같은 말을
+  하게 하기 위해서입니다.
+-->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -32,73 +39,87 @@
                 android:contentDescription="@string/cd_spot_thumbnail"
                 android:scaleType="centerCrop" />
 
+            <!-- 주제 알약을 사진 위로. 지도 마커와 같은 색을 씁니다. -->
             <TextView
-                android:id="@+id/tv_home_spot_score"
+                android:id="@+id/tv_home_spot_theme"
                 style="@style/Text.Caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="top|end"
+                android:layout_gravity="top|start"
                 android:layout_margin="@dimen/space_s"
-                android:background="@drawable/bg_score_badge"
+                android:background="@drawable/bg_theme_pill"
+                android:maxLines="1"
                 android:paddingHorizontal="@dimen/space_s"
                 android:paddingVertical="2dp"
-                android:textColor="@color/white"
                 android:textStyle="bold"
-                tools:text="★ 81" />
+                tools:text="산·전망" />
         </FrameLayout>
+
+        <!-- 빛이 맞는 시각. 오늘 지나갔으면 내일로 넘어갑니다. -->
+        <TextView
+            android:id="@+id/tv_home_spot_time"
+            style="@style/Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/space_m"
+            android:layout_marginTop="@dimen/space_m"
+            android:drawablePadding="4dp"
+            android:gravity="center_vertical"
+            android:textColor="@color/maple_500"
+            android:textStyle="bold"
+            tools:text="⏱ 내일 05:20" />
 
         <TextView
             android:id="@+id/tv_home_spot_title"
             style="@style/Text.SectionTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_m"
+            android:layout_marginTop="2dp"
             android:layout_marginHorizontal="@dimen/space_m"
             android:ellipsize="end"
             android:maxLines="1"
-            tools:text="내장산국립공원" />
+            tools:text="내장산 능선" />
 
-        <!--
-          주제 + 시간대를 한 줄에 나란히 둡니다.
-          예전에는 시간대 배지만 있었는데 "일몰 골든아워에 좋아요" 처럼 길어져
-          카드 폭을 넘기고 두 줄로 접혔습니다. 문구를 짧게 줄이고(일몰에 좋아요)
-          주제 알약을 앞에 붙여 한 줄에 들어가게 했습니다.
-        -->
-        <LinearLayout
+        <!-- 그 시간의 빛이 무엇을 만드는지 한 줄. -->
+        <TextView
+            android:id="@+id/tv_home_spot_desc"
+            style="@style/Text.Caption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_xs"
+            android:layout_marginTop="2dp"
             android:layout_marginHorizontal="@dimen/space_m"
-            android:layout_marginBottom="@dimen/space_m"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:minLines="2"
+            android:textColor="@color/text_secondary"
+            tools:text="푸른빛에서 첫 사광으로 이어져요" />
+
+        <!-- 한 곳짜리 출사 일정으로 바로 저장. -->
+        <LinearLayout
+            android:id="@+id/layout_home_spot_plan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            android:background="?attr/selectableItemBackground"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/space_m"
+            android:paddingVertical="@dimen/space_s">
+
+            <ImageView
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_place"
+                app:tint="@color/text_secondary" />
 
             <TextView
-                android:id="@+id/tv_home_spot_theme"
                 style="@style/Text.Caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_theme_pill"
-                android:maxLines="1"
-                android:paddingHorizontal="@dimen/space_s"
-                android:paddingVertical="2dp"
-                android:textStyle="bold"
-                tools:text="자연" />
-
-            <TextView
-                android:id="@+id/tv_home_spot_phase"
-                style="@style/Text.Caption"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/space_xs"
-                android:layout_weight="1"
-                android:background="@drawable/bg_phase_badge"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:paddingHorizontal="@dimen/space_s"
-                android:paddingVertical="2dp"
-                android:textStyle="bold"
-                tools:text="일몰에 좋아요" />
+                android:layout_marginStart="4dp"
+                android:text="@string/home_spot_plan_add"
+                android:textColor="@color/text_secondary" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
