@@ -1,14 +1,18 @@
 package com.youngs.picview.ui.guide
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -18,13 +22,17 @@ import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.chip.Chip
+import com.gun0912.tedpermission.PermissionListener
+import com.gun0912.tedpermission.normal.TedPermission
 import com.youngs.picview.R
 import com.youngs.picview.databinding.ActivitySiseonGuideBinding
+import com.youngs.picview.databinding.DialogPhotoSourceBinding
 import com.youngs.picview.databinding.DialogSiseonMissionBinding
 import com.youngs.picview.databinding.ItemGuidePhotoBinding
 import com.youngs.picview.databinding.ItemMissionSlotBinding
 import com.youngs.picview.domain.guide.SiseonGuide
 import com.youngs.picview.domain.guide.SiseonGuideItem
+import com.youngs.picview.util.MediaStoreSaver
 import com.youngs.picview.util.applyTopSystemBarInset
 import kotlin.math.abs
 
@@ -68,6 +76,25 @@ class SiseonGuideActivity : AppCompatActivity() {
             val slot = pendingSlot
             pendingSlot = -1
             if (uri == null || slot !in missionPhotos.indices) return@registerForActivityResult
+            missionPhotos[slot] = uri
+            renderMissionSlots()
+        }
+
+    // ── 카메라 촬영. 시스템 카메라가 이 URI 에 직접 쓰고 돌아옵니다.
+    private var pendingCameraUri: Uri? = null
+
+    private val missionCamera =
+        registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            val uri = pendingCameraUri
+            val slot = pendingSlot
+            pendingCameraUri = null
+            pendingSlot = -1
+            uri ?: return@registerForActivityResult
+            if (!success || slot !in missionPhotos.indices) {
+                // 촬영을 취소하면 미리 만들어 둔 빈 항목이 갤러리에 남으므로 지웁니다.
+                runCatching { contentResolver.delete(uri, null, null) }
+                return@registerForActivityResult
+            }
             missionPhotos[slot] = uri
             renderMissionSlots()
         }
@@ -286,10 +313,7 @@ class SiseonGuideActivity : AppCompatActivity() {
             val slot = ItemMissionSlotBinding.inflate(layoutInflater, sheet.layoutMissionSlots, false)
             slot.tvSlotNumber.text = "0${index + 1}"
             slot.tvSlotLabel.text = label
-            slot.frameSlot.setOnClickListener {
-                pendingSlot = index
-                missionPicker.launch("image/*")
-            }
+            slot.frameSlot.setOnClickListener { showPhotoSourceSheet(index, label) }
             (slot.root.layoutParams as? ViewGroup.MarginLayoutParams)?.let { params ->
                 if (index > 0) params.marginStart = resources.getDimensionPixelSize(R.dimen.space_s)
             }
@@ -339,6 +363,95 @@ class SiseonGuideActivity : AppCompatActivity() {
             if (ready) R.string.mission_complete else R.string.mission_incomplete
         )
     }
+
+    // ───────────────────── 사진 넣기 — 촬영 / 갤러리 ─────────────────────
+
+    /**
+     * 미션 사진 칸의 두 갈래 선택 시트.
+     *
+     * 미션은 현장에서 바로 찍는 흐름이라 카메라가 먼저 오지만,
+     * 미리 찍어 둔 세 장을 넣는 쓰임도 있어 갤러리도 함께 엽니다.
+     */
+    private fun showPhotoSourceSheet(slot: Int, label: String) {
+        val sheet = DialogPhotoSourceBinding.inflate(layoutInflater)
+        sheet.tvSourceSub.text = getString(R.string.mission_source_sub, label)
+
+        val dialog = BottomSheetDialog(this)
+        dialog.setContentView(sheet.root)
+        sheet.layoutSourceCamera.setOnClickListener {
+            dialog.dismiss()
+            openMissionCamera(slot)
+        }
+        sheet.layoutSourceGallery.setOnClickListener {
+            dialog.dismiss()
+            pendingSlot = slot
+            missionPicker.launch("image/*")
+        }
+        dialog.show()
+    }
+
+    /**
+     * 시스템 카메라를 엽니다.
+     *
+     * 매니페스트에 CAMERA 권한이 선언된 앱은 권한 없이 ACTION_IMAGE_CAPTURE 를
+     * 던지면 SecurityException 이 나므로, 반드시 권한을 받고 나서 엽니다.
+     */
+    private fun openMissionCamera(slot: Int) {
+        TedPermission.create()
+            .setPermissionListener(object : PermissionListener {
+                override fun onPermissionGranted() {
+                    val uri = newMissionPhotoUri()
+                    if (uri == null) {
+                        Toast.makeText(
+                            this@SiseonGuideActivity,
+                            R.string.mission_camera_failed,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return
+                    }
+                    pendingSlot = slot
+                    pendingCameraUri = uri
+                    missionCamera.launch(uri)
+                }
+
+                override fun onPermissionDenied(deniedPermissions: MutableList<String>?) {
+                    Toast.makeText(
+                        this@SiseonGuideActivity,
+                        R.string.mission_camera_denied,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
+            .setDeniedMessage(getString(R.string.mission_camera_denied))
+            .setPermissions(*cameraPermissions())
+            .check()
+    }
+
+    /** 안드로이드 9 이하는 MediaStore 저장에도 쓰기 권한이 필요합니다. */
+    private fun cameraPermissions(): Array<String> =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            arrayOf(Manifest.permission.CAMERA)
+        } else {
+            arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+
+    /**
+     * 촬영본이 저장될 DCIM/PicView 항목을 미리 만듭니다.
+     *
+     * IS_PENDING 을 걸면 다른 앱(시스템 카메라)이 그 항목에 쓸 수 없어
+     * 촬영이 실패하므로, 여기서는 빼고 바로 보이는 상태로 만듭니다.
+     * 취소 시에는 결과 콜백에서 지웁니다.
+     */
+    private fun newMissionPhotoUri(): Uri? = runCatching {
+        val values = MediaStoreSaver
+            .imageValues("PicView_mission_${System.currentTimeMillis()}.jpg")
+            .apply {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    remove(MediaStore.Images.Media.IS_PENDING)
+                }
+            }
+        contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+    }.getOrNull()
 
     // ───────────────────── 세 장 자동 분석 ─────────────────────
 
