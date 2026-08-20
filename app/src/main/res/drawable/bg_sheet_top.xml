@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 지도 바텀시트. 위쪽 모서리만 둥급니다. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/bg_card" />
+    <corners android:topLeftRadius="24dp" android:topRightRadius="24dp" />
+</shape>
