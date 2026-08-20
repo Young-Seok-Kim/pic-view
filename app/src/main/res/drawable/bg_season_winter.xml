@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 사계절 가이드 히어로 : 겨울. 남색 하늘에 눈 덮인 능선과 눈송이입니다. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="360dp"
+    android:height="210dp"
+    android:viewportWidth="360"
+    android:viewportHeight="210">
+
+    <path android:pathData="M0,0 H360 V210 H0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="180" android:startY="0"
+                android:endX="180" android:endY="210"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF223350" />
+                <item android:offset="1.0" android:color="#FF3E5878" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- 눈 덮인 능선 -->
+    <path
+        android:fillColor="#99C7D3E6"
+        android:pathData="M0,136 L58,106 L122,132 L190,100 L256,128 L314,104 L360,122 V210 H0 Z" />
+    <path
+        android:fillColor="#CCE9EFF7"
+        android:pathData="M0,168 L78,146 L158,164 L242,142 L318,160 L360,150 V210 H0 Z" />
+
+    <!-- 눈송이 -->
+    <path android:fillColor="#D9FFFFFF" android:pathData="M60,44 m-3.4,0 a3.4,3.4 0 1,0 6.8,0 a3.4,3.4 0 1,0 -6.8,0" />
+    <path android:fillColor="#99FFFFFF" android:pathData="M126,74 m-2.6,0 a2.6,2.6 0 1,0 5.2,0 a2.6,2.6 0 1,0 -5.2,0" />
+    <path android:fillColor="#CCFFFFFF" android:pathData="M206,40 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
+    <path android:fillColor="#8CFFFFFF" android:pathData="M280,84 m-2.4,0 a2.4,2.4 0 1,0 4.8,0 a2.4,2.4 0 1,0 -4.8,0" />
+    <path android:fillColor="#BFFFFFFF" android:pathData="M330,52 m-2.8,0 a2.8,2.8 0 1,0 5.6,0 a2.8,2.8 0 1,0 -5.6,0" />
+    <path android:fillColor="#A6FFFFFF" android:pathData="M166,96 m-2.4,0 a2.4,2.4 0 1,0 4.8,0 a2.4,2.4 0 1,0 -4.8,0" />
+    <path android:fillColor="#8CFFFFFF" android:pathData="M38,92 m-2.6,0 a2.6,2.6 0 1,0 5.2,0 a2.6,2.6 0 1,0 -5.2,0" />
+</vector>

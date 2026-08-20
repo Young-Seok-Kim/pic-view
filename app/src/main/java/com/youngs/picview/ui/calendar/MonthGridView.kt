@@ -45,6 +45,13 @@ class MonthGridView @JvmOverloads constructor(
             invalidate()
         }
 
+    /** 절정 앞뒤의 추천 날짜. 절정과 겹치면 절정이 이깁니다. */
+    var recommendedDays: Set<Int> = emptySet()
+        set(value) {
+            field = value
+            invalidate()
+        }
+
     private val dayPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER
     }
@@ -72,6 +79,8 @@ class MonthGridView @JvmOverloads constructor(
         todayPaint.color = maple
         dotPaint.color = golden
     }
+
+    private val recoDotPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     /** 이 달을 그리는 데 필요한 줄 수(요일 머리 1줄 + 날짜 줄). */
     private val weekRows: Int
@@ -126,9 +135,16 @@ class MonthGridView @JvmOverloads constructor(
             }
             canvas.drawText(day.toString(), cx, cy, dayPaint)
 
-            // 절정 기간 표시. 오늘 원 안에는 찍지 않습니다(겹쳐 안 보입니다).
-            if (day in markedDays && !isToday) {
-                canvas.drawCircle(cx, cy + rowH * 0.22f, 2.5f * density, dotPaint)
+            // 절정(단풍색)·추천(황금색) 표시. 오늘 원 안에는 찍지 않습니다.
+            // 절정이 추천을 이깁니다 — 같은 날 점 두 개는 소음입니다.
+            if (!isToday) {
+                if (day in markedDays) {
+                    dotPaint.color = maple
+                    canvas.drawCircle(cx, cy + rowH * 0.22f, 2.5f * density, dotPaint)
+                } else if (day in recommendedDays) {
+                    recoDotPaint.color = golden
+                    canvas.drawCircle(cx, cy + rowH * 0.22f, 2.5f * density, recoDotPaint)
+                }
             }
         }
     }
