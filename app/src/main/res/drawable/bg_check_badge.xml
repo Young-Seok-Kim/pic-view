@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 조건 카드 모서리의 선택 확인 배지. 붉은 원 안 흰 체크. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/maple_500" />
+            <stroke android:width="2dp" android:color="@color/bg_card" />
+        </shape>
+    </item>
+    <item
+        android:drawable="@drawable/ic_check"
+        android:gravity="center"
+        android:width="12dp"
+        android:height="12dp" />
+</layer-list>

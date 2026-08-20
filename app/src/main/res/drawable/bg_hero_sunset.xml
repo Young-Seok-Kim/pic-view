@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    계획 탭 히어로 배경 : 석양.
+    사진 대신 그린 장면입니다. 오른쪽 능선 위로 해가 내려앉고
+    왼쪽은 글자가 앉을 수 있게 옅은 크림으로 비워 둡니다.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="360dp"
+    android:height="120dp"
+    android:viewportWidth="360"
+    android:viewportHeight="120">
+
+    <!-- 하늘 : 왼쪽 크림 → 오른쪽 노을 -->
+    <path android:pathData="M0,0 H360 V120 H0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="0" android:startY="60"
+                android:endX="360" android:endY="60"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FFFBF1E4" />
+                <item android:offset="0.55" android:color="#FFF6D9AC" />
+                <item android:offset="1.0" android:color="#FFEC9E55" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- 해 주변의 붉은 번짐 -->
+    <path android:pathData="M295,64 m-55,0 a55,55 0 1,0 110,0 a55,55 0 1,0 -110,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="295" android:centerY="64"
+                android:gradientRadius="55"
+                android:type="radial">
+                <item android:offset="0.0" android:color="#B3FFE2A8" />
+                <item android:offset="1.0" android:color="#00FFE2A8" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- 먼 능선 -->
+    <path
+        android:fillColor="#59B97F5C"
+        android:pathData="M0,86 L52,70 L104,84 L158,62 L214,80 L268,58 L318,74 L360,64 V120 H0 Z" />
+
+    <!-- 해 : 능선 뒤로 반쯤 걸칩니다 -->
+    <path
+        android:fillColor="#FFFFDE9E"
+        android:pathData="M295,64 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0" />
+
+    <!-- 가까운 능선 -->
+    <path
+        android:fillColor="#8C8A5A40"
+        android:pathData="M0,100 L64,88 L132,98 L204,84 L272,96 L360,86 V120 H0 Z" />
+</vector>

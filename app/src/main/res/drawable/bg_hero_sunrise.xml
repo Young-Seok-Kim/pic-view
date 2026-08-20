@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    계획 탭 히어로 배경 : 일출.
+    해가 왼쪽에서 떠오릅니다. 석양과 좌우가 반대라 아침·저녁이
+    그림만으로도 구분됩니다. 하늘은 아직 푸른 기가 남아 있습니다.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="360dp"
+    android:height="120dp"
+    android:viewportWidth="360"
+    android:viewportHeight="120">
+
+    <path android:pathData="M0,0 H360 V120 H0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="0" android:startY="60"
+                android:endX="360" android:endY="60"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FFF6CF96" />
+                <item android:offset="0.45" android:color="#FFF4E1C2" />
+                <item android:offset="1.0" android:color="#FFDCE7F2" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <path android:pathData="M64,66 m-52,0 a52,52 0 1,0 104,0 a52,52 0 1,0 -104,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="64" android:centerY="66"
+                android:gradientRadius="52"
+                android:type="radial">
+                <item android:offset="0.0" android:color="#B3FFE9B8" />
+                <item android:offset="1.0" android:color="#00FFE9B8" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <path
+        android:fillColor="#597C8DA6"
+        android:pathData="M0,84 L48,66 L100,82 L152,60 L210,80 L266,64 L318,78 L360,68 V120 H0 Z" />
+
+    <path
+        android:fillColor="#FFFFE7AE"
+        android:pathData="M64,66 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0" />
+
+    <path
+        android:fillColor="#8C5A6B84"
+        android:pathData="M0,98 L70,88 L138,98 L206,86 L276,96 L360,88 V120 H0 Z" />
+</vector>

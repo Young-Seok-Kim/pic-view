@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    출사 조건 카드 한 칸 — 날짜 · 동행 · 체류 시간 · 이동 방법 · 촬영 목적.
+    값이 정해져 있다는 표시로 모서리에 체크 배지가 얹힙니다.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingTop="6dp"
+    android:paddingEnd="6dp"
+    tools:ignore="RtlSymmetry">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_cond"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardBackgroundColor="@color/bg_card"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:strokeColor="@color/maple_100"
+        app:strokeWidth="1.2dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/space_s"
+            android:paddingVertical="@dimen/space_m">
+
+            <TextView
+                android:id="@+id/tv_cond_label"
+                style="@style/Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                tools:text="날짜" />
+
+            <ImageView
+                android:id="@+id/iv_cond_icon"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="@dimen/space_s"
+                android:contentDescription="@null"
+                app:tint="@color/maple_500"
+                tools:src="@drawable/ic_calendar" />
+
+            <TextView
+                android:id="@+id/tv_cond_value"
+                style="@style/Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_s"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="@color/text_primary"
+                tools:text="8.12 (수)" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <ImageView
+        android:id="@+id/iv_cond_check"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_gravity="top|end"
+        android:contentDescription="@null"
+        android:src="@drawable/bg_check_badge" />
+</FrameLayout>

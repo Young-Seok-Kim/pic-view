@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 타임라인 골든아워 노드. 흰 원이 줄 위에 떠 보이게 합니다. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@color/bg_card" />
+    <stroke android:width="1.5dp" android:color="@color/maple_300" />
+</shape>

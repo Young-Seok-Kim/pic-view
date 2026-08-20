@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    오늘의 빛 코스 — 정거장 한 장.
+    왼쪽은 장소 사진, 오른쪽은 "몇 시에 도착해 무엇을 찍는가"입니다.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_stop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardBackgroundColor="@color/bg_card"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:strokeColor="@color/card_stroke"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/iv_stop_image"
+                android:layout_width="118dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/cd_spot_photo"
+                android:minHeight="196dp"
+                android:scaleType="centerCrop"
+                tools:src="@drawable/bg_image_placeholder" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="@dimen/space_m">
+
+                <TextView
+                    android:id="@+id/tv_stop_ordinal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_ordinal_badge"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="2dp"
+                    android:textColor="@color/text_on_brand"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    tools:text="1st" />
+
+                <TextView
+                    android:id="@+id/tv_stop_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_xs"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/pretendard_bold"
+                    android:maxLines="1"
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    tools:text="내장산 우화정" />
+
+                <TextView
+                    android:id="@+id/tv_stop_addr"
+                    style="@style/Text.Caption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    tools:text="정읍시 내장산로 936" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_s"
+                    android:background="@drawable/bg_arrive_box"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/space_m">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/course_arrive_label"
+                            android:textColor="@color/maple_600" />
+
+                        <TextView
+                            android:id="@+id/tv_stop_arrive"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/pretendard_bold"
+                            android:fontFeatureSettings="tnum"
+                            android:textColor="@color/maple_500"
+                            android:textSize="24sp"
+                            tools:text="18:10" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginVertical="2dp"
+                        android:background="@color/divider" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/space_m"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/course_travel_time_label" />
+
+                        <TextView
+                            android:id="@+id/tv_stop_travel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/pretendard_bold"
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp"
+                            tools:text="32분" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <TextView
+                    style="@style/Text.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_s"
+                    android:text="@string/course_action_label"
+                    android:textColor="@color/text_tertiary" />
+
+                <TextView
+                    android:id="@+id/tv_stop_note"
+                    style="@style/Text.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:textSize="13sp"
+                    tools:text="☀ 석양이 우화정 뒤로 넘어갈 때, 연못에 비치는 반영을 담아보세요." />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</FrameLayout>
