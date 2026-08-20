@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    계획 탭 히어로 배경 : 블루아워(새벽·저녁).
+    해는 없고 지평선에만 노을의 잔광이 남습니다. 어두운 배경이라
+    글자는 코드에서 밝은 색으로 바꿔 얹습니다.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="360dp"
+    android:height="120dp"
+    android:viewportWidth="360"
+    android:viewportHeight="120">
+
+    <path android:pathData="M0,0 H360 V120 H0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="180" android:startY="0"
+                android:endX="180" android:endY="120"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF3A4A6E" />
+                <item android:offset="1.0" android:color="#FF7D93B8" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- 지평선의 잔광 -->
+    <path android:pathData="M290,88 m-60,0 a60,60 0 1,0 120,0 a60,60 0 1,0 -120,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="290" android:centerY="88"
+                android:gradientRadius="60"
+                android:type="radial">
+                <item android:offset="0.0" android:color="#66FFD9A0" />
+                <item android:offset="1.0" android:color="#00FFD9A0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <path
+        android:fillColor="#B32C3854"
+        android:pathData="M0,84 L54,70 L108,82 L164,62 L222,80 L276,60 L324,76 L360,66 V120 H0 Z" />
+
+    <path
+        android:fillColor="#E61F2940"
+        android:pathData="M0,98 L66,88 L136,98 L208,86 L278,96 L360,88 V120 H0 Z" />
+</vector>

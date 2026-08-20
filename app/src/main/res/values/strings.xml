@@ -72,12 +72,48 @@
     <string name="subject_architecture">#건축·문화재</string>
     <string name="subject_food">#맛집</string>
     <string name="subject_night">#야경</string>
-    <string name="course_make">빛 스케줄 만들기</string>
+    <string name="course_make">✨ 출사 코스 만들기</string>
     <string name="course_need_spots">촬영지를 아직 불러오지 못했어요. 잠시 후 다시 시도해 주세요</string>
     <string name="course_no_result">조건에 맞는 촬영지를 찾지 못했어요. 시간이나 피사체를 넓혀보세요</string>
 
+    <!-- 출사 코스 : 입력(빛 흐름 시안) -->
+    <string name="course_hero_eyebrow">지금, 정읍의 빛</string>
+    <string name="course_hero_until_sunset">석양까지 %1$s</string>
+    <string name="course_hero_until_sunrise">일출까지 %1$s</string>
+    <string name="course_hero_golden_now">지금이 골든아워</string>
+    <string name="course_hero_sun_down">오늘의 해가 졌어요</string>
+    <string name="course_hero_golden">오늘 골든아워 %1$s ~ %2$s ⓘ</string>
+    <string name="course_hero_golden_tomorrow">내일 골든아워는 일출 %1$s부터예요</string>
+    <string name="course_hero_golden_unknown">골든아워 정보를 불러오지 못했어요</string>
+    <string name="course_pick_title">당신의 오늘을 선택해 주세요</string>
+    <string name="course_pick_hint">✨ 선택하신 조건으로 최적의 출사 코스를 추천해드려요</string>
+    <string name="course_cond_date">날짜</string>
+    <string name="course_cond_party">동행</string>
+    <string name="course_cond_duration">체류 시간</string>
+    <string name="course_cond_travel">이동 방법</string>
+    <string name="course_cond_subject">촬영 목적</string>
+    <string name="course_cond_date_format">M.d (E)</string>
+    <string name="course_duration_med">3~4시간</string>
+    <string name="course_subject_all">전체</string>
+    <string name="course_subject_more">%1$s 외 %2$d</string>
+    <string name="course_today_title">오늘의 출사 코스</string>
+    <string name="course_reco_badge">추천 1</string>
+    <string name="course_other">다른 코스 보기 ›</string>
+    <string name="course_arrive_label">도착 권장 시각</string>
+    <string name="course_travel_time_label">🚘 이동 시간</string>
+    <string name="course_travel_minutes">%1$d분</string>
+    <string name="course_travel_start">출발지</string>
+    <string name="course_action_label">추천 촬영 행동</string>
+    <string name="course_preview_empty">조건에 맞는 출사 코스를 찾고 있어요.\n촬영지를 불러온 뒤 다시 보여드릴게요</string>
+    <string name="course_timeline_title">오늘의 빛 타임라인 ⓘ</string>
+    <string name="course_tl_sunrise">일출</string>
+    <string name="course_tl_golden">골든아워</string>
+    <string name="course_tl_sunset">일몰</string>
+    <string name="course_save_plan">🔖 출사 계획 저장</string>
+    <string name="course_stop_ordinal">%1$d번째</string>
+
     <!-- 출사 코스 : 결과 -->
-    <string name="course_result_title">오늘의 빛 스케줄</string>
+    <string name="course_result_title">오늘의 출사 코스</string>
     <string name="course_timeline">코스 타임라인</string>
     <string name="course_save">저장</string>
     <string name="course_saved">내 코스에 저장했어요</string>
@@ -114,7 +150,7 @@
     <string name="home_duration_m">%1$d분</string>
     <string name="home_next_golden">🌇 골든아워까지 %1$d시간 %2$d분</string>
     <string name="home_golden_tomorrow">🌅 내일 일출을 기다려보세요</string>
-    <string name="home_make_course">오늘의 빛 스케줄 만들기</string>
+    <string name="home_make_course">오늘의 출사 코스 만들기</string>
     <string name="home_open_map">지도</string>
     <string name="home_open_explore">촬영지 전체</string>
     <string name="home_best_now">지금 가면 좋은 곳</string>
@@ -239,7 +275,7 @@
     <string name="my_visited_spots">다녀온 곳</string>
     <string name="my_saved_course_title">내 출사 코스</string>
     <string name="my_no_course">아직 저장한 코스가 없어요.
-코스 탭에서 빛 스케줄을 만들고 저장해 보세요.</string>
+코스 탭에서 출사 코스를 만들고 저장해 보세요.</string>
     <string name="my_delete_course">코스 삭제</string>
     <string name="my_delete_confirm">\"%1$s\" 코스를 삭제할까요?</string>
     <string name="my_accessibility">접근성</string>
@@ -421,7 +457,7 @@
     <string name="factor_comfort">머무는 여건</string>
     <string name="home_qa_calendar">캘린더</string>
     <string name="home_qa_mission">미션</string>
-    <string name="home_qa_course">빛 스케줄</string>
+    <string name="home_qa_course">출사 코스</string>
     <string name="calendar_prev_month">이전 달</string>
     <string name="calendar_next_month">다음 달</string>
     <string name="calendar_month_format">yyyy년 M월</string>

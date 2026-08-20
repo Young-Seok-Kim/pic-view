@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    출사 코스 입력.
+    계획(출사 조건 입력) — 빛 코스 시안.
 
-    일반 여행앱의 "예산·인원·맛집 태그" 대신 촬영 조건을 받습니다.
-    빛(언제) · 시간(얼마나) · 이동(어떻게) · 피사체(무엇을).
+    위에서부터 : 로고+날짜 알약 → "지금, 정읍의 빛" 히어로 →
+    조건 카드 다섯 칸 → 오늘의 빛 코스 미리보기 → 빛 타임라인 → CTA 둘.
+    히어로 배경은 지금 빛 구간(일출·낮·석양·블루아워·밤)을 따라 코드가 바꿉니다.
 -->
 <androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -20,31 +21,278 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="@dimen/screen_padding"
         android:paddingBottom="@dimen/space_3xl">
 
+        <!-- ─────────── 로고 · 날짜 ─────────── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_l"
+            android:layout_marginHorizontal="@dimen/screen_padding"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/Text.Display"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/app_name"
+                android:textColor="@color/maple_500"
+                android:textSize="24sp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_course_date"
+                android:layout_width="wrap_content"
+                android:layout_height="42dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/bg_card"
+                app:cardCornerRadius="21dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/card_stroke"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/space_l"
+                    android:paddingEnd="@dimen/space_s">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_calendar"
+                        app:tint="@color/maple_500" />
+
+                    <TextView
+                        android:id="@+id/tv_course_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/space_s"
+                        android:fontFamily="@font/pretendard_semibold"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_body"
+                        tools:text="2026.08.12 (수)" />
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_marginStart="2dp"
+                        android:contentDescription="@string/course_date_change"
+                        android:src="@drawable/baseline_chevron_right_24"
+                        app:tint="@color/text_tertiary" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <!-- ─────────── 히어로 : 지금, 정읍의 빛 ─────────── -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_hero"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_l"
+            android:layout_marginHorizontal="@dimen/screen_padding"
+            app:cardCornerRadius="@dimen/radius_card"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/iv_hero"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@null"
+                    android:scaleType="fitXY"
+                    tools:src="@drawable/bg_hero_sunset" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_xl">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tv_hero_dot"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="●"
+                            android:textColor="@color/maple_500"
+                            android:textSize="8sp" />
+
+                        <TextView
+                            android:id="@+id/tv_hero_eyebrow"
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/space_s"
+                            android:text="@string/course_hero_eyebrow"
+                            android:textColor="@color/text_secondary" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_hero_headline"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_xs"
+                        android:fontFamily="@font/pretendard_bold"
+                        android:letterSpacing="-0.02"
+                        android:textColor="@color/text_primary"
+                        android:textSize="30sp"
+                        tools:text="석양까지 58분" />
+
+                    <TextView
+                        android:id="@+id/tv_hero_golden"
+                        style="@style/Text.Body"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_m"
+                        android:textColor="@color/text_secondary"
+                        tools:text="오늘 골든아워 18:40 ~ 19:20 ⓘ" />
+                </LinearLayout>
+            </FrameLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ─────────── 조건 선택 ─────────── -->
         <TextView
-            android:id="@+id/tv_course_heading"
-            style="@style/Text.Display"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_2xl"
-            android:text="@string/course_input_title" />
+            android:layout_marginHorizontal="@dimen/screen_padding"
+            android:fontFamily="@font/pretendard_bold"
+            android:text="@string/course_pick_title"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_section" />
 
-        <TextView
-            style="@style/Text.Body"
+        <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_xs"
-            android:text="@string/course_input_subtitle" />
+            android:layout_marginTop="@dimen/space_m"
+            android:clipToPadding="false"
+            android:paddingHorizontal="@dimen/screen_padding"
+            android:scrollbars="none">
 
-        <!-- ─────────── 오늘의 빛 ─────────── -->
+            <LinearLayout
+                android:id="@+id/layout_conditions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            android:layout_marginHorizontal="@dimen/screen_padding"
+            android:text="@string/course_pick_hint"
+            android:textColor="@color/text_tertiary"
+            android:textSize="@dimen/text_caption" />
+
+        <!-- ─────────── 오늘의 빛 코스 ─────────── -->
         <com.google.android.material.card.MaterialCardView
             style="@style/Card.Elevated"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_xl"
-            app:cardBackgroundColor="@color/maple_50">
+            android:layout_marginHorizontal="@dimen/screen_padding">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/space_l">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/Text.SectionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/course_today_title" />
+
+                    <TextView
+                        android:id="@+id/tv_reco_badge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/space_s"
+                        android:background="@drawable/bg_pill_outline"
+                        android:paddingHorizontal="@dimen/space_m"
+                        android:paddingVertical="3dp"
+                        android:text="@string/course_reco_badge"
+                        android:textColor="@color/maple_600"
+                        android:textSize="@dimen/text_caption" />
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/tv_other_course"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_pill_soft"
+                        android:paddingHorizontal="@dimen/space_m"
+                        android:paddingVertical="5dp"
+                        android:text="@string/course_other"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/text_caption" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_course_preview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_m"
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:itemCount="1"
+                    tools:listitem="@layout/item_course_preview" />
+
+                <TextView
+                    android:id="@+id/tv_course_empty"
+                    style="@style/Text.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingVertical="@dimen/space_2xl"
+                    android:text="@string/course_preview_empty"
+                    android:visibility="gone"
+                    tools:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/layout_course_dots"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_m"
+                    android:gravity="center"
+                    android:orientation="horizontal" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ─────────── 오늘의 빛 타임라인 ─────────── -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Card.Elevated"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_m"
+            android:layout_marginHorizontal="@dimen/screen_padding">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -53,351 +301,160 @@
                 android:padding="@dimen/space_l">
 
                 <TextView
-                    android:id="@+id/tv_light_heading"
-                    style="@style/Text.Caption"
+                    style="@style/Text.SectionTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/course_today_light"
-                    android:textColor="@color/maple_700" />
+                    android:text="@string/course_timeline_title" />
 
-                <TextView
-                    android:id="@+id/tv_sun_times"
-                    style="@style/Text.SectionTitle"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_xs"
-                    android:textColor="@color/maple_800"
-                    tools:text="일출 05:47 · 일몰 19:39" />
+                    android:layout_marginTop="@dimen/space_l">
 
-                <TextView
-                    android:id="@+id/tv_next_golden"
-                    style="@style/Text.Body"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:textColor="@color/maple_700"
-                    tools:text="다음 골든아워까지 3시간 12분" />
+                    <View
+                        android:id="@+id/view_tl_line"
+                        android:layout_width="0dp"
+                        android:layout_height="3dp"
+                        android:layout_marginTop="17dp"
+                        android:layout_marginHorizontal="18dp"
+                        android:background="@drawable/bg_timeline_gradient"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <LinearLayout
+                        android:id="@+id/col_tl_sunrise"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:gravity="center"
+                            android:text="🌄"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_xs"
+                            android:text="@string/course_tl_sunrise" />
+
+                        <TextView
+                            android:id="@+id/tv_tl_sunrise"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/pretendard_semibold"
+                            android:fontFeatureSettings="tnum"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="@dimen/text_caption"
+                            tools:text="05:48" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/col_tl_golden"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_tl_node"
+                            android:gravity="center"
+                            android:text="🌅"
+                            android:textSize="15sp" />
+
+                        <TextView
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_xs"
+                            android:text="@string/course_tl_golden"
+                            android:textColor="@color/maple_600" />
+
+                        <TextView
+                            android:id="@+id/tv_tl_golden"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/pretendard_semibold"
+                            android:fontFeatureSettings="tnum"
+                            android:textColor="@color/maple_600"
+                            android:textSize="@dimen/text_caption"
+                            tools:text="18:40 ~ 19:20" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/col_tl_sunset"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:gravity="center"
+                            android:text="🌇"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_xs"
+                            android:text="@string/course_tl_sunset" />
+
+                        <TextView
+                            android:id="@+id/tv_tl_sunset"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/pretendard_semibold"
+                            android:fontFeatureSettings="tnum"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="@dimen/text_caption"
+                            tools:text="19:32" />
+                    </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- ─────────── 여행 날짜 ─────────── -->
-        <TextView
-            style="@style/Text.SectionTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_xl"
-            android:text="@string/course_date" />
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card_course_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_s"
-            android:clickable="true"
-            android:focusable="true"
-            app:cardBackgroundColor="@color/bg_card"
-            app:cardCornerRadius="@dimen/radius_card"
-            app:cardElevation="0dp"
-            app:strokeColor="@color/card_stroke"
-            app:strokeWidth="1dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:minHeight="@dimen/touch_target"
-                android:orientation="horizontal"
-                android:paddingHorizontal="@dimen/space_l"
-                android:paddingVertical="@dimen/space_m">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/course_date_icon"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/tv_course_date"
-                    style="@style/Text.SectionTitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/space_m"
-                    android:layout_weight="1"
-                    tools:text="2026.08.04 (화)" />
-
-                <TextView
-                    style="@style/Text.Body"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/course_date_change"
-                    android:textColor="@color/maple_500" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- ─────────── 인원 구성 ─────────── -->
-        <TextView
-            style="@style/Text.SectionTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_xl"
-            android:text="@string/course_party" />
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chips_party"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_s"
-            app:selectionRequired="true"
-            app:singleLine="false"
-            app:singleSelection="true">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_party_solo"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="@string/course_party_solo" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_party_couple"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/course_party_couple" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_party_family"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/course_party_family" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_party_friends"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/course_party_friends" />
-        </com.google.android.material.chip.ChipGroup>
-
-        <!-- ─────────── 언제 ─────────── -->
-        <TextView
-            style="@style/Text.SectionTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_xl"
-            android:text="@string/course_when" />
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chips_when"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_s"
-            app:selectionRequired="true"
-            app:singleLine="false"
-            app:singleSelection="true">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_when_now"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="@string/course_when_now" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_when_sunrise"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/course_when_sunrise" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_when_morning"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/course_when_morning" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_when_sunset"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/course_when_sunset" />
-        </com.google.android.material.chip.ChipGroup>
-
-        <!-- ─────────── 얼마나 ─────────── -->
-        <TextView
-            style="@style/Text.SectionTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_xl"
-            android:text="@string/course_duration" />
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chips_duration"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_s"
-            app:selectionRequired="true"
-            app:singleSelection="true">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_duration_short"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/course_duration_short" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_duration_half"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="@string/course_duration_half" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_duration_full"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/course_duration_full" />
-        </com.google.android.material.chip.ChipGroup>
-
-        <!-- ─────────── 이동 수단 ─────────── -->
-        <TextView
-            style="@style/Text.SectionTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_xl"
-            android:text="@string/course_travel" />
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chips_travel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_s"
-            app:selectionRequired="true"
-            app:singleSelection="true">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_travel_car"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="@string/course_travel_car" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_travel_transit"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/course_travel_transit" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_travel_walk"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/course_travel_walk" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_travel_rail"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/course_travel_rail" />
-        </com.google.android.material.chip.ChipGroup>
-
-        <!-- ─────────── 무엇을 ─────────── -->
-        <TextView
-            style="@style/Text.SectionTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_xl"
-            android:text="@string/course_subject" />
-
-        <TextView
-            style="@style/Text.Caption"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/course_subject_hint" />
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chips_subject"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_s"
-            app:singleSelection="false">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_subject_landscape"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/subject_landscape" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_subject_architecture"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/subject_architecture" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_subject_food"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/subject_food" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_subject_night"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/subject_night" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_subject_nature"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/subject_nature" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_subject_healing"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/subject_healing" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_subject_history"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/subject_history" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_subject_activity"
-                style="@style/Chip.Tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/subject_activity" />
-        </com.google.android.material.chip.ChipGroup>
-
+        <!-- ─────────── CTA ─────────── -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_make_course"
             style="@style/Button.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_2xl"
+            android:layout_marginTop="@dimen/space_xl"
+            android:layout_marginHorizontal="@dimen/screen_padding"
+            android:minHeight="54dp"
             android:text="@string/course_make" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_save_plan"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            android:layout_marginHorizontal="@dimen/screen_padding"
+            android:fontFamily="@font/mapo_backpacking"
+            android:minHeight="52dp"
+            android:text="@string/course_save_plan"
+            android:textColor="@color/maple_600"
+            android:textSize="@dimen/text_button"
+            app:cornerRadius="@dimen/radius_button"
+            app:strokeColor="@color/maple_300" />
 
         <TextView
             android:id="@+id/tv_course_error"

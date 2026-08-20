@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    계획 탭 히어로 배경 : 낮(오전·한낮·오후).
+    해가 높이 떠 있고 능선은 마른 모래빛입니다. 골든아워가 아니라는 것이
+    색으로 먼저 읽히게 채도를 낮춰 둡니다.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="360dp"
+    android:height="120dp"
+    android:viewportWidth="360"
+    android:viewportHeight="120">
+
+    <path android:pathData="M0,0 H360 V120 H0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="180" android:startY="0"
+                android:endX="180" android:endY="120"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FFFDF4E0" />
+                <item android:offset="1.0" android:color="#FFF6E3BC" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <path android:pathData="M298,30 m-38,0 a38,38 0 1,0 76,0 a38,38 0 1,0 -76,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="298" android:centerY="30"
+                android:gradientRadius="38"
+                android:type="radial">
+                <item android:offset="0.0" android:color="#99FFEFC2" />
+                <item android:offset="1.0" android:color="#00FFEFC2" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <path
+        android:fillColor="#FFFFE9AE"
+        android:pathData="M298,30 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0" />
+
+    <path
+        android:fillColor="#66C9B896"
+        android:pathData="M0,86 L56,72 L112,84 L170,66 L228,82 L286,64 L336,78 L360,70 V120 H0 Z" />
+
+    <path
+        android:fillColor="#99A99B72"
+        android:pathData="M0,100 L68,90 L140,100 L212,88 L284,98 L360,90 V120 H0 Z" />
+</vector>
