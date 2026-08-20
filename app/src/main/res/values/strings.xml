@@ -397,6 +397,45 @@
 
     <string name="map_spot_count">촬영지 %1$d곳</string>
 
+    <!-- 촬영지 탐색 지도 -->
+    <string name="map_title">촬영지 탐색</string>
+    <string name="map_status_format">지금은 %1$s · %2$s · %3$s</string>
+    <string name="map_until_sunset">일몰까지 %1$s</string>
+    <string name="map_until_sunrise">일출까지 %1$s</string>
+    <string name="map_story_label">스토리</string>
+    <string name="map_purpose_label">촬영 목적</string>
+    <string name="map_story_moon">🌙 달</string>
+    <string name="map_story_love">🤍 사랑</string>
+    <string name="map_story_revolution">🚩 혁명</string>
+    <string name="map_story_slow">🐌 느림</string>
+    <string name="map_story_season">🍃 계절</string>
+    <string name="map_purpose_reflect">💧 반사</string>
+    <string name="map_purpose_silhouette">👤 실루엣</string>
+    <string name="map_purpose_person">🧍 인물</string>
+    <string name="map_purpose_arch">🏛 건축선</string>
+    <string name="map_purpose_space">⬚ 여백</string>
+    <string name="map_legend_title">촬영 목적 범례</string>
+    <string name="map_reco_walk">%1$s 따라 걷기 · 지금 추천</string>
+    <string name="map_sheet_eyebrow">선택한 장소 · 지금 가는 이유</string>
+    <string name="map_stat_light">현재 빛</string>
+    <string name="map_stat_travel">이동</string>
+    <string name="map_stat_stay">체류</string>
+    <string name="map_stat_level">난이도</string>
+    <string name="map_reco_comp">추천 구성</string>
+    <string name="map_one_line">사진가를 위한 한 줄</string>
+    <string name="map_open_guide">🧭 시선 가이드 열기</string>
+    <string name="map_save_plan">🔖 출사 계획에 저장</string>
+    <string name="map_step_discover">발견</string>
+    <string name="map_step_select">선택</string>
+    <string name="map_step_shoot">촬영</string>
+    <string name="map_step_record">기록</string>
+    <string name="map_step_replan">재계획</string>
+    <string name="map_minutes">%1$d분</string>
+    <string name="map_stay_minutes">%1$d분</string>
+    <string name="cd_search">탐색 목록 열기</string>
+    <string name="cd_layers">범례 접기/펴기</string>
+    <string name="cd_spot_photo">촬영지 사진</string>
+
     <!-- 상세 -->
     <string name="detail_section_info">장소 정보</string>
     <string name="detail_photo_score">포토스코어</string>

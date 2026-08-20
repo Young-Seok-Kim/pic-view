@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 출사 단계 표시 : 이미 지난 단계. 붉은 원 + 체크. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/maple_500" />
+        </shape>
+    </item>
+    <item
+        android:drawable="@drawable/ic_check"
+        android:gravity="center"
+        android:width="11dp"
+        android:height="11dp" />
+</layer-list>

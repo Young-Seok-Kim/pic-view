@@ -212,6 +212,17 @@
     <color name="season_autumn">#D9822B</color>
     <color name="season_winter">#5B93B8</color>
 
+    <!--
+        ============ 촬영 목적(탐색 지도) ============
+        지도 마커·범례·칩이 같은 색을 씁니다. 다섯 목적이 전부 단풍색이면
+        지도에서 무엇이 어디 있는지 색으로 읽을 수 없습니다.
+    -->
+    <color name="purpose_reflect">#FFC08420</color>
+    <color name="purpose_silhouette">#FFC75B36</color>
+    <color name="purpose_person">#FF8B7CB0</color>
+    <color name="purpose_arch">#FF2F6DB5</color>
+    <color name="purpose_space">#FF7A675A</color>
+
     <!-- 하단 탭 -->
     <color name="nav_item_active">#B23A1B</color>
     <color name="nav_item_inactive">#9B8878</color>
