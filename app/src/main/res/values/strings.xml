@@ -502,7 +502,11 @@
     <string name="calendar_prev_month">이전 달</string>
     <string name="calendar_next_month">다음 달</string>
     <string name="calendar_month_format">yyyy년 M월</string>
-    <string name="frame_title">포토 프레임</string>
+    <string name="frame_title">정읍의 순간을 담다</string>
+    <string name="frame_mode_fourcut">네컷 사진</string>
+    <string name="frame_mode_single">사진 프레임</string>
+    <string name="frame_pick_one">🖼 사진 1장 선택하기 ›</string>
+    <string name="frame_pick_four">🖼 사진 4장 선택하기 ›</string>
     <string name="frame_save">저장</string>
     <string name="frame_pick">프레임 선택</string>
     <string name="frame_share">SNS에 공유하기</string>

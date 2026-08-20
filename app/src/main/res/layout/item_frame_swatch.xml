@@ -1,37 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 프레임 테마 한 칸. 고른 것은 테두리로 표시합니다. -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+    프레임 테마 카드 (시안 "프레임 선택").
+    색 견본 세 칸 + 테마 장식 + 장소 이름. 고른 카드는 테두리와 체크로 표시합니다.
+    색·이모지·배경은 어댑터가 테마 값으로 채웁니다.
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:id="@+id/card_swatch"
+    android:layout_width="102dp"
     android:layout_height="wrap_content"
     android:layout_marginEnd="10dp"
-    android:gravity="center_horizontal"
-    android:orientation="vertical">
+    android:clickable="true"
+    android:focusable="true"
+    app:cardBackgroundColor="#F4EAD9"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#33FFFFFF"
+    app:strokeWidth="2dp">
 
-    <FrameLayout
-        android:id="@+id/layout_swatch"
-        android:layout_width="76dp"
-        android:layout_height="76dp"
-        android:background="@drawable/bg_frame_swatch"
-        android:clickable="true"
-        android:focusable="true">
-
-        <View
-            android:id="@+id/view_swatch_color"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:layout_gravity="center"
-            android:background="@drawable/bg_frame_swatch_inner" />
-    </FrameLayout>
-
-    <TextView
-        android:id="@+id/tv_swatch_label"
-        style="@style/Text.Caption"
-        android:layout_width="76dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:gravity="center"
-        android:maxLines="1"
-        android:textColor="#CCFFFFFF"
-        tools:text="내장산 단풍" />
-</LinearLayout>
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/layout_swatch_paper"
+            android:layout_width="match_parent"
+            android:layout_height="86dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|start"
+                android:layout_margin="8dp"
+                android:orientation="vertical">
+
+                <View
+                    android:id="@+id/view_sw1"
+                    android:layout_width="22dp"
+                    android:layout_height="13dp"
+                    tools:background="#B23A1B" />
+
+                <View
+                    android:id="@+id/view_sw2"
+                    android:layout_width="22dp"
+                    android:layout_height="13dp"
+                    android:layout_marginTop="2dp"
+                    tools:background="#D9805E" />
+
+                <View
+                    android:id="@+id/view_sw3"
+                    android:layout_width="22dp"
+                    android:layout_height="13dp"
+                    android:layout_marginTop="2dp"
+                    tools:background="#E8AC93" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_swatch_motif"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="6dp"
+                android:textSize="30sp"
+                tools:text="🍁" />
+
+            <ImageView
+                android:id="@+id/iv_swatch_check"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="top|end"
+                android:layout_margin="6dp"
+                android:contentDescription="@null"
+                android:src="@drawable/bg_check_badge"
+                android:visibility="gone"
+                tools:visibility="visible" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tv_swatch_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="@font/pretendard_semibold"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="6dp"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            tools:background="#5C3A26"
+            tools:text="내장산 단풍" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
