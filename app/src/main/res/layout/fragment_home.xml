@@ -23,23 +23,71 @@
         android:orientation="vertical"
         android:paddingBottom="@dimen/space_3xl">
 
-        <!-- ─────────── 헤더 ─────────── -->
-        <TextView
-            android:id="@+id/tv_home_date"
-            style="@style/Text.Caption"
-            android:layout_width="wrap_content"
+        <!-- ─────────── 헤더 : 로고 + 날짜 알약 (시안) ─────────── -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_xl"
+            android:layout_marginTop="@dimen/space_l"
             android:layout_marginHorizontal="@dimen/screen_padding"
-            tools:text="8월 4일 화요일" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/tv_home_title"
-            style="@style/Text.Display"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/screen_padding"
-            android:text="@string/app_name" />
+            <TextView
+                style="@style/Text.Display"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/app_name"
+                android:textColor="@color/maple_500"
+                android:textSize="24sp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_home_date"
+                android:layout_width="wrap_content"
+                android:layout_height="42dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/bg_card"
+                app:cardCornerRadius="21dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/card_stroke"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/space_l"
+                    android:paddingEnd="@dimen/space_s">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_calendar"
+                        app:tint="@color/maple_500" />
+
+                    <TextView
+                        android:id="@+id/tv_home_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/space_s"
+                        android:fontFamily="@font/pretendard_semibold"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_body"
+                        tools:text="2026.08.20 (목)" />
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_marginStart="2dp"
+                        android:contentDescription="@string/home_qa_calendar"
+                        android:src="@drawable/baseline_chevron_right_24"
+                        app:tint="@color/text_tertiary" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
         <!-- ─────────── 히어로 : 지금의 빛 ─────────── -->
         <com.google.android.material.card.MaterialCardView

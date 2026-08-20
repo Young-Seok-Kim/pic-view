@@ -158,6 +158,7 @@
     <!-- 탐색 — 빛이 맞는 출사 (시안 LIGHT MATCH 탐색 화면) -->
     <string name="explore_title">어디서 어떤 장면을\n찍을까요?</string>
     <string name="explore_sub">정읍 시선이 추천하는 오늘의 장소</string>
+    <string name="explore_light_line">지금은 %1$s · %2$s</string>
     <string name="sort_reco">추천순</string>
     <string name="sort_dist">거리순</string>
     <string name="sort_light">빛 좋은 시간순</string>

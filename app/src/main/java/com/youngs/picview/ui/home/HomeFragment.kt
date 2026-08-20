@@ -77,7 +77,15 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
 
     private fun renderDate() {
         binding.tvHomeDate.text = LocalDate.now()
-            .format(DateTimeFormatter.ofPattern("M월 d일 EEEE", Locale.KOREAN))
+            .format(
+                DateTimeFormatter.ofPattern(
+                    getString(R.string.course_date_format), Locale.KOREAN
+                )
+            )
+        // 날짜 알약을 누르면 촬영 캘린더로 — 시안의 헤더 동선입니다.
+        binding.cardHomeDate.setOnClickListener {
+            (activity as? MainActivity)?.pushScreen(CalendarFragment())
+        }
     }
 
     // ─────────────────────── 지금의 빛 ───────────────────────
