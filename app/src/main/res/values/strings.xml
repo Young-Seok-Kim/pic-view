@@ -344,6 +344,7 @@
     <!-- 출사 기록(일기) -->
     <string name="diary_title">출사 기록</string>
     <string name="diary_subtitle">다녀온 곳이 하루 단위로 모여요</string>
+    <string name="diary_month_count">📖 이번 달 %1$d일의 기록</string>
     <string name="diary_empty_title">아직 기록이 없어요</string>
     <string name="diary_empty_desc">촬영지 상세에서 \"다녀왔어요\"를 누르면
 이곳에 하루가 쌓입니다.</string>

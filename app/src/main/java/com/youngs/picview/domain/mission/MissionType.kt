@@ -1,6 +1,7 @@
 package com.youngs.picview.domain.mission
 
 import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import com.youngs.picview.R
 
 /**
@@ -23,13 +24,15 @@ enum class MissionType(
     val icon: String,
     val doneVerb: String,
     @ColorRes val colorRes: Int,
-    @ColorRes val softColorRes: Int
+    @ColorRes val softColorRes: Int,
+    /** 필터 칩에 쓰는 벡터 아이콘. 글자 아이콘([icon])은 카드 원 안에 남습니다. */
+    @DrawableRes val iconRes: Int
 ) {
-    LIGHT("빛", "☀", "빛을 발견했어요", R.color.mission_light, R.color.mission_light_soft),
-    WEATHER("날씨", "☁", "색을 기록했어요", R.color.mission_weather, R.color.mission_weather_soft),
-    SEASON("계절", "❀", "계절을 관찰했어요", R.color.mission_season, R.color.mission_season_soft),
-    PLACE("장소", "⌖", "장면을 발견했어요", R.color.mission_place, R.color.mission_place_soft),
-    COMPARE("비교", "⇄", "차이를 비교했어요", R.color.mission_compare, R.color.mission_compare_soft),
-    RECORD("기록", "✎", "정읍을 완성했어요", R.color.mission_record, R.color.mission_record_soft),
-    SHARE("공유", "↗", "오늘의 정읍을 소개했어요", R.color.mission_share, R.color.mission_share_soft)
+    LIGHT("빛", "☀", "빛을 발견했어요", R.color.mission_light, R.color.mission_light_soft, R.drawable.ic_sun),
+    WEATHER("날씨", "☁", "색을 기록했어요", R.color.mission_weather, R.color.mission_weather_soft, R.drawable.ic_cloud),
+    SEASON("계절", "❀", "계절을 관찰했어요", R.color.mission_season, R.color.mission_season_soft, R.drawable.ic_leaf),
+    PLACE("장소", "⌖", "장면을 발견했어요", R.color.mission_place, R.color.mission_place_soft, R.drawable.ic_place),
+    COMPARE("비교", "⇄", "차이를 비교했어요", R.color.mission_compare, R.color.mission_compare_soft, R.drawable.ic_compare),
+    RECORD("기록", "✎", "정읍을 완성했어요", R.color.mission_record, R.color.mission_record_soft, R.drawable.ic_pencil),
+    SHARE("공유", "↗", "오늘의 정읍을 소개했어요", R.color.mission_share, R.color.mission_share_soft, R.drawable.ic_share)
 }
