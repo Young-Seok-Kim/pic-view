@@ -108,11 +108,12 @@
                         android:orientation="vertical"
                         android:paddingVertical="@dimen/space_s">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="🗺"
-                            android:textSize="20sp" />
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_map_route"
+                            app:tint="@color/maple_500" />
 
                         <TextView
                             android:id="@+id/tv_stat_course"
@@ -156,11 +157,12 @@
                         android:orientation="vertical"
                         android:paddingVertical="@dimen/space_s">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="📍"
-                            android:textSize="20sp" />
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_place"
+                            app:tint="@color/golden_600" />
 
                         <TextView
                             android:id="@+id/tv_stat_visit"
@@ -204,11 +206,12 @@
                         android:orientation="vertical"
                         android:paddingVertical="@dimen/space_s">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="🎯"
-                            android:textSize="20sp" />
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_target"
+                            app:tint="@color/maple_400" />
 
                         <TextView
                             android:id="@+id/tv_stat_mission"
@@ -327,11 +330,12 @@
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="🖼"
-                                android:textSize="17sp" />
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_frame_crop"
+                                app:tint="@color/maple_500" />
 
                             <TextView
                                 style="@style/Text.Caption"
@@ -371,11 +375,12 @@
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="☀️"
-                                android:textSize="17sp" />
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_sun"
+                                app:tint="@color/golden_500" />
 
                             <TextView
                                 style="@style/Text.Caption"
@@ -415,11 +420,12 @@
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="❤️"
-                                android:textSize="17sp" />
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_heart_filled"
+                                app:tint="@color/maple_500" />
 
                             <TextView
                                 style="@style/Text.Caption"
@@ -639,11 +645,12 @@
                 android:orientation="horizontal"
                 android:paddingVertical="@dimen/space_m">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="♿"
-                    android:textSize="15sp" />
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_accessibility"
+                    app:tint="@color/text_secondary" />
 
                 <TextView
                     style="@style/Text.Body"
@@ -666,11 +673,12 @@
                 android:orientation="horizontal"
                 android:paddingVertical="@dimen/space_m">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🔠"
-                    android:textSize="15sp" />
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_text_size"
+                    app:tint="@color/text_secondary" />
 
                 <TextView
                     style="@style/Text.Body"
@@ -693,11 +701,12 @@
                 android:orientation="horizontal"
                 android:paddingVertical="@dimen/space_m">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="ℹ️"
-                    android:textSize="15sp" />
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_info"
+                    app:tint="@color/text_secondary" />
 
                 <TextView
                     style="@style/Text.Body"
