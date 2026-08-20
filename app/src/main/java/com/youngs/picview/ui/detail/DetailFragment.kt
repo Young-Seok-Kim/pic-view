@@ -22,6 +22,7 @@ import com.youngs.picview.data.model.ImageItem
 import com.youngs.picview.data.repository.CourseRepository
 import com.youngs.picview.data.repository.DiaryRepository
 import com.google.android.material.chip.Chip
+import com.google.android.material.snackbar.Snackbar
 import com.youngs.picview.databinding.FragmentDetailBinding
 import com.youngs.picview.databinding.ItemPeopleTipBinding
 import com.youngs.picview.databinding.ItemScoreFactorBinding
@@ -241,10 +242,26 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                 val logged = runCatching {
                     CourseRepository(requireContext()).logVisit(spot, phase)
                 }.getOrDefault(false)
+                val view = _binding ?: return@launch
 
-                val message = if (logged) R.string.detail_checkin_done
-                else R.string.detail_checkin_already
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                if (logged) {
+                    // 기록이 남은 곳(일기 탭)으로 바로 이어 줍니다.
+                    // 토스트는 사라지면 끝이라 "그래서 어디서 보는데"가 남습니다.
+                    Snackbar.make(view.root, R.string.detail_checkin_done, Snackbar.LENGTH_LONG)
+                        // 하단 바(고도 12dp)가 스낵바를 가립니다. 그 위에 띄웁니다.
+                        .setAnchorView(view.btnSavePlan)
+                        .setAction(R.string.detail_checkin_view_diary) {
+                            // 일기 탭에서 들어온 경우 selectTab 이 같은 탭이라
+                            // 백스택을 정리하지 않으므로, 상세부터 닫습니다.
+                            parentFragmentManager.popBackStack()
+                            (activity as? MainActivity)?.selectTab(R.id.tab_diary)
+                        }
+                        .show()
+                } else {
+                    Toast.makeText(
+                        requireContext(), R.string.detail_checkin_already, Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }

@@ -839,6 +839,24 @@
                     tools:visibility="visible" />
 
                 <!--
+                  ============ 다녀왔어요 ============
+
+                  출사 기록(일기 탭)의 시작점입니다. 예전에는 접힌 "장소 정보"
+                  안의 작은 텍스트 버튼이라 사실상 찾을 수 없었습니다.
+                  일기가 여기서 시작되므로 항상 보이는 자리에 둡니다.
+                -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_checkin"
+                    style="@style/Button.Tonal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_xl"
+                    android:minHeight="52dp"
+                    android:text="@string/detail_checkin_long"
+                    android:textColor="@color/maple_700"
+                    app:backgroundTint="@color/maple_50" />
+
+                <!--
                   ============ 장소 정보 (접이식) ============
 
                   역사·건축 설명은 길고, 출사 결정에는 쓰이지 않습니다. 예전에는
@@ -902,29 +920,14 @@
                         app:icon="@drawable/ic_audio"
                         app:iconTint="@color/white" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_audio_speed"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btn_checkin"
-                            style="@style/Widget.Material3.Button.TextButton"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/detail_checkin"
-                            android:textColor="@color/maple_600" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btn_audio_speed"
-                            style="@style/Widget.Material3.Button.TextButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/text_secondary"
-                            tools:text="재생 속도 1.0x" />
-                    </LinearLayout>
+                        android:layout_gravity="end"
+                        android:textColor="@color/text_secondary"
+                        tools:text="재생 속도 1.0x" />
 
                     <!--
                       방문 정보 - 입장료·주차·운영시간.

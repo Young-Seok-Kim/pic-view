@@ -328,8 +328,10 @@
     <string name="diary_share">공유</string>
     <string name="diary_share_tag">#정읍시선 #출사 #정읍</string>
     <string name="detail_checkin">📍 다녀왔어요</string>
+    <string name="detail_checkin_long">📍 다녀왔어요 · 오늘 기록 남기기</string>
     <string name="detail_checkin_done">출사 기록에 담았어요</string>
     <string name="detail_checkin_already">오늘 이미 기록한 곳이에요</string>
+    <string name="detail_checkin_view_diary">일기 보기</string>
 
     <!-- 미션 & 배지 -->
     <string name="mission_title">미션 &amp; 기록</string>
