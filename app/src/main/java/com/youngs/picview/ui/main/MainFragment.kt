@@ -60,6 +60,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         setListeners()
         setObserve()
+        renderLightLine()
 
         recyclerViewState?.let {
             binding.rvPhotoSpots.layoutManager?.onRestoreInstanceState(it)
@@ -90,6 +91,52 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         viewModel.loadFailed.observe(viewLifecycleOwner) {
             renderListState(viewModel.filteredSpots.value.isNullOrEmpty())
         }
+
+        // 천문 정보가 도착하면 머리말의 빛 상태줄을 다시 씁니다.
+        viewModel.goldenHourData.observe(viewLifecycleOwner) { renderLightLine() }
+    }
+
+    /**
+     * "지금은 석양 · 일몰까지 58분" — 시안의 탐색 머리말.
+     *
+     * 질문("어디서 어떤 장면을 찍을까요?") 바로 아래에서 지금 빛이
+     * 답의 첫 단서가 됩니다. 천문 정보가 없으면 기본 소개 문구로 물러납니다.
+     */
+    private fun renderLightLine() {
+        val view = _binding ?: return
+        val sun = viewModel.sunTimes
+        val now = LocalTime.now()
+        val rise = sun.sunrise
+        val set = sun.sunset
+
+        if (rise == null || set == null) {
+            view.tvTagline.setText(R.string.explore_sub)
+            return
+        }
+
+        val phase = sun.phaseAt(now)
+        val phaseWord = when (phase) {
+            LightPhase.SUNSET -> "석양"
+            LightPhase.SUNRISE -> "아침빛"
+            else -> phase.label
+        }
+        val tail = when {
+            now < rise -> getString(
+                R.string.map_until_sunrise, minutesText(Duration.between(now, rise).toMinutes())
+            )
+            now < set -> getString(
+                R.string.map_until_sunset, minutesText(Duration.between(now, set).toMinutes())
+            )
+            else -> getString(R.string.course_hero_sun_down)
+        }
+        view.tvTagline.text = getString(R.string.explore_light_line, phaseWord, tail)
+    }
+
+    /** 한 시간이 안 되면 "분"만 씁니다. "0시간 58분"은 읽는 데 방해가 됩니다. */
+    private fun minutesText(minutes: Long): String = if (minutes >= 60) {
+        getString(R.string.home_duration_hm, minutes / 60, minutes % 60)
+    } else {
+        getString(R.string.home_duration_m, minutes)
     }
 
     // ───────────────────── 정렬 ─────────────────────
