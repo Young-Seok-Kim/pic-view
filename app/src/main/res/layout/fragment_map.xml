@@ -151,35 +151,55 @@
                                 style="@style/Chip.Tag"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/map_story_moon" />
+                                android:text="@string/map_story_moon"
+                                app:chipIcon="@drawable/ic_moon"
+                                app:chipIconSize="15dp"
+                                app:chipIconTint="@color/chip_content_selector"
+                                app:chipIconVisible="true" />
 
                             <com.google.android.material.chip.Chip
                                 android:id="@+id/chip_story_love"
                                 style="@style/Chip.Tag"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/map_story_love" />
+                                android:text="@string/map_story_love"
+                                app:chipIcon="@drawable/ic_heart"
+                                app:chipIconSize="15dp"
+                                app:chipIconTint="@color/chip_content_selector"
+                                app:chipIconVisible="true" />
 
                             <com.google.android.material.chip.Chip
                                 android:id="@+id/chip_story_revolution"
                                 style="@style/Chip.Tag"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/map_story_revolution" />
+                                android:text="@string/map_story_revolution"
+                                app:chipIcon="@drawable/ic_flag"
+                                app:chipIconSize="15dp"
+                                app:chipIconTint="@color/chip_content_selector"
+                                app:chipIconVisible="true" />
 
                             <com.google.android.material.chip.Chip
                                 android:id="@+id/chip_story_slow"
                                 style="@style/Chip.Tag"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/map_story_slow" />
+                                android:text="@string/map_story_slow"
+                                app:chipIcon="@drawable/ic_walk"
+                                app:chipIconSize="15dp"
+                                app:chipIconTint="@color/chip_content_selector"
+                                app:chipIconVisible="true" />
 
                             <com.google.android.material.chip.Chip
                                 android:id="@+id/chip_story_season"
                                 style="@style/Chip.Tag"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/map_story_season" />
+                                android:text="@string/map_story_season"
+                                app:chipIcon="@drawable/ic_leaf"
+                                app:chipIconSize="15dp"
+                                app:chipIconTint="@color/chip_content_selector"
+                                app:chipIconVisible="true" />
                         </com.google.android.material.chip.ChipGroup>
                     </HorizontalScrollView>
                 </LinearLayout>
@@ -215,35 +235,55 @@
                                 style="@style/Chip.Tag"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/map_purpose_reflect" />
+                                android:text="@string/map_purpose_reflect"
+                                app:chipIcon="@drawable/ic_glyph_drop"
+                                app:chipIconSize="15dp"
+                                app:chipIconTint="@color/chip_content_selector"
+                                app:chipIconVisible="true" />
 
                             <com.google.android.material.chip.Chip
                                 android:id="@+id/chip_purpose_silhouette"
                                 style="@style/Chip.Tag"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/map_purpose_silhouette" />
+                                android:text="@string/map_purpose_silhouette"
+                                app:chipIcon="@drawable/ic_glyph_person"
+                                app:chipIconSize="15dp"
+                                app:chipIconTint="@color/chip_content_selector"
+                                app:chipIconVisible="true" />
 
                             <com.google.android.material.chip.Chip
                                 android:id="@+id/chip_purpose_person"
                                 style="@style/Chip.Tag"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/map_purpose_person" />
+                                android:text="@string/map_purpose_person"
+                                app:chipIcon="@drawable/ic_people"
+                                app:chipIconSize="15dp"
+                                app:chipIconTint="@color/chip_content_selector"
+                                app:chipIconVisible="true" />
 
                             <com.google.android.material.chip.Chip
                                 android:id="@+id/chip_purpose_arch"
                                 style="@style/Chip.Tag"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/map_purpose_arch" />
+                                android:text="@string/map_purpose_arch"
+                                app:chipIcon="@drawable/ic_glyph_building"
+                                app:chipIconSize="15dp"
+                                app:chipIconTint="@color/chip_content_selector"
+                                app:chipIconVisible="true" />
 
                             <com.google.android.material.chip.Chip
                                 android:id="@+id/chip_purpose_space"
                                 style="@style/Chip.Tag"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/map_purpose_space" />
+                                android:text="@string/map_purpose_space"
+                                app:chipIcon="@drawable/ic_glyph_square"
+                                app:chipIconSize="15dp"
+                                app:chipIconTint="@color/chip_content_selector"
+                                app:chipIconVisible="true" />
                         </com.google.android.material.chip.ChipGroup>
                     </HorizontalScrollView>
                 </LinearLayout>

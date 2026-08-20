@@ -156,7 +156,7 @@
     <string name="home_best_now">지금 가면 좋은 곳</string>
 
     <!-- 탐색 — 빛이 맞는 출사 (시안 LIGHT MATCH 탐색 화면) -->
-    <string name="explore_title">빛이 맞는 출사</string>
+    <string name="explore_title">어디서 어떤 장면을\n찍을까요?</string>
     <string name="explore_sub">정읍 시선이 추천하는 오늘의 장소</string>
     <string name="sort_reco">추천순</string>
     <string name="sort_dist">거리순</string>
@@ -430,16 +430,16 @@
     <string name="map_until_sunrise">일출까지 %1$s</string>
     <string name="map_story_label">스토리</string>
     <string name="map_purpose_label">촬영 목적</string>
-    <string name="map_story_moon">🌙 달</string>
-    <string name="map_story_love">🤍 사랑</string>
-    <string name="map_story_revolution">🚩 혁명</string>
-    <string name="map_story_slow">🐌 느림</string>
-    <string name="map_story_season">🍃 계절</string>
-    <string name="map_purpose_reflect">💧 반사</string>
-    <string name="map_purpose_silhouette">👤 실루엣</string>
-    <string name="map_purpose_person">🧍 인물</string>
-    <string name="map_purpose_arch">🏛 건축선</string>
-    <string name="map_purpose_space">⬚ 여백</string>
+    <string name="map_story_moon">달</string>
+    <string name="map_story_love">사랑</string>
+    <string name="map_story_revolution">혁명</string>
+    <string name="map_story_slow">느림</string>
+    <string name="map_story_season">계절</string>
+    <string name="map_purpose_reflect">반사</string>
+    <string name="map_purpose_silhouette">실루엣</string>
+    <string name="map_purpose_person">인물</string>
+    <string name="map_purpose_arch">건축선</string>
+    <string name="map_purpose_space">여백</string>
     <string name="map_legend_title">촬영 목적 범례</string>
     <string name="map_reco_walk">%1$s 따라 걷기 · 지금 추천</string>
     <string name="map_sheet_eyebrow">선택한 장소 · 지금 가는 이유</string>
