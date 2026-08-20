@@ -109,13 +109,16 @@
             android:layout_height="wrap_content"
             tools:text="단풍이 물들기 전, 정읍의 하루" />
 
+        <!-- 본문은 편지지 위에 앉힙니다. 앱이 만든 정보가 아니라 '내가 쓴 글'입니다. -->
         <TextView
             android:id="@+id/tv_diary_body"
             style="@style/Text.Diary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_s"
+            android:background="@drawable/bg_diary_paper"
             android:lineSpacingExtra="6dp"
+            android:padding="@dimen/space_l"
             tools:text="이른 시간의 정읍사예술회관은 사람이 적어서 좋았다. 한낮의 강한 빛을 피해 실내로 옮겼다." />
 
         <!-- 액션 -->

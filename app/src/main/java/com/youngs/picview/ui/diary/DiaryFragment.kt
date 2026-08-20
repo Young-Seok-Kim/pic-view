@@ -62,6 +62,14 @@ class DiaryFragment : Fragment(R.layout.fragment_diary), MainActivity.TabRoot {
             binding.rvDiary.isVisible = days.isNotEmpty()
             binding.layoutDiaryHeader.isVisible = days.isNotEmpty()
             if (days.isNotEmpty()) adapter.nextRec = buildNextRec(days)
+
+            // 제목 옆 알약 — 이번 달에 며칠을 기록했는지 한 마디로.
+            val today = java.time.LocalDate.now()
+            val monthDays = days.count {
+                it.date.year == today.year && it.date.month == today.month
+            }
+            binding.tvDiaryMonth.isVisible = monthDays > 0
+            binding.tvDiaryMonth.text = getString(R.string.diary_month_count, monthDays)
         }
 
         mainViewModel.spotData.observe(viewLifecycleOwner) {

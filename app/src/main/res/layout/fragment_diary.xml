@@ -21,11 +21,31 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <TextView
-            style="@style/Text.Display"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/diary_title" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/Text.Display"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/diary_title" />
+
+            <TextView
+                android:id="@+id/tv_diary_month"
+                style="@style/Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_pill_soft"
+                android:paddingHorizontal="@dimen/space_m"
+                android:paddingVertical="3dp"
+                android:visibility="gone"
+                tools:text="📖 이번 달 3일의 기록"
+                tools:visibility="visible" />
+        </LinearLayout>
 
         <TextView
             style="@style/Text.Body"

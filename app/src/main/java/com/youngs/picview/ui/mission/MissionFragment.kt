@@ -213,7 +213,7 @@ class MissionFragment : Fragment(R.layout.fragment_mission) {
         // 나오는 칩은 화면만 늘립니다.
         MissionType.entries
             .filter { type -> Missions.ALL.any { it.type == type } }
-            .forEach { group.addView(filterChip(it, "${it.icon} ${it.label}", checked = false)) }
+            .forEach { group.addView(filterChip(it, it.label, checked = false)) }
     }
 
     private fun filterChip(type: MissionType?, label: String, checked: Boolean) =
@@ -226,6 +226,13 @@ class MissionFragment : Fragment(R.layout.fragment_mission) {
             setTextColor(ContextCompat.getColorStateList(context, R.color.chip_content_selector))
             chipStrokeWidth = resources.displayMetrics.density
             setChipStrokeColorResource(R.color.chip_stroke_selector)
+            // 글자 아이콘(☀·☁) 대신 다른 화면과 같은 벡터 아이콘을 답니다.
+            type?.let {
+                setChipIconResource(it.iconRes)
+                isChipIconVisible = true
+                chipIconSize = resources.displayMetrics.density * 15
+                setChipIconTintResource(R.color.chip_content_selector)
+            }
             setOnClickListener { selectFilter(type) }
         }
 
