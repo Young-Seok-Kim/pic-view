@@ -1,8 +1,9 @@
 # 디버그 APK 빌드.
 #
 # 릴리즈 서명(jks)은 로컬에만 있으므로 CI 는 디버그 빌드만 만듭니다.
+# 커밋 메시지에 "create apk" 가 포함된 푸시(또는 수동 실행)에서만 빌드하며,
 # 워크플로가 끝나면 Actions 실행 페이지의 Artifacts 에서
-# picview-debug-apk 를 내려받을 수 있습니다.
+# picview-debug-apk 를 내려받을 수 있습니다. (보관 기간 1일)
 name: Build APK
 
 on:
@@ -12,6 +13,7 @@ on:
 
 jobs:
   build:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'create apk')
     runs-on: ubuntu-latest
 
     steps:
@@ -37,4 +39,4 @@ jobs:
         with:
           name: picview-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 14
+          retention-days: 1
