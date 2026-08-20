@@ -244,6 +244,7 @@
 <p>
   <img src="docs/screenshots/05-detail.png" width="240" alt="상세 히어로와 황금시간" />
   <img src="docs/screenshots/16-detail-guide.png" width="240" alt="촬영 가이드 - 구도 탭" />
+  <img src="docs/screenshots/29-detail-checkin.png" width="240" alt="미션·적합도·다녀왔어요" />
 </p>
 
 상세 화면을 시안 기준으로 전면 개편했습니다. 설계 원칙은 하나입니다 —
