@@ -144,10 +144,11 @@ class OnboardingActivity : AppCompatActivity() {
     // ───────────────────────── 페이지 ─────────────────────────
 
     private data class Page(
-        val emoji: String,
+        /** 빛 장면 그림. 계획 탭 히어로와 같은 붓입니다. */
+        val sceneRes: Int,
+        val eyebrowRes: Int,
         val titleRes: Int,
-        val descRes: Int,
-        val tintRes: Int
+        val descRes: Int
     )
 
     private class PageAdapter(private val pages: List<Page>) :
@@ -164,16 +165,12 @@ class OnboardingActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: PageViewHolder, position: Int) {
             val page = pages[position]
-            val context = holder.itemView.context
 
             with(holder.binding) {
-                tvOnboardingEmoji.text = page.emoji
+                ivOnboardingScene.setImageResource(page.sceneRes)
+                tvOnboardingEyebrow.setText(page.eyebrowRes)
                 tvOnboardingTitle.setText(page.titleRes)
                 tvOnboardingDesc.setText(page.descRes)
-
-                layoutOnboardingSymbol.background?.mutate()?.setColorFilter(
-                    ContextCompat.getColor(context, page.tintRes), PorterDuff.Mode.SRC_IN
-                )
             }
         }
 
@@ -183,22 +180,22 @@ class OnboardingActivity : AppCompatActivity() {
     companion object {
         private val PAGES = listOf(
             Page(
-                emoji = "📸",
+                sceneRes = R.drawable.bg_hero_sunset,
+                eyebrowRes = R.string.onboarding_1_eyebrow,
                 titleRes = R.string.onboarding_1_title,
-                descRes = R.string.onboarding_1_desc,
-                tintRes = R.color.maple_50
+                descRes = R.string.onboarding_1_desc
             ),
             Page(
-                emoji = "🌅",
+                sceneRes = R.drawable.bg_hero_sunrise,
+                eyebrowRes = R.string.onboarding_2_eyebrow,
                 titleRes = R.string.onboarding_2_title,
-                descRes = R.string.onboarding_2_desc,
-                tintRes = R.color.golden_100
+                descRes = R.string.onboarding_2_desc
             ),
             Page(
-                emoji = "👀",
+                sceneRes = R.drawable.bg_hero_day,
+                eyebrowRes = R.string.onboarding_3_eyebrow,
                 titleRes = R.string.onboarding_3_title,
-                descRes = R.string.onboarding_3_desc,
-                tintRes = R.color.moss_50
+                descRes = R.string.onboarding_3_desc
             )
         )
 

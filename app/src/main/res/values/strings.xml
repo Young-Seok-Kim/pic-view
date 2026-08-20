@@ -4,6 +4,9 @@
 
     <!-- 온보딩 -->
     <string name="onboarding_skip">건너뛰기</string>
+    <string name="onboarding_1_eyebrow">LIGHT MATCH</string>
+    <string name="onboarding_2_eyebrow">LIGHT ROUTE</string>
+    <string name="onboarding_3_eyebrow">YOUR SISEON</string>
     <string name="onboarding_next">다음</string>
     <string name="onboarding_1_title">지금,
 가장 잘 나오는 곳</string>
