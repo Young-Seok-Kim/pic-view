@@ -21,6 +21,10 @@ class MyViewModel(app: Application) : AndroidViewModel(app) {
 
     val visitedSpotCount: LiveData<Int> = repository.observeVisitedSpotCount().asLiveData()
 
+    /** 방문 기록 전체. 이번 달 통계·최근 촬영·촬영 스타일이 여기서 계산됩니다. */
+    val visits: LiveData<List<com.youngs.picview.data.local.VisitLogEntity>> =
+        repository.observeVisits().asLiveData()
+
     fun deleteCourse(id: Long) {
         viewModelScope.launch { repository.delete(id) }
     }

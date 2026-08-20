@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 저장한 출사 코스 전체 목록. MY 탭의 "전체보기"에서 들어옵니다. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_page"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/layout_courses_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/space_m"
+        android:paddingVertical="@dimen/space_s">
+
+        <ImageView
+            android:id="@+id/btn_courses_back"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/cd_back"
+            android:padding="10dp"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/text_primary" />
+
+        <TextView
+            style="@style/Text.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:text="@string/my_saved_course_title" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_courses_empty"
+        style="@style/Text.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_2xl"
+        android:gravity="center"
+        android:paddingHorizontal="@dimen/screen_padding"
+        android:text="@string/my_no_course"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_saved_courses"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingHorizontal="@dimen/screen_padding"
+        android:paddingBottom="@dimen/space_2xl"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:itemCount="3"
+        tools:listitem="@layout/item_saved_course" />
+</LinearLayout>
