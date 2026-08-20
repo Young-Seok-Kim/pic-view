@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 사계절 가이드 히어로 : 여름. 짙은 숲과 계곡 물줄기입니다. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="360dp"
+    android:height="210dp"
+    android:viewportWidth="360"
+    android:viewportHeight="210">
+
+    <path android:pathData="M0,0 H360 V210 H0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="180" android:startY="0"
+                android:endX="180" android:endY="210"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF1C4530" />
+                <item android:offset="1.0" android:color="#FF356B4B" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <path
+        android:fillColor="#66103024"
+        android:pathData="M0,132 L56,102 L120,128 L188,96 L252,124 L312,98 L360,118 V210 H0 Z" />
+    <path
+        android:fillColor="#8C0E271C"
+        android:pathData="M0,164 L76,142 L156,160 L240,138 L316,156 L360,146 V210 H0 Z" />
+
+    <!-- 계곡 물줄기 -->
+    <path
+        android:fillColor="#59DFF2E4"
+        android:pathData="M150,210 C160,186 168,170 186,152 C176,176 172,192 170,210 Z" />
+    <path android:fillColor="#66DFF2E4" android:pathData="M120,196 L182,192 L180,197 L118,201 Z" />
+    <path android:fillColor="#4DDFF2E4" android:pathData="M200,186 L262,182 L260,187 L198,191 Z" />
+    <path android:fillColor="#40DFF2E4" android:pathData="M150,176 L206,172 L204,177 L148,181 Z" />
+
+    <!-- 잎 -->
+    <path android:fillColor="#8CBFE3C3" android:pathData="M64,52 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path android:fillColor="#73BFE3C3" android:pathData="M296,44 m-3.4,0 a3.4,3.4 0 1,0 6.8,0 a3.4,3.4 0 1,0 -6.8,0" />
+    <path android:fillColor="#66BFE3C3" android:pathData="M228,66 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
+</vector>

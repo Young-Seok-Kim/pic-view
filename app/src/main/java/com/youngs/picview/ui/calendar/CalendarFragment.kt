@@ -54,20 +54,59 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         binding.chipsSeason.setOnCheckedStateChangeListener { _, checked ->
             val season = seasonOf(checked.firstOrNull()) ?: return@setOnCheckedStateChangeListener
             adapter.submitList(SeasonHighlights.of(season))
-            // 계절을 바꾸면 달력도 그 계절로 옮깁니다. 가을을 눌렀는데 달력이
-            // 1월에 머물면 점이 하나도 안 보입니다.
+            // 계절을 바꾸면 히어로와 달력도 그 계절로 옮깁니다. 가을을 눌렀는데
+            // 달력이 1월에 머물면 점이 하나도 안 보입니다.
             shownMonth = season.monthToShow(YearMonth.now())
             renderMonth()
+            renderHeadline(season)
+            binding.tvNowGo.text = "${season.emoji} " + getString(R.string.calendar_now_go)
         }
 
         setupMonthNav()
 
         // 지금 계절부터 보여 줍니다. 1월에 봄부터 보여 주면 쓸모가 없습니다.
-        binding.chipsSeason.check(chipOf(Season.now()))
-        adapter.submitList(SeasonHighlights.of(Season.now()))
+        val now = Season.now()
+        binding.chipsSeason.check(chipOf(now))
+        adapter.submitList(SeasonHighlights.of(now))
         renderMonth()
+        renderHeadline(now)
+        binding.tvNowGo.text = "${now.emoji} " + getString(R.string.calendar_now_go)
 
-        renderHeadline()
+        setupStats()
+    }
+
+    // ─────────────────────── 오늘의 지표 ───────────────────────
+
+    /**
+     * 촬영 지수 · 일출 · 습도.
+     *
+     * 촬영 지수는 지금 촬영지들의 포토스코어 중 최고점입니다 — "오늘 어딘가는
+     * 이만큼 나온다"는 뜻이라, 평균보다 나갈 이유를 잘 말해 줍니다.
+     */
+    private fun setupStats() {
+        mainViewModel.spotData.observe(viewLifecycleOwner) { spots ->
+            val best = spots.orEmpty().maxOfOrNull { it.score } ?: 0
+            binding.tvStatIndex.text = best.toString()
+            binding.tvStatIndexLabel.setText(
+                when {
+                    best >= 85 -> R.string.calendar_index_great
+                    best >= 70 -> R.string.calendar_index_good
+                    best >= 55 -> R.string.calendar_index_normal
+                    else -> R.string.calendar_index_low
+                }
+            )
+        }
+
+        mainViewModel.goldenHourData.observe(viewLifecycleOwner) {
+            binding.tvStatSun.text =
+                mainViewModel.sunTimes.sunrise?.format(DateTimeFormatter.ofPattern("HH:mm"))
+                    ?: PLACEHOLDER
+        }
+
+        mainViewModel.humidityPercent.observe(viewLifecycleOwner) { humidity ->
+            binding.tvStatHumid.text =
+                humidity?.let { "${it.toInt()}%" } ?: PLACEHOLDER
+        }
     }
 
     // ─────────────────────── 월 달력 ───────────────────────
@@ -93,45 +132,72 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
      * (예: 10/25~11/3)도 이 달에 걸치는 부분만 잘라 표시합니다.
      */
     private fun renderMonth() {
-        binding.tvMonthLabel.text = shownMonth.format(
-            DateTimeFormatter.ofPattern(getString(R.string.calendar_month_format), Locale.KOREAN)
-        )
+        binding.tvMonthLabel.text =
+            getString(R.string.calendar_month_title, shownMonth.monthValue)
 
         val marked = mutableSetOf<Int>()
+        val recommended = mutableSetOf<Int>()
         SeasonHighlights.ALL.forEach { highlight ->
-            val start = highlight.peakStart
-            val end = highlight.peakEnd
             for (day in 1..shownMonth.lengthOfMonth()) {
-                val md = MonthDay.of(shownMonth.monthValue, day)
-                val inRange = if (start <= end) {
-                    md >= start && md <= end
-                } else {
-                    // 연말을 넘기는 구간(예: 12/20 ~ 1/10)
-                    md >= start || md <= end
+                val date = shownMonth.atDay(day)
+                when {
+                    inPeak(highlight, date) -> marked += day
+                    // 절정 앞뒤 닷새는 추천 — 절정만 찍으면 "그날 아니면
+                    // 못 찍는다"로 읽히는데, 실제로는 어깨 기간도 좋습니다.
+                    inPeak(highlight, date.plusDays(RECO_MARGIN_DAYS)) ||
+                        inPeak(highlight, date.minusDays(RECO_MARGIN_DAYS)) -> recommended += day
                 }
-                if (inRange) marked += day
             }
         }
 
         binding.viewMonthGrid.yearMonth = shownMonth
         binding.viewMonthGrid.markedDays = marked
+        binding.viewMonthGrid.recommendedDays = recommended - marked
     }
 
-    /** 지금 절정이거나 가장 임박한 피사체를 상단에 크게. */
-    private fun renderHeadline() {
-        val next = SeasonHighlights.upcoming(limit = 1).firstOrNull() ?: return
+    /** [date] 가 이 피사체의 절정 구간 안인지. 연말을 넘기는 구간도 셉니다. */
+    private fun inPeak(highlight: SeasonHighlight, date: LocalDate): Boolean {
+        val md = MonthDay.from(date)
+        val start = highlight.peakStart
+        val end = highlight.peakEnd
+        return if (start <= end) md >= start && md <= end
+        else md >= start || md <= end
+    }
+
+    /**
+     * 고른 계절의 대표 피사체를 히어로에 크게.
+     *
+     * 지금이 절정인 것을 먼저, 없으면 절정이 가장 가까운 것을 올립니다.
+     * 배경 그림도 계절을 따라 바뀝니다 — 겨울을 골랐는데 단풍빛 카드면
+     * 그림과 글이 서로 다른 말을 합니다.
+     */
+    private fun renderHeadline(season: Season) {
         val today = LocalDate.now()
+        val candidates = SeasonHighlights.of(season)
+        val next = candidates.firstOrNull { it.isPeakNow(today) }
+            ?: candidates.minByOrNull { it.daysUntilPeak(today) }
+            ?: return
+
+        binding.ivCalendarHero.setImageResource(
+            when (season) {
+                Season.SPRING -> R.drawable.bg_season_spring
+                Season.SUMMER -> R.drawable.bg_season_summer
+                Season.AUTUMN -> R.drawable.bg_season_autumn
+                Season.WINTER -> R.drawable.bg_season_winter
+            }
+        )
 
         binding.tvCalendarDday.text = if (next.isPeakNow(today)) {
             getString(R.string.calendar_peak_now)
         } else {
             getString(R.string.calendar_dday, next.daysUntilPeak(today))
         }
-        binding.tvCalendarNowTitle.text = "${next.emoji} ${next.title}"
+        binding.tvCalendarNowTitle.text = next.title
         binding.tvCalendarNowPeriod.text = periodText(next)
         binding.tvCalendarNowTip.text = next.tip
 
         binding.cardCalendarNow.setOnClickListener { openSpot(next) }
+        binding.btnCalendarPoint.setOnClickListener { openSpot(next) }
     }
 
     private fun periodText(h: SeasonHighlight): String {
@@ -174,6 +240,13 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val PLACEHOLDER = "—"
+
+        /** 절정 앞뒤로 이 일수만큼을 '추천'으로 표시합니다. */
+        private const val RECO_MARGIN_DAYS = 5L
     }
 }
 

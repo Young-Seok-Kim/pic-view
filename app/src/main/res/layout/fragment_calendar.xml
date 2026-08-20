@@ -54,60 +54,94 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- 지금 절정 / 다음 절정 -->
+            <!--
+              지금 절정 / 다음 절정 히어로.
+              배경 그림이 고른 계절을 따라 바뀝니다(봄 장밋빛 · 여름 숲 ·
+              가을 단풍 · 겨울 설경). 코드가 계절에 맞춰 갈아 끼웁니다.
+            -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_calendar_now"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/screen_padding"
-                app:cardBackgroundColor="@color/maple_500"
                 app:cardCornerRadius="@dimen/radius_card"
-                app:cardElevation="0dp">
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
 
-                <LinearLayout
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="@dimen/space_l">
+                    android:layout_height="wrap_content">
 
-                    <TextView
-                        android:id="@+id/tv_calendar_dday"
-                        style="@style/Text.Caption"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_pill_dark"
-                        android:paddingHorizontal="@dimen/space_m"
-                        android:paddingVertical="@dimen/space_xs"
-                        android:textColor="@color/white"
-                        android:textStyle="bold"
-                        tools:text="D-46" />
+                    <ImageView
+                        android:id="@+id/iv_calendar_hero"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@null"
+                        android:scaleType="fitXY"
+                        tools:src="@drawable/bg_season_summer" />
 
-                    <TextView
-                        android:id="@+id/tv_calendar_now_title"
-                        style="@style/Text.Title"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/space_s"
-                        android:textColor="@color/white"
-                        tools:text="🌼 구절초 지방정원 개화" />
+                        android:orientation="vertical"
+                        android:padding="@dimen/space_xl">
 
-                    <TextView
-                        android:id="@+id/tv_calendar_now_period"
-                        style="@style/Text.Body"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="#E6FFFFFF"
-                        tools:text="9월 20일 ~ 10월 10일 (평년 기준)" />
+                        <TextView
+                            android:id="@+id/tv_calendar_dday"
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_pill_dark"
+                            android:paddingHorizontal="@dimen/space_m"
+                            android:paddingVertical="@dimen/space_xs"
+                            android:textColor="@color/hero_accent"
+                            android:textStyle="bold"
+                            tools:text="지금이 절정" />
 
-                    <TextView
-                        android:id="@+id/tv_calendar_now_tip"
-                        style="@style/Text.Body"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/space_s"
-                        android:textColor="@color/white"
-                        tools:text="역광으로 담으면 흰 꽃잎이 투명하게 빛납니다." />
-                </LinearLayout>
+                        <TextView
+                            android:id="@+id/tv_calendar_now_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_s"
+                            android:fontFamily="@font/pretendard_bold"
+                            android:letterSpacing="-0.02"
+                            android:textColor="@color/white"
+                            android:textSize="26sp"
+                            tools:text="내장산 여름 계곡" />
+
+                        <TextView
+                            android:id="@+id/tv_calendar_now_period"
+                            style="@style/Text.Body"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/pretendard_semibold"
+                            android:textColor="#F2FFFFFF"
+                            tools:text="7월 15일 ~ 8월 25일 · 평년 기준" />
+
+                        <TextView
+                            android:id="@+id/tv_calendar_now_tip"
+                            style="@style/Text.Body"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_s"
+                            android:textColor="#E6FFFFFF"
+                            tools:text="숲속은 빛이 부족합니다. 흐린 날 장노출로 물을 부드럽게 담아보세요." />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_calendar_point"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_m"
+                            android:minHeight="42dp"
+                            android:text="@string/calendar_point_view"
+                            android:textColor="@color/white"
+                            android:textSize="13sp"
+                            app:cornerRadius="12dp"
+                            app:strokeColor="#99FFFFFF" />
+                    </LinearLayout>
+                </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- 시즌 탭 -->
@@ -149,6 +183,131 @@
                     android:layout_height="wrap_content"
                     android:text="@string/season_winter" />
             </com.google.android.material.chip.ChipGroup>
+
+            <!-- ─────────── 오늘의 촬영 지수 · 일출 · 습도 ─────────── -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_m"
+                android:layout_marginHorizontal="@dimen/screen_padding"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Card.Elevated"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1.2">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:padding="@dimen/space_m">
+
+                        <TextView
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/calendar_stat_index"
+                            android:textSize="10sp" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/tv_stat_index"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/pretendard_bold"
+                                android:textColor="@color/maple_500"
+                                android:textSize="24sp"
+                                tools:text="86" />
+
+                            <TextView
+                                android:id="@+id/tv_stat_index_label"
+                                style="@style/Text.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:textColor="@color/maple_600"
+                                android:textStyle="bold"
+                                tools:text="좋음" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Card.Elevated"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_weight="1">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:padding="@dimen/space_m">
+
+                        <TextView
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/calendar_stat_sun"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/tv_stat_sun"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/pretendard_bold"
+                            android:fontFeatureSettings="tnum"
+                            android:textColor="@color/golden_600"
+                            android:textSize="22sp"
+                            tools:text="05:55" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Card.Elevated"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:padding="@dimen/space_m">
+
+                        <TextView
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/calendar_stat_humidity"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/tv_stat_humid"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/pretendard_bold"
+                            android:fontFeatureSettings="tnum"
+                            android:textColor="@color/mission_weather"
+                            android:textSize="22sp"
+                            tools:text="55%" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
 
             <!--
               ─────────── 월 달력 ───────────
@@ -211,8 +370,57 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_s" />
+
+                    <!-- 범례 : 절정(단풍) · 추천(황금) -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="@dimen/space_s"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/dot_indicator_active"
+                            app:tint="@color/maple_500" />
+
+                        <TextView
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="@string/calendar_legend_peak" />
+
+                        <ImageView
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:layout_marginStart="@dimen/space_l"
+                            android:contentDescription="@null"
+                            android:src="@drawable/dot_indicator_active"
+                            app:tint="@color/golden_500" />
+
+                        <TextView
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="@string/calendar_legend_reco" />
+                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- ─────────── 지금 갈 곳 ─────────── -->
+            <TextView
+                android:id="@+id/tv_now_go"
+                style="@style/Text.SectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/screen_padding"
+                android:layout_marginTop="@dimen/space_2xl"
+                tools:text="🌿 지금 갈 곳" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_calendar"

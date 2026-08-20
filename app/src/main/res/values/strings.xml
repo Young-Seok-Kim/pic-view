@@ -191,6 +191,12 @@
     <string name="home_guide_sub">반사·실루엣·대칭·리딩라인까지 오늘의 빛에 맞는 촬영 방법을 자세히 안내합니다.</string>
     <string name="home_guide_open">시선 가이드 열기</string>
 
+    <!-- 홈 → 사계절 촬영 가이드 진입 배너 -->
+    <string name="home_season_eyebrow">JEONGEUP · SEASON GUIDE</string>
+    <string name="home_season_title">정읍 사계절 촬영 가이드</string>
+    <string name="home_season_peak_now">지금은 %1$s%2$s 절정이에요</string>
+    <string name="home_season_dday">%1$s까지 D-%2$d · 미리 준비해보세요</string>
+
     <!-- 시선 가이드 화면 -->
     <string name="siseon_eyebrow">촬영 전에 한 번만 확인하세요</string>
     <string name="siseon_title">한 장을 더 잘 찍는 순서</string>
@@ -372,7 +378,19 @@
     <string name="mission_badge_earned">🏅 %1$s 획득</string>
 
     <!-- 사계절 캘린더 -->
-    <string name="calendar_title">사계절 촬영 캘린더</string>
+    <string name="calendar_title">정읍 사계절 촬영 가이드</string>
+    <string name="calendar_point_view">📷 촬영 포인트 보기</string>
+    <string name="calendar_month_title">%1$d월 촬영 캘린더</string>
+    <string name="calendar_legend_peak">절정</string>
+    <string name="calendar_legend_reco">추천</string>
+    <string name="calendar_stat_index">오늘의 촬영 지수</string>
+    <string name="calendar_stat_sun">일출</string>
+    <string name="calendar_stat_humidity">습도</string>
+    <string name="calendar_index_great">매우 좋음</string>
+    <string name="calendar_index_good">좋음</string>
+    <string name="calendar_index_normal">보통</string>
+    <string name="calendar_index_low">아쉬움</string>
+    <string name="calendar_now_go">지금 갈 곳</string>
     <!-- 홈에서 지도 버튼과 가로로 나눠 쓰므로 짧게 둡니다. -->
     <string name="calendar_entry">📅 촬영 캘린더</string>
     <string name="season_spring">🌸 봄</string>

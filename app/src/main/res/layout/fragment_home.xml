@@ -416,6 +416,87 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!--
+          ─────────── 사계절 촬영 가이드 진입 배너 ───────────
+
+          캘린더 진입이 오른쪽 위 날짜 알약뿐이면 찾기 어렵습니다.
+          시선 가이드 배너 바로 아래, 같은 문법의 배너로 크게 둡니다.
+          바탕색은 지금 계절의 색을 따르고, 한 줄이 "지금 무엇이 절정인지"를
+          먼저 말해 눌러 볼 이유를 만듭니다.
+        -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_season_entry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_m"
+            android:layout_marginHorizontal="@dimen/screen_padding"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/golden_100"
+            app:cardCornerRadius="@dimen/radius_card"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/space_l">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="0.12"
+                        android:text="@string/home_season_eyebrow"
+                        android:textColor="@color/eyebrow_blue"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        style="@style/Text.SectionTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_xs"
+                        android:text="@string/home_season_title"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_title" />
+
+                    <TextView
+                        android:id="@+id/tv_season_entry_sub"
+                        style="@style/Text.Caption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_xs"
+                        android:textColor="@color/text_secondary"
+                        tools:text="지금은 내장산 여름 계곡이 절정이에요" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_season_entry_emoji"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_m"
+                    android:textSize="30sp"
+                    tools:text="🌿" />
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginStart="@dimen/space_xs"
+                    android:contentDescription="@null"
+                    android:src="@drawable/baseline_chevron_right_24"
+                    app:tint="@color/text_tertiary" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <ProgressBar
             android:id="@+id/progress_home"
             android:layout_width="wrap_content"
