@@ -351,45 +351,6 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
         }
 
         buildQuickActions()
-        renderSeasonEntry()
-    }
-
-    /**
-     * 사계절 촬영 가이드 배너.
-     *
-     * 캘린더 진입이 오른쪽 위 날짜 알약뿐이면 찾기 어렵습니다. 지금 계절의
-     * 색을 입힌 배너가 "지금 무엇이 절정인지"부터 말하고 캘린더로 보냅니다.
-     */
-    private fun renderSeasonEntry() {
-        val next = com.youngs.picview.domain.season.SeasonHighlights
-            .upcoming(limit = 1).firstOrNull() ?: return
-        val today = LocalDate.now()
-
-        binding.tvSeasonEntryEmoji.text = next.emoji
-        binding.tvSeasonEntrySub.text = if (next.isPeakNow(today)) {
-            getString(
-                R.string.home_season_peak_now,
-                next.title, next.title.byBatchim("이", "가")
-            )
-        } else {
-            getString(R.string.home_season_dday, next.title, next.daysUntilPeak(today))
-        }
-
-        binding.cardSeasonEntry.setCardBackgroundColor(
-            ContextCompat.getColor(
-                requireContext(),
-                when (com.youngs.picview.domain.season.Season.now()) {
-                    com.youngs.picview.domain.season.Season.SPRING -> R.color.mission_season_soft
-                    com.youngs.picview.domain.season.Season.SUMMER -> R.color.moss_50
-                    com.youngs.picview.domain.season.Season.AUTUMN -> R.color.golden_100
-                    com.youngs.picview.domain.season.Season.WINTER -> R.color.mission_weather_soft
-                }
-            )
-        )
-
-        binding.cardSeasonEntry.setOnClickListener {
-            (activity as? MainActivity)?.pushScreen(CalendarFragment())
-        }
     }
 
     /**
