@@ -76,10 +76,10 @@
 
                 <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="96dp"
+                    android:layout_height="110dp"
                     android:contentDescription="@null"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/bg_hero_sunrise" />
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/guide_motion" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -134,7 +134,7 @@
                         android:layout_height="match_parent"
                         android:contentDescription="@null"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/bg_hero_day" />
+                        android:src="@drawable/guide_leading" />
                 </com.google.android.material.card.MaterialCardView>
 
                 <LinearLayout
