@@ -37,8 +37,6 @@
     <string name="onboarding_demo_weather_label">맑음</string>
     <string name="onboarding_demo_altitude_value">18°</string>
     <string name="onboarding_demo_altitude_label">해 고도</string>
-    <string name="onboarding_demo_azimuth_value">서 263°</string>
-    <string name="onboarding_demo_azimuth_label">해 방향</string>
     <string name="onboarding_demo_golden_label">골든 아워</string>
     <string name="onboarding_demo_golden_range">18:29 ~ 19:02</string>
     <string name="onboarding_demo_golden_now">지금 좋아요</string>

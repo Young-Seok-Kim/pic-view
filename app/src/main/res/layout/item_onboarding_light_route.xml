@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     온보딩 2장 : LIGHT ROUTE (시안 2번 화면).
-    낮 장면 그림 아래에 하루의 빛 타임라인 예시를 보여 줍니다 —
+    낮 풍경 실사진 아래에 하루의 빛 타임라인 예시를 보여 줍니다 —
     일출 → 아침 빛 → 골든 아워 → 일몰. 골든 아워 칸만 살려서 강조합니다.
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -61,8 +61,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@null"
-                android:scaleType="fitXY"
-                android:src="@drawable/bg_hero_day" />
+                android:scaleType="centerCrop"
+                android:src="@drawable/guide_symmetry" />
         </com.google.android.material.card.MaterialCardView>
 
         <!-- 하루의 빛 타임라인 예시 — 값은 시안의 예시 그대로입니다. -->

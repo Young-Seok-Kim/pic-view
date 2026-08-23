@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     온보딩 1장 : LIGHT MATCH (시안 1번 화면).
-    빛 장면 그림 아래에 "지금 조건" 예시 카드를 붙입니다 —
-    날씨·해 고도·해 방향과 골든 아워 알림이 어떤 얼굴인지 미리 보여 줍니다.
+    노을 실사진 아래에 "지금 조건" 예시 카드를 붙입니다 —
+    날씨·해 고도와 골든 아워 알림이 어떤 얼굴인지 미리 보여 줍니다.
+    해 방향(방위각)은 뺐습니다 — 도 단위 숫자는 직관적으로 읽히지 않습니다.
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -61,8 +62,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@null"
-                android:scaleType="fitXY"
-                android:src="@drawable/bg_hero_sunset" />
+                android:scaleType="centerCrop"
+                android:src="@drawable/guide_reflection" />
         </com.google.android.material.card.MaterialCardView>
 
         <!-- "지금 조건" 예시 카드 — 값은 시안의 예시 그대로입니다. -->
@@ -137,33 +138,6 @@
                             android:textColor="@color/text_tertiary" />
                     </LinearLayout>
 
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginVertical="@dimen/space_xs"
-                        android:background="@color/card_stroke" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
-
-                        <TextView
-                            style="@style/Text.SectionTitle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/onboarding_demo_azimuth_value" />
-
-                        <TextView
-                            style="@style/Text.Caption"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="@string/onboarding_demo_azimuth_label"
-                            android:textColor="@color/text_tertiary" />
-                    </LinearLayout>
                 </LinearLayout>
 
                 <View
