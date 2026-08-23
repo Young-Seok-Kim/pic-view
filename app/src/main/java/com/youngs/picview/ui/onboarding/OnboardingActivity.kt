@@ -19,13 +19,13 @@ import androidx.viewpager2.widget.ViewPager2
 import com.youngs.picview.MainActivity
 import com.youngs.picview.R
 import com.youngs.picview.databinding.ActivityOnboardingBinding
-import com.youngs.picview.databinding.ItemOnboardingPageBinding
 import com.youngs.picview.util.AppPrefs
 
 /**
  * 최초 실행 안내 (NAVIGATION_FLOW §1).
  *
- * 3장을 넘긴 뒤 마지막에서 사용 모드를 고릅니다.
+ * 4장 구성 — 3장(YOUR SISEON)에서 보기 모드를 고르면 마지막 장으로
+ * 넘어가고, 4장의 "다음 출사 계획 보기"로 앱을 시작합니다.
  * 로그인·회원가입 단계는 없습니다 — 이 앱은 계정을 두지 않고,
  * 모든 기록이 단말에 남습니다.
  *
@@ -35,6 +35,9 @@ import com.youngs.picview.util.AppPrefs
 class OnboardingActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityOnboardingBinding
+
+    /** 3장에서 고른 보기 모드. 안 고르고 넘겼으면 일반 모드로 시작합니다. */
+    private var pendingSenior: Boolean? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,24 +77,34 @@ class OnboardingActivity : AppCompatActivity() {
         binding.btnOnboardingSkip.setOnClickListener {
             // 다시 보기로 왔으면 설정을 건드리지 않고 조용히 닫습니다.
             if (intent.getBooleanExtra(EXTRA_REVIEW, false)) finish()
-            else finishOnboarding(senior = false)
+            else finishOnboarding(senior = pendingSenior ?: false)
         }
 
         binding.btnOnboardingNext.setOnClickListener {
             binding.pagerOnboarding.currentItem = binding.pagerOnboarding.currentItem + 1
         }
 
-        binding.btnOnboardingSenior.setOnClickListener { finishOnboarding(senior = true) }
-        binding.btnOnboardingNormal.setOnClickListener { finishOnboarding(senior = false) }
+        binding.btnOnboardingSenior.setOnClickListener { chooseMode(senior = true) }
+        binding.btnOnboardingNormal.setOnClickListener { chooseMode(senior = false) }
+        binding.btnOnboardingFinish.setOnClickListener {
+            finishOnboarding(senior = pendingSenior ?: false)
+        }
     }
 
-    /** 마지막 장에서만 모드 선택 버튼을 보여 줍니다. */
+    /** 3장에서 모드를 고르면 바로 끝내지 않고 마지막 장을 보여 줍니다. */
+    private fun chooseMode(senior: Boolean) {
+        pendingSenior = senior
+        binding.pagerOnboarding.currentItem = PAGE_MODE + 1
+    }
+
+    /** 1·2장 다음 / 3장 모드 선택 / 4장 시작 버튼. */
     private fun renderActions(position: Int) {
+        val isModePage = position == PAGE_MODE
         val isLast = position == PAGES.lastIndex
-        binding.btnOnboardingNext.isVisible = !isLast
-        binding.btnOnboardingSenior.isVisible = isLast
-        binding.btnOnboardingNormal.isVisible = isLast
-        binding.btnOnboardingSkip.isVisible = !isLast
+        binding.btnOnboardingNext.isVisible = !isModePage && !isLast
+        binding.btnOnboardingSenior.isVisible = isModePage
+        binding.btnOnboardingNormal.isVisible = isModePage
+        binding.btnOnboardingFinish.isVisible = isLast
     }
 
     private fun finishOnboarding(senior: Boolean) {
@@ -143,61 +156,36 @@ class OnboardingActivity : AppCompatActivity() {
 
     // ───────────────────────── 페이지 ─────────────────────────
 
-    private data class Page(
-        /** 빛 장면 그림. 계획 탭 히어로와 같은 붓입니다. */
-        val sceneRes: Int,
-        val eyebrowRes: Int,
-        val titleRes: Int,
-        val descRes: Int
-    )
-
-    private class PageAdapter(private val pages: List<Page>) :
+    /**
+     * 페이지마다 장식이 달라 레이아웃을 통째로 바꿔 끼웁니다.
+     * 내용은 전부 XML에 박혀 있어 바인딩할 것이 없습니다.
+     */
+    private class PageAdapter(private val layouts: List<Int>) :
         RecyclerView.Adapter<PageAdapter.PageViewHolder>() {
 
-        class PageViewHolder(val binding: ItemOnboardingPageBinding) :
-            RecyclerView.ViewHolder(binding.root)
+        class PageViewHolder(view: View) : RecyclerView.ViewHolder(view)
+
+        override fun getItemViewType(position: Int) = layouts[position]
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = PageViewHolder(
-            ItemOnboardingPageBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
-            )
+            LayoutInflater.from(parent.context).inflate(viewType, parent, false)
         )
 
-        override fun onBindViewHolder(holder: PageViewHolder, position: Int) {
-            val page = pages[position]
+        override fun onBindViewHolder(holder: PageViewHolder, position: Int) = Unit
 
-            with(holder.binding) {
-                ivOnboardingScene.setImageResource(page.sceneRes)
-                tvOnboardingEyebrow.setText(page.eyebrowRes)
-                tvOnboardingTitle.setText(page.titleRes)
-                tvOnboardingDesc.setText(page.descRes)
-            }
-        }
-
-        override fun getItemCount() = pages.size
+        override fun getItemCount() = layouts.size
     }
 
     companion object {
         private val PAGES = listOf(
-            Page(
-                sceneRes = R.drawable.bg_hero_sunset,
-                eyebrowRes = R.string.onboarding_1_eyebrow,
-                titleRes = R.string.onboarding_1_title,
-                descRes = R.string.onboarding_1_desc
-            ),
-            Page(
-                sceneRes = R.drawable.bg_hero_sunrise,
-                eyebrowRes = R.string.onboarding_2_eyebrow,
-                titleRes = R.string.onboarding_2_title,
-                descRes = R.string.onboarding_2_desc
-            ),
-            Page(
-                sceneRes = R.drawable.bg_hero_day,
-                eyebrowRes = R.string.onboarding_3_eyebrow,
-                titleRes = R.string.onboarding_3_title,
-                descRes = R.string.onboarding_3_desc
-            )
+            R.layout.item_onboarding_light_match,
+            R.layout.item_onboarding_light_route,
+            R.layout.item_onboarding_siseon,
+            R.layout.item_onboarding_after_frame
         )
+
+        /** 보기 모드를 고르는 장(0부터). */
+        private const val PAGE_MODE = 2
 
         private const val EXTRA_REVIEW = "review"
 

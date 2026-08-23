@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 온보딩 예시 카드의 "지금 좋아요" 알약 배경. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/maple_500" />
+    <corners android:radius="100dp" />
+</shape>

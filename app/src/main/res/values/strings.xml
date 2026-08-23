@@ -4,26 +4,62 @@
 
     <!-- 온보딩 -->
     <string name="onboarding_skip">건너뛰기</string>
-    <string name="onboarding_1_eyebrow">LIGHT MATCH</string>
-    <string name="onboarding_2_eyebrow">LIGHT ROUTE</string>
-    <string name="onboarding_3_eyebrow">YOUR SISEON</string>
     <string name="onboarding_next">다음</string>
+    <string name="onboarding_finish">다음 출사 계획 보기</string>
+    <string name="onboarding_1_eyebrow">LIGHT MATCH</string>
     <string name="onboarding_1_title">지금,
 가장 잘 나오는 곳</string>
     <string name="onboarding_1_desc">날씨와 해의 위치를 실시간으로 계산해
 지금 사진이 가장 잘 나오는 정읍 촬영지를
-점수로 알려드려요.</string>
+알려드려요.</string>
+    <string name="onboarding_2_eyebrow">LIGHT ROUTE</string>
     <string name="onboarding_2_title">해를 따라
 동선을 짭니다</string>
-    <string name="onboarding_2_desc">일출·일몰 시각과 스팟의 방위를 맞춰
-골든아워에 어디 있어야 하는지까지
-시간표로 만들어 드려요.</string>
-    <string name="onboarding_3_title">어떻게
-보실래요?</string>
-    <string name="onboarding_3_desc">언제든 MY 탭에서 바꿀 수 있어요.
+    <string name="onboarding_2_desc">일출부터 일몰까지, 해의 이동 경로와
+촬영지 방향을 맞춰 가장 좋은 시간을
+놓치지 않도록 도와드려요.</string>
+    <string name="onboarding_3_eyebrow">YOUR SISEON</string>
+    <string name="onboarding_3_title">어떻게 보실래요?</string>
+    <string name="onboarding_3_desc">사진을 더 잘 만드는 구도 가이드를
+원하는 방식으로 보여드릴게요.</string>
+    <string name="onboarding_3_note">언제든 MY 탭에서 바꿀 수 있어요.
 로그인이나 가입은 필요 없습니다.</string>
-    <string name="onboarding_start_senior">편하게 쓸게요 (큰 글씨)</string>
+    <string name="onboarding_4_eyebrow">AFTER THE FRAME</string>
+    <string name="onboarding_4_title">찍은 뒤,
+다음 장면까지</string>
+    <string name="onboarding_4_desc">촬영을 기록하고, AI가 다음에 가기 좋은
+정읍의 촬영지를 추천해 드려요.</string>
+    <string name="onboarding_start_senior">편하게 볼게요 (큰 글씨)</string>
     <string name="onboarding_start_normal">일반 모드로 시작</string>
+
+    <!-- 온보딩 : 장면 속 예시 값(실데이터 아님, 시안 그대로) -->
+    <string name="onboarding_demo_weather_value">23°C</string>
+    <string name="onboarding_demo_weather_label">맑음</string>
+    <string name="onboarding_demo_altitude_value">18°</string>
+    <string name="onboarding_demo_altitude_label">해 고도</string>
+    <string name="onboarding_demo_azimuth_value">서 263°</string>
+    <string name="onboarding_demo_azimuth_label">해 방향</string>
+    <string name="onboarding_demo_golden_label">골든 아워</string>
+    <string name="onboarding_demo_golden_range">18:29 ~ 19:02</string>
+    <string name="onboarding_demo_golden_now">지금 좋아요</string>
+    <string name="onboarding_demo_tl_sunrise_time">05:46</string>
+    <string name="onboarding_demo_tl_sunrise">일출</string>
+    <string name="onboarding_demo_tl_morning_time">08:00</string>
+    <string name="onboarding_demo_tl_morning">아침 빛</string>
+    <string name="onboarding_demo_tl_golden_time">18:00</string>
+    <string name="onboarding_demo_tl_golden">골든 아워</string>
+    <string name="onboarding_demo_tl_sunset_time">19:02</string>
+    <string name="onboarding_demo_tl_sunset">일몰</string>
+    <string name="onboarding_demo_guide_silhouette">실루엣</string>
+    <string name="onboarding_demo_guide_reflection">반영</string>
+    <string name="onboarding_demo_guide_leading">리딩라인</string>
+    <string name="onboarding_demo_record_title">🗓 오늘의 기록</string>
+    <string name="onboarding_demo_record_place">정읍천 미로분수</string>
+    <string name="onboarding_demo_record_note">"빛이 너무 예뻤던 골든 아워.
+다음엔 반영을 더 담아보고 싶어요."</string>
+    <string name="onboarding_demo_next_label">내일 아침 추천</string>
+    <string name="onboarding_demo_next_place">내장산 단풍생태공원</string>
+    <string name="onboarding_demo_next_info">아침 빛 07:10 · 맑음 18°C</string>
 
     <!-- 하단 탭 -->
     <string name="tab_home">홈</string>
