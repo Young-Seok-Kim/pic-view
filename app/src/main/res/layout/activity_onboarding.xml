@@ -2,7 +2,8 @@
 <!--
     온보딩 (NAVIGATION_FLOW §1).
 
-    3장을 넘긴 뒤 마지막에서 사용 모드를 고릅니다.
+    4장 구성 — 3장에서 보기 모드(큰 글씨/일반)를 고르고,
+    4장에서 "다음 출사 계획 보기"로 시작합니다.
     로그인·회원가입 단계는 없습니다 — 이 앱은 계정을 두지 않습니다.
 -->
 <androidx.constraintlayout.widget.ConstraintLayout
@@ -58,7 +59,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 1·2장 : 다음 버튼 / 3장 : 모드 선택 두 버튼 -->
+    <!-- 1·2장 : 다음 / 3장 : 모드 선택 / 4장 : 시작 -->
     <LinearLayout
         android:id="@+id/layout_onboarding_actions"
         android:layout_width="0dp"
@@ -99,6 +100,14 @@
             android:visibility="gone"
             app:cornerRadius="@dimen/radius_button"
             tools:visibility="visible" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_onboarding_finish"
+            style="@style/Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/onboarding_finish"
+            android:visibility="gone" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
