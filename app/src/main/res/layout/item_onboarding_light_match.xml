@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     온보딩 1장 : LIGHT MATCH (시안 1번 화면).
-    노을 실사진 아래에 "지금 조건" 예시 카드를 붙입니다 —
-    날씨·해 고도와 골든 아워 알림이 어떤 얼굴인지 미리 보여 줍니다.
+    노을 실사진을 테두리 없이 화면 가득 깔고, 위아래 가장자리를 배경색
+    그라데이션으로 녹입니다. "지금 조건" 예시 카드가 사진 위에 떠 있습니다.
     해 방향(방위각)은 뺐습니다 — 도 단위 숫자는 직관적으로 읽히지 않습니다.
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -19,7 +19,6 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingHorizontal="@dimen/space_3xl"
         android:paddingVertical="@dimen/space_l">
 
         <TextView
@@ -38,6 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_s"
             android:gravity="center"
+            android:paddingHorizontal="@dimen/space_3xl"
             android:text="@string/onboarding_1_title" />
 
         <TextView
@@ -47,139 +47,147 @@
             android:layout_marginTop="@dimen/space_m"
             android:gravity="center"
             android:lineSpacingExtra="6dp"
+            android:paddingHorizontal="@dimen/space_3xl"
             android:text="@string/onboarding_1_desc" />
 
-        <com.google.android.material.card.MaterialCardView
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="168dp"
-            android:layout_marginTop="@dimen/space_xl"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="0dp"
-            app:strokeColor="@color/maple_200"
-            app:strokeWidth="1.5dp">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xl">
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="380dp"
                 android:contentDescription="@null"
                 android:scaleType="centerCrop"
                 android:src="@drawable/guide_reflection" />
-        </com.google.android.material.card.MaterialCardView>
 
-        <!-- "지금 조건" 예시 카드 — 값은 시안의 예시 그대로입니다. -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_m"
-            app:cardBackgroundColor="@color/bg_card"
-            app:cardCornerRadius="@dimen/radius_card"
-            app:cardElevation="0dp"
-            app:strokeColor="@color/card_stroke"
-            app:strokeWidth="1dp">
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_gravity="top"
+                android:background="@drawable/bg_onboarding_fade_top" />
 
-            <LinearLayout
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_gravity="bottom"
+                android:background="@drawable/bg_onboarding_fade_bottom" />
+
+            <!-- "지금 조건" 예시 카드 — 값은 시안의 예시 그대로입니다. -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="@dimen/space_l">
+                android:layout_gravity="bottom"
+                android:layout_marginHorizontal="@dimen/space_xl"
+                android:layout_marginBottom="@dimen/space_l"
+                app:cardBackgroundColor="@color/bg_card"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardElevation="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_l">
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="horizontal">
 
-                        <TextView
-                            style="@style/Text.SectionTitle"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="@string/onboarding_demo_weather_value" />
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
 
-                        <TextView
-                            style="@style/Text.Caption"
-                            android:layout_width="wrap_content"
+                            <TextView
+                                style="@style/Text.SectionTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/onboarding_demo_weather_value" />
+
+                            <TextView
+                                style="@style/Text.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="@string/onboarding_demo_weather_label"
+                                android:textColor="@color/text_tertiary" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginVertical="@dimen/space_xs"
+                            android:background="@color/card_stroke" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="@string/onboarding_demo_weather_label"
-                            android:textColor="@color/text_tertiary" />
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <TextView
+                                style="@style/Text.SectionTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/onboarding_demo_altitude_value" />
+
+                            <TextView
+                                style="@style/Text.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="@string/onboarding_demo_altitude_label"
+                                android:textColor="@color/text_tertiary" />
+                        </LinearLayout>
                     </LinearLayout>
 
                     <View
-                        android:layout_width="1dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginVertical="@dimen/space_xs"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="@dimen/space_m"
                         android:background="@color/card_stroke" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
-
-                        <TextView
-                            style="@style/Text.SectionTitle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/onboarding_demo_altitude_value" />
+                        android:layout_marginTop="@dimen/space_m"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
                         <TextView
                             style="@style/Text.Caption"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="@string/onboarding_demo_altitude_label"
-                            android:textColor="@color/text_tertiary" />
+                            android:text="@string/onboarding_demo_golden_label"
+                            android:textColor="@color/golden_600" />
+
+                        <TextView
+                            style="@style/Text.SectionTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/space_s"
+                            android:layout_weight="1"
+                            android:text="@string/onboarding_demo_golden_range" />
+
+                        <TextView
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_onboarding_pill"
+                            android:paddingHorizontal="@dimen/space_m"
+                            android:paddingVertical="6dp"
+                            android:text="@string/onboarding_demo_golden_now"
+                            android:textColor="@color/text_on_brand"
+                            android:textStyle="bold" />
                     </LinearLayout>
-
                 </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="@dimen/space_m"
-                    android:background="@color/card_stroke" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_m"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        style="@style/Text.Caption"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/onboarding_demo_golden_label"
-                        android:textColor="@color/golden_600" />
-
-                    <TextView
-                        style="@style/Text.SectionTitle"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/space_s"
-                        android:layout_weight="1"
-                        android:text="@string/onboarding_demo_golden_range" />
-
-                    <TextView
-                        style="@style/Text.Caption"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_onboarding_pill"
-                        android:paddingHorizontal="@dimen/space_m"
-                        android:paddingVertical="6dp"
-                        android:text="@string/onboarding_demo_golden_now"
-                        android:textColor="@color/text_on_brand"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            </com.google.android.material.card.MaterialCardView>
+        </FrameLayout>
     </LinearLayout>
 </ScrollView>

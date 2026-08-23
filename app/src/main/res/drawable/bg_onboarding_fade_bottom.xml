@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 온보딩 사진 아래쪽 가장자리를 페이지 배경색으로 녹이는 그라데이션. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="270"
+        android:startColor="#00FDF6EF"
+        android:endColor="@color/bg_page" />
+</shape>

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     온보딩 3장 : YOUR SISEON (시안 3번 화면).
-    구도 가이드 예시 사진과 실루엣·반영·리딩라인 썸네일을 보여 준 뒤,
-    화면 아래(액티비티)의 모드 버튼으로 보기 방식을 고릅니다.
+    구도 가이드 예시 사진을 테두리 없이 가득 깔고 위아래를 배경색으로
+    녹입니다. 실루엣·반영·리딩라인 썸네일을 보여 준 뒤, 화면 아래
+    (액티비티)의 모드 버튼으로 보기 방식을 고릅니다.
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -18,7 +19,6 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingHorizontal="@dimen/space_3xl"
         android:paddingVertical="@dimen/space_l">
 
         <TextView
@@ -37,6 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_s"
             android:gravity="center"
+            android:paddingHorizontal="@dimen/space_3xl"
             android:text="@string/onboarding_3_title" />
 
         <TextView
@@ -46,31 +47,40 @@
             android:layout_marginTop="@dimen/space_m"
             android:gravity="center"
             android:lineSpacingExtra="6dp"
+            android:paddingHorizontal="@dimen/space_3xl"
             android:text="@string/onboarding_3_desc" />
 
-        <com.google.android.material.card.MaterialCardView
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="176dp"
-            android:layout_marginTop="@dimen/space_xl"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="0dp"
-            app:strokeColor="@color/maple_200"
-            app:strokeWidth="1.5dp">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xl">
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="280dp"
                 android:contentDescription="@null"
                 android:scaleType="centerCrop"
                 android:src="@drawable/guide_frame" />
-        </com.google.android.material.card.MaterialCardView>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_gravity="top"
+                android:background="@drawable/bg_onboarding_fade_top" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_gravity="bottom"
+                android:background="@drawable/bg_onboarding_fade_bottom" />
+        </FrameLayout>
 
         <!-- 구도 가이드 맛보기 : 실루엣 · 반영 · 리딩라인 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_m"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/space_2xl">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -81,11 +91,9 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
-                    android:layout_height="64dp"
+                    android:layout_height="76dp"
                     app:cardCornerRadius="14dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="@color/card_stroke"
-                    app:strokeWidth="1dp">
+                    app:cardElevation="0dp">
 
                     <ImageView
                         android:layout_width="match_parent"
@@ -114,11 +122,9 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
-                    android:layout_height="64dp"
+                    android:layout_height="76dp"
                     app:cardCornerRadius="14dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="@color/card_stroke"
-                    app:strokeWidth="1dp">
+                    app:cardElevation="0dp">
 
                     <ImageView
                         android:layout_width="match_parent"
@@ -146,11 +152,9 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
-                    android:layout_height="64dp"
+                    android:layout_height="76dp"
                     app:cardCornerRadius="14dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="@color/card_stroke"
-                    app:strokeWidth="1dp">
+                    app:cardElevation="0dp">
 
                     <ImageView
                         android:layout_width="match_parent"
@@ -177,6 +181,7 @@
             android:layout_marginTop="@dimen/space_l"
             android:gravity="center"
             android:lineSpacingExtra="4dp"
+            android:paddingHorizontal="@dimen/space_3xl"
             android:text="@string/onboarding_3_note"
             android:textColor="@color/text_tertiary" />
     </LinearLayout>
