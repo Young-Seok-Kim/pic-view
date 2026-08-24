@@ -138,6 +138,7 @@
     <string name="course_subject_more">%1$s 외 %2$d</string>
     <string name="course_today_title">오늘의 출사 코스</string>
     <string name="course_reco_badge">추천 1</string>
+    <string name="course_reco_badge_format">추천 %1$d</string>
     <string name="course_other">다른 코스 보기 ›</string>
     <string name="course_arrive_label">도착 권장 시각</string>
     <string name="course_travel_time_label">🚘 이동 시간</string>
