@@ -224,6 +224,27 @@
                 android:background="@drawable/bg_shutter_button"
                 android:contentDescription="@string/cd_capture"
                 android:src="@android:color/transparent" />
+
+            <!-- 방금 찍은 사진. 누르면 그 사진을 들고 포토 프레임으로 갑니다. -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_last_shot"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="end|center_vertical"
+                android:visibility="gone"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#99FFFFFF"
+                app:strokeWidth="1.5dp"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/iv_last_shot"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/cd_last_shot"
+                    android:scaleType="centerCrop" />
+            </com.google.android.material.card.MaterialCardView>
         </FrameLayout>
     </LinearLayout>
 

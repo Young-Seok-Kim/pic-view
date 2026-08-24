@@ -530,7 +530,8 @@
     <string name="guide_symmetry">중앙선에 건물 중심을 맞춰보세요</string>
     <string name="guide_center">원 안을 피사체로 채워보세요</string>
     <string name="cd_capture">촬영 버튼</string>
-    <string name="cd_gallery">갤러리 보기</string>
+    <string name="cd_gallery">앨범에서 사진 고르기</string>
+    <string name="cd_last_shot">방금 찍은 사진 열기</string>
     <string name="cd_spot_thumbnail">촬영지 사진</string>
     <!-- 포즈 가이드 -->
     <string name="pose_section_title">포즈 추천</string>
