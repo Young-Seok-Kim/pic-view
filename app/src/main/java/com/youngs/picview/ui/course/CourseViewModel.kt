@@ -49,7 +49,16 @@ class CourseViewModel(app: Application) : AndroidViewModel(app) {
     private val _saved = MutableLiveData(SaveState.IDLE)
     val saved: LiveData<SaveState> = _saved
 
-    fun generate(spots: List<SpotItem>, sun: SunTimes, request: CourseRequest) {
+    /** 이 코스의 출사 예정일. [generate] 를 부른 화면이 넘겨 줍니다. */
+    private var planDate: java.time.LocalDate = java.time.LocalDate.now()
+
+    fun generate(
+        spots: List<SpotItem>,
+        sun: SunTimes,
+        request: CourseRequest,
+        date: java.time.LocalDate = java.time.LocalDate.now()
+    ) {
+        planDate = date
         val result = CoursePlanner.plan(spots, sun, request)
         _course.value = result
         _saved.value = SaveState.IDLE
@@ -89,7 +98,7 @@ class CourseViewModel(app: Application) : AndroidViewModel(app) {
 
         viewModelScope.launch {
             val ok = runCatching {
-                repository.save(course, _narration.value.orEmpty())
+                repository.save(course, _narration.value.orEmpty(), planDate)
             }.isSuccess
             _saved.value = if (ok) SaveState.SUCCESS else SaveState.FAILED
         }

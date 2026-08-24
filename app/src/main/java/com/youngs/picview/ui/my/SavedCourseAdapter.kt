@@ -2,6 +2,7 @@ package com.youngs.picview.ui.my
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -13,10 +14,15 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-/** MY 탭의 저장한 코스 목록. */
+/**
+ * 저장한 코스 목록 (MY 탭 · 코스 탭 공용).
+ *
+ * [onDelete] 를 넘기지 않으면 삭제 버튼이 숨겨집니다 — 코스 탭의
+ * 미리보기 자리에서는 열람만 하고, 삭제는 전체 목록에서 합니다.
+ */
 class SavedCourseAdapter(
     private val onClick: (SavedCourseWithStops) -> Unit,
-    private val onDelete: (SavedCourseWithStops) -> Unit
+    private val onDelete: ((SavedCourseWithStops) -> Unit)? = null
 ) : ListAdapter<SavedCourseWithStops, SavedCourseAdapter.CourseViewHolder>(DIFF) {
 
     class CourseViewHolder(val binding: ItemSavedCourseBinding) :
@@ -53,7 +59,8 @@ class SavedCourseAdapter(
             } + if (stops.size > PREVIEW_STOPS) " …" else ""
 
             root.setOnClickListener { onClick(item) }
-            btnSavedDelete.setOnClickListener { onDelete(item) }
+            btnSavedDelete.isVisible = onDelete != null
+            btnSavedDelete.setOnClickListener { onDelete?.invoke(item) }
         }
     }
 

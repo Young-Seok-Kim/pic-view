@@ -37,7 +37,11 @@ class CourseRepository(context: Context) {
 
     fun observeCourseCount(): Flow<Int> = courseDao.observeCourseCount()
 
-    suspend fun save(course: ShootingCourse, summary: String): Long {
+    suspend fun save(
+        course: ShootingCourse,
+        summary: String,
+        planDate: java.time.LocalDate = java.time.LocalDate.now()
+    ): Long {
         val entity = SavedCourseEntity(
             createdAt = System.currentTimeMillis(),
             title = defaultTitle(course),
@@ -46,7 +50,8 @@ class CourseRepository(context: Context) {
             totalMinutes = course.totalMinutes,
             travelMode = course.travelMode.name,
             sunriseMinute = course.sun.sunrise?.toMinuteOfDay() ?: -1,
-            sunsetMinute = course.sun.sunset?.toMinuteOfDay() ?: -1
+            sunsetMinute = course.sun.sunset?.toMinuteOfDay() ?: -1,
+            planDateEpochDay = planDate.toEpochDay()
         )
 
         val stops = course.stops.mapIndexed { index, stop -> stop.toEntity(index) }
@@ -211,3 +216,9 @@ fun SavedCourseWithStops.toShootingCourse(): ShootingCourse = ShootingCourse(
         .getOrDefault(TravelMode.CAR),
     totalDistanceKm = course.totalKm
 )
+
+/** 출사 예정일. 옛 데이터(0)는 저장한 날로 봅니다. */
+fun SavedCourseEntity.planDate(): java.time.LocalDate =
+    if (planDateEpochDay > 0) java.time.LocalDate.ofEpochDay(planDateEpochDay)
+    else java.time.Instant.ofEpochMilli(createdAt)
+        .atZone(java.time.ZoneId.systemDefault()).toLocalDate()

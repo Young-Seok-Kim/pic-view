@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
@@ -22,7 +23,13 @@ import com.youngs.picview.BuildConfig
 import com.youngs.picview.MainActivity
 import com.youngs.picview.R
 import com.youngs.picview.data.api.RetrofitClient
+import com.youngs.picview.data.local.SavedCourseWithStops
 import com.youngs.picview.data.repository.CourseRepository
+import com.youngs.picview.data.repository.arriveTime
+import com.youngs.picview.data.repository.planDate
+import com.youngs.picview.ui.my.SavedCourseAdapter
+import com.youngs.picview.ui.my.SavedCoursesFragment
+import com.youngs.picview.ui.my.MyViewModel
 import com.youngs.picview.databinding.FragmentCourseInputBinding
 import com.youngs.picview.databinding.ItemCourseConditionBinding
 import com.youngs.picview.domain.course.CoursePlanner
@@ -61,6 +68,9 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
 
     private val mainViewModel: MainViewModel by activityViewModels()
     private val courseViewModel: CourseViewModel by activityViewModels()
+    private val myViewModel: MyViewModel by viewModels()
+
+    private lateinit var savedAdapter: SavedCourseAdapter
 
     // ─────────────── 선택 상태 ───────────────
 
@@ -85,6 +95,7 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
         binding.scrollCourseInput.applyTopSystemBarInset()
 
         setupPreviewList()
+        setupSavedCourses()
         buildConditionCards()
         renderDate()
         renderHero()
@@ -102,6 +113,53 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
             regeneratePreview()
         }
         mainViewModel.spotData.observe(viewLifecycleOwner) { regeneratePreview() }
+    }
+
+    // ─────────────────────── 저장한 코스 ───────────────────────
+
+    /**
+     * 저장한 코스를 히어로 아래에 보여 줍니다.
+     *
+     * 코스를 세워 둔 사람이 이 탭을 여는 이유는 새 계획이 아니라 그 계획입니다.
+     * 오늘 예정 코스는 "오늘의 출사 계획" 카드로 따로 강조하고, 나머지는
+     * 최근 것 몇 개만 — 전체 열람·삭제는 저장한 코스 화면이 전담합니다.
+     */
+    private fun setupSavedCourses() {
+        savedAdapter = SavedCourseAdapter(onClick = { openSaved(it) })
+        binding.rvSavedCourses.adapter = savedAdapter
+        binding.btnSavedAll.setOnClickListener {
+            (activity as? MainActivity)?.pushScreen(SavedCoursesFragment())
+        }
+        myViewModel.courses.observe(viewLifecycleOwner) { renderSavedCourses(it) }
+    }
+
+    private fun renderSavedCourses(courses: List<SavedCourseWithStops>) {
+        val today = LocalDate.now()
+        val todayCourse = courses
+            .filter { it.course.planDate() == today }
+            .maxByOrNull { it.course.createdAt }
+
+        binding.cardTodayPlan.isVisible = todayCourse != null
+        todayCourse?.let { item ->
+            binding.tvTodayTitle.text = item.course.title
+            val first = item.orderedStops.firstOrNull()
+            binding.tvTodayLine.text = listOfNotNull(
+                first?.let { "${it.arriveTime().format(SAVED_TIME)} ${it.title}부터" },
+                "${item.orderedStops.size}곳"
+            ).joinToString(" · ")
+            binding.cardTodayPlan.setOnClickListener { openSaved(item) }
+        }
+
+        val rest = courses.filterNot { it.course.id == todayCourse?.course?.id }
+        binding.rowSavedHeader.isVisible = rest.isNotEmpty()
+        binding.rvSavedCourses.isVisible = rest.isNotEmpty()
+        savedAdapter.submitList(rest.take(SAVED_PREVIEW))
+    }
+
+    private fun openSaved(item: SavedCourseWithStops) {
+        (activity as? MainActivity)?.pushScreen(
+            CourseResultFragment.forSaved(item.course.id)
+        )
     }
 
     // ─────────────────────── 여행 날짜 ───────────────────────
@@ -492,7 +550,7 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
             return
         }
 
-        courseViewModel.generate(spots, activeSunTimes, buildRequest())
+        courseViewModel.generate(spots, activeSunTimes, buildRequest(), tripDate)
 
         val course = courseViewModel.course.value
         if (course == null || course.isEmpty) {
@@ -521,7 +579,8 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
         binding.tvCourseError.isVisible = false
         viewLifecycleOwner.lifecycleScope.launch {
             val ok = runCatching {
-                CourseRepository(requireContext()).save(course, TemplateNarrator.narrate(course))
+                CourseRepository(requireContext())
+                    .save(course, TemplateNarrator.narrate(course), tripDate)
             }.isSuccess
             Toast.makeText(
                 requireContext(),
@@ -597,6 +656,10 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
 
     companion object {
         private val HOUR_MINUTE: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+        private val SAVED_TIME: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
         private const val PLACEHOLDER = "—"
+
+        /** 코스 탭에 미리 보여 주는 저장 코스 수. 나머지는 전체보기로. */
+        private const val SAVED_PREVIEW = 3
     }
 }
