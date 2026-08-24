@@ -89,6 +89,9 @@ class PhotoFrameActivity : AppCompatActivity() {
     /** 테마·모드별 아트워크. 디코드를 렌더마다 반복하지 않으려는 캐시입니다. */
     private val artworkCache = mutableMapOf<Pair<FrameTheme, Mode>, FrameArtwork?>()
 
+    /** 폴라로이드에 찍히는 장소 이름. 사용자가 직접 바꿀 수 있습니다. */
+    private var placeName: String? = null
+
     /**
      * 색감 필터에서 돌아오면 원본을 물들인 것으로 갈아 끼웁니다.
      * 비트맵은 인텐트에 담기엔 커서 캐시 파일 경로로 주고받습니다.
@@ -163,8 +166,39 @@ class PhotoFrameActivity : AppCompatActivity() {
             if (mode == Mode.SINGLE) pickSingle.launch("image/*")
             else pickMultiple.launch("image/*")
         }
+        placeName = intent.getStringExtra(EXTRA_PLACE)
+        binding.btnFramePlace.setOnClickListener { showPlaceDialog() }
+
         binding.btnFrameSave.setOnClickListener { save(share = false) }
         binding.btnFrameShare.setOnClickListener { save(share = true) }
+    }
+
+    /** 장소 이름 입력 — 폴라로이드 아랫단에 그대로 찍힙니다. */
+    private fun showPlaceDialog() {
+        val input = android.widget.EditText(this).apply {
+            setText(placeName.orEmpty())
+            hint = getString(R.string.frame_edit_place_hint)
+            setSelection(text.length)
+        }
+        val container = android.widget.FrameLayout(this).apply {
+            setPadding(dp(20), dp(8), dp(20), 0)
+            addView(
+                input,
+                android.widget.FrameLayout.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            )
+        }
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.frame_edit_place_title)
+            .setView(container)
+            .setPositiveButton(R.string.confirm) { _, _ ->
+                placeName = input.text.toString().trim()
+                renderPreview()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     private fun applyInsets() {
@@ -185,9 +219,20 @@ class PhotoFrameActivity : AppCompatActivity() {
     private fun setupSwatches() {
         adapter = FrameSwatchAdapter { picked ->
             theme = picked
+            updatePlaceButton()
             renderPreview()
         }
         binding.rvFrames.adapter = adapter
+    }
+
+    /**
+     * 장소 이름 버튼은 장소명이 실제로 찍히는 프레임에서만 보입니다 —
+     * 아트워크 프레임은 제 표제를 갖고 있어 장소명을 그리지 않습니다.
+     */
+    private fun updatePlaceButton() {
+        val drawsPlace = mode == Mode.SINGLE &&
+            artworkCache.getOrPut(theme to Mode.SINGLE) { FrameArtwork.single(this, theme) } == null
+        binding.btnFramePlace.isVisible = drawsPlace
     }
 
     private fun setupModeToggle() {
@@ -206,6 +251,7 @@ class PhotoFrameActivity : AppCompatActivity() {
         )
         // 색감 필터는 한 장짜리 흐름입니다. 네컷에서는 숨겨 헷갈리지 않게 합니다.
         binding.btnFrameColor.isVisible = mode == Mode.SINGLE
+        updatePlaceButton()
     }
 
     // ─────────────────────── 미리보기 ───────────────────────
@@ -277,7 +323,7 @@ class PhotoFrameActivity : AppCompatActivity() {
         return PolaroidComposer.compose(
             photo = photo,
             theme = theme,
-            place = intent.getStringExtra(EXTRA_PLACE).orEmpty().ifBlank { getString(R.string.app_name) },
+            place = placeName.orEmpty().ifBlank { getString(R.string.app_name) },
             dateText = date,
             credit = getString(R.string.frame_credit),
             titleTypeface = ResourcesCompat.getFont(this, R.font.mapo_backpacking),

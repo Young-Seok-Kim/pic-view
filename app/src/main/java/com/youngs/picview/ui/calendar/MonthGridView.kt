@@ -52,8 +52,21 @@ class MonthGridView @JvmOverloads constructor(
             invalidate()
         }
 
+    /** 눌러서 고른 날짜. 단풍색 테두리 원으로 표시합니다. */
+    var selectedDay: Int? = null
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    /** 날짜 칸을 눌렀을 때. 인자는 그 달의 일(day of month). */
+    var onDayClick: ((Int) -> Unit)? = null
+
     private val dayPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER
+    }
+    private val selectedPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
     }
     private val headerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER
@@ -127,6 +140,13 @@ class MonthGridView @JvmOverloads constructor(
                 canvas.drawCircle(cx, cy - rowH * 0.16f, rowH * 0.34f, todayPaint)
             }
 
+            // 눌러서 고른 날은 테두리 원. 오늘 원과 겹치면 오늘이 이깁니다.
+            if (day == selectedDay && !isToday) {
+                selectedPaint.color = maple
+                selectedPaint.strokeWidth = 1.5f * density
+                canvas.drawCircle(cx, cy - rowH * 0.16f, rowH * 0.34f, selectedPaint)
+            }
+
             dayPaint.color = when {
                 isToday -> white
                 col == 0 -> maple            // 일요일
@@ -147,6 +167,43 @@ class MonthGridView @JvmOverloads constructor(
                 }
             }
         }
+    }
+
+    /**
+     * 날짜 칸 터치 → [onDayClick].
+     *
+     * 셀 좌표 계산의 역연산 하나라 제스처 디텍터 없이 처리합니다.
+     * 요일 머리 줄(0행)과 빈 칸은 무시합니다.
+     */
+    override fun onTouchEvent(event: android.view.MotionEvent): Boolean {
+        if (onDayClick == null) return super.onTouchEvent(event)
+        when (event.actionMasked) {
+            android.view.MotionEvent.ACTION_DOWN -> return true
+            android.view.MotionEvent.ACTION_UP -> {
+                dayAt(event.x, event.y)?.let { day ->
+                    onDayClick?.invoke(day)
+                    performClick()
+                }
+                return true
+            }
+        }
+        return super.onTouchEvent(event)
+    }
+
+    override fun performClick(): Boolean {
+        super.performClick()
+        return true
+    }
+
+    private fun dayAt(x: Float, y: Float): Int? {
+        val cellW = width / 7f
+        val rowH = ROW_HEIGHT_DP * density
+        val col = (x / cellW).toInt().coerceIn(0, 6)
+        val row = (y / rowH).toInt()
+        if (row < 1) return null
+        val firstOffset = yearMonth.atDay(1).dayOfWeek.value % 7
+        val day = (row - 1) * 7 + col - firstOffset + 1
+        return day.takeIf { it in 1..yearMonth.lengthOfMonth() }
     }
 
     private val density: Float get() = resources.displayMetrics.density
