@@ -51,7 +51,7 @@
     <string name="onboarding_demo_guide_silhouette">실루엣</string>
     <string name="onboarding_demo_guide_reflection">반영</string>
     <string name="onboarding_demo_guide_leading">리딩라인</string>
-    <string name="onboarding_demo_record_title">🗓 오늘의 기록</string>
+    <string name="onboarding_demo_record_title">오늘의 기록</string>
     <string name="onboarding_demo_record_place">정읍사공원</string>
     <string name="onboarding_demo_record_note">"빛이 너무 예뻤던 골든 아워.
 다음엔 반영을 더 담아보고 싶어요."</string>
@@ -109,7 +109,7 @@
     <string name="subject_architecture">#건축·문화재</string>
     <string name="subject_food">#맛집</string>
     <string name="subject_night">#야경</string>
-    <string name="course_make">✨ 출사 코스 만들기</string>
+    <string name="course_make">출사 코스 만들기</string>
     <string name="course_need_spots">촬영지를 아직 불러오지 못했어요. 잠시 후 다시 시도해 주세요</string>
     <string name="course_no_result">조건에 맞는 촬영지를 찾지 못했어요. 시간이나 피사체를 넓혀보세요</string>
 
@@ -123,10 +123,10 @@
     <string name="course_hero_golden_tomorrow">내일 골든아워는 일출 %1$s부터예요</string>
     <string name="course_hero_golden_unknown">골든아워 정보를 불러오지 못했어요</string>
     <string name="course_pick_title">당신의 오늘을 선택해 주세요</string>
-    <string name="course_today_plan">☀️ 오늘의 출사 계획</string>
+    <string name="course_today_plan">오늘의 출사 계획</string>
     <string name="course_today_open">이어보기 →</string>
     <string name="course_saved_section">내가 저장한 코스</string>
-    <string name="course_pick_hint">✨ 선택하신 조건으로 최적의 출사 코스를 추천해드려요</string>
+    <string name="course_pick_hint">선택하신 조건으로 최적의 출사 코스를 추천해드려요</string>
     <string name="course_cond_date">날짜</string>
     <string name="course_cond_party">동행</string>
     <string name="course_cond_duration">체류 시간</string>
@@ -149,7 +149,7 @@
     <string name="course_tl_sunrise">일출</string>
     <string name="course_tl_golden">골든아워</string>
     <string name="course_tl_sunset">일몰</string>
-    <string name="course_save_plan">🔖 출사 계획 저장</string>
+    <string name="course_save_plan">출사 계획 저장</string>
     <string name="course_stop_ordinal">%1$d번째</string>
 
     <!-- 출사 코스 : 결과 -->
@@ -389,19 +389,19 @@
     <string name="diary_empty_desc">촬영지 상세에서 \"다녀왔어요\"를 누르면
 이곳에 하루가 쌓입니다.</string>
     <string name="diary_stats_format">%1$d곳 · 평균 %2$d</string>
-    <string name="diary_generate">✨ 일기 만들기</string>
+    <string name="diary_generate">일기 만들기</string>
     <string name="diary_regenerate">다시 만들기</string>
     <string name="diary_share">공유</string>
     <string name="diary_share_tag">#정읍시선 #출사 #정읍</string>
-    <string name="detail_checkin">📍 다녀왔어요</string>
-    <string name="detail_checkin_long">📍 다녀왔어요 · 오늘 기록 남기기</string>
+    <string name="detail_checkin">다녀왔어요</string>
+    <string name="detail_checkin_long">다녀왔어요 · 오늘 기록 남기기</string>
     <string name="detail_checkin_done">출사 기록에 담았어요</string>
     <string name="detail_checkin_already">오늘 이미 기록한 곳이에요</string>
     <string name="detail_checkin_view_diary">일기 보기</string>
 
     <!-- 미션 & 배지 -->
     <string name="mission_title">미션 &amp; 기록</string>
-    <string name="mission_entry">🏅 미션 &amp; 배지</string>
+    <string name="mission_entry">미션 &amp; 배지</string>
     <string name="mission_summary">배지 %1$d / %2$d 개</string>
     <string name="mission_summary_desc">정읍에서 발견한 장면을 모아보세요</string>
     <string name="mission_summary_empty">촬영지에서 사진을 남기면 장면이 쌓입니다</string>
@@ -410,7 +410,7 @@
 
     <!-- 사계절 캘린더 -->
     <string name="calendar_title">정읍 사계절 촬영 가이드</string>
-    <string name="calendar_point_view">📷 촬영 포인트 보기</string>
+    <string name="calendar_point_view">촬영 포인트 보기</string>
     <string name="calendar_month_title">%1$d월 촬영 캘린더</string>
     <string name="calendar_legend_peak">절정</string>
     <string name="calendar_legend_reco">추천</string>
@@ -423,7 +423,7 @@
     <string name="calendar_index_low">아쉬움</string>
     <string name="calendar_now_go">지금 갈 곳</string>
     <!-- 홈에서 지도 버튼과 가로로 나눠 쓰므로 짧게 둡니다. -->
-    <string name="calendar_entry">📅 촬영 캘린더</string>
+    <string name="calendar_entry">촬영 캘린더</string>
     <string name="season_spring">🌸 봄</string>
     <string name="season_summer">🌿 여름</string>
     <string name="season_autumn">🍁 가을</string>
@@ -505,8 +505,8 @@
     <string name="map_stat_level">난이도</string>
     <string name="map_reco_comp">추천 구성</string>
     <string name="map_one_line">사진가를 위한 한 줄</string>
-    <string name="map_open_guide">🧭 시선 가이드 열기</string>
-    <string name="map_save_plan">🔖 출사 계획에 저장</string>
+    <string name="map_open_guide">시선 가이드 열기</string>
+    <string name="map_save_plan">출사 계획에 저장</string>
     <string name="map_step_discover">발견</string>
     <string name="map_step_select">선택</string>
     <string name="map_step_shoot">촬영</string>
@@ -586,15 +586,15 @@
     <string name="frame_title">정읍의 순간을 담다</string>
     <string name="frame_mode_fourcut">네컷 사진</string>
     <string name="frame_mode_single">사진 프레임</string>
-    <string name="frame_pick_one">🖼 사진 1장 선택하기 ›</string>
-    <string name="frame_pick_four">🖼 사진 4장 선택하기 ›</string>
+    <string name="frame_pick_one">사진 1장 선택하기 ›</string>
+    <string name="frame_pick_four">사진 4장 선택하기 ›</string>
     <string name="frame_save">저장</string>
     <string name="frame_pick">프레임 선택</string>
     <string name="frame_share">SNS에 공유하기</string>
     <string name="cd_frame_preview">프레임 미리보기</string>
     <string name="frame_saved">갤러리에 저장했어요</string>
     <string name="frame_save_failed">저장하지 못했어요</string>
-    <string name="frame_edit_place">✏️ 장소 이름 바꾸기</string>
+    <string name="frame_edit_place">장소 이름 바꾸기</string>
     <string name="frame_edit_place_title">장소 이름</string>
     <string name="frame_edit_place_hint">예) 내장산 우화정</string>
     <string name="frame_no_photo">사진을 불러오지 못했어요</string>
@@ -712,7 +712,7 @@
     <string name="detail_info_collapse">접기 ▴</string>
 
     <string name="palette_title">색감 필터</string>
-    <string name="frame_color">🎨 색감</string>
+    <string name="frame_color">색감</string>
     <string name="palette_before">원본</string>
     <string name="palette_after">적용</string>
     <string name="palette_strength">적용 세기</string>
