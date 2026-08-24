@@ -56,8 +56,8 @@
 
             <!--
               지금 절정 / 다음 절정 히어로.
-              배경 그림이 고른 계절을 따라 바뀝니다(봄 장밋빛 · 여름 숲 ·
-              가을 단풍 · 겨울 설경). 코드가 계절에 맞춰 갈아 끼웁니다.
+              배경이 고른 계절의 관광공사 실사진으로 바뀝니다(봄 꽃 ·
+              여름 계곡 · 가을 단풍 · 겨울 내장산). 코드가 갈아 끼웁니다.
             -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_calendar_now"
@@ -77,8 +77,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:contentDescription="@null"
-                        android:scaleType="fitXY"
-                        tools:src="@drawable/bg_season_summer" />
+                        android:scaleType="centerCrop"
+                        tools:src="@drawable/season_summer" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_season_scrim" />
 
                     <LinearLayout
                         android:layout_width="match_parent"

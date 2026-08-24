@@ -60,7 +60,7 @@
                 android:layout_height="380dp"
                 android:contentDescription="@null"
                 android:scaleType="centerCrop"
-                android:src="@drawable/guide_reflection" />
+                android:src="@drawable/onb_light_match" />
 
             <View
                 android:layout_width="match_parent"

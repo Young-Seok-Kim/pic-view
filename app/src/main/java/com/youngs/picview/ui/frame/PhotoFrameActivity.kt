@@ -22,6 +22,7 @@ import com.gun0912.tedpermission.normal.TedPermission
 import com.youngs.picview.R
 import com.youngs.picview.databinding.ActivityPhotoFrameBinding
 import com.youngs.picview.domain.frame.FourCutComposer
+import com.youngs.picview.domain.frame.FrameArtwork
 import com.youngs.picview.domain.frame.FrameTheme
 import com.youngs.picview.domain.frame.PolaroidComposer
 import com.youngs.picview.ui.palette.ColorPaletteActivity
@@ -84,6 +85,9 @@ class PhotoFrameActivity : AppCompatActivity() {
     private val fourPhotos = mutableListOf<Bitmap>()
 
     private var composed: Bitmap? = null
+
+    /** 테마·모드별 아트워크. 디코드를 렌더마다 반복하지 않으려는 캐시입니다. */
+    private val artworkCache = mutableMapOf<Pair<FrameTheme, Mode>, FrameArtwork?>()
 
     /**
      * 색감 필터에서 돌아오면 원본을 물들인 것으로 갈아 끼웁니다.
@@ -277,7 +281,10 @@ class PhotoFrameActivity : AppCompatActivity() {
             dateText = date,
             credit = getString(R.string.frame_credit),
             titleTypeface = ResourcesCompat.getFont(this, R.font.mapo_backpacking),
-            bodyTypeface = ResourcesCompat.getFont(this, R.font.pretendard_regular)
+            bodyTypeface = ResourcesCompat.getFont(this, R.font.pretendard_regular),
+            artwork = artworkCache.getOrPut(theme to Mode.SINGLE) {
+                FrameArtwork.single(this, theme)
+            }
         )
     }
 
@@ -285,7 +292,10 @@ class PhotoFrameActivity : AppCompatActivity() {
         photos = fourPhotos,
         theme = theme,
         titleTypeface = ResourcesCompat.getFont(this, R.font.mapo_backpacking),
-        bodyTypeface = ResourcesCompat.getFont(this, R.font.pretendard_bold)
+        bodyTypeface = ResourcesCompat.getFont(this, R.font.pretendard_bold),
+        artwork = artworkCache.getOrPut(theme to Mode.FOUR_CUT) {
+            FrameArtwork.fourCut(this, theme)
+        }
     )
 
     // ─────────────────────── 저장·공유 ───────────────────────

@@ -180,10 +180,10 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
         binding.ivCalendarHero.setImageResource(
             when (season) {
-                Season.SPRING -> R.drawable.bg_season_spring
-                Season.SUMMER -> R.drawable.bg_season_summer
-                Season.AUTUMN -> R.drawable.bg_season_autumn
-                Season.WINTER -> R.drawable.bg_season_winter
+                Season.SPRING -> R.drawable.season_spring
+                Season.SUMMER -> R.drawable.season_summer
+                Season.AUTUMN -> R.drawable.season_autumn
+                Season.WINTER -> R.drawable.season_winter
             }
         )
 

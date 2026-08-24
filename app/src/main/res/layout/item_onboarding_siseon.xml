@@ -60,7 +60,7 @@
                 android:layout_height="280dp"
                 android:contentDescription="@null"
                 android:scaleType="centerCrop"
-                android:src="@drawable/guide_frame" />
+                android:src="@drawable/onb_siseon" />
 
             <View
                 android:layout_width="match_parent"
@@ -131,7 +131,7 @@
                         android:layout_height="match_parent"
                         android:contentDescription="@string/onboarding_demo_guide_reflection"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/guide_reflection" />
+                        android:src="@drawable/onb_reflection" />
                 </com.google.android.material.card.MaterialCardView>
 
                 <TextView

@@ -77,7 +77,7 @@
                     android:layout_height="150dp"
                     android:contentDescription="@null"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/guide_motion" />
+                    android:src="@drawable/onb_record" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -130,7 +130,7 @@
                         android:layout_height="match_parent"
                         android:contentDescription="@null"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/guide_leading" />
+                        android:src="@drawable/onb_next" />
                 </com.google.android.material.card.MaterialCardView>
 
                 <LinearLayout
