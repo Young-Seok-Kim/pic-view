@@ -123,6 +123,9 @@
     <string name="course_hero_golden_tomorrow">내일 골든아워는 일출 %1$s부터예요</string>
     <string name="course_hero_golden_unknown">골든아워 정보를 불러오지 못했어요</string>
     <string name="course_pick_title">당신의 오늘을 선택해 주세요</string>
+    <string name="course_today_plan">☀️ 오늘의 출사 계획</string>
+    <string name="course_today_open">이어보기 →</string>
+    <string name="course_saved_section">내가 저장한 코스</string>
     <string name="course_pick_hint">✨ 선택하신 조건으로 최적의 출사 코스를 추천해드려요</string>
     <string name="course_cond_date">날짜</string>
     <string name="course_cond_party">동행</string>

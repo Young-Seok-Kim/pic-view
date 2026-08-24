@@ -27,7 +27,12 @@ data class SavedCourseEntity(
     val travelMode: String,
     /** 그날의 일출·일몰(자정 기준 분). 없으면 -1 */
     val sunriseMinute: Int,
-    val sunsetMinute: Int
+    val sunsetMinute: Int,
+    /**
+     * 출사 예정일(epoch day). 0 이면 옛 데이터 — 저장한 날로 봅니다.
+     * 코스 탭이 "오늘의 출사 계획"을 가려내는 데 씁니다.
+     */
+    val planDateEpochDay: Long = 0
 )
 
 /** 저장한 코스의 정거장 하나. */
