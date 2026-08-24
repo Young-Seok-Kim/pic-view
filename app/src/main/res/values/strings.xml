@@ -590,7 +590,6 @@
     <string name="cd_frame_preview">프레임 미리보기</string>
     <string name="frame_saved">갤러리에 저장했어요</string>
     <string name="frame_save_failed">저장하지 못했어요</string>
-    <string name="frame_credit">정읍 시선 · 관광 정보 출처 한국관광공사</string>
     <string name="frame_edit_place">✏️ 장소 이름 바꾸기</string>
     <string name="frame_edit_place_title">장소 이름</string>
     <string name="frame_edit_place_hint">예) 내장산 우화정</string>
