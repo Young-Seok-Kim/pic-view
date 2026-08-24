@@ -60,7 +60,7 @@
                 android:layout_height="380dp"
                 android:contentDescription="@null"
                 android:scaleType="centerCrop"
-                android:src="@drawable/guide_symmetry" />
+                android:src="@drawable/onb_light_route" />
 
             <View
                 android:layout_width="match_parent"

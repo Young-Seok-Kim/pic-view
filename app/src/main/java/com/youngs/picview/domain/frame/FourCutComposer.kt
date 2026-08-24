@@ -34,8 +34,11 @@ object FourCutComposer {
         photos: List<Bitmap>,
         theme: FrameTheme,
         titleTypeface: Typeface? = null,
-        bodyTypeface: Typeface? = null
+        bodyTypeface: Typeface? = null,
+        artwork: FrameArtwork? = null
     ): Bitmap {
+        if (artwork != null) return composeWithArtwork(photos, theme, artwork)
+
         val out = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(out)
         canvas.drawColor(theme.paperColor)
@@ -116,6 +119,35 @@ object FourCutComposer {
         }
         canvas.drawText(theme.fourCutTagline, centerX, slotsBottom + 206f, koPaint)
 
+        return out
+    }
+
+    /**
+     * 아트워크 합성 — 사진을 창마다 먼저 깔고 아트워크를 위에 덮습니다.
+     * 빈 칸은 흰 인화지에 옅은 순번만 남깁니다(기존과 같은 약속 —
+     * "더 채울 수 있다"가 보여야 합니다).
+     */
+    private fun composeWithArtwork(photos: List<Bitmap>, theme: FrameTheme, artwork: FrameArtwork): Bitmap {
+        val out = Bitmap.createBitmap(artwork.bitmap.width, artwork.bitmap.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(out)
+        canvas.drawColor(0xFFFFFFFF.toInt())
+
+        artwork.windows.forEachIndexed { index, dest ->
+            val photo = photos.getOrNull(index)
+            if (photo != null) {
+                PolaroidComposer.drawPhotoInWindow(canvas, photo, dest)
+            } else {
+                val hint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = theme.captionColor
+                    alpha = 90
+                    textSize = 44f
+                    textAlign = Paint.Align.CENTER
+                }
+                canvas.drawText("${index + 1}", dest.centerX(), dest.centerY() + 16f, hint)
+            }
+        }
+
+        canvas.drawBitmap(artwork.bitmap, 0f, 0f, Paint(Paint.FILTER_BITMAP_FLAG))
         return out
     }
 

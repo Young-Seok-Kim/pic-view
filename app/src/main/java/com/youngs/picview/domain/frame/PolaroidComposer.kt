@@ -34,6 +34,7 @@ object PolaroidComposer {
      * @param place 장소 이름
      * @param dateText "2026.08.12" 형태
      * @param credit 출처 한 줄(관광 정보 출처 표기)
+     * @param artwork 손그림 프레임 아트워크. 있으면 시안 원본에 사진만 끼웁니다.
      */
     fun compose(
         photo: Bitmap,
@@ -42,8 +43,11 @@ object PolaroidComposer {
         dateText: String,
         credit: String,
         titleTypeface: Typeface? = null,
-        bodyTypeface: Typeface? = null
+        bodyTypeface: Typeface? = null,
+        artwork: FrameArtwork? = null
     ): Bitmap {
+        if (artwork != null) return composeWithArtwork(photo, artwork)
+
         val out = Bitmap.createBitmap(SIZE, SIZE, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(out)
         canvas.drawColor(theme.paperColor)
@@ -149,6 +153,34 @@ object PolaroidComposer {
         canvas.drawText(credit, textLeft, SIZE - 44f, creditPaint)
 
         return out
+    }
+
+    /**
+     * 아트워크 합성 — 사진을 창에 먼저 깔고 아트워크를 위에 덮습니다.
+     * 장소명·날짜는 그리지 않습니다. 아트워크가 이미 제 표제를 갖고 있어
+     * 글씨를 더 얹으면 시안의 균형이 무너집니다.
+     */
+    private fun composeWithArtwork(photo: Bitmap, artwork: FrameArtwork): Bitmap {
+        val out = Bitmap.createBitmap(artwork.bitmap.width, artwork.bitmap.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(out)
+        canvas.drawColor(0xFFFFFFFF.toInt())
+        drawPhotoInWindow(canvas, photo, artwork.windows.first())
+        canvas.drawBitmap(artwork.bitmap, 0f, 0f, Paint(Paint.FILTER_BITMAP_FLAG))
+        return out
+    }
+
+    /** 창 좌표에 센터 크롭으로 채웁니다. 늘려 채우면 얼굴이 일그러집니다. */
+    internal fun drawPhotoInWindow(canvas: Canvas, photo: Bitmap, dest: RectF) {
+        val scale = maxOf(dest.width() / photo.width, dest.height() / photo.height)
+        val cropW = (dest.width() / scale).toInt().coerceAtMost(photo.width)
+        val cropH = (dest.height() / scale).toInt().coerceAtMost(photo.height)
+        val src = Rect(
+            (photo.width - cropW) / 2,
+            (photo.height - cropH) / 2,
+            (photo.width - cropW) / 2 + cropW,
+            (photo.height - cropH) / 2 + cropH
+        )
+        canvas.drawBitmap(photo, src, dest, Paint(Paint.FILTER_BITMAP_FLAG))
     }
 
     /** 장소 이름이 길면 말줄임. 두 줄로 흘리면 아랫단 균형이 무너집니다. */
