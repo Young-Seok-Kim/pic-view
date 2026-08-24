@@ -291,6 +291,19 @@
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
+    <!--
+        내 위치 버튼.
+        SDK 기본 버튼은 왼쪽 아래라 범례 카드에 가려져 누를 수 없습니다.
+        오른쪽 아래(축척 바 위)로 빼서 항상 보이게 합니다.
+    -->
+    <com.naver.maps.map.widget.LocationButtonView
+        android:id="@+id/btn_my_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/space_l"
+        android:layout_marginBottom="76dp" />
+
     <!-- ─────────── 촬영 목적 범례 ─────────── -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_legend"

@@ -281,7 +281,11 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
         this.naverMap = map
 
         map.locationSource = locationSource
-        map.uiSettings.isLocationButtonEnabled = true
+
+        // 기본 위치 버튼(왼쪽 아래)은 범례 카드에 가려집니다.
+        // 오른쪽 아래에 둔 우리 버튼을 지도에 묶어 대신 씁니다.
+        map.uiSettings.isLocationButtonEnabled = false
+        binding.btnMyLocation.map = map
 
         // 내 위치는 표시하되 카메라를 따라가지는 않습니다.
         // Follow 로 두면 정읍 밖에서 앱을 열었을 때 촬영지가 하나도 안 보입니다.
