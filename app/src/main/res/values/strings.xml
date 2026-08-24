@@ -427,6 +427,8 @@
     <string name="season_winter">❄️ 겨울</string>
     <string name="calendar_dday">D-%1$d</string>
     <string name="calendar_peak_now">지금이 절정</string>
+    <string name="calendar_selected_peak">%1$s · 절정이에요</string>
+    <string name="calendar_selected_dday">%1$s 기준 D-%2$d</string>
     <string name="calendar_period">%1$s ~ %2$s · 평년 기준</string>
     <string name="calendar_period_subject">%1$s ~ %2$s · %3$s</string>
     <string name="calendar_festivals">정읍 축제</string>
@@ -589,6 +591,9 @@
     <string name="frame_saved">갤러리에 저장했어요</string>
     <string name="frame_save_failed">저장하지 못했어요</string>
     <string name="frame_credit">정읍 시선 · 관광 정보 출처 한국관광공사</string>
+    <string name="frame_edit_place">✏️ 장소 이름 바꾸기</string>
+    <string name="frame_edit_place_title">장소 이름</string>
+    <string name="frame_edit_place_hint">예) 내장산 우화정</string>
     <string name="frame_no_photo">사진을 불러오지 못했어요</string>
     <!--
       빠른 이동 타일의 두 줄 설명.

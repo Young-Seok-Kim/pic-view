@@ -64,6 +64,9 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
 
         setupMonthNav()
 
+        // 날짜를 누르면 그날에 맞는 피사체로 히어로가 바뀝니다.
+        binding.viewMonthGrid.onDayClick = { day -> onDaySelected(shownMonth.atDay(day)) }
+
         // 지금 계절부터 보여 줍니다. 1월에 봄부터 보여 주면 쓸모가 없습니다.
         val now = Season.now()
         binding.chipsSeason.check(chipOf(now))
@@ -135,6 +138,9 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         binding.tvMonthLabel.text =
             getString(R.string.calendar_month_title, shownMonth.monthValue)
 
+        // 달이 바뀌면 이전 달에서 고른 날짜 표시는 지웁니다.
+        binding.viewMonthGrid.selectedDay = null
+
         val marked = mutableSetOf<Int>()
         val recommended = mutableSetOf<Int>()
         SeasonHighlights.ALL.forEach { highlight ->
@@ -177,9 +183,30 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         val next = candidates.firstOrNull { it.isPeakNow(today) }
             ?: candidates.minByOrNull { it.daysUntilPeak(today) }
             ?: return
+        renderHeadlineFor(next, today)
+    }
+
+    /**
+     * 달력 날짜를 누르면 그날에 맞는 피사체로 히어로를 바꿉니다.
+     *
+     * 그날이 절정인 피사체를 먼저, 없으면 그날 기준으로 절정이 가장 가까운
+     * 피사체를 올립니다. 계절 칩은 건드리지 않습니다 — 칩을 바꾸면 달력이
+     * 그 계절의 달로 넘어가 버려, 보고 있던 달력이 발밑에서 움직입니다.
+     */
+    private fun onDaySelected(date: LocalDate) {
+        binding.viewMonthGrid.selectedDay = date.dayOfMonth
+        val highlight = SeasonHighlights.ALL.firstOrNull { inPeak(it, date) }
+            ?: SeasonHighlights.ALL.minByOrNull { it.daysUntilPeak(date) }
+            ?: return
+        renderHeadlineFor(highlight, date)
+    }
+
+    /** [date] 기준으로 히어로 카드를 채웁니다. 오늘이면 문구가 기존과 같습니다. */
+    private fun renderHeadlineFor(next: SeasonHighlight, date: LocalDate) {
+        val today = LocalDate.now()
 
         binding.ivCalendarHero.setImageResource(
-            when (season) {
+            when (next.season) {
                 Season.SPRING -> R.drawable.season_spring
                 Season.SUMMER -> R.drawable.season_summer
                 Season.AUTUMN -> R.drawable.season_autumn
@@ -187,10 +214,18 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
             }
         )
 
-        binding.tvCalendarDday.text = if (next.isPeakNow(today)) {
-            getString(R.string.calendar_peak_now)
-        } else {
-            getString(R.string.calendar_dday, next.daysUntilPeak(today))
+        val fmt = DateTimeFormatter.ofPattern("M월 d일", Locale.KOREAN)
+        binding.tvCalendarDday.text = when {
+            date == today ->
+                if (next.isPeakNow(today)) getString(R.string.calendar_peak_now)
+                else getString(R.string.calendar_dday, next.daysUntilPeak(today))
+            next.isPeakNow(date) ->
+                getString(R.string.calendar_selected_peak, date.format(fmt))
+            else ->
+                getString(
+                    R.string.calendar_selected_dday,
+                    date.format(fmt), next.daysUntilPeak(date)
+                )
         }
         binding.tvCalendarNowTitle.text = next.title
         binding.tvCalendarNowPeriod.text = periodText(next)
