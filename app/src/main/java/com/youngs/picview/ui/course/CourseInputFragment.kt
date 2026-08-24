@@ -41,6 +41,7 @@ import com.youngs.picview.domain.light.LightPhase
 import com.youngs.picview.domain.light.SunTimes
 import com.youngs.picview.ui.detail.DetailFragment
 import com.youngs.picview.ui.main.MainViewModel
+import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.util.TravelMode
 import com.youngs.picview.util.applyTopSystemBarInset
 import com.youngs.picview.util.retryOrNull
@@ -103,16 +104,19 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
 
         binding.cardCourseDate.setOnClickListener { pickDate() }
         binding.btnMakeCourse.setOnClickListener { generate() }
-        binding.tvOtherCourse.setOnClickListener { generate() }
+        binding.tvOtherCourse.setOnClickListener {
+            variantIndex++
+            regeneratePreview()
+        }
         binding.btnSavePlan.setOnClickListener { savePlan() }
 
         // 촬영지·천문 정보가 도착하면 히어로와 미리보기를 갱신합니다.
         mainViewModel.goldenHourData.observe(viewLifecycleOwner) {
             renderHero()
             renderTimeline()
-            regeneratePreview()
+            resetPreview()
         }
-        mainViewModel.spotData.observe(viewLifecycleOwner) { regeneratePreview() }
+        mainViewModel.spotData.observe(viewLifecycleOwner) { resetPreview() }
     }
 
     // ─────────────────────── 저장한 코스 ───────────────────────
@@ -202,7 +206,7 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
         if (date == LocalDate.now()) {
             dateSunTimes = null
             renderTimeline()
-            regeneratePreview()
+            resetPreview()
             return
         }
 
@@ -221,7 +225,7 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
             )
             _binding ?: return@launch
             renderTimeline()
-            regeneratePreview()
+            resetPreview()
         }
     }
 
@@ -428,7 +432,7 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
             .setSingleChoiceItems(labels.toTypedArray(), current) { dialog, index ->
                 onPicked(index)
                 renderConditionValues()
-                regeneratePreview()
+                resetPreview()
                 dialog.dismiss()
             }
             .setNegativeButton(R.string.cancel, null)
@@ -450,7 +454,7 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
                     if (checked[index]) subjects.add(subject)
                 }
                 renderConditionValues()
-                regeneratePreview()
+                resetPreview()
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
@@ -477,6 +481,53 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
         })
     }
 
+    /** "다른 코스 보기"가 올리는 변형 번호. 조건이 바뀌면 0으로 돌아갑니다. */
+    private var variantIndex = 0
+
+    /** 지금 변형이 쓰는 촬영지 풀. 만들기·저장이 미리보기와 같은 코스를 쓰게 합니다. */
+    private var variantPool: List<SpotItem> = emptyList()
+
+    /**
+     * 변형 코스 계산 — 앞 변형이 쓴 촬영지를 빼고 다시 짭니다.
+     *
+     * [CoursePlanner] 는 결정론이라 같은 입력으로는 늘 같은 코스가 나옵니다.
+     * "다른 코스 보기"는 정말 다른 코스를 기대하는 자리라, 이미 보여 준
+     * 코스의 촬영지를 빼서 입력 자체를 바꿔 줍니다. 더 짤 촬영지가 없으면
+     * 첫 번째 코스로 되돌아갑니다(순환).
+     */
+    private fun planVariant(all: List<SpotItem>): ShootingCourse? {
+        if (all.isEmpty()) {
+            variantPool = emptyList()
+            return null
+        }
+        var pool = all
+        var course = CoursePlanner.plan(pool, activeSunTimes, buildRequest())
+        var step = 0
+        while (step < variantIndex) {
+            val used = course.stops.map { it.spot.contentId }.toSet()
+            val nextPool = pool.filterNot { it.contentId in used }
+            val next = if (nextPool.isEmpty()) null
+            else CoursePlanner.plan(nextPool, activeSunTimes, buildRequest())
+            if (next == null || next.isEmpty) {
+                variantIndex = 0
+                pool = all
+                course = CoursePlanner.plan(all, activeSunTimes, buildRequest())
+                break
+            }
+            pool = nextPool
+            course = next
+            step++
+        }
+        variantPool = pool
+        return course
+    }
+
+    /** 조건이 바뀌면 변형을 처음으로 되돌리고 다시 계산합니다. */
+    private fun resetPreview() {
+        variantIndex = 0
+        regeneratePreview()
+    }
+
     /**
      * 지금 조건으로 코스를 즉시 계산해 미리보기에 올립니다.
      *
@@ -487,13 +538,13 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
         val view = _binding ?: return
         val spots = mainViewModel.spotData.value.orEmpty()
 
-        val course = if (spots.isEmpty()) null
-        else CoursePlanner.plan(spots, activeSunTimes, buildRequest())
+        val course = if (spots.isEmpty()) null else planVariant(spots)
 
         val stops = course?.stops.orEmpty()
         previewAdapter.submitList(stops)
         view.tvCourseEmpty.isVisible = stops.isEmpty()
         view.rvCoursePreview.isVisible = stops.isNotEmpty()
+        view.tvRecoBadge.text = getString(R.string.course_reco_badge_format, variantIndex + 1)
         buildDots(stops.size)
     }
 
@@ -550,7 +601,11 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
             return
         }
 
-        courseViewModel.generate(spots, activeSunTimes, buildRequest(), tripDate)
+        // 미리보기에 떠 있는 변형과 같은 코스가 결과 화면에 나오도록
+        // 그 변형의 촬영지 풀을 그대로 넘깁니다.
+        courseViewModel.generate(
+            variantPool.ifEmpty { spots }, activeSunTimes, buildRequest(), tripDate
+        )
 
         val course = courseViewModel.course.value
         if (course == null || course.isEmpty) {
@@ -570,8 +625,9 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
             return
         }
 
-        val course: ShootingCourse = CoursePlanner.plan(spots, activeSunTimes, buildRequest())
-        if (course.isEmpty) {
+        // 미리보기에 떠 있는 변형을 그대로 저장합니다.
+        val course: ShootingCourse? = planVariant(spots)
+        if (course == null || course.isEmpty) {
             showError(getString(R.string.course_no_result))
             return
         }
