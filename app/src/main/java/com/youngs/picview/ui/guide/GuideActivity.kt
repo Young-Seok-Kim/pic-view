@@ -12,6 +12,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
@@ -23,12 +24,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import com.bumptech.glide.Glide
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import com.youngs.picview.BuildConfig
 import com.youngs.picview.R
 import com.youngs.picview.util.MediaStoreSaver
 import com.youngs.picview.databinding.ActivityGuideBinding
+import com.youngs.picview.ui.frame.PhotoFrameActivity
 import com.youngs.picview.domain.light.LightPhase
 import com.youngs.picview.domain.pose.GroupSize
 import com.youngs.picview.domain.pose.PoseRecommender
@@ -72,12 +75,25 @@ class GuideActivity : AppCompatActivity() {
     /** 무엇을 찍는가. 인물이면 포즈 목록, 나머지면 촬영 요령이 나옵니다. */
     private var subject: Subject = Subject.PERSON
 
+    /**
+     * 앨범에서 사진 한 장 고르기.
+     *
+     * 갤러리 앱을 여는 게 아니라 시스템 사진 선택기를 띄웁니다.
+     * 고른 사진은 이 장소 이름을 들고 포토 프레임으로 이어집니다 —
+     * 방금 찍은 사진과 같은 마무리(프레임 → 저장·공유)를 밟게 하기 위해서입니다.
+     */
     private val galleryLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val selectedImageUri: Uri? = result.data?.data
-        }
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri ?: return@registerForActivityResult
+        startActivity(
+            PhotoFrameActivity.intent(
+                this,
+                photoUri = uri,
+                place = intent.getStringExtra(EXTRA_SPOT_NAME).orEmpty(),
+                takenAt = System.currentTimeMillis()
+            )
+        )
     }
 
 
@@ -270,28 +286,9 @@ class GuideActivity : AppCompatActivity() {
         }
 
         binding.btnGallery.setOnClickListener {
-            // 💡 1. 갤러리 앱을 열기 위한 인텐트를 생성하되, 특정 URI 주소를 강제로 넣지 않습니다.
-            val intent = Intent(Intent.ACTION_MAIN).apply {
-                // 이미지 카테고리를 타겟팅
-                addCategory(Intent.CATEGORY_APP_GALLERY)
-                // 시스템 무관하게 '항상 새로운 태스크(화면)'로 깔끔하게 열리도록 플래그 설정
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            }
-
-            try {
-                // 💡 2. 기기에 설치된 진짜 갤러리 앱(삼성 갤러리 등)의 메인 목록 화면을 실행합니다.
-                startActivity(intent)
-            } catch (e: Exception) {
-                // 💡 3. 만약 위 표준 카테고리가 안 먹히는 구형 기기일 경우를 위한 안전한 예외(Fallback) 처리
-                val fallbackIntent = Intent(Intent.ACTION_VIEW).apply {
-                    type = "image/*"
-                }
-                try {
-                    startActivity(Intent.createChooser(fallbackIntent, "갤러리 열기"))
-                } catch (ex: Exception) {
-                    Toast.makeText(this, "갤러리 앱을 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
-                }
-            }
+            galleryLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
         }
     }
 
@@ -374,13 +371,38 @@ class GuideActivity : AppCompatActivity() {
                 output.savedUri?.let { MediaStoreSaver.publish(this@GuideActivity, it) }
 
                 output.savedUri?.let { recordVisitWithPhoto(it) }
-                runOnUiThread { binding.btnCapture.isEnabled = true }
+                runOnUiThread {
+                    binding.btnCapture.isEnabled = true
+                    output.savedUri?.let { showLastShot(it) }
+                }
             }
             override fun onError(exception: ImageCaptureException) {
                 runOnUiThread { binding.btnCapture.isEnabled = true }
                 Log.e("CAMERA_ERROR", "촬영 실패: ${exception.message}")
             }
         })
+    }
+
+    /**
+     * 방금 찍은 사진을 오른쪽 아래 썸네일로 보여 줍니다.
+     *
+     * 찍고 나서 결과를 바로 볼 길이 없으면 잘 찍혔는지 확인하러 카메라를
+     * 떠나야 합니다. 썸네일을 누르면 그 사진을 들고 포토 프레임으로 가서
+     * 확인과 프레임 고르기가 한 번에 됩니다.
+     */
+    private fun showLastShot(uri: Uri) {
+        binding.cardLastShot.visibility = android.view.View.VISIBLE
+        Glide.with(this).load(uri).centerCrop().into(binding.ivLastShot)
+        binding.cardLastShot.setOnClickListener {
+            startActivity(
+                PhotoFrameActivity.intent(
+                    this,
+                    photoUri = uri,
+                    place = intent.getStringExtra(EXTRA_SPOT_NAME).orEmpty(),
+                    takenAt = System.currentTimeMillis()
+                )
+            )
+        }
     }
 
     /**
