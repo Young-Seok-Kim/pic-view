@@ -525,7 +525,7 @@
                             style="@style/Text.SectionTitle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            tools:text="금빛을 따라가세요" />
+                            tools:text="노을빛이 닿는 곳을 담아보세요" />
 
                         <TextView
                             android:id="@+id/tv_light_hint"

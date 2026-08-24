@@ -33,7 +33,6 @@ object PolaroidComposer {
      * @param theme 프레임 테마
      * @param place 장소 이름
      * @param dateText "2026.08.12" 형태
-     * @param credit 출처 한 줄(관광 정보 출처 표기)
      * @param artwork 손그림 프레임 아트워크. 있으면 시안 원본에 사진만 끼웁니다.
      */
     fun compose(
@@ -41,7 +40,6 @@ object PolaroidComposer {
         theme: FrameTheme,
         place: String,
         dateText: String,
-        credit: String,
         titleTypeface: Typeface? = null,
         bodyTypeface: Typeface? = null,
         artwork: FrameArtwork? = null
@@ -128,12 +126,6 @@ object PolaroidComposer {
             textSize = 31f
             typeface = bodyTypeface ?: Typeface.DEFAULT
         }
-        val creditPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = theme.captionColor
-            textSize = 22f
-            alpha = 140
-            typeface = bodyTypeface ?: Typeface.DEFAULT
-        }
 
         // 장소명 + 작은 잎(시안: "내장산국립공원 🍁").
         val textLeft = MARGIN + 10f
@@ -150,7 +142,6 @@ object PolaroidComposer {
             "전라북도 정읍시 · ${theme.tagline}",
             textLeft, captionTop + 178f, captionPaint
         )
-        canvas.drawText(credit, textLeft, SIZE - 44f, creditPaint)
 
         return out
     }

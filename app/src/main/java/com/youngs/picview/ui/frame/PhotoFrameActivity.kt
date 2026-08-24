@@ -325,7 +325,6 @@ class PhotoFrameActivity : AppCompatActivity() {
             theme = theme,
             place = placeName.orEmpty().ifBlank { getString(R.string.app_name) },
             dateText = date,
-            credit = getString(R.string.frame_credit),
             titleTypeface = ResourcesCompat.getFont(this, R.font.mapo_backpacking),
             bodyTypeface = ResourcesCompat.getFont(this, R.font.pretendard_regular),
             artwork = artworkCache.getOrPut(theme to Mode.SINGLE) {
