@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 스탬프 모서리의 잠금 배지. [bg_check_badge] 의 잠긴 짝입니다. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/text_tertiary" />
+            <stroke android:width="2dp" android:color="@color/bg_card" />
+        </shape>
+    </item>
+    <item
+        android:drawable="@drawable/ic_lock"
+        android:gravity="center"
+        android:width="10dp"
+        android:height="10dp" />
+</layer-list>

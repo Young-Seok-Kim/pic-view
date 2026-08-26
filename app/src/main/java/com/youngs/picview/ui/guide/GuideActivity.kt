@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.PickVisualMediaRequest
@@ -31,19 +32,24 @@ import com.youngs.picview.BuildConfig
 import com.youngs.picview.R
 import com.youngs.picview.util.MediaStoreSaver
 import com.youngs.picview.databinding.ActivityGuideBinding
+import com.youngs.picview.databinding.DialogGuideExampleBinding
 import com.youngs.picview.ui.frame.PhotoFrameActivity
+import com.youngs.picview.domain.guide.SiseonGuide
 import com.youngs.picview.domain.light.LightPhase
 import com.youngs.picview.domain.pose.GroupSize
+import com.youngs.picview.domain.pose.Pose
 import com.youngs.picview.domain.pose.PoseRecommender
+import com.youngs.picview.domain.pose.PoseScore
 import com.youngs.picview.domain.spot.Facing
 import com.youngs.picview.domain.spot.SpotFactsTable
+import androidx.core.view.isVisible
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import androidx.lifecycle.lifecycleScope
 import com.youngs.picview.data.repository.CourseRepository
 import com.youngs.picview.ui.model.SpotItem
 import kotlinx.coroutines.launch
 import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.camera.core.resolutionselector.ResolutionSelector
-import androidx.core.view.isVisible
 import com.youngs.picview.domain.pose.Subject
 
 class GuideActivity : AppCompatActivity() {
@@ -57,6 +63,7 @@ class GuideActivity : AppCompatActivity() {
 
         /** 촬영한 사진을 방문 기록에 붙이기 위한 장소 식별자. */
         const val EXTRA_CONTENT_ID = "CONTENT_ID"
+
     }
 
     private lateinit var binding: ActivityGuideBinding
@@ -71,6 +78,18 @@ class GuideActivity : AppCompatActivity() {
     private lateinit var phase: LightPhase
 
     private var groupSize: GroupSize = GroupSize.SOLO
+
+    /** 이 화면의 구도. 격자가 이 값을 봅니다. */
+    private lateinit var guideType: GuideOverlayView.GuideType
+
+    /**
+     * 포즈 목록에서 지금 고른 것.
+     *
+     * [PoseAdapter] 는 목록을 새로 받을 때마다 1등을 자동으로 고르고
+     * 콜백을 부르므로, 화면이 뜨자마자 값이 채워집니다.
+     */
+    private var selectedPose: PoseScore? = null
+
 
     /** 무엇을 찍는가. 인물이면 포즈 목록, 나머지면 촬영 요령이 나옵니다. */
     private var subject: Subject = Subject.PERSON
@@ -142,7 +161,7 @@ class GuideActivity : AppCompatActivity() {
 
         binding.tvSpotName.text = spotName
 
-        val guideType = when (spotType) {
+        guideType = when (spotType) {
             "14" -> GuideOverlayView.GuideType.SYMMETRY // 문화시설 : 건축 대칭
             "39" -> GuideOverlayView.GuideType.CENTER   // 음식점 : 근접 촬영
             else -> GuideOverlayView.GuideType.THIRDS   // 자연·레포츠 등 풍경
@@ -163,6 +182,55 @@ class GuideActivity : AppCompatActivity() {
     }
 
     /**
+     * 지금 고른 포즈의 예시 그림.
+     *
+     * 포즈 칩은 이름과 한 줄 요령까지만 말합니다. "뒤돌아 걷기"가 실제로
+     * 어떤 그림인지는 글로는 잘 안 떠오릅니다. 자세와 카메라 자리를 그린
+     * 한 장이 그 자리를 메웁니다.
+     *
+     * 인물이 아닌 피사체(풍경·음식 등)를 고른 상태에서는 포즈 자체가
+     * 없으므로, 그 피사체의 촬영 요령을 대신 보여 줍니다.
+     */
+    private fun showExample() {
+        val picked = selectedPose
+        if (picked == null || subject != Subject.PERSON) {
+            Toast.makeText(this, subject.tipFor(phase), Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val pose = picked.pose
+        val sheet = BottomSheetDialog(this)
+        val view = DialogGuideExampleBinding.inflate(layoutInflater)
+        sheet.setContentView(view.root)
+
+        view.tvExampleEmoji.text = pose.emoji
+        view.tvExampleTitle.text = pose.label
+        view.ivExamplePhoto.setImageResource(pose.artRes)
+        view.tvExampleDesc.text = pose.tip
+        // 왜 이게 지금 추천인지. 점수만 있으면 근거 없는 숫자로 보입니다.
+        view.tvExampleTip.text = picked.reason
+
+        // 이 장소의 구도가 어떤 것인지도 함께 일러 줍니다.
+        val facts = SpotFactsTable.of(
+            intent.getStringExtra(EXTRA_SPOT_NAME).orEmpty(),
+            intent.getStringExtra(EXTRA_SPOT_TYPE)
+        )
+        view.layoutExampleTips.removeAllViews()
+        SiseonGuide.byId(SiseonGuide.guideIdFor(facts)).tips.forEach { tip ->
+            view.layoutExampleTips.addView(
+                TextView(this).apply {
+                    text = "· $tip"
+                    setTextColor(ContextCompat.getColor(this@GuideActivity, R.color.text_secondary))
+                    textSize = 13f
+                    setPadding(0, dp(3), 0, dp(3))
+                }
+            )
+        }
+
+        sheet.show()
+    }
+
+    /**
      * 포즈 추천.
      *
      * 순서를 고정하지 않고 [PoseRecommender] 가 지금의 빛·방위·인원으로 매번
@@ -176,6 +244,8 @@ class GuideActivity : AppCompatActivity() {
         poseAdapter = PoseAdapter { selected ->
             // 고른 포즈의 촬영 요령을 상단 안내 문구 자리에 띄웁니다.
             binding.tvGuideMessage.text = selected.pose.tip
+            // 예시 버튼이 "지금 고른 그 포즈"를 보여 줘야 하므로 들고 있습니다.
+            selectedPose = selected
         }
         binding.rvPoses.adapter = poseAdapter
 
@@ -276,6 +346,7 @@ class GuideActivity : AppCompatActivity() {
 
     private fun setOnClickListener() {
         binding.btnGuideBack.setOnClickListener { finish() }
+        binding.btnGuideExample.setOnClickListener { showExample() }
 
         binding.btnCapture.setOnClickListener {
             // 셔터를 누른 느낌을 주는 짧은 스케일 피드백

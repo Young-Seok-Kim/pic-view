@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    포즈 예시 · 뒤돌아 걷기.
+
+    실사진이 아니라 그림입니다. 이 자리에 필요한 건 "정읍이 이렇게 생겼다"가
+    아니라 "몸을 이렇게 두라"이고, 그건 사진보다 그림이 정확합니다.
+    사람 얼굴이 나오는 남의 사진을 예시로 쓰지 않아도 된다는 이점도 있습니다.
+
+    아래쪽 황금색 점이 촬영자, 위쪽 붉은 인물이 피사체입니다.
+    화면 어디에 서고 어디서 찍는지가 한눈에 보이도록 늘 같은 색으로 씁니다.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="180dp"
+    android:viewportWidth="240"
+    android:viewportHeight="180">
+
+    <path android:fillColor="@color/golden_100" android:pathData="M0,0h240v128H0z" />
+    <path android:fillColor="@color/golden_300" android:pathData="M196,34m-15,0a15,15 0,1 1,30 0a15,15 0,1 1,-30 0" />
+    <path android:fillColor="@color/moss_100" android:pathData="M0,96c30,-16 62,-10 92,4c30,14 74,10 148,-12v40H0z" />
+    <path android:fillColor="@color/sand_200" android:pathData="M0,128h240v52H0z" />
+
+    <!-- 멀어지는 길 -->
+    <path android:fillColor="@color/sand_300" android:pathData="M104,128h30l38,52H68z" />
+
+    <!-- 피사체 : 등을 보이고 걷는 사람 -->
+    <path android:fillColor="@color/maple_500" android:pathData="M119,74m-9,0a9,9 0,1 1,18 0a9,9 0,1 1,-18 0" />
+    <path android:fillColor="@color/maple_500" android:pathData="M108,86h22v34h-22z" />
+    <path android:fillColor="@color/maple_500" android:pathData="M104,88h5v26h-5z" />
+    <path android:fillColor="@color/maple_500" android:pathData="M130,88h5v26h-5z" />
+    <!-- 걷는 중이라 두 다리가 벌어져 있습니다 -->
+    <path android:fillColor="@color/maple_600" android:pathData="M110,120l-7,24h6l7,-24z" />
+    <path android:fillColor="@color/maple_600" android:pathData="M124,120l8,24h-6l-8,-24z" />
+
+    <!-- 촬영자 -->
+    <path android:fillColor="@color/golden_500" android:pathData="M120,166m-9,0a9,9 0,1 1,18 0a9,9 0,1 1,-18 0" />
+    <path android:strokeColor="@color/white" android:strokeWidth="2" android:fillColor="@android:color/transparent"
+        android:pathData="M120,166m-9,0a9,9 0,1 1,18 0a9,9 0,1 1,-18 0" />
+
+    <!-- 촬영자 → 피사체 -->
+    <path android:strokeColor="@color/maple_400" android:strokeWidth="2" android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent" android:pathData="M120,154V132" />
+    <path android:fillColor="@color/maple_400" android:pathData="M120,124l6,10h-12z" />
+</vector>

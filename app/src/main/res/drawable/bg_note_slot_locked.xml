@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  빛 수집 노트에서 아직 못 받은 자리.
+
+  비워 두지 않고 점선으로 남깁니다. "빈 칸"이 아니라 "채울 자리"로
+  읽혀야 다음에 무엇을 할지 눈에 들어옵니다. ([bg_stamp_empty] 와 같은 뜻)
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/bg_card_muted" />
+    <corners android:radius="10dp" />
+    <stroke
+        android:width="1.5dp"
+        android:color="@color/card_stroke"
+        android:dashWidth="4dp"
+        android:dashGap="3dp" />
+</shape>

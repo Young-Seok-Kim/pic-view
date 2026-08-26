@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    지금 고른 포즈의 예시 그림.
+
+    촬영 화면의 "?" 가 엽니다. 포즈 칩은 이름과 한 줄 요령만 보여 줄 수
+    있어서, "뒤돌아 걷기"가 실제로 어떤 그림인지는 안 떠오릅니다.
+    그림 한 장이 그 자리를 메웁니다.
+
+    아래 인원 칩으로 고른 포즈가 바뀌면 이 그림도 함께 바뀝니다.
+-->
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/bg_card">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/space_l"
+        android:paddingTop="@dimen/space_m"
+        android:paddingBottom="@dimen/space_2xl">
+
+        <View
+            android:layout_width="36dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/space_l"
+            android:background="@drawable/bg_pill_soft" />
+
+        <TextView
+            style="@style/Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:letterSpacing="0.06"
+            android:text="@string/pose_example_title"
+            android:textColor="@color/maple_500" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_example_emoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="22sp"
+                tools:text="🚶" />
+
+            <TextView
+                android:id="@+id/tv_example_title"
+                style="@style/Text.Title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_s"
+                android:layout_weight="1"
+                tools:text="뒤돌아 걷기" />
+        </LinearLayout>
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/iv_example_photo"
+            android:layout_width="match_parent"
+            android:layout_height="190dp"
+            android:layout_marginTop="@dimen/space_m"
+            android:background="@color/bg_card_muted"
+            android:contentDescription="@string/cd_pose_example"
+            android:scaleType="fitCenter"
+            app:shapeAppearanceOverlay="@style/Shape.Thumb"
+            tools:src="@drawable/pose_walk_away" />
+
+        <!-- 그림이 무엇을 가리키는지. 색만으로는 안 읽힙니다. -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/bg_legend_subject" />
+
+            <TextView
+                style="@style/Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="@string/pose_legend_subject" />
+
+            <View
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginStart="@dimen/space_l"
+                android:background="@drawable/bg_legend_shooter" />
+
+            <TextView
+                style="@style/Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="@string/pose_legend_shooter" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_example_desc"
+            style="@style/Text.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_m"
+            tools:text="카메라를 등지고 천천히 걸어가세요. 멈춘 순간보다 걷는 중간이 자연스럽습니다." />
+
+        <TextView
+            android:id="@+id/tv_example_tip"
+            style="@style/Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            android:background="@drawable/bg_pill_soft"
+            android:paddingHorizontal="@dimen/space_m"
+            android:paddingVertical="@dimen/space_s"
+            android:textColor="@color/text_primary"
+            tools:text="지금 빛에서는 실루엣이 가장 잘 나옵니다" />
+
+        <LinearLayout
+            android:id="@+id/layout_example_tips"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_m"
+            android:orientation="vertical" />
+
+        <!-- 이 그림이 실사진이 아니라는 사실을 숨기지 않습니다. -->
+        <TextView
+            style="@style/Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_l"
+            android:text="@string/pose_example_note"
+            android:textColor="@color/text_tertiary" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

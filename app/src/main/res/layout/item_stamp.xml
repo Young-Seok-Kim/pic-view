@@ -18,9 +18,11 @@
     android:orientation="vertical"
     android:paddingVertical="@dimen/space_s">
 
+    <!-- 상자 비율을 스탬프 원본(180:200)과 맞춥니다. 정사각형에 넣으면
+         남는 여백만큼 그림이 작아 보이고, 칸마다 그 여백이 달라집니다. -->
     <ImageView
         android:id="@+id/iv_stamp_art"
-        android:layout_width="80dp"
+        android:layout_width="72dp"
         android:layout_height="80dp"
         android:contentDescription="@null"
         android:scaleType="fitCenter"
@@ -32,9 +34,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_xs"
-        android:gravity="center"
+        android:gravity="center|top"
         android:ellipsize="end"
         android:maxLines="2"
+        android:minLines="2"
         tools:text="황금빛 수집가" />
 
     <TextView

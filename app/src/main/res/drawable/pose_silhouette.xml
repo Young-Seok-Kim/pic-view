@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    포즈 예시 · 실루엣.
+
+    해가 피사체 뒤에 있고 인물은 검게 남습니다. 팔다리를 몸에서 떼어
+    윤곽이 뭉치지 않게 그렸습니다 — 그림 자체가 요령을 말합니다.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="180dp"
+    android:viewportWidth="240"
+    android:viewportHeight="180">
+
+    <path android:fillColor="@color/light_sunset" android:pathData="M0,0h240v128H0z" />
+    <path android:fillColor="@color/golden_500" android:pathData="M0,54h240v74H0z" />
+    <path android:fillColor="@color/golden_300" android:pathData="M120,70m-38,0a38,38 0,1 1,76 0a38,38 0,1 1,-76 0" />
+    <path android:fillColor="@color/sand_950" android:pathData="M0,128h240v52H0z" />
+
+    <!-- 피사체 : 해를 등지고 선 사람. 팔을 벌려 윤곽을 살립니다. -->
+    <path android:fillColor="@color/sand_950" android:pathData="M120,50m-9,0a9,9 0,1 1,18 0a9,9 0,1 1,-18 0" />
+    <path android:fillColor="@color/sand_950" android:pathData="M111,62h18v34h-18z" />
+    <path android:fillColor="@color/sand_950" android:pathData="M111,66l-20,10 4,7 20,-10z" />
+    <path android:fillColor="@color/sand_950" android:pathData="M129,66l20,10 -4,7 -20,-10z" />
+    <path android:fillColor="@color/sand_950" android:pathData="M113,96l-6,32h7l5,-32z" />
+    <path android:fillColor="@color/sand_950" android:pathData="M127,96l6,32h-7l-5,-32z" />
+
+    <path android:fillColor="@color/golden_500" android:pathData="M120,160m-9,0a9,9 0,1 1,18 0a9,9 0,1 1,-18 0" />
+    <path android:strokeColor="@color/white" android:strokeWidth="2" android:fillColor="@android:color/transparent"
+        android:pathData="M120,160m-9,0a9,9 0,1 1,18 0a9,9 0,1 1,-18 0" />
+</vector>
