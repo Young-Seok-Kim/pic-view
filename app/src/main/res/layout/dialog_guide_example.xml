@@ -32,12 +32,13 @@
             android:background="@drawable/bg_pill_soft" />
 
         <TextView
+            android:id="@+id/tv_example_eyebrow"
             style="@style/Text.Caption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:letterSpacing="0.06"
-            android:text="@string/pose_example_title"
-            android:textColor="@color/maple_500" />
+            android:textColor="@color/maple_500"
+            tools:text="이렇게 서 보세요" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -66,11 +67,13 @@
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/iv_example_photo"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_m"
+            android:adjustViewBounds="true"
             android:background="@color/bg_card_muted"
             android:contentDescription="@string/cd_pose_example"
-            android:scaleType="centerCrop"
+            android:maxHeight="400dp"
+            android:scaleType="fitCenter"
             app:shapeAppearanceOverlay="@style/Shape.Thumb"
             tools:src="@drawable/pose_walk_away" />
 
@@ -103,11 +106,12 @@
 
         <!-- 이 그림이 실사진이 아니라는 사실을 숨기지 않습니다. -->
         <TextView
+            android:id="@+id/tv_example_note"
             style="@style/Text.Caption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_l"
-            android:text="@string/pose_example_note"
-            android:textColor="@color/text_tertiary" />
+            android:textColor="@color/text_tertiary"
+            tools:text="자세를 보여 주는 예시 그림이에요." />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
