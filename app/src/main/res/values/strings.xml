@@ -597,6 +597,7 @@
 
     <!-- 촬영 화면 · 포즈 예시 -->
     <string name="cd_pose_example">이 포즈 예시 그림</string>
+    <string name="pose_hint_first_run">눌러서 포즈 예시 그림 보기</string>
     <string name="pose_example_title">이렇게 서 보세요</string>
     <string name="pose_example_note">자세를 보여 주는 예시 그림이에요. 정읍에서 찍은 실사진이 아닙니다.</string>
     <!-- 코스 입력 : 날짜 · 인원 · 입장료 -->

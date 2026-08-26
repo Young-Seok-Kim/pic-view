@@ -24,6 +24,7 @@ object AppPrefs {
     private const val KEY_INSTALL_ID = "install_id"
     private const val KEY_FAVORITES = "favorite_spots"
     private const val KEY_DIARY_FEELING_PREFIX = "diary_feelings_"
+    private const val KEY_POSE_HINT_SEEN = "pose_hint_seen"
 
     private fun prefs(context: Context): SharedPreferences =
         context.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -42,6 +43,19 @@ object AppPrefs {
 
     fun setOnboarded(context: Context) {
         prefs(context).edit().putBoolean(KEY_ONBOARDED, true).apply()
+    }
+
+    /**
+     * 촬영 화면의 "포즈 예시" 안내를 이미 봤는지.
+     *
+     * 한 번은 말해 주되 두 번은 말하지 않습니다. 매번 뜨는 안내는
+     * 그때부터 도움이 아니라 치워야 할 것이 됩니다.
+     */
+    fun isPoseHintSeen(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_POSE_HINT_SEEN, false)
+
+    fun setPoseHintSeen(context: Context) {
+        prefs(context).edit().putBoolean(KEY_POSE_HINT_SEEN, true).apply()
     }
 
     /** 글씨 크기 단계. */

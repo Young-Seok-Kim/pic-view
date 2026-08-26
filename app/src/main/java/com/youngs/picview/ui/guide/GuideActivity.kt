@@ -30,6 +30,7 @@ import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import com.youngs.picview.BuildConfig
 import com.youngs.picview.R
+import com.youngs.picview.util.AppPrefs
 import com.youngs.picview.util.MediaStoreSaver
 import com.youngs.picview.databinding.ActivityGuideBinding
 import com.youngs.picview.databinding.DialogGuideExampleBinding
@@ -63,6 +64,9 @@ class GuideActivity : AppCompatActivity() {
 
         /** 촬영한 사진을 방문 기록에 붙이기 위한 장소 식별자. */
         const val EXTRA_CONTENT_ID = "CONTENT_ID"
+
+        /** 첫 안내가 스스로 사라지기까지. 읽기에 넉넉하고 방해되지 않는 선. */
+        private const val POSE_HINT_MS = 6000L
 
     }
 
@@ -179,6 +183,39 @@ class GuideActivity : AppCompatActivity() {
         )
 
         setupPoses(spotName, spotType)
+        showPoseHintOnce()
+    }
+
+    /**
+     * 처음 한 번만 "?" 를 가리키는 안내.
+     *
+     * 아이콘만으로는 그 뒤에 포즈 예시가 있다는 걸 알 수 없습니다.
+     * 한 번 보여 주고 나면 다시 뜨지 않습니다 — 두 번째부터는 도움이
+     * 아니라 미리보기를 가리는 것이 됩니다.
+     *
+     * 눌러도 사라지고, 그냥 두면 [POSE_HINT_MS] 뒤에 스스로 사라집니다.
+     * 셔터를 누르려는 사람을 기다리게 하지 않기 위해서입니다.
+     */
+    private fun showPoseHintOnce() {
+        if (AppPrefs.isPoseHintSeen(this)) return
+
+        val hint = binding.layoutPoseHint
+        hint.isVisible = true
+        AppPrefs.setPoseHintSeen(this)
+
+        val dismiss = Runnable {
+            if (!hint.isVisible) return@Runnable
+            hint.animate().alpha(0f).setDuration(200).withEndAction {
+                hint.isVisible = false
+                hint.alpha = 1f
+            }.start()
+        }
+        hint.setOnClickListener {
+            hint.removeCallbacks(dismiss)
+            dismiss.run()
+            showExample()
+        }
+        hint.postDelayed(dismiss, POSE_HINT_MS)
     }
 
     /**
