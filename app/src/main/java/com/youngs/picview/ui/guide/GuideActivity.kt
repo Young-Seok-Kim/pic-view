@@ -229,23 +229,40 @@ class GuideActivity : AppCompatActivity() {
      * 없으므로, 그 피사체의 촬영 요령을 대신 보여 줍니다.
      */
     private fun showExample() {
-        val picked = selectedPose
-        if (picked == null || subject != Subject.PERSON) {
-            Toast.makeText(this, subject.tipFor(phase), Toast.LENGTH_LONG).show()
-            return
-        }
-
-        val pose = picked.pose
         val sheet = BottomSheetDialog(this)
         val view = DialogGuideExampleBinding.inflate(layoutInflater)
         sheet.setContentView(view.root)
 
-        view.tvExampleEmoji.text = pose.emoji
-        view.tvExampleTitle.text = pose.label
-        view.ivExamplePhoto.setImageResource(pose.artRes)
-        view.tvExampleDesc.text = pose.tip
-        // 왜 이게 지금 추천인지. 점수만 있으면 근거 없는 숫자로 보입니다.
-        view.tvExampleTip.text = picked.reason
+        // 인물이면 고른 포즈를, 나머지는 그 피사체의 촬영 요령을 보여 줍니다.
+        // 풍경·동물·음식에는 포즈가 없고 "어떻게 담나"가 문제라, 물어야 할
+        // 것이 다르면 답도 달라야 합니다.
+        // 화면이 막 떴을 때는 아직 콜백이 안 왔을 수 있습니다. 그때는 지금
+        // 조건의 1등을 씁니다 — 목록에 보이는 것과 같은 포즈입니다.
+        val picked = selectedPose
+            ?: PoseRecommender.recommend(phase, facing, groupSize).firstOrNull()
+
+        if (subject == Subject.PERSON && picked != null) {
+            view.tvExampleEyebrow.setText(R.string.pose_example_title)
+            view.tvExampleNote.setText(R.string.pose_example_note)
+            view.tvExampleEmoji.text = picked.pose.emoji
+            view.tvExampleTitle.text = picked.pose.label
+            view.ivExamplePhoto.setImageResource(picked.pose.artRes)
+            view.tvExampleDesc.text = picked.pose.tip
+            // 왜 이게 지금 추천인지. 점수만 있으면 근거 없는 숫자로 보입니다.
+            view.tvExampleTip.text = picked.reason
+        } else {
+            // 풍경·동물·음식은 "서는" 게 아니라 "담는" 것이라 말이 다릅니다.
+            view.tvExampleEyebrow.setText(R.string.subject_example_title)
+            view.tvExampleNote.setText(R.string.subject_example_note)
+            view.tvExampleEmoji.text = subject.emoji
+            view.tvExampleTitle.text = subject.label
+            view.ivExamplePhoto.setImageResource(subject.artRes)
+            val tip = subject.tipFor(phase)
+            view.tvExampleDesc.isVisible = tip.isNotBlank()
+            view.tvExampleDesc.text = tip
+            // 지금 빛이 왜 그런 요령을 부르는지 한 줄로 잇습니다.
+            view.tvExampleTip.text = "${phase.label} · ${phase.lightCharacter}"
+        }
 
         // 이 장소의 구도가 어떤 것인지도 함께 일러 줍니다.
         val facts = SpotFactsTable.of(

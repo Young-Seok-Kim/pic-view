@@ -92,11 +92,25 @@ enum class GroupSize(val label: String) {
  * 인물은 "어떻게 서지"가 문제라 포즈 목록이 나오고, 나머지는 "어떻게 담지"가
  * 문제라 촬영 요령이 나옵니다.
  */
-enum class Subject(val emoji: String, val label: String) {
-    PERSON("🧍", "인물"),
-    LANDSCAPE("🏞", "풍경"),
-    ANIMAL("🐦", "동물"),
-    FOOD("🍲", "음식");
+enum class Subject(
+    val emoji: String,
+    val label: String,
+    /**
+     * 이 피사체를 어떻게 담는지 보여 주는 예시 그림.
+     *
+     * 인물은 포즈마다 그림이 따로 있으므로([Pose.artRes]) 여기서는 쓰지
+     * 않습니다. 나머지 셋은 포즈가 없고 "어떻게 담나"가 문제라 한 장이면
+     * 충분합니다 — 그림 자체가 [tipFor] 의 문장을 그대로 보여 줍니다
+     * (수평선을 아래 3분할선에, 눈높이를 낮추고 앞쪽에 여백, 창가 역광).
+     */
+    @DrawableRes val artRes: Int
+) {
+    // 인물은 [Pose.artRes] 가 대신하므로 이 값은 읽히지 않습니다.
+    // 그래도 자리를 비울 수 없어 가장 대표적인 포즈 그림을 둡니다.
+    PERSON("🧍", "인물", R.drawable.pose_walk_away),
+    LANDSCAPE("🏞", "풍경", R.drawable.subject_landscape),
+    ANIMAL("🐦", "동물", R.drawable.subject_animal),
+    FOOD("🍲", "음식", R.drawable.subject_food);
 
     /**
      * 이 피사체를 담는 요령. 빛 구간에 따라 달라지는 것만 갈라 씁니다.
