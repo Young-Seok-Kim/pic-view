@@ -598,9 +598,7 @@
     <!-- 촬영 화면 · 포즈 예시 -->
     <string name="cd_pose_example">이 포즈 예시 그림</string>
     <string name="pose_example_title">이렇게 서 보세요</string>
-    <string name="pose_example_note">그림은 자세와 카메라 위치를 보여 주는 예시예요. 정읍 실사진이 아닙니다.</string>
-    <string name="pose_legend_subject">찍히는 사람</string>
-    <string name="pose_legend_shooter">찍는 사람</string>
+    <string name="pose_example_note">자세를 보여 주는 예시 그림이에요. 정읍에서 찍은 실사진이 아닙니다.</string>
     <!-- 코스 입력 : 날짜 · 인원 · 입장료 -->
     <string name="course_date">여행 날짜</string>
     <string name="course_date_icon">📅</string>

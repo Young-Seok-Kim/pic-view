@@ -66,47 +66,13 @@
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/iv_example_photo"
             android:layout_width="match_parent"
-            android:layout_height="190dp"
+            android:layout_height="300dp"
             android:layout_marginTop="@dimen/space_m"
             android:background="@color/bg_card_muted"
             android:contentDescription="@string/cd_pose_example"
-            android:scaleType="fitCenter"
+            android:scaleType="centerCrop"
             app:shapeAppearanceOverlay="@style/Shape.Thumb"
             tools:src="@drawable/pose_walk_away" />
-
-        <!-- 그림이 무엇을 가리키는지. 색만으로는 안 읽힙니다. -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_s"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <View
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:background="@drawable/bg_legend_subject" />
-
-            <TextView
-                style="@style/Text.Caption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:text="@string/pose_legend_subject" />
-
-            <View
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:layout_marginStart="@dimen/space_l"
-                android:background="@drawable/bg_legend_shooter" />
-
-            <TextView
-                style="@style/Text.Caption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:text="@string/pose_legend_shooter" />
-        </LinearLayout>
 
         <TextView
             android:id="@+id/tv_example_desc"
