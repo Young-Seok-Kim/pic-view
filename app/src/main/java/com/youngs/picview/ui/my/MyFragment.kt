@@ -1,45 +1,58 @@
 package com.youngs.picview.ui.my
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.youngs.picview.BuildConfig
 import com.youngs.picview.MainActivity
 import com.youngs.picview.R
-import com.youngs.picview.data.local.SavedCourseWithStops
 import com.youngs.picview.data.local.VisitLogEntity
 import com.youngs.picview.databinding.FragmentMyBinding
-import com.youngs.picview.domain.light.LightPhase
+import com.youngs.picview.databinding.ItemTasteAxisBinding
 import com.youngs.picview.domain.mission.Missions
-import com.youngs.picview.domain.spot.ShotTokens
+import com.youngs.picview.domain.my.PhotoTaste
+import com.youngs.picview.domain.my.TasteAxis
+import com.youngs.picview.domain.season.SeasonHighlight
+import com.youngs.picview.domain.season.SeasonHighlights
 import com.youngs.picview.domain.spot.SpotFactsTable
+import com.youngs.picview.ui.course.CourseInputFragment
+import com.youngs.picview.ui.guide.GuideActivity
 import com.youngs.picview.ui.frame.PhotoFrameActivity
+import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.ui.mission.MissionFragment
 import com.youngs.picview.ui.onboarding.OnboardingActivity
 import com.youngs.picview.util.AppPrefs
 import com.youngs.picview.util.FontStep
+import com.youngs.picview.util.SunCountdown
 import com.youngs.picview.util.applyTopSystemBarInset
-import com.youngs.picview.util.byBatchim
 import java.time.LocalDate
-import java.time.YearMonth
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 /**
- * MY — 나의 시선 (시안 구조).
+ * MY — 나의 시선 (시안 개편).
  *
  * 로그인이 없으므로 프로필(아바타·레벨·가입일)과 고객센터는 두지 않습니다.
- * 계정이 아니라 **기록**이 곧 프로필입니다 — 이번 달의 통계, 최근 촬영,
- * 촬영 스타일이 전부 로컬 방문 기록에서 계산됩니다.
+ * 계정이 아니라 **기록**이 곧 프로필입니다.
  *
- * 접근성·글씨 크기는 아래 퀵링크에서 다이얼로그로 다룹니다. 시니어 전환과
- * 글씨 크기는 Activity 재생성이 필요해서(테마·fontScale 은 화면 생성
- * 시점에만 적용됨) 확인 후 recreate 합니다.
+ * 화면은 위에서 아래로 시간축이 넓어지게 놓았습니다.
+ * 오늘의 시선(지금) → 이번 달의 촬영 리듬 → 최근 아카이브·촬영 성향 →
+ * 다음에 가볼 정읍(다음 계절) → 빛 수집 노트(모아 온 전부).
+ * 마지막 줄만 기록이 아니라 기록을 다루는 일입니다.
+ *
+ * 히어로의 빛·날씨는 [MainViewModel] 이 이미 받아 둔 값을 씁니다. MY 탭이
+ * 같은 API 를 또 부르면 홈과 다른 숫자가 나올 수 있습니다.
  */
 class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
 
@@ -48,16 +61,15 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
 
     private val viewModel: MyViewModel by viewModels()
 
+    /** 빛·날씨·촬영지 목록. Activity 범위라 홈과 같은 값을 봅니다. */
+    private val mainViewModel: MainViewModel by activityViewModels()
+
+    private lateinit var photoAdapter: MyPhotoAdapter
+    private lateinit var noteAdapter: LightNoteAdapter
+
     /** 이번 달 1일 0시(epoch millis). 월 통계의 경계선입니다. */
     private val monthStart: Long by lazy {
         LocalDate.now().withDayOfMonth(1)
-            .atStartOfDay(ZoneId.systemDefault())
-            .toInstant().toEpochMilli()
-    }
-
-    /** 지난 달 1일 0시(epoch millis). */
-    private val lastMonthStart: Long by lazy {
-        LocalDate.now().withDayOfMonth(1).minusMonths(1)
             .atStartOfDay(ZoneId.systemDefault())
             .toInstant().toEpochMilli()
     }
@@ -68,19 +80,27 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
 
         binding.scrollMy.applyTopSystemBarInset()
 
-        val now = YearMonth.now()
-        binding.tvMyMonth.text = "📅 ${now.year}. ${now.monthValue}"
-
         setupActions()
-        setupPhotos()
+        setupLists()
+        renderToday()
+        renderNextTrip()
 
-        viewModel.courses.observe(viewLifecycleOwner) { renderCourses(it) }
-        viewModel.visits.observe(viewLifecycleOwner) { visits ->
-            renderVisitStats(visits)
-            renderPhotos(visits)
-            renderStyle(visits)
-            renderMission(visits)
+        viewModel.courses.observe(viewLifecycleOwner) {
+            binding.tvStatCourse.text = it.size.toString()
         }
+        viewModel.visits.observe(viewLifecycleOwner) { visits ->
+            renderRhythm(visits)
+            renderArchive(visits)
+            renderTaste(visits)
+            renderLightNote(visits)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 빛은 가만히 있어도 흐릅니다. 탭으로 돌아왔을 때 "석양까지 58분"이
+        // 아까 그대로면 화면이 시간을 놓친 것처럼 보입니다.
+        renderToday()
     }
 
     private fun setupActions() {
@@ -88,63 +108,30 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
             (activity as? MainActivity)?.pushScreen(SavedCoursesFragment())
         }
         binding.layoutStatCourses.setOnClickListener(openCourses)
-        binding.btnCourseAll.setOnClickListener(openCourses)
-        binding.cardSavedCourse.setOnClickListener(openCourses)
 
         val openVisits = View.OnClickListener {
             (activity as? MainActivity)?.pushScreen(VisitedFragment())
         }
-        binding.layoutStatVisits.setOnClickListener(openVisits)
-        binding.tvMyPhotosMore.setOnClickListener(openVisits)
+        binding.layoutStatShots.setOnClickListener(openVisits)
+        binding.tvArchiveAll.setOnClickListener(openVisits)
 
         val openMissions = View.OnClickListener {
             (activity as? MainActivity)?.pushScreen(MissionFragment())
         }
         binding.layoutStatMissions.setOnClickListener(openMissions)
-        binding.btnMyMissions.setOnClickListener(openMissions)
-        binding.cardNextMission.setOnClickListener(openMissions)
+
+        binding.btnTodayShoot.setOnClickListener { startTodayShoot() }
+        binding.btnNextPlan.setOnClickListener {
+            (activity as? MainActivity)?.pushScreen(CourseInputFragment())
+        }
 
         binding.btnMySettings.setOnClickListener { showAppInfo() }
-        binding.layoutQuickAccess.setOnClickListener { showSeniorDialog() }
-        binding.layoutQuickFont.setOnClickListener { showFontDialog() }
-        binding.layoutQuickInfo.setOnClickListener { showAppInfo() }
+        binding.layoutExport.setOnClickListener { exportPhotos() }
+        binding.layoutReset.setOnClickListener { confirmReset() }
+        binding.layoutQuickAccess.setOnClickListener { showAccessibilityDialog() }
     }
 
-    // ─────────────────────── 이번 달의 시선 ───────────────────────
-
-    /** "+2 / -1 / +0" — 부호를 붙여 지난 달과의 차이를 말합니다. */
-    private fun signed(value: Int): String = if (value >= 0) "+$value" else "$value"
-
-    private fun renderVisitStats(visits: List<VisitLogEntity>) {
-        // 다녀온 장소 — 누적 수. 증감은 "이번 달 새로 가 본 곳 - 지난 달 새로 가 본 곳".
-        val allPlaces = visits.map { it.contentId }.toSet()
-        val newThisMonth = allPlaces.size -
-            visits.filter { it.visitedAt < monthStart }.map { it.contentId }.toSet().size
-        val beforeLastMonth = visits.filter { it.visitedAt < lastMonthStart }
-            .map { it.contentId }.toSet().size
-        val newLastMonth = visits.filter { it.visitedAt < monthStart }
-            .map { it.contentId }.toSet().size - beforeLastMonth
-
-        binding.tvStatVisit.text = allPlaces.size.toString()
-        binding.tvStatVisitDelta.text =
-            getString(R.string.my_month_delta, signed(newThisMonth - newLastMonth))
-
-        // 완성한 미션 — 지금 기준과 이번 달이 시작되기 전 기준의 차이.
-        val doneNow = Missions.progress(visits).count { it.isComplete }
-        val doneBefore = Missions
-            .progress(visits.filter { it.visitedAt < monthStart })
-            .count { it.isComplete }
-
-        binding.tvStatMission.text = doneNow.toString()
-        binding.tvStatMissionDelta.text =
-            getString(R.string.my_month_delta, signed(doneNow - doneBefore))
-    }
-
-    // ─────────────────────── 최근 촬영 ───────────────────────
-
-    private lateinit var photoAdapter: MyPhotoAdapter
-
-    private fun setupPhotos() {
+    private fun setupLists() {
         photoAdapter = MyPhotoAdapter { visit ->
             val uri = visit.photoUri ?: return@MyPhotoAdapter
             // 사진을 누르면 포토 프레임으로 — 미션 "나만의 정읍 엽서"의 길입니다.
@@ -154,134 +141,246 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
                 )
             )
         }
-        binding.rvMyPhotos.layoutManager = GridLayoutManager(requireContext(), 3)
+        binding.rvMyPhotos.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvMyPhotos.adapter = photoAdapter
+
+        noteAdapter = LightNoteAdapter {
+            (activity as? MainActivity)?.pushScreen(MissionFragment())
+        }
+        binding.rvLightNote.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.rvLightNote.adapter = noteAdapter
     }
 
-    private fun renderPhotos(visits: List<VisitLogEntity>) {
+    // ─────────────────────── 오늘의 시선 ───────────────────────
+
+    /**
+     * 지금 나가야 할 이유 한 장.
+     *
+     * 장소는 점수 1위 촬영지(홈이 쓰는 그 순서)를, 문장은 그 장소의 촬영
+     * 지식을 씁니다. 아직 목록을 못 받았으면 우화정으로 채웁니다 — 빈 카드를
+     * 두느니 정읍에서 가장 자주 권하게 되는 자리를 보여 주는 편이 낫습니다.
+     */
+    private fun renderToday() {
+        val binding = _binding ?: return
+
+        val sky = mainViewModel.skyState.value
+        val date = LocalDate.now().format(DATE)
+        binding.tvTodayMeta.text = if (sky != null) {
+            getString(R.string.my_today_meta, sky.label, date)
+        } else {
+            date
+        }
+
+        val countdown = SunCountdown.untilNextEvent(requireContext(), mainViewModel.sunTimes)
+        binding.tvTodayCountdown.isVisible = countdown != null
+        binding.tvTodayCountdown.text = countdown.orEmpty()
+
+        val spot = mainViewModel.spotData.value?.firstOrNull()
+        if (spot == null) {
+            binding.tvTodayPlace.setText(R.string.my_today_place_fallback)
+            binding.tvTodayLine.setText(R.string.my_today_fallback)
+            binding.ivTodayPhoto.setImageResource(R.drawable.spot_uhwajeong)
+            return
+        }
+
+        binding.tvTodayPlace.text = spot.title
+        binding.tvTodayLine.text = SpotFactsTable.of(spot.title, spot.contentTypeId).note
+
+        Glide.with(binding.ivTodayPhoto)
+            .load(spot.imageUrl.takeIf { it.isNotBlank() })
+            .placeholder(R.drawable.spot_uhwajeong)
+            .error(R.drawable.spot_uhwajeong)
+            .centerCrop()
+            .into(binding.ivTodayPhoto)
+    }
+
+    /**
+     * 히어로의 CTA — 지금 추천 장소로 포즈 가이드를 엽니다.
+     *
+     * 목록을 아직 못 받았으면 장소를 특정할 수 없어 촬영한 사진을 기록에
+     * 붙일 자리가 없습니다. 그때는 탐색 탭으로 보내 장소부터 고르게 합니다.
+     */
+    private fun startTodayShoot() {
+        val spot = mainViewModel.spotData.value?.firstOrNull()
+        if (spot == null) {
+            (activity as? MainActivity)?.selectTab(R.id.tab_explore)
+            return
+        }
+        startActivity(
+            Intent(requireContext(), GuideActivity::class.java).apply {
+                putExtra(GuideActivity.EXTRA_SPOT_NAME, spot.title)
+                putExtra(GuideActivity.EXTRA_SPOT_TYPE, spot.contentTypeId)
+                putExtra(GuideActivity.EXTRA_PHASE, mainViewModel.sunTimes.phaseNow().name)
+                putExtra(GuideActivity.EXTRA_CONTENT_ID, spot.contentId)
+            }
+        )
+    }
+
+    // ─────────────────────── 이번 달의 촬영 리듬 ───────────────────────
+
+    private fun renderRhythm(visits: List<VisitLogEntity>) {
+        // 촬영 기록 — 이번 달에 직접 찍어 남긴 사진 수.
+        binding.tvStatShots.text = visits
+            .count { !it.photoUri.isNullOrBlank() && it.visitedAt >= monthStart }
+            .toString()
+
+        binding.tvStatMission.text = Missions.progress(visits).count { it.isComplete }.toString()
+    }
+
+    // ─────────────────────── 최근 촬영 아카이브 ───────────────────────
+
+    private fun renderArchive(visits: List<VisitLogEntity>) {
         val photos = visits
             .filter { !it.photoUri.isNullOrBlank() }
             .distinctBy { it.photoUri }
-            .take(6)
+            .take(4)
 
-        binding.cardMyPhotos.isVisible = photos.isNotEmpty()
+        binding.rvMyPhotos.isVisible = photos.isNotEmpty()
+        binding.layoutArchiveEmpty.isVisible = photos.isEmpty()
+        binding.tvArchiveAll.isVisible = photos.isNotEmpty()
         photoAdapter.submitList(photos)
     }
 
-    // ─────────────────────── 나의 촬영 스타일 ───────────────────────
+    // ─────────────────────── 나의 촬영 성향 ───────────────────────
 
-    /**
-     * 방문 기록에서 취향을 계산합니다.
-     *
-     * 구도는 다녀온 장소의 추천 구도 중 가장 잦은 것, 빛은 체크인할 때
-     * 가장 잦았던 빛 구간, 장소는 가장 여러 번 간 두 곳입니다.
-     * 스스로 적은 적 없는 프로필이 기록만으로 만들어집니다.
-     */
-    private fun renderStyle(visits: List<VisitLogEntity>) {
-        binding.cardMyStyle.isVisible = visits.isNotEmpty()
-        if (visits.isEmpty()) return
+    private fun renderTaste(visits: List<VisitLogEntity>) {
+        val taste = PhotoTaste.of(visits)
 
-        val topGuide = visits
-            .groupingBy { SpotFactsTable.of(it.title, null).guide }
-            .eachCount()
-            .maxByOrNull { it.value }?.key
-        if (topGuide != null) {
-            binding.tvStyleGuide.text =
-                getString(R.string.my_style_guide_line, ShotTokens.of(topGuide).label)
-        }
-
-        val topPhase = visits
-            .mapNotNull { runCatching { LightPhase.valueOf(it.phaseName) }.getOrNull() }
-            .groupingBy { it }
-            .eachCount()
-            .maxByOrNull { it.value }?.key
-        if (topPhase != null) {
-            binding.tvStyleLight.text =
-                getString(R.string.my_style_light_line, topPhase.label)
-        }
-
-        val topPlaces = visits
-            .groupingBy { it.title }
-            .eachCount()
-            .entries
-            .sortedByDescending { it.value }
-            .take(2)
-            .joinToString(", ") { it.key }
-        binding.tvStylePlace.text =
-            topPlaces + topPlaces.byBatchim("을", "를") + " 자주 찾았어요"
-    }
-
-    // ─────────────────────── 저장한 출사 코스 ───────────────────────
-
-    private fun renderCourses(courses: List<SavedCourseWithStops>) {
-        binding.tvStatCourse.text = courses.size.toString()
-
-        val thisMonth = courses.count { it.course.createdAt >= monthStart }
-        val lastMonth = courses.count {
-            it.course.createdAt in lastMonthStart until monthStart
-        }
-        binding.tvStatCourseDelta.text =
-            getString(R.string.my_month_delta, signed(thisMonth - lastMonth))
-
-        val latest = courses.firstOrNull()
-        if (latest == null) {
-            binding.tvCourseTitle.setText(R.string.my_no_course)
-            binding.tvCourseMeta.text = ""
-            binding.ivCourseThumb.setImageResource(R.drawable.bg_image_placeholder)
-            return
-        }
-
-        binding.tvCourseTitle.text = latest.course.title
-        binding.tvCourseMeta.text = getString(
-            R.string.my_course_meta, latest.stops.size, latest.course.totalKm
+        val axisViews = listOf(
+            binding.tasteReflection, binding.tasteGolden, binding.tasteWater
         )
 
-        Glide.with(binding.ivCourseThumb)
-            .load(latest.orderedStops.firstOrNull()?.imageUrl?.takeIf { it.isNotBlank() })
-            .placeholder(R.drawable.bg_image_placeholder)
-            .error(R.drawable.bg_image_placeholder)
-            .centerCrop()
-            .into(binding.ivCourseThumb)
-    }
-
-    // ─────────────────────── 이어서 할 미션 ───────────────────────
-
-    private fun renderMission(visits: List<VisitLogEntity>) {
-        val next = Missions.progress(visits).firstOrNull { !it.isComplete }
-
-        if (next == null) {
-            binding.tvMissionTitle.text = getString(R.string.my_mission_done_all)
-            binding.tvMissionHint.isVisible = false
-            binding.layoutMissionProgress.isVisible = false
+        if (taste == null) {
+            // 사진 한두 장으로 "68%"를 말하면 그건 통계가 아니라 장식입니다.
+            axisViews.forEach { it.root.isVisible = false }
+            binding.dividerTaste.isVisible = false
+            binding.tvTasteBasis.text =
+                getString(R.string.my_taste_locked, PhotoTaste.MIN_SAMPLE)
+            binding.tvTasteInsight.isVisible = false
             return
         }
 
-        binding.tvMissionTitle.text = next.mission.title
-        binding.tvMissionHint.isVisible = true
-        binding.tvMissionHint.text = next.mission.nextHint
-        binding.ivMissionStamp.setImageResource(next.mission.stampRes)
-        binding.layoutMissionProgress.isVisible = true
-        binding.tvMissionCount.text =
-            getString(R.string.my_mission_progress, next.current, next.target)
-        binding.progressMission.max = 100
-        binding.progressMission.progress = (next.ratio * 100).toInt()
+        binding.tvTasteBasis.text = getString(R.string.my_taste_basis, taste.sampleSize)
+        binding.dividerTaste.isVisible = true
+
+        val icons = listOf(R.drawable.ic_glyph_drop, R.drawable.ic_sun, R.drawable.ic_wave)
+        axisViews.forEachIndexed { index, axisBinding ->
+            axisBinding.root.isVisible = true
+            bindAxis(axisBinding, taste.axes[index], icons[index])
+        }
+
+        binding.tvTasteInsight.isVisible = taste.insight != null
+        binding.tvTasteInsight.text = taste.insight.orEmpty()
+    }
+
+    private fun bindAxis(view: ItemTasteAxisBinding, axis: TasteAxis, iconRes: Int) {
+        view.ivAxisIcon.setImageResource(iconRes)
+        view.tvAxisLabel.text = axis.label
+        view.progressAxis.progress = axis.percent
+        view.tvAxisPercent.text = getString(R.string.my_taste_percent, axis.percent)
+    }
+
+    // ─────────────────────── 다음에 가볼 정읍 ───────────────────────
+
+    private fun renderNextTrip() {
+        val next: SeasonHighlight = SeasonHighlights.upcoming(limit = 1).firstOrNull() ?: return
+
+        binding.tvNextTitle.text = next.title
+        binding.tvNextTip.text = next.tip
+        binding.ivNextPhoto.setImageResource(next.photoRes)
+
+        val days = next.daysUntilPeak()
+        binding.tvNextDday.text = if (next.isPeakNow()) {
+            getString(R.string.my_next_peak_now)
+        } else {
+            "· " + getString(R.string.my_next_peak_in, days.toInt())
+        }
+    }
+
+    // ─────────────────────── 빛 수집 노트 ───────────────────────
+
+    private fun renderLightNote(visits: List<VisitLogEntity>) {
+        val progress = Missions.progress(visits)
+        noteAdapter.submitList(progress)
+        binding.tvLightNoteCount.text = getString(
+            R.string.my_light_note_count,
+            progress.count { it.isComplete },
+            progress.size
+        )
+    }
+
+    // ─────────────────────── 사진 내보내기 ───────────────────────
+
+    /**
+     * 직접 찍은 사진을 다른 앱으로 보냅니다.
+     *
+     * 사진은 이미 갤러리(MediaStore)에 있고 [VisitLogEntity.photoUri] 는 그
+     * 주소입니다. 그래서 파일을 새로 만들거나 압축하지 않고 공유 시트에
+     * 그대로 넘깁니다 — 앱이 사진을 한 벌 더 만들면 용량만 두 배가 됩니다.
+     */
+    private fun exportPhotos() {
+        val uris = viewModel.visits.value
+            .orEmpty()
+            .mapNotNull { it.photoUri }
+            .distinct()
+            .map(Uri::parse)
+
+        if (uris.isEmpty()) {
+            toast(getString(R.string.my_export_none))
+            return
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.my_export)
+            .setMessage(getString(R.string.my_export_message, uris.size))
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.confirm) { _, _ -> share(uris) }
+            .show()
+    }
+
+    private fun share(uris: List<Uri>) {
+        val intent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+            type = "image/*"
+            putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        try {
+            startActivity(Intent.createChooser(intent, getString(R.string.my_export)))
+        } catch (e: ActivityNotFoundException) {
+            toast(getString(R.string.my_export_failed))
+        }
+    }
+
+    // ─────────────────────── 데이터 초기화 ───────────────────────
+
+    private fun confirmReset() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.my_reset)
+            .setMessage(R.string.my_reset_message)
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.my_reset_confirm) { _, _ ->
+                viewModel.resetAll {
+                    if (_binding == null) return@resetAll
+                    toast(getString(R.string.my_reset_done))
+                }
+            }
+            .show()
     }
 
     // ─────────────────────── 접근성 · 글씨 크기 · 앱 정보 ───────────────────────
 
-    private fun showSeniorDialog() {
-        val enabling = !AppPrefs.isSeniorMode(requireContext())
+    /** 큰 글씨 모드와 글씨 크기를 한 자리에서 고릅니다. */
+    private fun showAccessibilityDialog() {
+        val seniorOn = AppPrefs.isSeniorMode(requireContext())
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(
-                if (enabling) R.string.senior_switch_title
-                else R.string.senior_switch_back_title
-            )
-            .setMessage(
-                if (enabling) R.string.senior_switch_desc
-                else R.string.senior_switch_back_desc
-            )
-            .setPositiveButton(R.string.confirm) { _, _ ->
-                AppPrefs.setSeniorMode(requireContext(), enabling)
+            .setTitle(R.string.my_accessibility)
+            .setMessage(if (seniorOn) R.string.my_senior_title_on else R.string.my_senior_desc)
+            .setPositiveButton(R.string.my_font_size) { _, _ -> showFontDialog() }
+            .setNeutralButton(
+                if (seniorOn) R.string.my_senior_off else R.string.my_senior_on
+            ) { _, _ ->
+                AppPrefs.setSeniorMode(requireContext(), !seniorOn)
                 // 테마와 탭 구성이 Activity 생성 시점에 정해지므로 재생성합니다.
                 requireActivity().recreate()
             }
@@ -291,11 +390,7 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
 
     private fun showFontDialog() {
         val steps = listOf(FontStep.NORMAL, FontStep.LARGE, FontStep.XLARGE)
-        val labels = arrayOf(
-            getString(R.string.font_size_normal),
-            getString(R.string.font_size_large),
-            getString(R.string.font_size_xlarge)
-        )
+        val labels = steps.map { it.label }.toTypedArray()
         val current = steps.indexOf(AppPrefs.fontStep(requireContext()))
 
         MaterialAlertDialogBuilder(requireContext())
@@ -323,6 +418,10 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
             .show()
     }
 
+    private fun toast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
     override fun scrollToTop() {
         _binding?.scrollMy?.smoothScrollTo(0, 0)
     }
@@ -330,5 +429,9 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private val DATE: DateTimeFormatter = DateTimeFormatter.ofPattern("M월 d일")
     }
 }

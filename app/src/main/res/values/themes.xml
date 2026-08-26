@@ -84,6 +84,12 @@
         <item name="cornerSize">@dimen/radius_card</item>
     </style>
 
+    <!-- 카드 안에 들어가는 작은 썸네일. 카드보다 덜 둥글어야 안쪽으로 읽힙니다. -->
+    <style name="Shape.Thumb" parent="ShapeAppearance.Material3.Corner.Medium">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
     <style name="MaterialAlertDialog.PicView.Title" parent="MaterialAlertDialog.Material3.Title.Text">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">@dimen/text_title</item>

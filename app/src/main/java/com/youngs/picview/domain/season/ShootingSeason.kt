@@ -1,5 +1,7 @@
 package com.youngs.picview.domain.season
 
+import androidx.annotation.DrawableRes
+import com.youngs.picview.R
 import java.time.LocalDate
 import java.time.MonthDay
 import java.time.YearMonth
@@ -61,7 +63,15 @@ data class SeasonHighlight(
     val peakEnd: MonthDay,
     val emoji: String,
     /** 그 시기에 어떻게 찍는지. */
-    val tip: String
+    val tip: String,
+    /**
+     * 그 절정을 보여 주는 관광공사 실사진.
+     *
+     * 전용 사진이 없는 절정(벚꽃·설경)은 같은 계절의 사진으로 대신합니다.
+     * 그림으로 흉내 내지 않습니다 — 언제 가야 이 장면인지를 말하는 카드라
+     * 실제로 그렇게 보이는 사진이라야 약속이 됩니다.
+     */
+    @DrawableRes val photoRes: Int
 ) {
     val season: Season get() = Season.entries.first { peakStart.monthValue in it.months }
 
@@ -112,7 +122,9 @@ object SeasonHighlights {
             peakStart = MonthDay.of(4, 1),
             peakEnd = MonthDay.of(4, 12),
             emoji = "🌸",
-            tip = "만개 후 사흘이 지나면 꽃비가 내립니다. 흐린 날이 꽃색이 더 곱게 나와요."
+            tip = "만개 후 사흘이 지나면 꽃비가 내립니다. 흐린 날이 꽃색이 더 곱게 나와요.",
+            // 정읍천 벚꽃은 관광공사 목록에 등록된 스팟이 아니라 전용 사진이 없습니다.
+            photoRes = R.drawable.season_spring
         ),
         SeasonHighlight(
             id = "spring_green",
@@ -122,7 +134,8 @@ object SeasonHighlights {
             peakStart = MonthDay.of(4, 25),
             peakEnd = MonthDay.of(5, 20),
             emoji = "🌱",
-            tip = "비 온 다음 날 아침이 가장 선명합니다. 계곡물과 함께 담아보세요."
+            tip = "비 온 다음 날 아침이 가장 선명합니다. 계곡물과 함께 담아보세요.",
+            photoRes = R.drawable.highlight_spring_green
         ),
         SeasonHighlight(
             id = "lotus",
@@ -132,7 +145,8 @@ object SeasonHighlights {
             peakStart = MonthDay.of(7, 10),
             peakEnd = MonthDay.of(8, 10),
             emoji = "🪷",
-            tip = "연꽃은 아침에 피고 한낮에 오므립니다. 해뜨고 두 시간 안에 가세요."
+            tip = "연꽃은 아침에 피고 한낮에 오므립니다. 해뜨고 두 시간 안에 가세요.",
+            photoRes = R.drawable.highlight_lotus
         ),
         SeasonHighlight(
             id = "valley",
@@ -142,7 +156,8 @@ object SeasonHighlights {
             peakStart = MonthDay.of(7, 15),
             peakEnd = MonthDay.of(8, 25),
             emoji = "💧",
-            tip = "숲속은 빛이 부족합니다. 흐린 날 장노출로 물을 부드럽게 담아보세요."
+            tip = "숲속은 빛이 부족합니다. 흐린 날 장노출로 물을 부드럽게 담아보세요.",
+            photoRes = R.drawable.highlight_valley
         ),
         SeasonHighlight(
             id = "gujeolcho",
@@ -152,7 +167,8 @@ object SeasonHighlights {
             peakStart = MonthDay.of(9, 20),
             peakEnd = MonthDay.of(10, 10),
             emoji = "🌼",
-            tip = "역광으로 담으면 흰 꽃잎이 투명하게 빛납니다. 일몰 한 시간 전이 최적."
+            tip = "역광으로 담으면 흰 꽃잎이 투명하게 빛납니다. 일몰 한 시간 전이 최적.",
+            photoRes = R.drawable.highlight_gujeolcho
         ),
         SeasonHighlight(
             id = "maple",
@@ -162,7 +178,8 @@ object SeasonHighlights {
             peakStart = MonthDay.of(10, 28),
             peakEnd = MonthDay.of(11, 15),
             emoji = "🍁",
-            tip = "대한민국 단풍 1번지. 단풍터널은 역광이 살아나는 늦은 오후가 절정입니다."
+            tip = "대한민국 단풍 1번지. 단풍터널은 역광이 살아나는 늦은 오후가 절정입니다.",
+            photoRes = R.drawable.highlight_maple
         ),
         SeasonHighlight(
             id = "snow",
@@ -172,7 +189,9 @@ object SeasonHighlights {
             peakStart = MonthDay.of(12, 20),
             peakEnd = MonthDay.of(2, 10),
             emoji = "❄️",
-            tip = "눈 온 다음 날 아침에만 볼 수 있습니다. 노출을 +1 정도 올려야 눈이 하얗게 나와요."
+            tip = "눈 온 다음 날 아침에만 볼 수 있습니다. 노출을 +1 정도 올려야 눈이 하얗게 나와요.",
+            // 관광공사 정읍 사진에 설경 컷이 없어 같은 계절 사진으로 대신합니다.
+            photoRes = R.drawable.season_winter
         ),
         SeasonHighlight(
             id = "ssanghwa",
@@ -182,7 +201,8 @@ object SeasonHighlights {
             peakStart = MonthDay.of(12, 1),
             peakEnd = MonthDay.of(2, 28),
             emoji = "☕",
-            tip = "김이 오르는 찻잔은 창가 역광에서 가장 잘 보입니다."
+            tip = "김이 오르는 찻잔은 창가 역광에서 가장 잘 보입니다.",
+            photoRes = R.drawable.highlight_ssanghwa
         )
     )
 

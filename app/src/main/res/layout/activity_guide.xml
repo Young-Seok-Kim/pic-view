@@ -86,6 +86,23 @@
                 android:textSize="@dimen/text_section"
                 android:textStyle="bold"
                 tools:text="내장산 국립공원" />
+
+            <!--
+              지금 고른 포즈의 예시 그림.
+
+              아래 포즈 칩 줄은 그대로 둡니다 — 무엇을 고를지는 거기서 정하고,
+              고른 것이 어떤 자세인지는 이 버튼이 그림으로 보여 줍니다.
+            -->
+            <ImageView
+                android:id="@+id/btn_guide_example"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="@dimen/space_s"
+                android:background="@drawable/bg_glass_circle"
+                android:contentDescription="@string/cd_pose_example"
+                android:padding="9dp"
+                android:src="@drawable/ic_help"
+                app:tint="@color/white" />
         </LinearLayout>
 
         <TextView

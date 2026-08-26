@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    포즈 예시 · 손 프레임.
+
+    손으로 만든 네모 안에 풍경이 들어옵니다. 네모 안쪽만 선명하게,
+    바깥은 옅게 두어 "손에 초점을 맞추면 배경이 부드러워진다"를 보여 줍니다.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="180dp"
+    android:viewportWidth="240"
+    android:viewportHeight="180">
+
+    <path android:fillColor="@color/golden_100" android:pathData="M0,0h240v180H0z" />
+    <!-- 흐릿한 바깥 풍경 -->
+    <path android:fillColor="@color/moss_100" android:pathData="M0,112c40,-26 84,-22 122,-2c30,16 74,14 118,-8v78H0z" />
+    <path android:fillColor="@color/sand_200" android:pathData="M0,150h240v30H0z" />
+
+    <!-- 손이 만든 네모 안 : 또렷한 장면 -->
+    <path android:fillColor="@color/golden_200" android:pathData="M78,52h84v58H78z" />
+    <path android:fillColor="@color/golden_500" android:pathData="M142,72m-11,0a11,11 0,1 1,22 0a11,11 0,1 1,-22 0" />
+    <path android:fillColor="@color/moss_500" android:pathData="M78,96c20,-16 42,-14 60,0c8,6 16,8 24,4v10H78z" />
+    <path android:fillColor="@color/sand_400" android:pathData="M78,110h84v-4H78z" />
+
+    <!-- 두 손 : 왼쪽 위 · 오른쪽 아래 모서리를 잡습니다 -->
+    <path android:fillColor="@color/maple_500" android:pathData="M62,36h16v82H62z" />
+    <path android:fillColor="@color/maple_500" android:pathData="M62,36h58v14H62z" />
+    <path android:fillColor="@color/maple_600" android:pathData="M162,44h16v82h-16z" />
+    <path android:fillColor="@color/maple_600" android:pathData="M120,112h58v14h-58z" />
+
+    <!-- 네모 테두리 강조 -->
+    <path android:strokeColor="@color/white" android:strokeWidth="2" android:fillColor="@android:color/transparent"
+        android:pathData="M78,52h84v58H78z" />
+</vector>

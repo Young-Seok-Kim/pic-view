@@ -123,7 +123,7 @@ object Missions {
      * 관광공사 분류에 "수변"이 없어서 이름으로 거릅니다. 정읍의 수변
      * 촬영지는 대부분 이름에 물이 들어갑니다(옥정호·내장저수지·용추폭포).
      */
-    private val WATER_PLACES = listOf(
+    val WATER_PLACES = listOf(
         "옥정호", "저수지", "연못", "폭포", "호수", "지방정원", "피향정"
     )
 

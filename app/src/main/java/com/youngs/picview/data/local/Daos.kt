@@ -48,6 +48,10 @@ interface CourseDao {
 
     @Query("SELECT COUNT(*) FROM saved_course")
     fun observeCourseCount(): Flow<Int>
+
+    /** 저장한 코스 전부. 정거장은 외래키 CASCADE 로 함께 지워집니다. */
+    @Query("DELETE FROM saved_course")
+    suspend fun deleteAllCourses()
 }
 
 @Dao
@@ -65,6 +69,9 @@ interface DiaryDao {
 
     @Query("DELETE FROM diary WHERE dateKey = :dateKey")
     suspend fun delete(dateKey: String)
+
+    @Query("DELETE FROM diary")
+    suspend fun deleteAll()
 }
 
 @Dao
@@ -108,4 +115,14 @@ interface VisitDao {
 
     @Query("DELETE FROM visit_log WHERE id = :id")
     suspend fun delete(id: Long)
+
+    /**
+     * 방문 기록 전부.
+     *
+     * 사진 파일은 건드리지 않습니다. [VisitLogEntity.photoUri] 는 갤러리에
+     * 있는 사진을 가리키는 주소일 뿐이라, 기록을 지운다고 사용자가 찍은
+     * 사진까지 지우면 앱이 월권을 하는 셈입니다.
+     */
+    @Query("DELETE FROM visit_log")
+    suspend fun deleteAll()
 }

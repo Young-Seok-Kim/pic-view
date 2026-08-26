@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  촬영 성향 막대.
+
+  ProgressBar 의 기본 막대는 모서리가 각져 카드 안에서 혼자 딱딱합니다.
+  트랙과 채움 모두 알약 모양으로 깎아 둡니다.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/sand_200" />
+            <corners android:radius="999dp" />
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape android:shape="rectangle">
+                <solid android:color="@color/maple_400" />
+                <corners android:radius="999dp" />
+            </shape>
+        </clip>
+    </item>
+</layer-list>

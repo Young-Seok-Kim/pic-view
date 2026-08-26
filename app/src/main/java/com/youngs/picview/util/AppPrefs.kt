@@ -95,6 +95,23 @@ object AppPrefs {
     }
 
     /**
+     * 기록성 설정만 지웁니다 — 찜한 촬영지와 날짜별 감정 태그.
+     *
+     * 큰 글씨 모드·글씨 크기·온보딩 여부·설치 식별자는 남깁니다. 그것들은
+     * "무엇을 했는가"가 아니라 "이 앱을 어떻게 쓰는가"라서, 기록 초기화로
+     * 함께 사라지면 화면이 갑자기 낯설어집니다.
+     */
+    fun clearRecords(context: Context) {
+        val p = prefs(context)
+        val editor = p.edit()
+        editor.remove(KEY_FAVORITES)
+        p.all.keys
+            .filter { it.startsWith(KEY_DIARY_FEELING_PREFIX) }
+            .forEach { editor.remove(it) }
+        editor.apply()
+    }
+
+    /**
      * 익명 설치 식별자. 최초 호출 시 생성해 저장합니다.
      * 개인정보가 아니며, 앱을 지우면 사라집니다.
      */

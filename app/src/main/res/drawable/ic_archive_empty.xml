@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  아직 사진이 없는 아카이브 자리.
+
+  실사진을 넣지 않습니다. 여기 들어갈 사진은 사용자가 찍은 것이라,
+  남의 사진을 미리 깔아 두면 "이미 뭔가 있다"는 오해가 생깁니다.
+  점선 액자 안에 능선과 해만 그려 "여기에 들어올 것"을 가리킵니다.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="72dp"
+    android:height="60dp"
+    android:viewportWidth="72"
+    android:viewportHeight="60">
+
+    <!-- 점선 액자 -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/card_stroke"
+        android:strokeWidth="2"
+        android:strokeLineJoin="round"
+        android:pathData="M6,8h60v44H6z" />
+
+    <!-- 해 -->
+    <path
+        android:fillColor="@color/golden_300"
+        android:pathData="M24,24m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" />
+
+    <!-- 능선 -->
+    <path
+        android:fillColor="@color/sand_300"
+        android:pathData="M8,52l16,-18 11,12 9,-9 20,15z" />
+</vector>

@@ -62,6 +62,23 @@ class CourseRepository(context: Context) {
 
     suspend fun get(courseId: Long): SavedCourseWithStops? = courseDao.getCourse(courseId)
 
+    /**
+     * 이 기기에 쌓인 기록을 전부 지웁니다 — 코스·방문·일기·찜·감정.
+     *
+     * 설정(큰 글씨 모드·글씨 크기·온보딩 여부)은 남깁니다. 기록을 지우겠다는
+     * 뜻이 "앱을 처음처럼 되돌려 달라"는 뜻은 아닙니다. 글씨를 크게 맞춰 둔
+     * 사람에게 기록 초기화가 글씨까지 되돌려 놓으면 그건 사고입니다.
+     *
+     * 갤러리의 사진 파일도 남깁니다. 사진은 사용자 것이고 이 앱은 그 주소만
+     * 들고 있었을 뿐입니다.
+     */
+    suspend fun clearAllRecords() {
+        courseDao.deleteAllCourses()
+        visitDao.deleteAll()
+        db.diaryDao().deleteAll()
+        AppPrefs.clearRecords(appContext)
+    }
+
     /** "내장산국립공원 외 4곳" 형태의 기본 이름. */
     private fun defaultTitle(course: ShootingCourse): String {
         val head = course.goldenStops.firstOrNull()?.spot?.title
@@ -122,6 +139,40 @@ class CourseRepository(context: Context) {
         val attached = visitDao.attachPhoto(spot.contentId, photoUri)
         if (attached > 0) return false
         return logVisit(spot, phase, photoUri)
+    }
+
+    /**
+     * 세 장 비교에서 고른 대표 컷을 기록에 붙입니다.
+     *
+     * [logCapture] 와 달리 [SpotItem] 을 요구하지 않습니다. 촬영 화면은
+     * 장소 이름과 식별자만 들고 있고, 좌표나 점수는 모릅니다. 대표 컷을
+     * 남기자고 없는 값을 지어낼 이유가 없습니다.
+     *
+     * 사진이 아직 안 붙은 그 장소의 기록이 있으면 거기에 붙이고, 없으면
+     * 새 기록을 만듭니다. 세 장 중 대표만 기록에 남고 나머지 둘도 갤러리에는
+     * 그대로 있습니다.
+     */
+    suspend fun attachPhoto(
+        contentId: String,
+        title: String,
+        phase: LightPhase,
+        photoUri: String
+    ) {
+        if (visitDao.attachPhoto(contentId, photoUri) > 0) return
+
+        visitDao.insert(
+            VisitLogEntity(
+                contentId = contentId,
+                title = title,
+                visitedAt = System.currentTimeMillis(),
+                // 장소 점수는 촬영 화면이 모릅니다. 0 은 "안 잼"이라는 뜻입니다.
+                score = 0,
+                imageUrl = "",
+                phaseName = phase.name,
+                installId = AppPrefs.installId(appContext),
+                photoUri = photoUri
+            )
+        )
     }
 
     companion object {

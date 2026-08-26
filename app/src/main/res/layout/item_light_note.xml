@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    빛 수집 노트 한 칸.
+
+    우표처럼 점선 테두리를 두르고, 받은 것과 못 받은 것을 바탕색과
+    모서리 배지로 가릅니다. 못 받은 칸도 그림을 보여 줍니다 — 무엇을
+    모을 수 있는지 알아야 모으고 싶어집니다. ([StampAdapter] 와 같은 뜻)
+
+    칸 크기는 전부 고정입니다. 배지 이름이 "계절 수집가"(5자)와
+    "나만의 큐레이터"(7자)처럼 길이가 달라, 높이를 내용에 맡기면 여덟 칸의
+    아래끝이 들쭉날쭉해집니다. 그림 상자도 스탬프 원본 비율(180:200)과
+    같은 45:50 으로 두어 어떤 스탬프든 똑같은 크기로 앉습니다.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="@dimen/space_s">
+
+    <!-- 가장 긴 배지 이름("나만의 큐레이터" 7자)이 한 줄에 들어가는 폭입니다.
+         좁으면 그 칸만 두 줄이 되어 여덟 칸의 글줄이 어긋나 보입니다. -->
+    <LinearLayout
+        android:id="@+id/layout_note_slot"
+        android:layout_width="92dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_note_slot_locked"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingHorizontal="4dp"
+        android:paddingVertical="@dimen/space_s">
+
+        <ImageView
+            android:id="@+id/iv_note_art"
+            android:layout_width="45dp"
+            android:layout_height="50dp"
+            android:contentDescription="@null"
+            android:scaleType="fitCenter"
+            tools:src="@drawable/stamp_water_mirror" />
+
+        <!--
+            두 줄로 고정합니다. 한 줄짜리 이름이 섞이면 칸마다 높이가 달라지고,
+            큰 글씨 모드에서는 세 줄로 번져 격자가 무너집니다.
+        -->
+        <TextView
+            android:id="@+id/tv_note_badge"
+            style="@style/Text.Stamp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:ellipsize="end"
+            android:gravity="center|top"
+            android:lineSpacingExtra="0dp"
+            android:maxLines="2"
+            android:minLines="2"
+            android:textSize="11sp"
+            tools:text="수면의 관찰자" />
+    </LinearLayout>
+
+    <!-- 받았는지 잠겼는지. 색만으로는 색각 이상이 있으면 안 갈립니다. -->
+    <ImageView
+        android:id="@+id/iv_note_state"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="3dp"
+        android:layout_marginBottom="3dp"
+        android:contentDescription="@null"
+        tools:src="@drawable/bg_check_badge" />
+</FrameLayout>
