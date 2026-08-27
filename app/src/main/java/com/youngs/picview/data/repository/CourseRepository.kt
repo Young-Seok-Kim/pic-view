@@ -58,6 +58,26 @@ class CourseRepository(context: Context) {
         return courseDao.saveCourse(entity, stops)
     }
 
+    /**
+     * 같은 날, 같은 곳들로 이미 저장된 코스가 있는지.
+     *
+     * '저장'을 두 번 누르거나 뒤로 갔다 다시 들어와 또 누르면 목록에
+     * 똑같은 카드가 둘 생겼습니다. 날짜와 정거장 구성(순서 포함)이 같으면
+     * 같은 코스로 봅니다 — 같은 곳들을 다른 순서로 도는 것은 다른 코스라
+     * 순서까지 봅니다.
+     */
+    suspend fun hasSameCourse(
+        course: ShootingCourse,
+        planDate: java.time.LocalDate
+    ): Boolean {
+        val signature = course.stops.map { it.spot.contentId }
+        if (signature.isEmpty()) return false
+
+        return courseDao.coursesOn(planDate.toEpochDay()).any { saved ->
+            saved.orderedStops.map { it.contentId } == signature
+        }
+    }
+
     suspend fun delete(courseId: Long) = courseDao.deleteCourse(courseId)
 
     suspend fun get(courseId: Long): SavedCourseWithStops? = courseDao.getCourse(courseId)

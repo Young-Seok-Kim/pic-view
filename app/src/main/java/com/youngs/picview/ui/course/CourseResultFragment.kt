@@ -23,6 +23,7 @@ import com.youngs.picview.data.repository.planDate
 import com.youngs.picview.data.repository.toShootingCourse
 import com.youngs.picview.databinding.FragmentCourseResultBinding
 import com.youngs.picview.domain.course.ShootingCourse
+import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.ui.detail.DetailFragment
 import com.youngs.picview.ui.main.MainViewModel
 import kotlinx.coroutines.launch
@@ -162,6 +163,30 @@ class CourseResultFragment : Fragment(R.layout.fragment_course_result) {
         // 날짜를 바꾸면 그 날짜의 일출·일몰을 새로 받아오는 동안 잠깐 뜹니다.
         courseViewModel.rescheduling.observe(viewLifecycleOwner) { busy ->
             binding.progressResult.isVisible = busy
+        }
+
+        courseViewModel.droppedPicks.observe(viewLifecycleOwner) { renderDropped(it) }
+    }
+
+    /**
+     * 담았는데 못 들어간 곳을 밝힙니다.
+     *
+     * 코스는 시간 안에 들어가는 곳만 세웁니다. 세 곳을 담았는데 두 곳만
+     * 나오면 말해 주지 않는 한 버그로 보입니다. 빠진 곳 이름과 그 장소가
+     * 기다리는 빛을 함께 적어, 왜 이번엔 안 맞았는지가 보이게 합니다.
+     */
+    private fun renderDropped(dropped: List<com.youngs.picview.ui.model.SpotItem>) {
+        val view = _binding ?: return
+        view.cardDropped.isVisible = dropped.isNotEmpty()
+        if (dropped.isEmpty()) return
+
+        val picked = courseViewModel.pickedCount
+        view.tvDroppedTitle.text = getString(
+            R.string.course_dropped_title, picked, picked - dropped.size
+        )
+        view.tvDroppedNames.text = dropped.joinToString("\n") { spot ->
+            val facts = SpotFactsTable.of(spot.title, spot.contentTypeId)
+            "${spot.title} · ${facts.bestPhase.label}에 좋은 곳"
         }
     }
 

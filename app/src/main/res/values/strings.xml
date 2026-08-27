@@ -162,6 +162,26 @@
     <string name="course_timeline">코스 타임라인</string>
     <!-- 타임라인 날짜 줄. 이틀 이상일 때만 몇째 날인지를 붙입니다. -->
     <string name="course_day_nth">%1$d일차 · %2$s</string>
+    <!-- 촬영지 직접 고르기 — "장소는 내가, 순서는 빛이" -->
+    <string name="picker_entry_title">직접 고르기</string>
+    <string name="picker_entry_none">찜한 곳으로 코스를 짤 수 있어요</string>
+    <string name="picker_entry_count">%1$d곳을 담았어요 · 순서는 빛이 정합니다</string>
+    <string name="picker_title">어디를 다녀올까요</string>
+    <string name="picker_sub">고르기만 하세요 · 순서는 빛이 세웁니다</string>
+    <string name="picker_clear">비우기</string>
+    <string name="picker_filter_all">전체</string>
+    <string name="picker_filter_favorite">찜한 곳</string>
+    <string name="picker_filter_picked">담은 곳</string>
+    <string name="picker_favorited">찜한 곳</string>
+    <string name="picker_toggle">코스에 담기</string>
+    <string name="picker_done_all">전체에서 코스 짜기</string>
+    <string name="picker_done_count">%1$d곳으로 코스 짜기</string>
+    <string name="picker_empty_spots">촬영지를 아직 불러오지 못했어요</string>
+    <string name="picker_empty_favorites">찜한 곳이 없어요.\n탐색이나 상세에서 하트를 눌러 담아 보세요.</string>
+    <string name="picker_empty_picked">아직 담은 곳이 없어요</string>
+    <!-- 담았는데 시간 안에 못 들어간 곳 안내 -->
+    <string name="course_dropped_title">담은 %1$d곳 중 %2$d곳이 들어갔어요</string>
+    <string name="course_dropped_hint">출발 시각을 당기거나 체류 시간을 늘리면 들어갈 수 있어요.</string>
     <string name="course_save">저장</string>
     <string name="course_saved">내 코스에 저장했어요</string>
     <string name="course_travel_format">↳ 이동 %1$d분 · %2$.1fkm</string>
@@ -221,7 +241,16 @@
     <string name="map_expand">지도 확대</string>
     <string name="cd_category_filter">카테고리 필터</string>
     <!-- 카드 하단 한 줄. 자동차 아이콘이 앞에 붙으므로 이모지를 뺐습니다. -->
-    <string name="spot_travel_minutes">차로 %1$d분</string>
+    <!--
+        기준을 밝혀 씁니다.
+
+        그냥 "차로 8분"이라고만 하면 누구나 **내 위치에서** 8분으로 읽는데,
+        실제로는 정읍 시내(시청 인근)에서 잰 거리입니다. 서울에서 계획을
+        짜는 사람에게 "내 위치에서 180분"은 쓸모가 없고, 정읍 안에서 곳과
+        곳 사이를 가늠하는 데는 시내 기준이 더 쓸모있습니다. 그래서 기준은
+        그대로 두고 말로 밝힙니다.
+    -->
+    <string name="spot_travel_minutes">시내에서 차로 %1$d분</string>
 
     <!-- 일기 — 감정과 다음 추천 (시안) -->
     <string name="diary_feelings_label">오늘의 감정</string>
@@ -235,7 +264,16 @@
     <string name="home_best_eyebrow">NEXT PHOTO · LIGHT MATCH</string>
     <string name="home_spot_time_today">오늘 %1$s</string>
     <string name="home_spot_time_tomorrow">내일 %1$s</string>
-    <string name="home_spot_plan_add">출사 계획에 담기</string>
+    <!--
+        장소 담기는 찜 하나로 통일했습니다.
+        예전에는 "출사 계획에 담기"가 1곳짜리 코스를 만들어 코스 목록에
+        넣었고, 담은 곳들이 모여 한 계획이 되는 게 아니라 따로 놀았습니다.
+    -->
+    <string name="home_spot_plan_add">담아 두기</string>
+    <string name="bookmark_added">찜했어요 · 코스 탭에서 골라 코스를 짤 수 있어요</string>
+    <string name="bookmark_removed">찜을 풀었어요</string>
+    <string name="bookmark_save_label">담아 두기</string>
+    <string name="bookmark_saved_label">담았음</string>
 
     <!-- 홈 → 시선 가이드 진입 배너 -->
     <string name="home_guide_eyebrow">JEONGEUP SISEON · GUIDE</string>
@@ -583,7 +621,7 @@
     <string name="map_reco_comp">추천 구성</string>
     <string name="map_one_line">사진가를 위한 한 줄</string>
     <string name="map_open_guide">시선 가이드 열기</string>
-    <string name="map_save_plan">출사 계획에 저장</string>
+    <string name="map_save_plan">담아 두기</string>
     <string name="map_step_discover">발견</string>
     <string name="map_step_select">선택</string>
     <string name="map_step_shoot">촬영</string>

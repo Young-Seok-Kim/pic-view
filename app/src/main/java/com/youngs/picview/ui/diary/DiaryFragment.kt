@@ -14,7 +14,7 @@ import com.youngs.picview.domain.guide.SiseonGuide
 import com.youngs.picview.domain.light.LightPhase
 import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.ui.main.MainViewModel
-import com.youngs.picview.util.PlanQuickSave
+import com.youngs.picview.util.SpotBookmark
 import kotlinx.coroutines.launch
 import java.time.LocalTime
 import com.youngs.picview.MainActivity
@@ -137,16 +137,20 @@ class DiaryFragment : Fragment(R.layout.fragment_diary), MainActivity.TabRoot {
         )
     }
 
-    /** "이 계획으로 출사 준비하기" — 한 곳짜리 출사 일정으로 저장합니다. */
+    /**
+     * "이 계획으로 출사 준비하기" — 그 장소를 찜해 둡니다.
+     *
+     * 예전에는 한 곳짜리 코스를 새로 만들어 코스 목록에 넣었습니다. 그래서
+     * 누를 때마다 1곳짜리 코스가 하나씩 생기고 서로 합쳐지지 않았습니다.
+     * 담아 둔 곳들로 코스를 짜는 길은 코스 탭의 '직접 고르기'에 있습니다.
+     */
     private fun prepareNext(rec: DiaryAdapter.NextRec) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            val saved = PlanQuickSave.save(requireContext(), rec.spot, mainViewModel.sunTimes)
-            Toast.makeText(
-                requireContext(),
-                if (saved) R.string.detail_plan_saved else R.string.detail_plan_failed,
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+        val added = SpotBookmark.toggle(requireContext(), rec.spot.contentId)
+        Toast.makeText(
+            requireContext(),
+            if (added) R.string.bookmark_added else R.string.bookmark_removed,
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     private fun applyTopInset() {

@@ -111,7 +111,18 @@ class SpotAdapter(
     fun updateData(newList: List<SpotItem>) = submitList(newList)
 
     companion object {
-        /** 정읍 시내 기준점(시청 인근). 거리·이동 시간의 출발점입니다. */
+        /**
+         * 거리·이동 시간의 출발점 — 정읍 시내(시청 인근).
+         *
+         * **내 위치가 아닙니다.** 목록은 대개 집에서 계획을 짤 때 보는
+         * 화면이라, 내 위치 기준으로 재면 모든 곳이 "차로 180분"이 되어
+         * 곳과 곳을 견줄 수가 없습니다. 시내를 원점으로 두면 정읍 안에서의
+         * 멀고 가까움이 그대로 읽힙니다. 화면 문구도 "시내에서 차로 8분"
+         * 으로 기준을 밝혀 씁니다(R.string.spot_travel_minutes).
+         *
+         * 현장에서 실제로 움직일 때 쓰는 "내 위치 기준"은 지도 시트가
+         * 따로 계산합니다([com.youngs.picview.ui.map.MapFragment]).
+         */
         val CITY_CENTER = LatLng(35.5699, 126.8559)
 
         private val DIFF = object : DiffUtil.ItemCallback<SpotItem>() {

@@ -114,6 +114,15 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
         renderTimeline()
 
         binding.cardCourseDate.setOnClickListener { pickDate() }
+        binding.cardPickSpots.setOnClickListener {
+            (activity as? MainActivity)?.pushScreen(SpotPickerFragment())
+        }
+
+        // 담은 곳이 바뀌면 요약 줄과 미리보기가 함께 따라옵니다.
+        courseViewModel.pickedIds.observe(viewLifecycleOwner) {
+            renderPickSummary()
+            resetPreview()
+        }
         binding.btnMakeCourse.setOnClickListener { generate() }
         binding.tvOtherCourse.setOnClickListener {
             variantIndex++
@@ -347,6 +356,22 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
 
     private fun color(resId: Int) = ContextCompat.getColor(requireContext(), resId)
 
+    /**
+     * "3곳을 담았어요 · 순서는 빛이 정합니다".
+     *
+     * 담은 곳이 없으면 그 사실을 나무라지 않고 무엇을 할 수 있는지만
+     * 말합니다 — 안 담아도 전체에서 코스가 나오기 때문입니다.
+     */
+    private fun renderPickSummary() {
+        val view = _binding ?: return
+        val count = courseViewModel.pickedCount
+        view.tvPickSummary.text = if (count == 0) {
+            getString(R.string.picker_entry_none)
+        } else {
+            getString(R.string.picker_entry_count, count)
+        }
+    }
+
     // ─────────────────────── 조건 카드 ───────────────────────
 
     private fun buildConditionCards() {
@@ -552,7 +577,9 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
         val view = _binding ?: return
         val spots = mainViewModel.spotData.value.orEmpty()
 
-        val course = if (spots.isEmpty()) null else planVariant(spots)
+        // 직접 고른 곳이 있으면 그것만으로 짭니다("장소는 내가, 순서는 빛이").
+        val pool = courseViewModel.poolFor(spots)
+        val course = if (pool.isEmpty()) null else planVariant(pool)
 
         val stops = course?.stops.orEmpty()
         previewAdapter.submitList(stops)
@@ -618,7 +645,8 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
         // 미리보기에 떠 있는 변형과 같은 코스가 결과 화면에 나오도록
         // 그 변형의 촬영지 풀을 그대로 넘깁니다.
         courseViewModel.generate(
-            variantPool.ifEmpty { spots }, activeSunTimes, buildRequest(), tripDate
+            variantPool.ifEmpty { courseViewModel.poolFor(spots) },
+            activeSunTimes, buildRequest(), tripDate
         )
 
         val course = courseViewModel.course.value
@@ -640,7 +668,7 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
         }
 
         // 미리보기에 떠 있는 변형을 그대로 저장합니다.
-        val course: ShootingCourse? = planVariant(spots)
+        val course: ShootingCourse? = planVariant(courseViewModel.poolFor(spots))
         if (course == null || course.isEmpty) {
             showError(getString(R.string.course_no_result))
             return
@@ -676,7 +704,14 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
                 .takeIf { it > start } ?: LocalTime.of(23, 30),
             travelMode = travelMode(),
             subjects = subjects.toSet(),
-            maxStops = if (hours >= 8) 6 else if (hours >= 5) 5 else 3,
+            // 체류 시간이 정하는 상한. 다만 **직접 고른 곳은 상한이 되지
+            // 않게** 합니다 — 여덟 곳을 골라 놓고 셋만 나오면 고른 뜻이
+            // 사라집니다. 시간 안에 안 들어가는 곳은 배치 단계에서
+            // 자연히 빠지므로, 여기서 미리 자를 이유가 없습니다.
+            maxStops = maxOf(
+                if (hours >= 8) 6 else if (hours >= 5) 5 else 3,
+                courseViewModel.pickedCount
+            ),
             stayFactor = stayFactor()
         )
     }

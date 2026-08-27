@@ -49,6 +49,11 @@ interface CourseDao {
     @Query("SELECT COUNT(*) FROM saved_course")
     fun observeCourseCount(): Flow<Int>
 
+    /** 그 날짜에 저장된 코스들. 같은 코스를 두 번 저장하지 않으려고 씁니다. */
+    @Transaction
+    @Query("SELECT * FROM saved_course WHERE planDateEpochDay = :epochDay")
+    suspend fun coursesOn(epochDay: Long): List<SavedCourseWithStops>
+
     /** 저장한 코스 전부. 정거장은 외래키 CASCADE 로 함께 지워집니다. */
     @Query("DELETE FROM saved_course")
     suspend fun deleteAllCourses()

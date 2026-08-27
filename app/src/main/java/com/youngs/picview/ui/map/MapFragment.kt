@@ -41,7 +41,7 @@ import com.youngs.picview.ui.guide.GuideOverlayView
 import com.youngs.picview.ui.guide.SiseonGuideActivity
 import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.ui.model.SpotItem
-import com.youngs.picview.util.PlanQuickSave
+import com.youngs.picview.util.SpotBookmark
 import com.youngs.picview.util.TravelMode
 import com.youngs.picview.util.applyTopSystemBarInset
 import com.youngs.picview.util.distanceKmTo
@@ -515,15 +515,33 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
         return "${purpose.label} + $second"
     }
 
+    /**
+     * 시트의 담기 — 찜 토글.
+     *
+     * 예전에는 한 곳짜리 코스를 만들어 코스 목록에 넣었습니다. 지도에서
+     * 여러 곳을 담아도 코스 하나로 모이지 않고 1곳짜리 코스가 여럿
+     * 생겼습니다. 지금은 찜으로 모이고, 코스 탭의 '직접 고르기'에서
+     * 그 찜한 곳을 골라 코스를 짭니다.
+     */
     private fun savePlan(spot: SpotItem) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            val saved = PlanQuickSave.save(requireContext(), spot, viewModel.sunTimes)
-            Toast.makeText(
-                requireContext(),
-                if (saved) R.string.detail_plan_saved else R.string.detail_plan_failed,
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+        val added = SpotBookmark.toggle(requireContext(), spot.contentId)
+        renderSheetSaveState(spot)
+        Toast.makeText(
+            requireContext(),
+            if (added) R.string.bookmark_added else R.string.bookmark_removed,
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    /** 담긴 곳인지 시트에 표시합니다. 눌렀는데 아무 변화가 없으면 안 됩니다. */
+    private fun renderSheetSaveState(spot: SpotItem) {
+        val saved = SpotBookmark.isSaved(requireContext(), spot.contentId)
+        binding.btnSheetBookmark.setImageResource(
+            if (saved) R.drawable.ic_heart_filled else R.drawable.ic_heart
+        )
+        binding.btnSheetSave.setText(
+            if (saved) R.string.bookmark_saved_label else R.string.bookmark_save_label
+        )
     }
 
     override fun onDestroyView() {
