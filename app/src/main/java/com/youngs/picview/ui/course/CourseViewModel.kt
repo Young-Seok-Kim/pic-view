@@ -5,6 +5,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.youngs.picview.BuildConfig
+import com.youngs.picview.data.api.RetrofitClient
 import com.youngs.picview.data.repository.CourseRepository
 import com.youngs.picview.domain.course.CoursePlanner
 import com.youngs.picview.domain.course.CourseRequest
@@ -13,6 +15,7 @@ import com.youngs.picview.domain.course.ShootingCourse
 import com.youngs.picview.domain.course.TemplateNarrator
 import com.youngs.picview.domain.light.SunTimes
 import com.youngs.picview.ui.model.SpotItem
+import com.youngs.picview.util.retryOrNull
 import kotlinx.coroutines.launch
 
 /** 코스 저장 진행 상태. */
@@ -58,6 +61,27 @@ class CourseViewModel(app: Application) : AndroidViewModel(app) {
     var planDate: java.time.LocalDate = java.time.LocalDate.now()
         private set
 
+    /**
+     * 마지막 생성에 쓴 재료.
+     *
+     * 결과 화면에서 날짜·시각만 바꿔 다시 짤 수 있어야 하는데, 그러려면
+     * 촬영지 풀과 나머지 조건(동행·체류·이동·목적)을 그대로 들고 있어야
+     * 합니다. 없으면 입력 화면까지 되돌아가 처음부터 고르게 됩니다.
+     */
+    private var lastSpots: List<SpotItem> = emptyList()
+    private var lastRequest: CourseRequest? = null
+
+    /** 결과 화면에서 날짜·시각을 고칠 수 있는 상태인지. 저장된 코스는 불가. */
+    val canReschedule: Boolean get() = lastRequest != null
+
+    /** 지금 코스의 출발 시각. 날짜를 바꿔도 시각은 그대로 이어 갑니다. */
+    val startTime: java.time.LocalTime?
+        get() = lastRequest?.startTime
+
+    /** 다시 짜는 중인지. 천문 조회가 끼어 있어 즉시 끝나지 않습니다. */
+    private val _rescheduling = MutableLiveData(false)
+    val rescheduling: LiveData<Boolean> = _rescheduling
+
     fun generate(
         spots: List<SpotItem>,
         sun: SunTimes,
@@ -65,6 +89,9 @@ class CourseViewModel(app: Application) : AndroidViewModel(app) {
         date: java.time.LocalDate = java.time.LocalDate.now()
     ) {
         planDate = date
+        lastSpots = spots
+        lastRequest = request
+
         val result = CoursePlanner.plan(spots, sun, request)
         _course.value = result
         _saved.value = SaveState.IDLE
@@ -96,6 +123,65 @@ class CourseViewModel(app: Application) : AndroidViewModel(app) {
             if (text.isNotEmpty()) _narration.value = text
             _narrating.value = false
         }
+    }
+
+    /**
+     * 날짜·출발 시각만 바꿔 같은 조건으로 다시 짭니다.
+     *
+     * 결과를 보고 나서야 "한 시간 늦게 나갈걸", "이건 내일 하자"가 생깁니다.
+     * 그때마다 입력 화면으로 되돌아가 동행·체류·이동·목적을 다시 고르게
+     * 하면 아무도 고치지 않습니다. 나머지 조건은 그대로 두고 둘만 바꿉니다.
+     *
+     * 고른 날짜의 일출·일몰을 새로 받아오는 것이 핵심입니다. 오늘 값을
+     * 그대로 쓰면 몇 주 뒤 코스의 골든아워 슬롯이 통째로 어긋납니다
+     * (정읍 일몰은 8월 19:34, 12월 17:25).
+     *
+     * @param fallbackSun 천문 조회가 실패했을 때 쓸 값(대개 오늘 것).
+     */
+    fun reschedule(
+        date: java.time.LocalDate,
+        startAt: java.time.LocalTime,
+        fallbackSun: SunTimes
+    ) {
+        val base = lastRequest ?: return
+        val spots = lastSpots
+        if (spots.isEmpty()) return
+
+        _rescheduling.value = true
+
+        viewModelScope.launch {
+            val sun = sunTimesFor(date) ?: fallbackSun
+
+            // 체류 시간(끝 - 시작)은 유지한 채 시작만 옮깁니다.
+            // 자정을 넘기면 LocalTime 이 되감기므로 23:30 에서 끊습니다.
+            val span = java.time.Duration.between(base.startTime, base.endTime).toMinutes()
+            val end = startAt.plusMinutes(span)
+                .takeIf { it > startAt } ?: java.time.LocalTime.of(23, 30)
+
+            _rescheduling.value = false
+            generate(spots, sun, base.copy(startTime = startAt, endTime = end), date)
+        }
+    }
+
+    /**
+     * 그 날짜의 일출·일몰. 오늘이면 호출자가 이미 들고 있으므로 null 을 줍니다.
+     * 실패해도 null 로 돌아가 호출자가 가진 값으로 이어 갑니다.
+     */
+    private suspend fun sunTimesFor(date: java.time.LocalDate): SunTimes? {
+        if (date == java.time.LocalDate.now()) return null
+
+        val locdate = date.format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE)
+        val astro = retryOrNull("ASTRO_DATE") {
+            RetrofitClient.weatherApiService.getAreaRiseSetInfo(
+                BuildConfig.TOUR_API_KEY, locdate
+            )
+        }?.response?.body?.items?.item ?: return null
+
+        return SunTimes(
+            sunrise = SunTimes.parse(astro.sunrise),
+            sunset = SunTimes.parse(astro.sunset),
+            meridian = SunTimes.parse(astro.meridian)
+        )
     }
 
     fun saveCurrent() {

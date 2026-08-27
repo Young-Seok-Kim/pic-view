@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 타임라인 날짜 구분선의 알약. 정거장 카드와 겨루지 않게 옅게 둡니다. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/maple_50" />
+    <corners android:radius="@dimen/radius_pill" />
+</shape>
