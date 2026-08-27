@@ -448,12 +448,14 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
-                        <TextView
+                        <ImageView
                             android:layout_width="36dp"
                             android:layout_height="36dp"
-                            android:gravity="center"
-                            android:text="🌄"
-                            android:textSize="18sp" />
+                            android:background="@drawable/bg_tl_node_plain"
+                            android:contentDescription="@null"
+                            android:padding="6dp"
+                            android:src="@drawable/ic_sunrise_line"
+                            app:tint="@color/golden_600" />
 
                         <TextView
                             style="@style/Text.Caption"
@@ -483,13 +485,14 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
-                        <TextView
+                        <ImageView
                             android:layout_width="36dp"
                             android:layout_height="36dp"
                             android:background="@drawable/bg_tl_node"
-                            android:gravity="center"
-                            android:text="🌅"
-                            android:textSize="15sp" />
+                            android:contentDescription="@null"
+                            android:padding="7dp"
+                            android:src="@drawable/ic_golden_hour_line"
+                            app:tint="@color/maple_500" />
 
                         <TextView
                             style="@style/Text.Caption"
@@ -519,12 +522,14 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
-                        <TextView
+                        <ImageView
                             android:layout_width="36dp"
                             android:layout_height="36dp"
-                            android:gravity="center"
-                            android:text="🌇"
-                            android:textSize="18sp" />
+                            android:background="@drawable/bg_tl_node_plain"
+                            android:contentDescription="@null"
+                            android:padding="6dp"
+                            android:src="@drawable/ic_sunset_line"
+                            app:tint="@color/maple_600" />
 
                         <TextView
                             style="@style/Text.Caption"

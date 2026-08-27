@@ -104,6 +104,26 @@
                 tools:text="🌅 지금은 석양 · 일몰까지 58분 · 반사 추천" />
         </com.google.android.material.card.MaterialCardView>
 
+        <!--
+            스토리를 고른 순간의 즉시 피드백.
+            칩을 눌러도 지도만 조용히 바뀌면 "눌렸나?" 싶습니다.
+            "지금 달 코스 12곳" 한 줄이 선택과 결과를 잇습니다.
+        -->
+        <TextView
+            android:id="@+id/tv_story_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            android:background="@drawable/bg_story_badge"
+            android:paddingHorizontal="@dimen/space_m"
+            android:paddingVertical="6dp"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_caption"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:text="🌙 지금 달 코스 12곳"
+            tools:visibility="visible" />
+
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -325,10 +345,11 @@
             android:paddingVertical="@dimen/space_s">
 
             <TextView
+                android:id="@+id/tv_legend_title"
                 style="@style/Text.Caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/map_legend_title"
+                android:text="@string/map_legend_purpose"
                 android:textStyle="bold" />
 
             <LinearLayout

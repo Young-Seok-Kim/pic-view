@@ -1,7 +1,10 @@
 package com.youngs.picview.ui.detail
 
+import android.content.res.ColorStateList
 import android.graphics.PorterDuff
 import android.view.LayoutInflater
+import android.view.View
+import android.widget.LinearLayout
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -45,12 +48,48 @@ class PlaceMissionAdapter(
                 R.string.mission_count, item.current, item.target
             )
             tvPlaceMissionCount.setTextColor(ContextCompat.getColor(context, type.colorRes))
+            renderDots(layoutPlaceMissionDots, item.current, item.target, type.colorRes)
 
             rowPlaceMission.setOnClickListener { onPick(item) }
         }
     }
 
+    /**
+     * 진행도를 도트로도 겹쳐 보여 줍니다 (●●○).
+     *
+     * 숫자는 좁은 칸에서 가장 먼저 잘리는 것입니다. 도트는 잘려도 남은
+     * 개수가 보이고, 무엇보다 "두 개 중 하나"가 계산 없이 읽힙니다.
+     */
+    private fun renderDots(container: LinearLayout, current: Int, target: Int, colorRes: Int) {
+        container.removeAllViews()
+        if (target <= 0 || target > MAX_DOTS) return
+
+        val context = container.context
+        val density = context.resources.displayMetrics.density
+        val size = (5 * density).toInt()
+        val gap = (3 * density).toInt()
+        val filled = ContextCompat.getColor(context, colorRes)
+        val empty = ContextCompat.getColor(context, R.color.divider)
+
+        repeat(target) { index ->
+            container.addView(
+                View(context).apply {
+                    setBackgroundResource(R.drawable.dot_indicator_active)
+                    backgroundTintList = ColorStateList.valueOf(
+                        if (index < current) filled else empty
+                    )
+                    layoutParams = LinearLayout.LayoutParams(size, size).apply {
+                        if (index > 0) marginStart = gap
+                    }
+                }
+            )
+        }
+    }
+
     companion object {
+        /** 도트로 세는 것이 숫자보다 빠른 한계. 이보다 많으면 숫자만 둡니다. */
+        private const val MAX_DOTS = 6
+
         private val DIFF = object : DiffUtil.ItemCallback<MissionProgress>() {
             override fun areItemsTheSame(oldItem: MissionProgress, newItem: MissionProgress) =
                 oldItem.mission.id == newItem.mission.id

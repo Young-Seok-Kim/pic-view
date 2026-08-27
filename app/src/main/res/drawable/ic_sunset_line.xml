@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    일몰 — 일출과 같은 지평선·해에 꺾쇠만 아래로 뒤집었습니다.
+    두 아이콘이 한 벌로 읽혀야 타임라인의 양 끝이 짝으로 보입니다.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M2,18.6h20v2h-20z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M11,9.4c-4.3,0 -7.8,3.2 -8,7.2h16c-0.2,-4 -3.7,-7.2 -8,-7.2z" />
+    <!-- 아래로 내려가는 꺾쇠 -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M18.2,1.4l-1.4,1.4 3.4,3.4 3.4,-3.4 -1.4,-1.4 -2,2z" />
+</vector>

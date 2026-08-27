@@ -37,7 +37,7 @@ class CoursePreviewAdapter(
         with(holder.binding) {
             tvStopOrdinal.text = ordinalOf(position)
             tvStopTitle.text = stop.spot.title
-            tvStopAddr.text = stop.spot.addr1
+            tvStopAddr.text = shortAddress(stop.spot.addr1)
             tvStopArrive.text = stop.arriveAt.format(HOUR_MINUTE)
 
             tvStopTravel.text = if (stop.travelMinutes > 0) {
@@ -60,6 +60,18 @@ class CoursePreviewAdapter(
             cardStop.setOnClickListener { onClick(stop) }
         }
     }
+
+    /**
+     * 시·도 접두어를 뗀 주소.
+     *
+     * TourAPI 는 "전북특별자치도 정읍시 시기4길 13"처럼 줍니다. 정읍만
+     * 다루는 화면에서 앞의 여덟 글자는 매 카드마다 같은 말을 반복하며
+     * 정작 필요한 길 이름을 밀어냅니다.
+     */
+    private fun shortAddress(addr: String): String = addr
+        .removePrefix("전북특별자치도 ")
+        .removePrefix("전라북도 ")
+        .trim()
 
     /** 시안 표기(1st·2nd…)를 따릅니다. 4번째부터는 4th, 5th 로 이어집니다. */
     private fun ordinalOf(position: Int): String = when (position) {

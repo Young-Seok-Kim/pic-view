@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    스토리 배지 바탕. 색은 코드에서 스토리 색으로 갈아 끼웁니다
+    (MapFragment.renderStoryBadge). 여기 값은 미리보기용 기본값입니다.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/story_moon" />
+    <corners android:radius="14dp" />
+</shape>

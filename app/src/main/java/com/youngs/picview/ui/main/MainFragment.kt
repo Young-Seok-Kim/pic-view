@@ -5,9 +5,12 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.youngs.picview.MainActivity
 import com.youngs.picview.R
 import com.youngs.picview.databinding.FragmentMainBinding
@@ -19,6 +22,7 @@ import com.youngs.picview.ui.detail.DetailFragment
 import com.youngs.picview.ui.guide.SiseonGuideActivity
 import com.youngs.picview.ui.map.MapFragment
 import com.youngs.picview.ui.model.SpotItem
+import com.youngs.picview.util.AppPrefs
 import com.youngs.picview.util.LatLng
 import com.youngs.picview.util.distanceKmTo
 import java.time.Duration
@@ -70,9 +74,11 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     private fun setObserve() {
         spotAdapter = SpotAdapter(
             onItemClick = { spot -> openDetail(spot) },
-            onGuideClick = { spot -> openGuide(spot) }
+            onGuideClick = { spot -> openGuide(spot) },
+            onFavoriteClick = { spot -> toastFavorite(spot) }
         )
         binding.rvPhotoSpots.adapter = spotAdapter
+        setupMapLink()
 
         viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
             binding.progressBar.isVisible = loading
@@ -83,7 +89,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         }
 
         viewModel.filteredSpots.observe(viewLifecycleOwner) { filteredList ->
-            spotAdapter.updateData(sorted(filteredList))
+            val ordered = sorted(filteredList)
+            spotAdapter.updateData(ordered)
+            renderMapPins(ordered)
             renderListState(filteredList.isEmpty())
         }
 
@@ -137,6 +145,74 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         getString(R.string.home_duration_hm, minutes / 60, minutes % 60)
     } else {
         getString(R.string.home_duration_m, minutes)
+    }
+
+    // ───────────────────── 약도 ↔ 목록 연동 ─────────────────────
+
+    /**
+     * 약도의 핀 셋에 지금 목록의 맨 위 세 곳을 앉힙니다.
+     *
+     * 예전에는 "내장산 자락"·"정읍사공원"이 레이아웃에 박혀 있어, 정렬을
+     * 바꾸든 카테고리를 걸든 약도는 늘 같은 그림이었습니다. 그러니 위에
+     * 지도가 있어도 아래 목록과 아무 관계가 없었습니다.
+     */
+    private fun renderMapPins(spots: List<SpotItem>) {
+        val view = _binding ?: return
+        val pins = listOf(
+            Triple(view.layoutMapPin1, view.ivMapPin1, view.tvMapPin1),
+            Triple(view.layoutMapPin2, view.ivMapPin2, view.tvMapPin2),
+            Triple(view.layoutMapPin3, view.ivMapPin3, view.tvMapPin3)
+        )
+        pins.forEachIndexed { index, (group, _, label) ->
+            val spot = spots.getOrNull(index)
+            group.isVisible = spot != null
+            label.text = spot?.title.orEmpty()
+        }
+        highlightPin(0)
+    }
+
+    /**
+     * 목록을 스크롤하면 맨 위에 온 카드의 핀이 커집니다.
+     *
+     * 실제 지도를 살아 있는 채로 얹으면 목록 스크롤과 지도 스크롤이
+     * 싸우므로, 약도 쪽을 목록에 맞춰 움직이는 방향으로 이었습니다.
+     */
+    private fun setupMapLink() {
+        binding.rvPhotoSpots.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
+                    val first = (rv.layoutManager as? LinearLayoutManager)
+                        ?.findFirstVisibleItemPosition() ?: return
+                    highlightPin(first)
+                }
+            }
+        )
+    }
+
+    /** 지금 보고 있는 카드의 핀만 크게. 나머지는 원래 크기로 돌립니다. */
+    private fun highlightPin(position: Int) {
+        val view = _binding ?: return
+        listOf(view.ivMapPin1, view.ivMapPin2, view.ivMapPin3)
+            .forEachIndexed { index, pin ->
+                val active = index == position
+                pin.animate()
+                    .scaleX(if (active) 1.45f else 1f)
+                    .scaleY(if (active) 1.45f else 1f)
+                    .setDuration(160)
+                    .start()
+            }
+    }
+
+    private fun toastFavorite(spot: SpotItem) {
+        Toast.makeText(
+            requireContext(),
+            if (AppPrefs.isFavorite(requireContext(), spot.contentId)) {
+                R.string.detail_favorited
+            } else {
+                R.string.detail_unfavorited
+            },
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     // ───────────────────── 정렬 ─────────────────────
@@ -199,7 +275,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
                 R.id.chip_sort_light -> SortMode.LIGHT
                 else -> SortMode.RECO
             }
-            spotAdapter.updateData(sorted(viewModel.filteredSpots.value.orEmpty()))
+            val ordered = sorted(viewModel.filteredSpots.value.orEmpty())
+            spotAdapter.updateData(ordered)
+            renderMapPins(ordered)
             binding.rvPhotoSpots.scrollToPosition(0)
             binding.appbar.setExpanded(true, true)
         }

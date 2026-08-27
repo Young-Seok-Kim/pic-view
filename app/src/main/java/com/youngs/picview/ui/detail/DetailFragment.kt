@@ -2,6 +2,7 @@ package com.youngs.picview.ui.detail
 
 import android.content.Intent
 import android.net.Uri
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -54,6 +55,7 @@ import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import java.time.LocalTime
 import kotlin.math.roundToInt
+import com.youngs.picview.util.OverviewDigest
 import com.youngs.picview.util.OverviewFormatter
 
 class DetailFragment : Fragment(R.layout.fragment_detail) {
@@ -662,7 +664,8 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
         // 강점 둘과 발목을 잡은 것 하나를 엮어 설명합니다.
         // 항목 하나만 보여 주면 "비가 오지 않아요" 로 끝나 버립니다.
-        binding.tvScoreTitle.text = getString(R.string.detail_score_title, score.total)
+        binding.tvScoreTitle.setText(R.string.detail_score_title)
+        binding.gaugeScore.score = score.total
         binding.tvScoreHeadline.text = score.summary
 
         container.removeAllViews()
@@ -870,7 +873,7 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
         val cachedTip = detailCache[spot.contentId]
         if (cachedTip != null) {
             audioText = cachedTip
-            _binding?.tvDetailTip?.text = OverviewFormatter.format(cachedTip)
+            renderOverview(cachedTip)
             return
         }
 
@@ -888,12 +891,50 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                 detailCache[spot.contentId] = overview
 
                 audioText = overview
-                _binding?.tvDetailTip?.text = OverviewFormatter.format(overview)
+                renderOverview(overview)
             } catch (e: Exception) {
                 Log.e("DETAIL_ERROR", "API 호출 실패: ", e)
-                _binding?.tvDetailTip?.text =
+                renderOverview(
                     "이곳은 삼분할 구도를 활용해 배경과 인물을 배치하면 더욱 안정적인 사진을 얻을 수 있습니다."
+                )
             }
+        }
+    }
+
+    /**
+     * 장소 설명을 세 갈래로 나눠 앉힙니다.
+     *
+     *   태그   — 어떤 곳인지 한눈에 (#공연장 #전시)
+     *   세 줄  — 접어 둔 채로도 남는 요지
+     *   전문   — 펼친 사람만 보는 원문 (형광펜 그대로)
+     *
+     * 셋 다 같은 원문에서 나오므로 서로 어긋나지 않고, 요약은 원문의
+     * 앞 문장을 그대로 써 없는 말이 섞이지 않습니다.
+     */
+    private fun renderOverview(overview: String) {
+        val view = _binding ?: return
+
+        view.tvDetailTip.text = OverviewFormatter.format(overview)
+        view.tvInfoSummary.text = OverviewDigest.summaryOf(overview)
+
+        val tags = OverviewDigest.tagsOf(overview)
+        view.chipsInfoTags.removeAllViews()
+        view.chipsInfoTags.isVisible = tags.isNotEmpty()
+        tags.forEach { tag ->
+            view.chipsInfoTags.addView(
+                Chip(requireContext()).apply {
+                    text = tag
+                    isCheckable = false
+                    isClickable = false
+                    chipStrokeWidth = 0f
+                    textSize = 12f
+                    chipBackgroundColor = ColorStateList.valueOf(
+                        ContextCompat.getColor(requireContext(), R.color.maple_50)
+                    )
+                    setTextColor(ContextCompat.getColor(requireContext(), R.color.maple_700))
+                    chipMinHeight = 28 * resources.displayMetrics.density
+                }
+            )
         }
     }
 

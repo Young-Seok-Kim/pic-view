@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.youngs.picview.MainActivity
 import com.youngs.picview.R
 import com.youngs.picview.data.repository.CourseRepository
+import com.youngs.picview.data.repository.planDate
 import com.youngs.picview.data.repository.toShootingCourse
 import com.youngs.picview.databinding.FragmentCourseResultBinding
 import com.youngs.picview.domain.course.ShootingCourse
@@ -76,6 +77,7 @@ class CourseResultFragment : Fragment(R.layout.fragment_course_result) {
 
         courseViewModel.course.observe(viewLifecycleOwner) { course ->
             course ?: return@observe
+            renderDate(courseViewModel.planDate)
             render(course)
         }
 
@@ -111,6 +113,7 @@ class CourseResultFragment : Fragment(R.layout.fragment_course_result) {
 
             view.tvResultTitle.text = saved.course.title
             view.tvResultNarration.text = saved.course.summary
+            renderDate(saved.course.planDate())
             render(saved.toShootingCourse())
         }
     }
@@ -122,17 +125,48 @@ class CourseResultFragment : Fragment(R.layout.fragment_course_result) {
 
         val fmt = DateTimeFormatter.ofPattern("HH:mm")
         val sun = course.sun
-        binding.tvResultSun.text = if (sun.hasData) {
-            getString(
-                R.string.course_sun_format,
-                sun.sunrise!!.format(fmt),
-                sun.sunset!!.format(fmt)
-            )
+        if (sun.hasData) {
+            binding.tvResultSunrise.text =
+                getString(R.string.course_sunrise_at, sun.sunrise!!.format(fmt))
+            binding.tvResultSunset.text =
+                getString(R.string.course_sunset_at, sun.sunset!!.format(fmt))
         } else {
-            getString(R.string.course_sun_unknown)
+            binding.tvResultSunrise.text = getString(R.string.course_sun_unknown)
+            binding.tvResultSunset.text = ""
         }
 
-        binding.tvResultStats.text = course.fallbackSummary()
+        renderStats(course)
+    }
+
+    /**
+     * 숫자 세 칸 — 몇 곳 · 얼마나 걸리나 · 얼마나 머나.
+     *
+     * 예전에는 이 셋이 "3곳 · 2시간 54분 · 3km" 한 줄이라 값과 값 사이가
+     * 가운뎃점 하나로만 갈렸습니다. 칸을 나누고 라벨을 아래에 붙이면
+     * 훑어보는 것만으로 어느 숫자가 무엇인지 읽힙니다.
+     */
+    private fun renderStats(course: ShootingCourse) {
+        binding.tvResultStatCount.text = getString(R.string.course_stat_count, course.stops.size)
+
+        val hours = course.totalMinutes / 60
+        val minutes = course.totalMinutes % 60
+        binding.tvResultStatTime.text = when {
+            hours <= 0 -> getString(R.string.home_duration_m, minutes.toLong())
+            minutes == 0 -> getString(R.string.course_stat_hours, hours)
+            else -> getString(R.string.home_duration_hm, hours.toLong(), minutes.toLong())
+        }
+
+        binding.tvResultStatDistance.text =
+            getString(R.string.course_stat_km, course.totalDistanceKm)
+    }
+
+    /** 이 코스가 어느 날의 것인지. 저장한 코스는 저장된 날짜를 씁니다. */
+    private fun renderDate(date: java.time.LocalDate) {
+        binding.tvResultDate.text = date.format(
+            DateTimeFormatter.ofPattern(
+                getString(R.string.course_date_format), java.util.Locale.KOREAN
+            )
+        )
     }
 
     private fun applyTopInset() {

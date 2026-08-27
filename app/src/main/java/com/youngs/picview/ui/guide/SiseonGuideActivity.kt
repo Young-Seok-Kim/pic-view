@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.content.res.ColorStateList
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -30,9 +32,11 @@ import com.youngs.picview.databinding.DialogPhotoSourceBinding
 import com.youngs.picview.databinding.DialogSiseonMissionBinding
 import com.youngs.picview.databinding.ItemGuidePhotoBinding
 import com.youngs.picview.databinding.ItemMissionSlotBinding
+import com.youngs.picview.databinding.ItemMissionStepBinding
 import com.youngs.picview.domain.guide.SiseonGuide
 import com.youngs.picview.domain.guide.SiseonGuideItem
 import com.youngs.picview.util.MediaStoreSaver
+import com.youngs.picview.util.TtsController
 import com.youngs.picview.util.applyTopSystemBarInset
 import kotlin.math.abs
 
@@ -55,6 +59,16 @@ class SiseonGuideActivity : AppCompatActivity() {
     private var spotTitle: String? = null
 
     private val checkState = BooleanArray(SiseonGuide.checklist.size)
+
+    /**
+     * 미션을 소리로 읽어 줍니다.
+     *
+     * 촬영 중에는 화면을 볼 손도 눈도 없습니다. 공들여 쓴 안내가 읽히지
+     * 않는 가장 큰 이유라, 같은 문장을 귀로도 받게 합니다.
+     */
+    private val tts by lazy {
+        TtsController(this).also { lifecycle.addObserver(it) }
+    }
 
     // ── 미션 상태. 다이얼로그가 닫혀도 이어서 볼 수 있게 화면이 들고 있습니다.
     private var missionBinding: DialogSiseonMissionBinding? = null
@@ -190,13 +204,70 @@ class SiseonGuideActivity : AppCompatActivity() {
         renderTodayLine()
     }
 
+    /**
+     * 날씨 탭이 바꾸는 모든 것.
+     *
+     * 예전에는 여기서 문구 넷만 갈아 끼웠습니다. 그래서 탭을 눌러도
+     * 사진과 구도가 그대로라 "필터가 왜 있지"가 됐습니다. 지금은
+     * 참고 사진·라벨·볼 것·전용 기능·복습 질문·색까지 함께 바뀝니다.
+     */
     private fun renderContext() {
         val context = SiseonGuide.contextById(contextId)
         binding.tvLightLabel.text = context.label
         binding.tvLightTitle.text = context.title
         binding.tvLightHint.text = context.hint
         binding.tvLightDetail.text = context.detail
+
+        val tone = ContextCompat.getColor(this, context.toneRes)
+
+        // ① 참고 사진 + 라벨
+        binding.ivWeatherPhoto.setImageResource(context.photoRes)
+        binding.tvWeatherLabelEn.text = context.photoLabelEn
+        binding.tvWeatherLabelKo.text = context.photoLabelKo
+        binding.layoutWeatherLabel.background?.mutate()?.setTint(tone)
+
+        // ② 이 날씨의 컨셉과 볼 것
+        binding.tvWeatherConcept.text = "${context.emoji} ${context.chipLabel} · ${context.concept}"
+        binding.tvWeatherConcept.setTextColor(tone)
+        binding.tvWeatherPoint.text = context.guidePoint
+
+        // ③ 전용 기능 두셋
+        binding.chipsWeatherTools.removeAllViews()
+        context.tools.forEach { tool ->
+            binding.chipsWeatherTools.addView(
+                Chip(this).apply {
+                    text = tool
+                    isCheckable = false
+                    isClickable = false
+                    chipBackgroundColor = ColorStateList.valueOf(
+                        ContextCompat.getColor(this@SiseonGuideActivity, context.toneContainerRes)
+                    )
+                    setTextColor(tone)
+                    chipStrokeWidth = 0f
+                }
+            )
+        }
+
+        // ④ MY FRAME 복습 질문
+        binding.tvFrameQuestion.text = "${context.emoji} ${context.frameQuestion}"
+
         renderTodayLine()
+    }
+
+    /**
+     * 날씨를 고르면 구도 캐러셀도 그 날씨의 구도로 옮겨 갑니다.
+     *
+     * 사진만 바뀌고 아래 구도 설명이 그대로면 화면이 두 이야기를 합니다.
+     * 사용자가 직접 캐러셀을 넘긴 뒤에는 건드리지 않습니다 — 그때는
+     * 구도를 고르는 중이라 발밑이 흔들리면 안 됩니다.
+     */
+    private fun syncGuideToContext() {
+        val target = SiseonGuide.items.indexOfFirst {
+            it.id == SiseonGuide.contextById(contextId).guideId
+        }
+        if (target >= 0 && target != selectedIndex) {
+            binding.vpGuide.setCurrentItem(target, true)
+        }
     }
 
     /** 오늘의 추천 한 장. 홈에서 온 장소가 있으면 그 이름으로 말합니다. */
@@ -213,15 +284,57 @@ class SiseonGuideActivity : AppCompatActivity() {
         binding.tvTodayMeta.text = "${context.value} · ${context.hint}"
     }
 
+    /**
+     * 날씨 탭.
+     *
+     * 여섯 탭이 같은 색이면 무엇을 고른 상태인지 글자를 읽어야 압니다.
+     * 이모지 + 날씨 톤 색으로 이중 코딩해 훑기만 해도 구분되게 합니다.
+     */
     private fun setupContextChips() {
         SiseonGuide.contexts.forEach { context ->
+            val tone = ContextCompat.getColor(this, context.toneRes)
+            val container = ContextCompat.getColor(this, context.toneContainerRes)
             binding.chipsGuideContext.addView(
                 Chip(this).apply {
                     id = android.view.View.generateViewId()
-                    text = context.chipLabel
+                    text = "${context.emoji} ${context.chipLabel}"
                     isCheckable = true
                     isChecked = context.id == contextId
                     tag = context.id
+                    // 고른 탭만 그 날씨의 색으로 채웁니다.
+                    chipBackgroundColor = ColorStateList(
+                        arrayOf(
+                            intArrayOf(android.R.attr.state_checked),
+                            intArrayOf()
+                        ),
+                        intArrayOf(container, ContextCompat.getColor(this@SiseonGuideActivity, R.color.bg_card))
+                    )
+                    setTextColor(
+                        ColorStateList(
+                            arrayOf(
+                                intArrayOf(android.R.attr.state_checked),
+                                intArrayOf()
+                            ),
+                            intArrayOf(
+                                tone,
+                                ContextCompat.getColor(
+                                    this@SiseonGuideActivity, R.color.text_secondary
+                                )
+                            )
+                        )
+                    )
+                    chipStrokeWidth = 1 * resources.displayMetrics.density
+                    chipStrokeColor = ColorStateList(
+                        arrayOf(
+                            intArrayOf(android.R.attr.state_checked),
+                            intArrayOf()
+                        ),
+                        intArrayOf(
+                            tone,
+                            ContextCompat.getColor(this@SiseonGuideActivity, R.color.divider)
+                        )
+                    )
+                    isCheckedIconVisible = false
                 }
             )
         }
@@ -229,6 +342,7 @@ class SiseonGuideActivity : AppCompatActivity() {
             val chip = checked.firstOrNull()?.let { group.findViewById<Chip>(it) }
             contextId = (chip?.tag as? String) ?: contextId
             renderContext()
+            syncGuideToContext()
         }
     }
 
@@ -290,21 +404,50 @@ class SiseonGuideActivity : AppCompatActivity() {
         sheet.tvMissionGoal.text = context.detail
 
         // 현장 체크 세 줄 — 구도의 기준점, 지금 빛의 할 일, 비교 한 번 더.
+        //
+        // 각 줄은 "할 일 한 줄 + 참고 사진 한 장"입니다. 부연은 접어 두고
+        // 궁금한 사람만 폅니다. 셋을 다 읽지 않아도 촬영을 시작할 수 있어야
+        // 합니다 — 현장에서 글을 읽는 사람은 없습니다.
         val steps = listOf(
-            getString(R.string.mission_step_first, item.title) to item.tip,
-            context.title to context.hint,
-            getString(R.string.mission_step_last) to getString(R.string.mission_step_last_hint)
+            Triple(
+                getString(R.string.mission_step_first, item.title), item.tip, item.imageRes
+            ),
+            Triple(context.title, context.detail, context.photoRes),
+            Triple(
+                getString(R.string.mission_step_last),
+                getString(R.string.mission_step_last_hint),
+                0
+            )
         )
         sheet.layoutMissionSteps.removeAllViews()
-        steps.forEachIndexed { index, (title, hint) ->
-            sheet.layoutMissionSteps.addView(
-                CheckBox(this).apply {
-                    text = "$title\n$hint"
-                    setOnCheckedChangeListener { _, checked ->
-                        missionChecks[index] = checked
-                        renderMissionProgress()
-                    }
-                }
+        steps.forEachIndexed { index, (title, detail, photoRes) ->
+            val step = ItemMissionStepBinding.inflate(
+                layoutInflater, sheet.layoutMissionSteps, false
+            )
+            step.tvStepTitle.text = title
+            step.tvStepDetail.text = detail
+            step.ivStepPhoto.isVisible = photoRes != 0
+            if (photoRes != 0) step.ivStepPhoto.setImageResource(photoRes)
+
+            step.tvStepMore.setOnClickListener {
+                val open = !step.tvStepDetail.isVisible
+                step.tvStepDetail.isVisible = open
+                step.tvStepMore.setText(
+                    if (open) R.string.mission_step_less else R.string.mission_step_more
+                )
+            }
+            step.cbStep.setOnCheckedChangeListener { _, checked ->
+                missionChecks[index] = checked
+                renderMissionProgress()
+            }
+            sheet.layoutMissionSteps.addView(step.root)
+        }
+
+        // 읽기 대신 듣기. 세 줄을 그대로 이어 읽어 줍니다.
+        sheet.btnMissionTts.setOnClickListener {
+            tts.toggle(
+                (listOf(context.detail) + steps.map { it.first })
+                    .joinToString(" ") { it.trimEnd('.') + "." }
             )
         }
 
@@ -324,7 +467,10 @@ class SiseonGuideActivity : AppCompatActivity() {
         dialog.setContentView(sheet.root)
         dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         dialog.behavior.skipCollapsed = true
-        dialog.setOnDismissListener { missionBinding = null }
+        dialog.setOnDismissListener {
+            missionBinding = null
+            tts.stop()
+        }
         sheet.btnMissionClose.setOnClickListener { dialog.dismiss() }
         sheet.btnMissionComplete.setOnClickListener { dialog.dismiss() }
 
@@ -342,6 +488,17 @@ class SiseonGuideActivity : AppCompatActivity() {
             photo.isVisible = uri != null
             empty.isVisible = uri == null
             uri?.let { Glide.with(this).load(it).centerCrop().into(photo) }
+
+            // 사진이 들어오면 그 스텝의 체크가 저절로 켜집니다.
+            // 찍었는데 체크까지 손으로 눌러야 하면 '읽고 확인하는 일'이
+            // 하나 더 늘어납니다. 행동이 곧 완료가 되게 합니다.
+            if (uri != null && !missionChecks[index]) {
+                missionChecks[index] = true
+                sheet.layoutMissionSteps
+                    .getChildAt(index)
+                    ?.findViewById<CheckBox>(R.id.cb_step)
+                    ?.isChecked = true
+            }
         }
         sheet.tvMissionPhotoCount.text =
             getString(R.string.mission_added, missionPhotos.count { it != null })

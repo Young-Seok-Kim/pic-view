@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    방문 상태 배지 바탕. 색은 코드에서 '다녀옴/아직'에 따라 갈아 끼웁니다
+    (FavoritesFragment). 여기 값은 미리보기용 기본값입니다.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/bg_card_muted" />
+    <corners android:radius="@dimen/radius_pill" />
+</shape>

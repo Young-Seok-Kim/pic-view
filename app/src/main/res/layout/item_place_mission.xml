@@ -58,12 +58,37 @@
             tools:text="다음 황금시간에 한 장 더 남겨보세요" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tv_place_mission_count"
-        style="@style/Text.Caption"
+    <!--
+        진행도.
+
+        예전에는 "1 / 2" 를 wrap_content 텍스트 하나로 두었는데, 옆의
+        제목이 늘어나면 밀려 "0 /" 처럼 잘렸습니다. 폭을 넉넉히 고정하고
+        (숫자 두 자리까지 들어갑니다) 그 위에 도트를 얹어, 글자가 잘려도
+        몇 개 남았는지는 도트로 읽히게 했습니다.
+    -->
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/space_s"
-        android:textStyle="bold"
-        tools:text="1 / 2" />
+        android:layout_marginStart="@dimen/space_m"
+        android:gravity="end"
+        android:minWidth="44dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_place_mission_count"
+            style="@style/Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:textStyle="bold"
+            tools:text="1/2" />
+
+        <LinearLayout
+            android:id="@+id/layout_place_mission_dots"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:orientation="horizontal" />
+    </LinearLayout>
 </LinearLayout>

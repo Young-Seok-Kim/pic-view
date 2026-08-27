@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    타임라인 양 끝(일출·일몰) 노드.
+    가운데 골든아워 노드는 테두리를 둘러 강조하고, 양 끝은 옅은 바탕만
+    깔아 줄 위에 앉은 것처럼 보이게 합니다.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@color/bg_card" />
+</shape>

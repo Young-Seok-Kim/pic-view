@@ -63,7 +63,17 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- ── 요약 카드 ── -->
+            <!--
+              ── 오늘의 코스 요약 ──
+
+              예전에는 단풍색 한 덩어리 안에 세 줄이 같은 무게로 쌓여
+              무엇이 제목이고 무엇이 수치인지 읽히지 않았고, 날짜가
+              어디에도 없어 "언제의 코스인지"를 모른 채 보게 됐습니다.
+
+              지금은 세 층입니다 — 날짜(언제) → 한 줄 설명(왜 이 순서) →
+              숫자 세 칸(몇 곳·얼마·얼마나 멀리). 일출·일몰은 이모지 대신
+              아이콘을 달고 좌우 두 칸으로 나눕니다.
+            -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -80,33 +90,145 @@
                     android:padding="@dimen/space_l">
 
                     <TextView
-                        android:id="@+id/tv_result_sun"
+                        android:id="@+id/tv_result_date"
                         style="@style/Text.Caption"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#E6FFFFFF"
-                        tools:text="🌅 일출 05:47 · 일몰 19:39" />
+                        android:letterSpacing="0.06"
+                        android:textColor="#B3FFFFFF"
+                        tools:text="2026년 8월 27일 (목)" />
 
                     <TextView
                         android:id="@+id/tv_result_narration"
-                        style="@style/Text.Body"
+                        style="@style/Text.Title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/space_s"
+                        android:layout_marginTop="@dimen/space_xs"
                         android:textColor="@color/white"
-                        tools:text="내장산의 일몰 골든아워에 맞춰 동선을 짰어요. 빛이 강한 한낮엔 쌍화차거리로 잠시 피해 가세요." />
+                        tools:text="내장산의 일몰 골든아워에 맞춰 동선을 짰어요." />
 
-                    <TextView
-                        android:id="@+id/tv_result_stats"
-                        style="@style/Text.Caption"
+                    <!-- 일출·일몰 — 하루의 양 끝이라 좌우로 맞붙입니다. -->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_m"
                         android:background="@drawable/bg_pill_dark"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal"
                         android:paddingHorizontal="@dimen/space_m"
-                        android:paddingVertical="@dimen/space_xs"
-                        android:textColor="@color/white"
-                        tools:text="5곳 · 6시간 7분 · 27km" />
+                        android:paddingVertical="@dimen/space_s">
+
+                        <TextView
+                            android:id="@+id/tv_result_sunrise"
+                            style="@style/Text.Caption"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:drawablePadding="6dp"
+                            android:gravity="center_vertical"
+                            android:textColor="@color/white"
+                            app:drawableStartCompat="@drawable/ic_sunrise_line"
+                            app:drawableTint="@color/golden_300"
+                            tools:text="일출 06:00" />
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="16dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginHorizontal="@dimen/space_m"
+                            android:background="#33FFFFFF" />
+
+                        <TextView
+                            android:id="@+id/tv_result_sunset"
+                            style="@style/Text.Caption"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:drawablePadding="6dp"
+                            android:gravity="center_vertical"
+                            android:textColor="@color/white"
+                            app:drawableStartCompat="@drawable/ic_sunset_line"
+                            app:drawableTint="@color/golden_300"
+                            tools:text="일몰 19:09" />
+                    </LinearLayout>
+
+                    <!-- 숫자 세 칸. 값을 크게, 라벨을 아래 작게 둡니다. -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_l"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tv_result_stat_count"
+                                style="@style/Text.SectionTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                tools:text="3곳" />
+
+                            <TextView
+                                style="@style/Text.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/course_stat_places"
+                                android:textColor="#99FFFFFF"
+                                android:textSize="10sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tv_result_stat_time"
+                                style="@style/Text.SectionTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                tools:text="2시간 54분" />
+
+                            <TextView
+                                style="@style/Text.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/course_stat_duration"
+                                android:textColor="#99FFFFFF"
+                                android:textSize="10sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tv_result_stat_distance"
+                                style="@style/Text.SectionTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                tools:text="3km" />
+
+                            <TextView
+                                style="@style/Text.Caption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/course_stat_distance"
+                                android:textColor="#99FFFFFF"
+                                android:textSize="10sp" />
+                        </LinearLayout>
+                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

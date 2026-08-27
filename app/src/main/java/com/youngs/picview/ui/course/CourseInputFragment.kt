@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.youngs.picview.BuildConfig
 import com.youngs.picview.MainActivity
@@ -77,6 +79,15 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
 
     /** 다녀올 날짜. 기본은 오늘입니다. */
     private var tripDate: LocalDate = LocalDate.now()
+
+    /**
+     * 출발 시각. null 이면 날짜가 정합니다 — 오늘이면 지금, 다른 날이면 오전 9시.
+     *
+     * 예전에는 이 값을 고를 수 없어 "오늘 지금부터 네 시간"만 돌렸고,
+     * 저녁 열면 세 칸이 전부 야간으로 채워졌습니다. 내일 새벽에
+     * 나가려는 사람은 그 코스를 오늘 밤에 짜 수 없었습니다.
+     */
+    private var startAt: LocalTime? = null
 
     private var partyIndex = 0
     private var durationIndex = 1
@@ -362,6 +373,9 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
             Condition(R.string.course_cond_party, R.drawable.ic_people, {
                 partyLabels()[partyIndex]
             }) { pickSingle(R.string.course_cond_party, partyLabels(), partyIndex) { partyIndex = it } },
+            Condition(R.string.course_cond_start, R.drawable.ic_sun, {
+                startTime().format(HOUR_MINUTE)
+            }) { pickStartTime() },
             Condition(R.string.course_cond_duration, R.drawable.ic_clock, {
                 durationLabels()[durationIndex]
             }) { pickSingle(R.string.course_cond_duration, durationLabels(), durationIndex) { durationIndex = it } },
@@ -673,8 +687,32 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
      * 오늘이면 지금부터 — 이미 지난 시각으로 코스를 짤 수 없습니다.
      * 다른 날짜면 오전 9시부터 하루를 계획합니다.
      */
-    private fun startTime(): LocalTime =
-        if (tripDate == LocalDate.now()) LocalTime.now() else LocalTime.of(9, 0)
+    private fun startTime(): LocalTime = startAt
+        ?: if (tripDate == LocalDate.now()) LocalTime.now() else LocalTime.of(9, 0)
+
+    /**
+     * 출발 시각 고르기.
+     *
+     * 지역을 넓히면 하루짜리 코스가 아니게 됩니다. 그때
+     * "몇 시에 시작하느냐"는 날짜만큼 큰 조건이라, 지금부터
+     * 고를 수 있게 둘니다.
+     */
+    private fun pickStartTime() {
+        val current = startTime()
+        val picker = MaterialTimePicker.Builder()
+            .setTimeFormat(TimeFormat.CLOCK_24H)
+            .setHour(current.hour)
+            .setMinute(current.minute)
+            .setTitleText(R.string.course_cond_start)
+            .build()
+
+        picker.addOnPositiveButtonClickListener {
+            startAt = LocalTime.of(picker.hour, picker.minute)
+            renderConditionValues()
+            resetPreview()
+        }
+        picker.show(parentFragmentManager, "course_start_time")
+    }
 
     private fun durationHours(): Int = when (durationIndex) {
         0 -> 2

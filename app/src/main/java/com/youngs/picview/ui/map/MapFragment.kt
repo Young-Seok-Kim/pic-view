@@ -221,6 +221,7 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
     private fun setupChips() {
         binding.chipsStory.setOnCheckedStateChangeListener { _, checkedIds ->
             selectedStory = checkedIds.firstOrNull()?.let(storyByChip::get)
+            buildLegend()
             refreshMarkers()
         }
         binding.chipsPurpose.setOnCheckedStateChangeListener { _, checkedIds ->
@@ -242,12 +243,46 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
         }
     }
 
-    /** 촬영 목적 범례. 마커와 같은 색·같은 순서로 다섯 줄을 만듭니다. */
+    /**
+     * 스토리를 고른 순간의 피드백 — "🌙 지금 달 코스 12곳".
+     *
+     * 칩을 눌러도 지도만 바뀌면 무엇이 걸러졌는지 세어 봐야 압니다.
+     * 고른 이야기의 이름과 곳 수를 그 이야기의 색으로 되돌려 줍니다.
+     */
+    private fun renderStoryBadge(count: Int) {
+        val badge = binding.tvStoryBadge
+        val story = selectedStory
+        if (story == null) {
+            badge.isVisible = false
+            return
+        }
+        badge.isVisible = true
+        badge.text = "${story.emoji} " + getString(R.string.map_story_badge, story.label, count)
+        badge.background?.mutate()?.setTint(
+            ContextCompat.getColor(requireContext(), story.colorRes)
+        )
+    }
+
+    /**
+     * 지도 범례. 스토리를 고르면 마커의 축이 바뀌므로 범례도 함께 바뀝니다.
+     * 마커는 스토리 색인데 범례가 목적 색이면 서로 다른 지도를 설명합니다.
+     */
     private fun buildLegend() {
         val container = binding.layoutLegendRows
         container.removeAllViews()
 
-        ShotPurpose.values().forEach { purpose ->
+        val story = selectedStory
+        binding.tvLegendTitle.setText(
+            if (story == null) R.string.map_legend_purpose else R.string.map_legend_story
+        )
+
+        val rows: List<Pair<String, Int>> = if (story == null) {
+            ShotPurpose.values().map { it.label to it.colorRes }
+        } else {
+            SpotStory.values().map { "${it.emoji} ${it.label}" to it.colorRes }
+        }
+
+        rows.forEach { (text, colorRes) ->
             val row = LinearLayout(requireContext()).apply {
                 orientation = LinearLayout.HORIZONTAL
                 gravity = android.view.Gravity.CENTER_VERTICAL
@@ -257,13 +292,13 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
             val dot = ImageView(requireContext()).apply {
                 setImageResource(R.drawable.dot_indicator_active)
                 imageTintList = android.content.res.ColorStateList.valueOf(
-                    ContextCompat.getColor(requireContext(), purpose.colorRes)
+                    ContextCompat.getColor(requireContext(), colorRes)
                 )
                 layoutParams = LinearLayout.LayoutParams(dp(10), dp(10))
             }
 
             val label = TextView(requireContext()).apply {
-                text = purpose.label
+                this.text = text
                 setTextColor(ContextCompat.getColor(requireContext(), R.color.text_secondary))
                 textSize = 11f
                 setPadding(dp(6), 0, 0, 0)
@@ -330,11 +365,16 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
             Entry(spot, position, facts, purpose)
         }
 
+        // 스토리를 고른 동안에는 마커의 축이 바뀝니다.
+        // 목적(반사·실루엣…)은 "무엇을 찍는가"의 축이라, '달을 따라 걷기'를
+        // 골라도 마커가 그대로면 스토리를 고른 값이 화면에 남지 않습니다.
+        val story = selectedStory
+
         entries.forEach { entry ->
             val marker = Marker()
             marker.position = entry.position
             marker.captionText = entry.spot.title
-            marker.icon = OverlayImage.fromResource(entry.purpose.markerRes)
+            marker.icon = OverlayImage.fromResource(story?.markerRes ?: entry.purpose.markerRes)
             // 핀의 아래 꼭짓점이 실제 좌표를 가리키게 합니다.
             marker.anchor = PointF(0.5f, 1.0f)
 
@@ -354,12 +394,16 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
             markers.add(marker)
         }
 
+        renderStoryBadge(entries.size)
+
         // 스토리를 골랐고 몇 곳으로 좁혀졌으면 추천 순서대로 걷기 동선을 잇습니다.
         // (spotData 는 포토스코어 내림차순으로 정렬돼 있습니다)
-        if (selectedStory != null && entries.size in 2..6) {
+        if (story != null && entries.size in 2..6) {
             route = PolylineOverlay().apply {
                 coords = entries.map { it.position }
-                color = ContextCompat.getColor(requireContext(), R.color.golden_500)
+                // 동선도 그 스토리의 색으로 잇습니다. 마커와 선이 따로 놀면
+                // 걷는 순서가 이 이야기의 것이라는 게 읽히지 않습니다.
+                color = ContextCompat.getColor(requireContext(), story.colorRes)
                 width = dp(3)
                 setPattern(dp(8), dp(8))
                 this.map = map

@@ -120,6 +120,10 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
         }
         binding.layoutStatMissions.setOnClickListener(openMissions)
 
+        binding.cardFavorites.setOnClickListener {
+            (activity as? MainActivity)?.pushScreen(FavoritesFragment())
+        }
+
         binding.btnTodayShoot.setOnClickListener { startTodayShoot() }
         binding.btnNextPlan.setOnClickListener {
             (activity as? MainActivity)?.pushScreen(CourseInputFragment())
@@ -226,6 +230,27 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
             .toString()
 
         binding.tvStatMission.text = Missions.progress(visits).count { it.isComplete }.toString()
+
+        renderFavoritesSummary(visits)
+    }
+
+    /**
+     * 찜 줄의 한 줄 요약 — "8곳 · 아직 안 간 곳 5".
+     *
+     * 개수만 적으면 눌러 볼 이유가 약합니다. 아직 남은 곳 수가 보이면
+     * 그것이 곧 다음에 나갈 이유가 됩니다.
+     */
+    private fun renderFavoritesSummary(visits: List<VisitLogEntity>) {
+        val view = _binding ?: return
+        val favorites = AppPrefs.favoriteSpots(requireContext())
+        val visited = visits.map { it.contentId }.toSet()
+        val todo = favorites.count { it !in visited }
+
+        view.tvFavoritesSummary.text = if (favorites.isEmpty()) {
+            getString(R.string.favorites_summary_empty)
+        } else {
+            getString(R.string.favorites_summary, favorites.size, todo)
+        }
     }
 
     // ─────────────────────── 최근 촬영 아카이브 ───────────────────────

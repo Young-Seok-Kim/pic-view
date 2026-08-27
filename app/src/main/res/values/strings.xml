@@ -129,6 +129,7 @@
     <string name="course_pick_hint">선택하신 조건으로 최적의 출사 코스를 추천해드려요</string>
     <string name="course_cond_date">날짜</string>
     <string name="course_cond_party">동행</string>
+    <string name="course_cond_start">출발 시각</string>
     <string name="course_cond_duration">체류 시간</string>
     <string name="course_cond_travel">이동 방법</string>
     <string name="course_cond_subject">촬영 목적</string>
@@ -141,7 +142,8 @@
     <string name="course_reco_badge_format">추천 %1$d</string>
     <string name="course_other">다른 코스 보기 ›</string>
     <string name="course_arrive_label">도착 권장 시각</string>
-    <string name="course_travel_time_label">🚘 이동 시간</string>
+    <!-- 앞에 자동차 아이콘이 붙으므로 이모지를 뺐습니다. -->
+    <string name="course_travel_time_label">이동 시간</string>
     <string name="course_travel_minutes">%1$d분</string>
     <string name="course_travel_start">출발지</string>
     <string name="course_action_label">추천 촬영 행동</string>
@@ -160,7 +162,16 @@
     <string name="course_saved">내 코스에 저장했어요</string>
     <string name="course_travel_format">↳ 이동 %1$d분 · %2$.1fkm</string>
     <string name="course_guide_format">📷 추천 구도 · %1$s</string>
-    <string name="course_sun_format">🌅 일출 %1$s · 일몰 %2$s</string>
+    <!-- 결과 요약 카드 — 이모지 대신 아이콘을 쓰므로 글자만 남깁니다. -->
+    <string name="course_sunrise_at">일출 %1$s</string>
+    <string name="course_sunset_at">일몰 %1$s</string>
+    <!-- 숫자 세 칸 : 값(크게)과 라벨(작게)을 따로 씁니다. -->
+    <string name="course_stat_count">%1$d곳</string>
+    <string name="course_stat_hours">%1$d시간</string>
+    <string name="course_stat_km">%1$.0fkm</string>
+    <string name="course_stat_places">촬영지</string>
+    <string name="course_stat_duration">소요 시간</string>
+    <string name="course_stat_distance">이동 거리</string>
     <string name="course_sun_unknown">🌅 일출·일몰 정보를 불러오지 못했어요</string>
     <string name="course_next_golden">다음 골든아워까지 %1$d시간 %2$d분</string>
     <string name="course_golden_now">지금 골든아워예요 · 바로 나가보세요</string>
@@ -205,8 +216,8 @@
     <string name="sort_light">빛 좋은 시간순</string>
     <string name="map_expand">지도 확대</string>
     <string name="cd_category_filter">카테고리 필터</string>
-    <string name="spot_travel_car">🚗 차로 %1$d분</string>
-    <string name="spot_guide_line">구도 %1$s</string>
+    <!-- 카드 하단 한 줄. 자동차 아이콘이 앞에 붙으므로 이모지를 뺐습니다. -->
+    <string name="spot_travel_minutes">차로 %1$d분</string>
 
     <!-- 일기 — 감정과 다음 추천 (시안) -->
     <string name="diary_feelings_label">오늘의 감정</string>
@@ -240,6 +251,9 @@
     <string name="siseon_compare_eyebrow">MY FRAME · COMPARE</string>
     <string name="siseon_compare_title">내 사진을 가이드와 비교해보세요.</string>
     <string name="siseon_compare_sub">같은 장소에서 찍은 사진을 올리면 구도와 피사체 배치를 나란히 확인할 수 있어요.</string>
+    <!-- 날씨별 참고 카드 -->
+    <string name="siseon_weather_tools">이 날씨의 촬영 팁</string>
+    <string name="cd_weather_reference">날씨별 참고 사진</string>
     <string name="siseon_upload">사진 업로드</string>
     <string name="siseon_upload_change">사진 바꾸기</string>
     <string name="siseon_compare_empty">사진을 업로드하면 이곳에서 가이드와 나란히 비교할 수 있어요.</string>
@@ -269,6 +283,11 @@
     <string name="mission_step_first">%1$s의 기준점을 먼저 찾기</string>
     <string name="mission_step_last">같은 장면을 한 번 더 비교해보기</string>
     <string name="mission_step_last_hint">현재 위치·두 걸음 가까이·좌우 이동으로 비교</string>
+    <!-- 미션 한 줄의 접기/펼치기. 긴 부연은 기본 접음입니다. -->
+    <string name="mission_step_more">더 알아보기 ▾</string>
+    <string name="mission_step_less">접기 ▴</string>
+    <string name="cd_mission_step_example">미션 참고 사진</string>
+    <string name="cd_mission_listen">미션 음성으로 듣기</string>
     <string name="mission_capture_title">세 장을 비교해보세요</string>
     <string name="mission_capture_sub">같은 장면을 세 위치에서 찍으면, 가장 좋은 거리와 방향을 직접 찾을 수 있어요.</string>
     <string name="mission_added">%1$d/3 추가됨</string>
@@ -455,7 +474,8 @@
     <string name="mission_summary">배지 %1$d / %2$d 개</string>
     <string name="mission_summary_desc">정읍에서 발견한 장면을 모아보세요</string>
     <string name="mission_summary_empty">촬영지에서 사진을 남기면 장면이 쌓입니다</string>
-    <string name="mission_count">%1$d / %2$d</string>
+    <!-- 좌우 공백을 뺀 것은 좋은 칸에서 한 글자라도 더 버티게 하려고입니다. -->
+    <string name="mission_count">%1$d/%2$d</string>
     <string name="mission_badge_earned">🏅 %1$s 획득</string>
 
     <!-- 사계절 캘린더 -->
@@ -546,7 +566,10 @@
     <string name="map_purpose_person">인물</string>
     <string name="map_purpose_arch">건축선</string>
     <string name="map_purpose_space">여백</string>
-    <string name="map_legend_title">촬영 목적 범례</string>
+    <string name="map_legend_purpose">촬영 목적 범례</string>
+    <string name="map_legend_story">스토리 범례</string>
+    <!-- 스토리 칩을 누른 직후의 즉시 피드백 -->
+    <string name="map_story_badge">지금 %1$s 코스 %2$d곳</string>
     <string name="map_reco_walk">%1$s 따라 걷기 · 지금 추천</string>
     <string name="map_sheet_eyebrow">선택한 장소 · 지금 가는 이유</string>
     <string name="map_stat_light">현재 빛</string>
@@ -714,7 +737,9 @@
     <string name="detail_save_plan">출사 일정 저장</string>
     <string name="detail_plan_saved">출사 일정을 저장했어요</string>
     <string name="detail_plan_failed">저장하지 못했어요</string>
-    <string name="detail_score_title">오늘의 출사 적합도 %1$d점</string>
+    <!-- 점수는 게이지 안에 숫자로 들어가므로 제목에서 뺐습니다. -->
+    <string name="detail_score_title">오늘의 출사 적합도</string>
+    <string name="detail_score_unit">점</string>
 
     <!-- 상세 개편(시안) — 호 라벨 -->
     <string name="detail_arc_sunrise">일출</string>
@@ -723,6 +748,19 @@
 
     <!-- 상세 개편(시안) — 히어로·날씨 -->
     <string name="cd_favorite">찜하기</string>
+
+    <!-- 찜한 촬영지 -->
+    <string name="favorites_title">찜한 촬영지</string>
+    <string name="favorites_count">%1$d곳</string>
+    <string name="favorites_filter_all">전체</string>
+    <string name="favorites_state_visited">다녀옴</string>
+    <string name="favorites_state_todo">아직</string>
+    <string name="favorites_match_now">지금 빛과 맞아요</string>
+    <string name="favorites_remove">찜 해제</string>
+    <string name="favorites_empty">아직 찜한 촬영지가 없어요.\n탐색이나 상세 화면에서 하트를 눌러 담아 보세요.</string>
+    <string name="favorites_empty_filtered">이 촬영 목적으로 찜한 곳이 없어요.</string>
+    <string name="favorites_summary">%1$d곳 · 아직 안 간 곳 %2$d</string>
+    <string name="favorites_summary_empty">마음에 든 촬영지에 하트를 눌러 보세요</string>
     <string name="cd_share">공유하기</string>
     <string name="detail_favorited">찜한 촬영지에 담았어요</string>
     <string name="detail_unfavorited">찜을 해제했어요</string>

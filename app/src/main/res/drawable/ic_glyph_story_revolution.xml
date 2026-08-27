@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 혁명 스토리 마커의 흰색 글리프. 마커 위에 얹히므로 테마 틴트를 쓰지 않습니다. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M14.4,6L14,4L5,4v17h2v-7h5.6l0.4,2h7L20,6z" />
+</vector>

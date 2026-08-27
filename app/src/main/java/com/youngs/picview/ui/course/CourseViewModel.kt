@@ -49,8 +49,14 @@ class CourseViewModel(app: Application) : AndroidViewModel(app) {
     private val _saved = MutableLiveData(SaveState.IDLE)
     val saved: LiveData<SaveState> = _saved
 
-    /** 이 코스의 출사 예정일. [generate] 를 부른 화면이 넘겨 줍니다. */
-    private var planDate: java.time.LocalDate = java.time.LocalDate.now()
+    /**
+     * 이 코스의 출사 예정일. [generate] 를 부른 화면이 넘겨 줍니다.
+     *
+     * 결과 화면도 이 값을 읽습니다 — 날짜가 안 보이면 내일 새벽 코스를
+     * 오늘 밤에 짜 놓고도 언제 것인지 알 수 없습니다.
+     */
+    var planDate: java.time.LocalDate = java.time.LocalDate.now()
+        private set
 
     fun generate(
         spots: List<SpotItem>,
