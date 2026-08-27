@@ -443,11 +443,17 @@ class SiseonGuideActivity : AppCompatActivity() {
             sheet.layoutMissionSteps.addView(step.root)
         }
 
-        // 읽기 대신 듣기. 세 줄을 그대로 이어 읽어 줍니다.
-        sheet.btnMissionTts.setOnClickListener {
-            tts.toggle(
-                (listOf(context.detail) + steps.map { it.first })
-                    .joinToString(" ") { it.trimEnd('.') + "." }
+        // 읽기 대신 듣기. 상황 한 줄과 할 일 세 줄을 이어 읽어 줍니다.
+        val script = (listOf(context.detail) + steps.map { it.first })
+            .joinToString(" ") { it.trimEnd('.') + "." }
+
+        sheet.btnMissionTts.setOnClickListener { tts.toggle(script) }
+
+        // 재생 중에는 버튼이 "듣기 멈추기"로 바뀝니다. 소리가 나는데
+        // 버튼이 그대로면 다시 눌러 겹쳐 재생하려 들게 됩니다.
+        tts.speaking.observe(this) { speaking ->
+            missionBinding?.btnMissionTts?.setText(
+                if (speaking) R.string.mission_listen_stop else R.string.mission_listen
             )
         }
 
