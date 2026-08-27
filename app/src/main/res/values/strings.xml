@@ -130,6 +130,8 @@
     <string name="course_cond_date">날짜</string>
     <string name="course_cond_party">동행</string>
     <string name="course_cond_start">출발 시각</string>
+    <!-- 결과 화면의 날짜 알약. 누르면 날짜·시각을 고쳐 다시 짜니다. -->
+    <string name="course_date_with_start">%1$s · %2$s 출발</string>
     <string name="course_cond_duration">체류 시간</string>
     <string name="course_cond_travel">이동 방법</string>
     <string name="course_cond_subject">촬영 목적</string>
@@ -158,6 +160,8 @@
     <!-- 출사 코스 : 결과 -->
     <string name="course_result_title">오늘의 출사 코스</string>
     <string name="course_timeline">코스 타임라인</string>
+    <!-- 타임라인 날짜 줄. 이틀 이상일 때만 몇째 날인지를 붙입니다. -->
+    <string name="course_day_nth">%1$d일차 · %2$s</string>
     <string name="course_save">저장</string>
     <string name="course_saved">내 코스에 저장했어요</string>
     <string name="course_travel_format">↳ 이동 %1$d분 · %2$.1fkm</string>

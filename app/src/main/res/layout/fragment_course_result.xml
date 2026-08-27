@@ -89,14 +89,29 @@
                     android:orientation="vertical"
                     android:padding="@dimen/space_l">
 
+                    <!--
+                      날짜·출발 시각은 결과를 보고 나서 고치고 싶어집니다 —
+                      "한 시간 늦게 나갈걸", "이건 내일 하자". 그때마다 입력
+                      화면으로 되돌아가 동행·체류·이동·목적을 다시 고르게
+                      하면 아무도 고치지 않습니다. 여기서 바로 누릅니다.
+                    -->
                     <TextView
                         android:id="@+id/tv_result_date"
                         style="@style/Text.Caption"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:letterSpacing="0.06"
-                        android:textColor="#B3FFFFFF"
-                        tools:text="2026년 8월 27일 (목)" />
+                        android:background="@drawable/bg_pill_dark"
+                        android:drawablePadding="6dp"
+                        android:gravity="center_vertical"
+                        android:letterSpacing="0.02"
+                        android:minHeight="32dp"
+                        android:paddingHorizontal="@dimen/space_m"
+                        android:paddingVertical="4dp"
+                        android:textColor="@color/white"
+                        app:drawableStartCompat="@drawable/ic_calendar"
+                        app:drawableEndCompat="@drawable/baseline_chevron_right_24"
+                        app:drawableTint="#B3FFFFFF"
+                        tools:text="2026.08.27 (목) · 09:09 출발" />
 
                     <TextView
                         android:id="@+id/tv_result_narration"
