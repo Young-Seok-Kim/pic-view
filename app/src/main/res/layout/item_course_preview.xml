@@ -2,6 +2,12 @@
 <!--
     오늘의 빛 코스 — 정거장 한 장.
     왼쪽은 장소 사진, 오른쪽은 "몇 시에 도착해 무엇을 찍는가"입니다.
+
+    글의 위계를 세 단으로 눌러 두었습니다. 예전에는 순번 배지·장소명·주소·
+    라벨·시각·이동시간·행동 일곱 줄이 서로 비슷한 크기라 눈이 쉴 곳이
+    없었습니다. 지금은 (1) 장소명 (2) 도착 시각 (3) 나머지 순으로
+    또렷하게 갈립니다. 이모지(🚘)는 아이콘으로 바꿔 기기마다 톤이 튀지
+    않게 했습니다.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -71,8 +77,11 @@
                     style="@style/Text.Caption"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
                     android:ellipsize="end"
                     android:maxLines="1"
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="11sp"
                     tools:text="정읍시 내장산로 936" />
 
                 <LinearLayout
@@ -103,7 +112,7 @@
                             android:fontFamily="@font/pretendard_bold"
                             android:fontFeatureSettings="tnum"
                             android:textColor="@color/maple_500"
-                            android:textSize="24sp"
+                            android:textSize="22sp"
                             tools:text="18:10" />
                     </LinearLayout>
 
@@ -125,7 +134,11 @@
                             style="@style/Text.Caption"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/course_travel_time_label" />
+                            android:drawablePadding="4dp"
+                            android:gravity="center_vertical"
+                            android:text="@string/course_travel_time_label"
+                            app:drawableStartCompat="@drawable/ic_car"
+                            app:drawableTint="@color/text_tertiary" />
 
                         <TextView
                             android:id="@+id/tv_stop_travel"
@@ -139,24 +152,23 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <TextView
-                    style="@style/Text.Caption"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_s"
-                    android:text="@string/course_action_label"
-                    android:textColor="@color/text_tertiary" />
-
+                <!--
+                  "추천 촬영 행동"이라는 라벨 한 줄은 지웠습니다. 카메라
+                  아이콘이 같은 말을 하고, 그 자리에 문장이 한 줄 더 들어갑니다.
+                -->
                 <TextView
                     android:id="@+id/tv_stop_note"
-                    style="@style/Text.Body"
+                    style="@style/Text.Caption"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="@dimen/space_s"
+                    android:drawablePadding="6dp"
                     android:ellipsize="end"
                     android:maxLines="2"
-                    android:textSize="13sp"
-                    tools:text="☀ 석양이 우화정 뒤로 넘어갈 때, 연못에 비치는 반영을 담아보세요." />
+                    android:textColor="@color/text_secondary"
+                    app:drawableStartCompat="@drawable/baseline_camera_alt_24"
+                    app:drawableTint="@color/maple_400"
+                    tools:text="석양이 우화정 뒤로 넘어갈 때, 연못에 비치는 반영을 담아보세요." />
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

@@ -13,7 +13,7 @@ import com.bumptech.glide.Glide
 import com.youngs.picview.R
 import com.youngs.picview.databinding.ItemCourseStopBinding
 import com.youngs.picview.domain.course.CourseStop
-import com.youngs.picview.ui.guide.GuideOverlayView
+import com.youngs.picview.domain.guide.SiseonGuide
 import java.time.format.DateTimeFormatter
 
 /** 빛 스케줄 타임라인. */
@@ -60,7 +60,7 @@ class CourseStopAdapter(
             // 마지막 정거장은 아래로 이어지는 선을 그리지 않습니다.
             viewStopLine.isVisible = position < itemCount - 1
 
-            tvStopPhase.text = "${stop.phase.label} · ${stop.facts.facing.label}"
+            tvStopPhase.text = "${stop.phase.label} · ${stop.facts.facing.phraseLabel}"
             tvStopPhase.setTextColor(phaseColor)
             tvStopPhase.background?.mutate()?.setColorFilter(
                 ColorUtils.setAlphaComponent(phaseColor, PHASE_BADGE_ALPHA),
@@ -69,9 +69,13 @@ class CourseStopAdapter(
 
             tvStopReason.text = stop.reason
 
-            tvStopGuide.text = context.getString(
-                R.string.course_guide_format, guideName(context, stop.facts.guide)
-            )
+            // 구도는 카메라 오버레이의 세 종류가 아니라 시선 가이드의 열
+            // 구도에서 고릅니다. 세 종류로는 "야간 · 문화시설" 세 칸이
+            // 나란히 "좌우 대칭축"이 되어 추천이 없는 것과 같아집니다.
+            // 도착 시각의 빛까지 함께 봅니다 — 같은 곳도 시간이 다르면
+            // 찍는 법이 다르다는 것이 이 앱의 전제입니다.
+            val guide = SiseonGuide.byId(SiseonGuide.guideIdFor(stop.facts, stop.phase))
+            tvStopGuide.text = context.getString(R.string.course_guide_format, guide.title)
 
             if (stop.travelMinutes > 0) {
                 tvStopTravel.isVisible = true
@@ -85,17 +89,6 @@ class CourseStopAdapter(
             root.setOnClickListener { onClick(stop) }
         }
     }
-
-    private fun guideName(
-        context: android.content.Context,
-        type: GuideOverlayView.GuideType
-    ): String = context.getString(
-        when (type) {
-            GuideOverlayView.GuideType.THIRDS -> R.string.guide_name_thirds
-            GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_name_symmetry
-            GuideOverlayView.GuideType.CENTER -> R.string.guide_name_center
-        }
-    )
 
     companion object {
         private val TIME: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")

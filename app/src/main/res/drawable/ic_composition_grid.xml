@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    구도 아이콘 — 삼분할 격자.
+    카드 하단 줄에서 "구도"라는 낱말을 대신합니다. 촬영 화면의
+    오버레이와 같은 모양이라, 한 번 본 사람은 바로 알아봅니다.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M3,4h18v1.6h-18z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M3,18.4h18v1.6h-18z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M3,4h1.6v16h-1.6z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M19.4,4h1.6v16h-1.6z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M9.2,4h1.2v16h-1.2z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M13.6,4h1.2v16h-1.2z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M3,9.2h18v1.2h-18z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M3,13.6h18v1.2h-18z" />
+</vector>

@@ -94,6 +94,9 @@ class CourseRepository(context: Context) {
 
     fun observeVisitedSpotCount(): Flow<Int> = visitDao.observeVisitedSpotCount()
 
+    /** 다녀온 곳의 contentId 집합. 찜 목록이 방문 상태를 붙일 때 씁니다. */
+    suspend fun visitedContentIds(): Set<String> = visitDao.visitedContentIds().toSet()
+
     /**
      * 방문 기록을 남깁니다.
      *

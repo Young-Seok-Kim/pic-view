@@ -89,6 +89,10 @@ interface VisitDao {
     @Query("SELECT COUNT(DISTINCT contentId) FROM visit_log")
     fun observeVisitedSpotCount(): Flow<Int>
 
+    /** 다녀온 곳의 contentId. 찜 목록의 '다녀옴 / 아직' 배지에 씁니다. */
+    @Query("SELECT DISTINCT contentId FROM visit_log")
+    suspend fun visitedContentIds(): List<String>
+
 
     /**
      * 이미 남아 있는 방문 기록에 사진을 붙입니다.

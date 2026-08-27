@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    일출 — 지평선에 걸친 해와 오른쪽의 위쪽 꺾쇠.
+
+    처음에는 화살을 해 바로 위에 세웠는데, 18dp 로 줄어들면 화살과 해가
+    붙어 사람 형상처럼 보였습니다. 꺾쇠를 옆으로 빼고 해를 키웠습니다.
+    이모지(🌅)는 기기마다 그림이 달라 같은 화면에서도 톤이 튑니다.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- 지평선 -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M2,18.6h20v2h-20z" />
+    <!-- 지평선에 걸친 반원 해 -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M11,9.4c-4.3,0 -7.8,3.2 -8,7.2h16c-0.2,-4 -3.7,-7.2 -8,-7.2z" />
+    <!-- 위로 오르는 꺾쇠 -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M18.2,7.6l-1.4,-1.4 3.4,-3.4 3.4,3.4 -1.4,1.4 -2,-2z" />
+</vector>

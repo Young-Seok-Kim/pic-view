@@ -106,6 +106,22 @@
                 android:layout_weight="1"
                 android:text="@string/mission_steps_title" />
 
+            <!--
+              화면을 보지 않고도 듣게 합니다.
+              현장에서 해가 넘어가는 동안 손은 카메라에 있고 눈은 장면에
+              있습니다. 그때 읽으라고 하면 아무도 읽지 않습니다.
+            -->
+            <ImageView
+                android:id="@+id/btn_mission_tts"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_marginEnd="@dimen/space_xs"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_mission_listen"
+                android:padding="7dp"
+                android:src="@drawable/ic_audio"
+                app:tint="@color/maple_600" />
+
             <TextView
                 android:id="@+id/tv_mission_check_count"
                 style="@style/Text.Caption"

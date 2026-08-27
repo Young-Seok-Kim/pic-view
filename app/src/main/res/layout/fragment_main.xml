@@ -103,56 +103,103 @@
                         android:textColor="#7FA3B5"
                         android:textSize="10sp" />
 
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:layout_gravity="start|bottom"
-                        android:layout_marginStart="44dp"
-                        android:layout_marginBottom="34dp"
-                        android:contentDescription="@null"
-                        android:src="@drawable/ic_place"
-                        app:tint="@color/golden_300" />
-
-                    <TextView
-                        style="@style/Text.Caption"
+                    <!--
+                      핀 셋. 그린 그림이 아니라 지금 목록 맨 위 세 곳입니다.
+                      정렬과 필터를 바꾸면 이름도 함께 바뀌고, 목록을 스크롤해
+                      맨 위에 온 카드의 핀이 커집니다. 약도와 목록이 따로 놀면
+                      위치 감각이 생기지 않습니다.
+                    -->
+                    <LinearLayout
+                        android:id="@+id/layout_map_pin_1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start|bottom"
-                        android:layout_marginStart="30dp"
-                        android:layout_marginBottom="16dp"
-                        android:text="내장산 자락"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="10sp" />
+                        android:layout_marginStart="26dp"
+                        android:layout_marginBottom="14dp"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
 
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
+                        <ImageView
+                            android:id="@+id/iv_map_pin_1"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_place"
+                            app:tint="@color/golden_300" />
+
+                        <TextView
+                            android:id="@+id/tv_map_pin_1"
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxWidth="96dp"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="10sp"
+                            tools:text="내장산 자락" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layout_map_pin_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginStart="-40dp"
-                        android:layout_marginTop="-16dp"
-                        android:contentDescription="@null"
-                        android:src="@drawable/ic_place"
-                        app:tint="@color/eyebrow_blue" />
+                        android:layout_marginTop="-24dp"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
 
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:layout_gravity="end|center_vertical"
-                        android:layout_marginEnd="70dp"
-                        android:contentDescription="@null"
-                        android:src="@drawable/ic_place"
-                        app:tint="@color/maple_500" />
+                        <ImageView
+                            android:id="@+id/iv_map_pin_2"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_place"
+                            app:tint="@color/eyebrow_blue" />
 
-                    <TextView
-                        style="@style/Text.Caption"
+                        <TextView
+                            android:id="@+id/tv_map_pin_2"
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxWidth="96dp"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="10sp"
+                            tools:text="정읍천" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layout_map_pin_3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end|center_vertical"
                         android:layout_marginEnd="34dp"
-                        android:layout_marginTop="24dp"
-                        android:text="정읍사공원"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="10sp" />
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/iv_map_pin_3"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_place"
+                            app:tint="@color/maple_500" />
+
+                        <TextView
+                            android:id="@+id/tv_map_pin_3"
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxWidth="96dp"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="10sp"
+                            tools:text="정읍사공원" />
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/btn_map_expand"
@@ -205,21 +252,33 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="@string/sort_reco" />
+                        android:text="@string/sort_reco"
+                        app:chipIcon="@drawable/ic_star"
+                        app:chipIconSize="14dp"
+                        app:chipIconTint="@color/chip_content_selector"
+                        app:chipIconVisible="true" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_sort_dist"
                         style="@style/Chip.Category"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/sort_dist" />
+                        android:text="@string/sort_dist"
+                        app:chipIcon="@drawable/ic_near_me"
+                        app:chipIconSize="14dp"
+                        app:chipIconTint="@color/chip_content_selector"
+                        app:chipIconVisible="true" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_sort_light"
                         style="@style/Chip.Category"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/sort_light" />
+                        android:text="@string/sort_light"
+                        app:chipIcon="@drawable/ic_sun"
+                        app:chipIconSize="14dp"
+                        app:chipIconTint="@color/chip_content_selector"
+                        app:chipIconVisible="true" />
                 </com.google.android.material.chip.ChipGroup>
             </HorizontalScrollView>
 

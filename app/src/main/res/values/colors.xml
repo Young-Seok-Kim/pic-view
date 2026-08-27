@@ -232,6 +232,38 @@
     <color name="purpose_arch">#FF2F6DB5</color>
     <color name="purpose_space">#FF7A675A</color>
 
+    <!--
+        ============ 날씨 여섯 (시선 가이드 탭) ============
+        여섯 탭이 전부 같은 색이면 무엇을 고른 상태인지 글자를 읽어야
+        압니다. 날씨의 실제 톤을 그대로 씁니다 — 일출은 주황, 비는 블루.
+        container 는 선택된 탭의 배경(밝은 화면 위)입니다.
+    -->
+    <color name="weather_clear">#FFD98E1A</color>
+    <color name="weather_clear_container">#FFFCEFD5</color>
+    <color name="weather_cloudy">#FF6E7B85</color>
+    <color name="weather_cloudy_container">#FFEDF0F2</color>
+    <color name="weather_sunrise">#FFE0662B</color>
+    <color name="weather_sunrise_container">#FFFCE7DA</color>
+    <color name="weather_sunset">#FFC1462F</color>
+    <color name="weather_sunset_container">#FFFAE0DA</color>
+    <color name="weather_night">#FF3E4A78</color>
+    <color name="weather_night_container">#FFE4E7F2</color>
+    <color name="weather_rain">#FF2F6DB5</color>
+    <color name="weather_rain_container">#FFE2ECF7</color>
+
+    <!--
+        ============ 스토리(달·사랑·혁명·느림·계절) ============
+        촬영 목적이 "무엇을 찍는가"의 색이라면, 이것은 "어떤 이야기를
+        걷는가"의 색입니다. 스토리 칩을 고른 순간에만 지도가 이 색으로
+        바뀌므로 목적 색과 겹쳐 보이지 않습니다.
+        달=달빛 네이비, 사랑=연분홍, 혁명=적갈, 느림=흙빛 세피아, 계절=상록.
+    -->
+    <color name="story_moon">#FF3E4A78</color>
+    <color name="story_love">#FFC2607F</color>
+    <color name="story_revolution">#FF8E3B2A</color>
+    <color name="story_slow">#FF8A6E4B</color>
+    <color name="story_season">#FF3F7D4E</color>
+
     <!-- 하단 탭 -->
     <color name="nav_item_active">#B23A1B</color>
     <color name="nav_item_inactive">#9B8878</color>

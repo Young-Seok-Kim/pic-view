@@ -71,12 +71,22 @@ enum class ShotPurpose(
  * 내장산·구절초(계절)처럼 정읍이 실제로 가진 이야기 다섯 갈래입니다.
  * 한 장소가 여러 이야기에 걸칠 수 있어 집합으로 돌려줍니다.
  */
-enum class SpotStory(val label: String, val emoji: String) {
-    MOON("달", "🌙"),
-    LOVE("사랑", "🤍"),
-    REVOLUTION("혁명", "🚩"),
-    SLOW("느림", "🐌"),
-    SEASON("계절", "🍃");
+enum class SpotStory(
+    val label: String,
+    val emoji: String,
+    /** 스토리를 골랐을 때 지도 마커·배지가 함께 입는 색. */
+    @ColorRes val colorRes: Int,
+    /**
+     * 색 + 아이콘 이중 코딩 마커.
+     * 색 하나로만 나누면 밝은 야외 화면이나 색각 이상에서 구분이 사라집니다.
+     */
+    @DrawableRes val markerRes: Int
+) {
+    MOON("달", "🌙", R.color.story_moon, R.drawable.marker_story_moon),
+    LOVE("사랑", "🤍", R.color.story_love, R.drawable.marker_story_love),
+    REVOLUTION("혁명", "🚩", R.color.story_revolution, R.drawable.marker_story_revolution),
+    SLOW("느림", "🐌", R.color.story_slow, R.drawable.marker_story_slow),
+    SEASON("계절", "🍃", R.color.story_season, R.drawable.marker_story_season);
 
     companion object {
         private val KEYWORDS: List<Pair<SpotStory, List<String>>> = listOf(

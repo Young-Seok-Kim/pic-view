@@ -7,6 +7,7 @@ import com.youngs.picview.domain.spot.SpotFacts
 import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.util.LatLng
+import com.youngs.picview.util.byBatchim
 import com.youngs.picview.util.distanceKmTo
 import com.youngs.picview.util.estimateTravelMinutes
 import com.youngs.picview.util.roadDistanceKm
@@ -102,7 +103,7 @@ object CoursePlanner {
                     arriveAt = window.start,
                     phase = window.phase,
                     reason = buildString {
-                        append(pick.facts.facing.label)
+                        append(pick.facts.facing.phraseLabel)
                         append(" · ")
                         append(window.phase.label)
                         append(" ${window.durationMinutes}분")
@@ -264,11 +265,19 @@ object CoursePlanner {
      * 스팟의 고유 촬영 팁(facts.note)은 **그 스팟의 최적 시간대에 배치됐을 때만**
      * 씁니다. 그러지 않으면 오후에 넣어 놓고 "오전이 가장 깔끔해요" 같은
      * 앞뒤 안 맞는 문구가 나옵니다.
+     *
+     * 최적 시간이 아닐 때 예전에는 [LightPhase.hint] 를 그대로 썼습니다.
+     * 그런데 그것은 "삼각대가 필요해요"처럼 **장비 조건**이라, 코스의 세
+     * 칸이 나란히 "삼각대가 필요해요"로 채워지면 왜 여기를 가는지가
+     * 사라집니다. 대신 그 빛에 **무엇이 찍히는지**([LightPhase.subject])를
+     * 말합니다.
      */
     private fun reasonFor(facts: SpotFacts, phase: LightPhase): String = when {
         phase == facts.bestPhase -> facts.note
-        !fitsPhase(facts, phase) -> phase.hint
-        else -> "${phase.label} · ${facts.facing.label}에 담기 좋아요"
+        !fitsPhase(facts, phase) ->
+            "${phase.label}엔 ${phase.subject}" +
+                phase.subject.byBatchim("을", "를") + " 노려보세요"
+        else -> "${phase.label} · ${facts.facing.phraseLabel} 담기 좋아요"
     }
 
     private fun matchesSubjects(candidate: Candidate, subjects: Set<Subject>): Boolean {

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 미션 스텝 참고 썸네일의 모서리. clipToOutline 이 이 모양으로 사진을 자릅니다. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/bg_image_placeholder" />
+    <corners android:radius="10dp" />
+</shape>
