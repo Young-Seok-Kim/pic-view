@@ -209,7 +209,12 @@
     <!-- ================= 스플래시 ================= -->
     <style name="Theme.PicView.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/maple_600</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <!--
+            스플래시 아이콘은 단색 배경(단풍색) 위에 올라가므로
+            풍경 사진이 아니라 뷰파인더 모양을 씁니다. 사진을 넣으면
+            원형으로 잘려 하늘과 강이 뭉개집니다.
+        -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_monochrome</item>
         <item name="postSplashScreenTheme">@style/Theme.PicView</item>
     </style>
 
