@@ -126,6 +126,53 @@ class CourseViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /**
+     * 저장한 코스를 화면에 올리면서 **다시 짤 재료도 되살립니다.**
+     *
+     * 처음에는 저장한 코스의 날짜를 못 고치게 막았습니다. 조건(촬영지 풀 ·
+     * 동행 · 체류)이 저장돼 있지 않아 다시 짤 수 없다고 봤기 때문입니다.
+     * 그런데 "이건 내일 하자"가 가장 자주 생기는 자리가 바로 저장해 둔
+     * 코스입니다. 막아 두면 정작 필요한 곳에서 못 쓰게 됩니다.
+     *
+     * 없는 것은 되살릴 수 있는 만큼만 되살립니다.
+     *   · 촬영지 풀 — 지금 목록 전체로 갈음합니다
+     *   · 출발·종료 시각 — 첫 정거장 도착과 마지막 정거장 출발에서 역산
+     *   · 이동 수단 — 저장돼 있습니다
+     *   · 곳 수 — 저장된 정거장 수를 그대로 상한으로 둡니다
+     *   · 동행·촬영 목적 — 남아 있지 않아 기본값(전체)으로 둡니다
+     *
+     * 다시 짠 결과는 저장본을 덮어쓰지 않습니다. 새 코스로 화면에 뜨고,
+     * 마음에 들면 사용자가 다시 저장합니다.
+     */
+    fun adoptSaved(
+        course: ShootingCourse,
+        date: java.time.LocalDate,
+        summary: String,
+        spots: List<SpotItem>
+    ) {
+        planDate = date
+        lastSpots = spots
+
+        val start = course.startTime
+        val end = course.endTime
+        lastRequest = if (spots.isEmpty() || start == null || end == null || end <= start) {
+            // 되살릴 수 없으면 조용히 못 고치는 상태로 둡니다.
+            // 반쯤 복원한 조건으로 엉뚱한 코스를 내놓는 것보다 낫습니다.
+            null
+        } else {
+            CourseRequest(
+                startTime = start,
+                endTime = end,
+                travelMode = course.travelMode,
+                maxStops = course.stops.size.coerceAtLeast(1)
+            )
+        }
+
+        _course.value = course
+        _narration.value = summary
+        _saved.value = SaveState.IDLE
+    }
+
+    /**
      * 날짜·출발 시각만 바꿔 같은 조건으로 다시 짭니다.
      *
      * 결과를 보고 나서야 "한 시간 늦게 나갈걸", "이건 내일 하자"가 생깁니다.

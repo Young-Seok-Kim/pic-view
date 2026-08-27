@@ -88,26 +88,9 @@ class CourseResultFragment : Fragment(R.layout.fragment_course_result) {
             courseViewModel.consumeSaved()
         }
 
-        courseViewModel.course.observe(viewLifecycleOwner) { course ->
-            course ?: return@observe
-            renderDate(courseViewModel.planDate, editable = courseViewModel.canReschedule)
-            render(course, courseViewModel.planDate)
-        }
-
-        // 날짜를 바꾸면 그 날짜의 일출·일몰을 새로 받아오는 동안 잠깐 뜹니다.
-        courseViewModel.rescheduling.observe(viewLifecycleOwner) { busy ->
-            binding.progressResult.isVisible = busy
-        }
-
         // 설명 문구는 규칙 요약 → LLM 문장 순으로 두 번 들어옵니다.
-        courseViewModel.narration.observe(viewLifecycleOwner) {
-            binding.tvResultNarration.text = it
-        }
-        courseViewModel.narrating.observe(viewLifecycleOwner) { generating ->
-            // 타임라인은 이미 떠 있으므로 문구 생성 중에도 화면을 막지 않습니다.
-            binding.progressResult.isVisible = false
-            binding.tvResultNarration.alpha = if (generating) 0.7f else 1f
-        }
+        // 타임라인은 이미 떠 있으므로 문구 생성 중에도 화면을 막지 않습니다.
+        observeCourse(savedTitle = null)
     }
 
     // ─────────────────── 저장한 코스 ───────────────────
@@ -130,9 +113,55 @@ class CourseResultFragment : Fragment(R.layout.fragment_course_result) {
             }
 
             view.tvResultTitle.text = saved.course.title
-            view.tvResultNarration.text = saved.course.summary
-            renderDate(saved.course.planDate(), editable = false)
-            render(saved.toShootingCourse(), saved.course.planDate())
+
+            // 저장한 코스도 날짜·출발 시각을 고칠 수 있게 재료를 되살립니다.
+            // 되살린 뒤로는 방금 만든 코스와 같은 길을 탑니다 — 화면은
+            // 언제나 ViewModel 이 들고 있는 코스를 그립니다.
+            courseViewModel.adoptSaved(
+                course = saved.toShootingCourse(),
+                date = saved.course.planDate(),
+                summary = saved.course.summary,
+                spots = mainViewModel.spotData.value.orEmpty()
+            )
+            observeCourse(savedTitle = saved.course.title)
+        }
+    }
+
+    /**
+     * ViewModel 의 코스를 화면에 겁니다.
+     *
+     * 저장한 코스로 들어왔더라도 날짜를 고치면 **새 코스**가 되므로,
+     * 그때부터는 저장 버튼이 나타나야 합니다. 첫 방출은 저장본 그대로라
+     * 세지 않고, 그 뒤의 방출부터 "다시 짠 것"으로 봅니다.
+     */
+    private fun observeCourse(savedTitle: String?) {
+        var emissions = 0
+
+        courseViewModel.course.observe(viewLifecycleOwner) { course ->
+            course ?: return@observe
+            emissions++
+
+            val rescheduled = savedTitle != null && emissions > 1
+            if (rescheduled) {
+                // 다시 짠 코스는 아직 저장 전입니다. 제목도 새 코스의 것으로.
+                binding.btnResultSave.isVisible = true
+                binding.tvResultTitle.setText(R.string.course_today_title)
+            }
+
+            renderDate(courseViewModel.planDate, editable = courseViewModel.canReschedule)
+            render(course, courseViewModel.planDate)
+        }
+
+        courseViewModel.narration.observe(viewLifecycleOwner) {
+            binding.tvResultNarration.text = it
+        }
+        courseViewModel.narrating.observe(viewLifecycleOwner) { generating ->
+            binding.tvResultNarration.alpha = if (generating) 0.7f else 1f
+        }
+
+        // 날짜를 바꾸면 그 날짜의 일출·일몰을 새로 받아오는 동안 잠깐 뜹니다.
+        courseViewModel.rescheduling.observe(viewLifecycleOwner) { busy ->
+            binding.progressResult.isVisible = busy
         }
     }
 
