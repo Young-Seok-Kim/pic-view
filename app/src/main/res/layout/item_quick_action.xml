@@ -13,11 +13,19 @@
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
+    <!--
+      높이는 코드가 정합니다 (HomeFragment.buildQuickActions) — 화면 폭에서
+      여백과 칸 사이 간격을 뺀 뒤 넷으로 나눈 값이라 타일이 정사각형이
+      됩니다. 예전에는 여기에 0dp 를 두었는데, 가중치 없는 세로 방향에서
+      0dp 는 "보이지 않는 뷰"라 lint 가 Suspicious0dp 로 막았습니다.
+      값이 어차피 덮어씌워지므로 wrap_content 로 두고, 미리보기 높이만
+      tools 로 넣어 둡니다. adjustViewBounds 는 centerCrop 과 함께 쓰면
+      아무 일도 하지 않아 함께 뺐습니다.
+    -->
     <ImageView
         android:id="@+id/iv_qa_icon"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
+        android:layout_height="wrap_content"
         android:background="@drawable/bg_quick_action"
         android:clickable="true"
         android:contentDescription="@null"
