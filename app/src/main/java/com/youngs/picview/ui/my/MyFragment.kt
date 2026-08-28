@@ -59,6 +59,9 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
     private var _binding: FragmentMyBinding? = null
     private val binding get() = _binding!!
 
+    /** 아카이브 카드가 목록으로 갈지 촬영으로 갈지 가르는 값. */
+    private var hasArchivePhotos = false
+
     private val viewModel: MyViewModel by viewModels()
 
     /** 빛·날씨·촬영지 목록. Activity 범위라 홈과 같은 값을 봅니다. */
@@ -114,6 +117,18 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
         }
         binding.layoutStatShots.setOnClickListener(openVisits)
         binding.tvArchiveAll.setOnClickListener(openVisits)
+
+        // 아카이브 카드는 통째로 목적지입니다. 다만 사진이 하나도 없을 때
+        // 빈 목록으로 보내는 건 "없다"를 두 번 말하는 것이라, 그때는
+        // 오늘의 촬영으로 내보냅니다.
+        binding.cardArchive.setOnClickListener {
+            if (hasArchivePhotos) {
+                (activity as? MainActivity)?.pushScreen(VisitedFragment())
+            } else {
+                startTodayShoot()
+            }
+        }
+        binding.tvArchiveStart.setOnClickListener { startTodayShoot() }
 
         val openMissions = View.OnClickListener {
             (activity as? MainActivity)?.pushScreen(MissionFragment())
@@ -261,9 +276,13 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
             .distinctBy { it.photoUri }
             .take(4)
 
+        hasArchivePhotos = photos.isNotEmpty()
         binding.rvMyPhotos.isVisible = photos.isNotEmpty()
         binding.layoutArchiveEmpty.isVisible = photos.isEmpty()
         binding.tvArchiveAll.isVisible = photos.isNotEmpty()
+        binding.cardArchive.contentDescription = getString(
+            if (photos.isEmpty()) R.string.cd_my_archive_empty else R.string.cd_my_archive
+        )
         photoAdapter.submitList(photos)
     }
 

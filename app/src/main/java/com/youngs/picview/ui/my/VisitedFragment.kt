@@ -122,8 +122,11 @@ private class VisitedAdapter(
             tvVisitedScore.text = context.getString(R.string.home_score_format, item.score)
             tvVisitedScore.isVisible = item.score > 0
 
+            // 촬영으로 남은 기록은 imageUrl 이 비어 있습니다(그 자리에서 찍었으니
+            // 관광공사 사진을 받아 둘 이유가 없습니다). 내가 찍은 사진을 먼저
+            // 걸고, 없을 때만 장소 사진으로 내려갑니다.
             Glide.with(ivVisited)
-                .load(item.imageUrl.takeIf { it.isNotBlank() })
+                .load(item.photoUri?.takeIf { it.isNotBlank() } ?: item.imageUrl.takeIf { it.isNotBlank() })
                 .placeholder(R.drawable.bg_image_placeholder)
                 .error(R.drawable.bg_image_placeholder)
                 .centerCrop()

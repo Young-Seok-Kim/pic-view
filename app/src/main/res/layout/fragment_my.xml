@@ -504,12 +504,20 @@
             android:baselineAligned="false"
             android:orientation="horizontal">
 
+            <!--
+                카드 전체가 목적지입니다. 예전에는 우측 "전체 사진 보기" 알약과
+                썸네일만 눌렸는데, 카드 생김새는 눌리는 카드(즐겨찾기)와 똑같아서
+                제목 언저리를 눌러 본 사람은 앱이 고장 난 줄 압니다.
+            -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_archive"
                 style="@style/Card.Elevated"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="5dp"
-                android:layout_weight="1.35">
+                android:layout_weight="1.35"
+                android:clickable="true"
+                android:focusable="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -577,6 +585,23 @@
                             android:layout_marginTop="@dimen/space_s"
                             android:gravity="center"
                             android:text="@string/my_archive_empty" />
+
+                        <!--
+                            빈 카드는 "전체 사진 보기"를 숨기느라 통째로 죽은
+                            영역이 됐었습니다. 보여 줄 게 없을 때야말로
+                            나가야 할 이유를 줘야 합니다.
+                        -->
+                        <TextView
+                            android:id="@+id/tv_archive_start"
+                            style="@style/Text.Caption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_m"
+                            android:background="@drawable/bg_pill_outline"
+                            android:paddingHorizontal="@dimen/space_m"
+                            android:paddingVertical="5dp"
+                            android:text="@string/my_archive_start"
+                            android:textColor="@color/maple_600" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
