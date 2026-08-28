@@ -68,9 +68,16 @@ class DiaryAdapter(
         with(holder.binding) {
             tvDiaryDate.text = day.date.format(DATE)
 
-            tvDiaryStats.text = context.getString(
-                R.string.diary_stats_format, day.visits.size, day.averageScore
-            )
+            // 촬영으로 남은 기록에는 점수가 없습니다(그 자리에서 찍었으니 추천
+            // 점수를 매길 일이 없습니다). 그때 "평균 0"을 띄우면 0점을 받은
+            // 하루처럼 읽혀서, 점수가 있는 날만 평균을 붙입니다.
+            tvDiaryStats.text = if (day.averageScore > 0) {
+                context.getString(
+                    R.string.diary_stats_format, day.visits.size, day.averageScore
+                )
+            } else {
+                context.getString(R.string.diary_stats_places, day.visits.size)
+            }
 
             tvDiaryVisits.text = day.visits.joinToString(" · ") { visit ->
                 "${visit.visitedAt.toDiaryLocalTime().format(TIME)} ${visit.title}"

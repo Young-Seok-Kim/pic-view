@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    색이 진한 원 위에 얹는 체크.
+
+    ic_check 는 테마 틴트(?attr/colorControlNormal)를 달고 있어 layer-list
+    안에서도 어두운 색으로 칠해집니다. 붉은 배지 위에 올리면 체크가 아니라
+    긁힌 자국처럼 보여서, 배지 전용으로 틴트 없는 흰 체크를 따로 둡니다.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M9,16.17L4.83,12l-1.42,1.41L9,19 21,7l-1.41,-1.41z" />
+</vector>

@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
-        <shape android:shape="rectangle">
-            <solid android:color="@color/bg_image_placeholder" />
-        </shape>
-    </item>
-    <item
-        android:width="32dp"
-        android:height="32dp"
-        android:drawable="@drawable/baseline_image_24"
-        android:gravity="center" />
-</layer-list>
+<!--
+    사진이 아직 없거나 못 받았을 때 깔리는 면.
+
+    예전에는 가운데에 액자 아이콘을 얹었습니다. 그런데 이 그림은 대부분
+    centerCrop 인 ImageView 에 들어가는데, centerCrop 은 그림 전체를 뷰
+    크기로 늘립니다. 32dp 로 적어 둔 아이콘이 카드만큼 커져서, 사진 대신
+    검은 사각형이 놓인 것처럼 보였습니다. 면 하나로 두면 어떤 크기에서도
+    같은 얼굴입니다.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/bg_image_placeholder" />
+</shape>
