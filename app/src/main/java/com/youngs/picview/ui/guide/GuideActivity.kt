@@ -25,7 +25,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
-import com.bumptech.glide.Glide
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import com.youngs.picview.BuildConfig
@@ -34,7 +33,6 @@ import com.youngs.picview.util.AppPrefs
 import com.youngs.picview.util.MediaStoreSaver
 import com.youngs.picview.databinding.ActivityGuideBinding
 import com.youngs.picview.databinding.DialogGuideExampleBinding
-import com.youngs.picview.ui.frame.PhotoFrameActivity
 import com.youngs.picview.domain.guide.SiseonGuide
 import com.youngs.picview.domain.light.LightPhase
 import com.youngs.picview.domain.pose.GroupSize
@@ -99,24 +97,25 @@ class GuideActivity : AppCompatActivity() {
     private var subject: Subject = Subject.PERSON
 
     /**
-     * 앨범에서 사진 한 장 고르기.
+     * 앨범에서 사진 한 장 보기.
      *
-     * 갤러리 앱을 여는 게 아니라 시스템 사진 선택기를 띄웁니다.
-     * 고른 사진은 이 장소 이름을 들고 포토 프레임으로 이어집니다 —
-     * 방금 찍은 사진과 같은 마무리(프레임 → 저장·공유)를 밟게 하기 위해서입니다.
+     * 갤러리 앱을 여는 게 아니라 시스템 사진 선택기를 띄우고, 고른 사진은
+     * 시스템 사진 뷰어로 넘깁니다. 예전에는 포토 프레임으로 보냈는데,
+     * 남이 다른 날 다른 곳에서 찍은 사진에 이 장소 이름이 붙어 버립니다.
+     * 프레임은 내가 남긴 기록(MY 아카이브·일기)에서 꺼낼 때만 씁니다.
      */
     private val galleryLauncher = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         uri ?: return@registerForActivityResult
-        startActivity(
-            PhotoFrameActivity.intent(
-                this,
-                photoUri = uri,
-                place = intent.getStringExtra(EXTRA_SPOT_NAME).orEmpty(),
-                takenAt = System.currentTimeMillis()
-            )
-        )
+        val view = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "image/*")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        // 볼 앱이 없을 수도 있습니다. 그때 앱이 죽는 것보다 한 줄 알리는 편이 낫습니다.
+        runCatching { startActivity(view) }.onFailure {
+            Toast.makeText(this, R.string.guide_photo_view_failed, Toast.LENGTH_SHORT).show()
+        }
     }
 
 
@@ -495,11 +494,14 @@ class GuideActivity : AppCompatActivity() {
                 // 다 쓰고 나서 갤러리에 노출합니다(API 29+ 에서만 의미가 있습니다).
                 output.savedUri?.let { MediaStoreSaver.publish(this@GuideActivity, it) }
 
-                output.savedUri?.let { recordVisitWithPhoto(it) }
-                runOnUiThread {
-                    binding.btnCapture.isEnabled = true
-                    output.savedUri?.let { showLastShot(it) }
+                // 기록을 남긴 뒤에 화면을 닫습니다. 먼저 닫으면 기록을 쓰던
+                // 코루틴이 액티비티와 함께 취소돼 사진만 남고 방문은 사라집니다.
+                val saved = output.savedUri
+                if (saved == null) {
+                    runOnUiThread { binding.btnCapture.isEnabled = true }
+                    return
                 }
+                recordVisitWithPhoto(saved) { runOnUiThread { finish() } }
             }
             override fun onError(exception: ImageCaptureException) {
                 runOnUiThread { binding.btnCapture.isEnabled = true }
@@ -509,36 +511,19 @@ class GuideActivity : AppCompatActivity() {
     }
 
     /**
-     * 방금 찍은 사진을 오른쪽 아래 썸네일로 보여 줍니다.
-     *
-     * 찍고 나서 결과를 바로 볼 길이 없으면 잘 찍혔는지 확인하러 카메라를
-     * 떠나야 합니다. 썸네일을 누르면 그 사진을 들고 포토 프레임으로 가서
-     * 확인과 프레임 고르기가 한 번에 됩니다.
-     */
-    private fun showLastShot(uri: Uri) {
-        binding.cardLastShot.visibility = android.view.View.VISIBLE
-        Glide.with(this).load(uri).centerCrop().into(binding.ivLastShot)
-        binding.cardLastShot.setOnClickListener {
-            startActivity(
-                PhotoFrameActivity.intent(
-                    this,
-                    photoUri = uri,
-                    place = intent.getStringExtra(EXTRA_SPOT_NAME).orEmpty(),
-                    takenAt = System.currentTimeMillis()
-                )
-            )
-        }
-    }
-
-    /**
      * 촬영한 사진을 방문 기록에 남깁니다.
      *
      * 사진을 찍었다는 건 그 자리에 있었다는 뜻이라, 따로 "다녀왔어요"를 누르지
      * 않아도 방문으로 봅니다. 이렇게 해야 촬영 → 기록 → 일기가 끊기지 않습니다.
      */
-    private fun recordVisitWithPhoto(uri: Uri) {
-        val contentId = intent.getStringExtra(EXTRA_CONTENT_ID) ?: return
-        val name = intent.getStringExtra(EXTRA_SPOT_NAME) ?: return
+    private fun recordVisitWithPhoto(uri: Uri, onDone: () -> Unit = {}) {
+        val contentId = intent.getStringExtra(EXTRA_CONTENT_ID)
+        val name = intent.getStringExtra(EXTRA_SPOT_NAME)
+        if (contentId == null || name == null) {
+            // 장소를 모르면 기록할 수 없지만, 사진은 이미 갤러리에 남았습니다.
+            onDone()
+            return
+        }
 
         lifecycleScope.launch {
             runCatching {
@@ -561,6 +546,7 @@ class GuideActivity : AppCompatActivity() {
                     this@GuideActivity, R.string.guide_photo_logged, Toast.LENGTH_SHORT
                 ).show()
             }
+            onDone()
         }
     }
 }
