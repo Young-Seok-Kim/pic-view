@@ -534,7 +534,7 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
      * 그 찜한 곳을 골라 코스를 짭니다.
      */
     private fun savePlan(spot: SpotItem) {
-        val added = SpotBookmark.toggle(requireContext(), spot.contentId)
+        val added = SpotBookmark.toggle(requireContext(), spot)
         renderSheetSaveState(spot)
         Toast.makeText(
             requireContext(),

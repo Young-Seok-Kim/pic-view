@@ -101,6 +101,22 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
 
     override fun onResume() {
         super.onResume()
+        refreshOnReturn()
+    }
+
+    /**
+     * 상세·찜 목록은 이 화면 위에 얹히고(pushScreen 은 hide 만 함) 이 화면은
+     * 계속 RESUMED 라, 돌아와도 onResume 이 오지 않습니다. 숨김이 풀리는
+     * 순간이 "돌아온" 순간입니다.
+     */
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden && _binding != null) refreshOnReturn()
+    }
+
+    private fun refreshOnReturn() {
+        // 찜 목록에서 찜을 빼거나, 관광공사에 없는 찜이 정리됐을 수 있으므로 "n곳"을 다시 셉니다.
+        viewModel.visits.value?.let { renderFavoritesSummary(it) }
         // 빛은 가만히 있어도 흐릅니다. 탭으로 돌아왔을 때 "석양까지 58분"이
         // 아까 그대로면 화면이 시간을 놓친 것처럼 보입니다.
         renderToday()

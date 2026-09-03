@@ -22,8 +22,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_page"
-    android:clipToPadding="false"
     android:fillViewport="true">
+    <!--
+        위 패딩은 상태바 높이(MyFragment 가 applyTopSystemBarInset 으로 넣음).
+        clipToPadding 을 기본값(true)으로 두어 스크롤해도 내용이 상태바 밑으로
+        들어가지 않습니다. 이 화면은 사진이 위까지 깔리는 히어로가 없으므로
+        상태바 자리는 바탕색으로 비워 두는 것이 맞습니다.
+    -->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -59,35 +64,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:text="@string/my_subtitle" />
-            </LinearLayout>
-
-            <!--
-                로그인이 없다는 사실은 숨길 일이 아니라 이 앱의 약속입니다.
-                눌러도 아무 일이 없어야 맞습니다 — 상태 표시이지 버튼이 아닙니다.
-            -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_pill_outline"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingHorizontal="@dimen/space_m"
-                android:paddingVertical="6dp">
-
-                <ImageView
-                    android:layout_width="13dp"
-                    android:layout_height="13dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_lock"
-                    app:tint="@color/maple_500" />
-
-                <TextView
-                    style="@style/Text.Caption"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:text="@string/my_local_badge"
-                    android:textColor="@color/text_secondary" />
             </LinearLayout>
 
             <ImageView

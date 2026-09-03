@@ -83,7 +83,7 @@ class SpotAdapter(
             renderFavorite(btnSpotFavorite, AppPrefs.isFavorite(context, item.contentId))
             btnSpotFavorite.setOnClickListener {
                 renderFavorite(
-                    btnSpotFavorite, AppPrefs.toggleFavorite(context, item.contentId)
+                    btnSpotFavorite, AppPrefs.toggleFavorite(context, item)
                 )
                 onFavoriteClick(item)
             }

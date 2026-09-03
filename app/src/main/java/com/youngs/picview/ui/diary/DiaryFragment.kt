@@ -145,7 +145,7 @@ class DiaryFragment : Fragment(R.layout.fragment_diary), MainActivity.TabRoot {
      * 담아 둔 곳들로 코스를 짜는 길은 코스 탭의 '직접 고르기'에 있습니다.
      */
     private fun prepareNext(rec: DiaryAdapter.NextRec) {
-        val added = SpotBookmark.toggle(requireContext(), rec.spot.contentId)
+        val added = SpotBookmark.toggle(requireContext(), rec.spot)
         Toast.makeText(
             requireContext(),
             if (added) R.string.bookmark_added else R.string.bookmark_removed,

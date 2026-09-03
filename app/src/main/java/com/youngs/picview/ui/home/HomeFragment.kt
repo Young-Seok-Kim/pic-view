@@ -362,7 +362,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
      * 골라 담으면 순서는 빛이 세웁니다.
      */
     private fun savePlan(spot: SpotItem) {
-        val added = SpotBookmark.toggle(requireContext(), spot.contentId)
+        val added = SpotBookmark.toggle(requireContext(), spot)
         Toast.makeText(
             requireContext(),
             if (added) R.string.bookmark_added else R.string.bookmark_removed,

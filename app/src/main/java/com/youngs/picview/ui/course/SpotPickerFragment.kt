@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DiffUtil
@@ -20,11 +21,13 @@ import com.youngs.picview.ui.adapter.SpotAdapter
 import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.util.AppPrefs
+import com.youngs.picview.data.repository.FavoriteSpots
 import com.youngs.picview.util.LatLng
 import com.youngs.picview.util.TravelMode
 import com.youngs.picview.util.applyTopSystemBarInset
 import com.youngs.picview.util.distanceKmTo
 import com.youngs.picview.util.estimateTravelMinutes
+import kotlinx.coroutines.launch
 
 /**
  * 코스에 담을 촬영지 고르기 — "장소는 내가, 순서는 빛이".
@@ -105,9 +108,22 @@ class SpotPickerFragment : Fragment(R.layout.fragment_spot_picker) {
         }
     }
 
+    /**
+     * 홈 목록(100건)에 없는 찜도 고를 수 있어야 하므로, 찜한 곳은
+     * [FavoriteSpots.resolve] 로 따로 찾아 목록 뒤에 붙입니다.
+     */
     private fun render() {
+        if (_binding == null) return
+        val known = mainViewModel.spotData.value.orEmpty()
+        viewLifecycleOwner.lifecycleScope.launch {
+            val favoriteSpots = FavoriteSpots.resolve(requireContext(), known).spots
+            val knownIds = known.map { it.contentId }.toSet()
+            renderRows(known + favoriteSpots.filter { it.contentId !in knownIds })
+        }
+    }
+
+    private fun renderRows(all: List<SpotItem>) {
         val view = _binding ?: return
-        val all = mainViewModel.spotData.value.orEmpty()
         val favorites = AppPrefs.favoriteSpots(requireContext())
         val picked = courseViewModel.pickedIds.value.orEmpty()
 

@@ -415,7 +415,6 @@
 
     <!-- MY 탭 · 시안 개편 -->
     <string name="my_subtitle">이 기기에만 안전하게 저장돼요</string>
-    <string name="my_local_badge">로컬 저장 · 로그인 없음</string>
 
     <string name="my_today_title">오늘의 시선</string>
     <string name="my_today_meta">%1$s · %2$s</string>

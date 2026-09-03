@@ -1,6 +1,7 @@
 package com.youngs.picview.util
 
 import android.content.Context
+import com.youngs.picview.ui.model.SpotItem
 
 /**
  * 장소 하나를 담아 두는 일.
@@ -26,8 +27,8 @@ object SpotBookmark {
      *
      * @return true 면 방금 담긴 것, false 면 방금 뺀 것
      */
-    fun toggle(context: Context, contentId: String): Boolean =
-        AppPrefs.toggleFavorite(context, contentId)
+    fun toggle(context: Context, spot: SpotItem): Boolean =
+        AppPrefs.toggleFavorite(context, spot)
 
     fun isSaved(context: Context, contentId: String): Boolean =
         AppPrefs.isFavorite(context, contentId)

@@ -196,7 +196,7 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
         render(AppPrefs.isFavorite(requireContext(), spot.contentId))
 
         binding.btnFavorite.setOnClickListener {
-            val favorite = AppPrefs.toggleFavorite(requireContext(), spot.contentId)
+            val favorite = AppPrefs.toggleFavorite(requireContext(), spot)
             render(favorite)
             Toast.makeText(
                 requireContext(),

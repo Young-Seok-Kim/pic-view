@@ -2,6 +2,8 @@ package com.youngs.picview.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.gson.Gson
+import com.youngs.picview.ui.model.SpotItem
 import java.util.UUID
 
 /**
@@ -23,6 +25,9 @@ object AppPrefs {
     private const val KEY_ONBOARDED = "onboarding_done"
     private const val KEY_INSTALL_ID = "install_id"
     private const val KEY_FAVORITES = "favorite_spots"
+
+    /** 찜한 장소의 정보(JSON). 홈 목록에서 밀려나도 찜 목록에 보이게 합니다. 뒤에 contentId 가 붙습니다. */
+    private const val KEY_FAVORITE_SNAPSHOT_PREFIX = "favorite_spot_"
     private const val KEY_DIARY_FEELING_PREFIX = "diary_feelings_"
     private const val KEY_POSE_HINT_SEEN = "pose_hint_seen"
 
@@ -80,14 +85,51 @@ object AppPrefs {
     fun isFavorite(context: Context, contentId: String): Boolean =
         contentId in favoriteSpots(context)
 
-    /** 찜을 토글하고, 토글 후 찜 상태를 돌려줍니다. */
-    fun toggleFavorite(context: Context, contentId: String): Boolean {
+    /**
+     * 찜을 토글하고, 토글 후 찜 상태를 돌려줍니다.
+     *
+     * 담을 때는 장소 정보도 스냅샷으로 남깁니다. 홈 목록은 관광공사 API 에서
+     * 100건만 받아 와 구성이 바뀌므로, id 만 남기면 나중에 목록에서 그 장소를
+     * 못 찾아 "찜 3곳"인데 2곳만 보이는 일이 생깁니다.
+     */
+    fun toggleFavorite(context: Context, spot: SpotItem): Boolean {
         val current = favoriteSpots(context).toMutableSet()
-        val nowFavorite = !current.remove(contentId)
-        if (nowFavorite) current.add(contentId)
-        prefs(context).edit().putStringSet(KEY_FAVORITES, current).apply()
+        val nowFavorite = !current.remove(spot.contentId)
+        if (nowFavorite) current.add(spot.contentId)
+        prefs(context).edit()
+            .putStringSet(KEY_FAVORITES, current)
+            .apply {
+                if (nowFavorite) putString(KEY_FAVORITE_SNAPSHOT_PREFIX + spot.contentId, gson.toJson(spot))
+                else remove(KEY_FAVORITE_SNAPSHOT_PREFIX + spot.contentId)
+            }
+            .apply()
         return nowFavorite
     }
+
+    /** 관광공사에서 내려간 장소처럼 더는 보여 줄 수 없는 찜을 지웁니다. */
+    fun removeFavorites(context: Context, contentIds: Collection<String>) {
+        if (contentIds.isEmpty()) return
+        val current = favoriteSpots(context).toMutableSet()
+        current.removeAll(contentIds.toSet())
+        prefs(context).edit()
+            .putStringSet(KEY_FAVORITES, current)
+            .apply { contentIds.forEach { remove(KEY_FAVORITE_SNAPSHOT_PREFIX + it) } }
+            .apply()
+    }
+
+    /** 찜한 장소의 스냅샷을 갱신합니다. 홈 목록에서 다시 만난 장소는 최신 정보로 덮습니다. */
+    fun saveFavoriteSnapshot(context: Context, spot: SpotItem) {
+        prefs(context).edit()
+            .putString(KEY_FAVORITE_SNAPSHOT_PREFIX + spot.contentId, gson.toJson(spot))
+            .apply()
+    }
+
+    /** 찜할 때 남긴 장소 정보. 스냅샷을 남기기 전에 찜한 것은 null 입니다. */
+    fun favoriteSnapshot(context: Context, contentId: String): SpotItem? =
+        prefs(context).getString(KEY_FAVORITE_SNAPSHOT_PREFIX + contentId, null)
+            ?.let { runCatching { gson.fromJson(it, SpotItem::class.java) }.getOrNull() }
+
+    private val gson by lazy { Gson() }
 
     /**
      * 그날의 감정 태그(시안 — 오늘의 감정).
@@ -120,7 +162,9 @@ object AppPrefs {
         val editor = p.edit()
         editor.remove(KEY_FAVORITES)
         p.all.keys
-            .filter { it.startsWith(KEY_DIARY_FEELING_PREFIX) }
+            .filter {
+                it.startsWith(KEY_DIARY_FEELING_PREFIX) || it.startsWith(KEY_FAVORITE_SNAPSHOT_PREFIX)
+            }
             .forEach { editor.remove(it) }
         editor.apply()
     }
