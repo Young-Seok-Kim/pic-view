@@ -2,6 +2,7 @@ package com.youngs.picview.ui.map
 
 import android.graphics.PointF
 import android.os.Bundle
+import com.youngs.picview.util.NaverMapSdkInit
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -84,6 +85,12 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
         val lng = mapx.toDoubleOrNull() ?: return null
         if (lat !in 33.0..39.0 || lng !in 124.0..132.0) return null
         return LatLng(lat, lng)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        // 지도 SDK 는 여기서 처음 씁니다. 뷰를 만들기 전에 초기화해야 합니다.
+        NaverMapSdkInit.ensure(requireContext())
+        super.onCreate(savedInstanceState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -453,7 +460,10 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
                     requireContext(),
                     spotTitle = spot.title,
                     contextId = SiseonGuide.contextIdFor(facts.bestPhase),
-                    guideId = SiseonGuide.guideIdFor(facts)
+                    guideId = SiseonGuide.guideIdFor(facts),
+                    // 미션에서 찍은 사진이 이 장소의 방문 기록("다녀왔어요")이 되도록.
+                    contentId = spot.contentId,
+                    phaseName = viewModel.sunTimes.phaseNow().name
                 )
             )
         }

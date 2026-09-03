@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -57,11 +56,10 @@ class MainActivity : BaseActivity() {
     private val isSenior get() = AppPrefs.isSeniorMode(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        // 최초 실행이면 안내부터. 여기서 모드를 고르고 돌아옵니다.
-        // setContentView 전에 넘겨야 본 화면이 한 프레임 비치지 않습니다.
+        // 최초 실행이면 안내부터. 보통은 SplashActivity 가 미리 가르지만,
+        // 다른 경로로 들어와도 본 화면이 한 프레임 비치지 않게 여기서도 막습니다.
         if (!AppPrefs.isOnboarded(this)) {
             startActivity(OnboardingActivity.intent(this))
             finish()
@@ -72,8 +70,6 @@ class MainActivity : BaseActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        splashScreen.setKeepOnScreenCondition { viewModel.isLoading.value == true }
 
         setupBottomNav()
         setupWindowInsets()
