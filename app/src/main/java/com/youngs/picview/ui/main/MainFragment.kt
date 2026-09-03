@@ -329,7 +329,10 @@ class MainFragment : Fragment(R.layout.fragment_main) {
                 requireContext(),
                 spotTitle = spot.title,
                 contextId = SiseonGuide.contextIdFor(facts.bestPhase),
-                guideId = SiseonGuide.guideIdFor(facts)
+                guideId = SiseonGuide.guideIdFor(facts),
+                // 미션에서 찍은 사진이 이 장소의 방문 기록("다녀왔어요")이 되도록.
+                contentId = spot.contentId,
+                phaseName = viewModel.sunTimes.phaseNow().name
             )
         )
     }

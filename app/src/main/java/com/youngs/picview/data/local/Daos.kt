@@ -98,6 +98,15 @@ interface VisitDao {
     @Query("SELECT DISTINCT contentId FROM visit_log")
     suspend fun visitedContentIds(): List<String>
 
+    /**
+     * 한 장소의 방문 기록, 최근 것부터.
+     *
+     * 상세 화면의 "다녀왔어요"가 이걸 봅니다. Flow 라서 촬영 화면에서 찍고
+     * 돌아오는 순간 표시가 저절로 바뀝니다.
+     */
+    @Query("SELECT * FROM visit_log WHERE contentId = :contentId ORDER BY visitedAt DESC")
+    fun observeByContentId(contentId: String): Flow<List<VisitLogEntity>>
+
 
     /**
      * 이미 남아 있는 방문 기록에 사진을 붙입니다.
@@ -105,16 +114,20 @@ interface VisitDao {
      * 촬영 화면에서 셔터를 누르면 그 장소의 가장 최근 기록을 찾아 채웁니다.
      * 사진이 이미 있으면 덮지 않습니다. 한 장소에서 여러 장을 찍었을 때
      * 첫 장(대개 가장 공들인 것)이 남는 편이 자연스럽습니다.
+     *
+     * [since] 이전의 기록에는 붙이지 않습니다. 몇 주 전 기록에 오늘 사진이
+     * 붙으면 일기에서 그 사진이 옛날 날짜로 들어가고 이달 촬영 수에서도
+     * 빠집니다. 그런 경우엔 오늘 기록을 새로 만드는 게 맞습니다.
      */
     @Query("""
         UPDATE visit_log SET photoUri = :uri
         WHERE id = (
             SELECT id FROM visit_log
-            WHERE contentId = :contentId AND photoUri IS NULL
+            WHERE contentId = :contentId AND photoUri IS NULL AND visitedAt >= :since
             ORDER BY visitedAt DESC LIMIT 1
         )
     """)
-    suspend fun attachPhoto(contentId: String, uri: String): Int
+    suspend fun attachPhoto(contentId: String, uri: String, since: Long): Int
 
     /** 같은 장소를 짧은 시간 안에 여러 번 기록하지 않도록 확인용. */
     @Query(

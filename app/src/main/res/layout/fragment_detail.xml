@@ -869,8 +869,9 @@
                 <!--
                   ============ 다녀왔어요 ============
 
-                  출사 기록(일기 탭)의 시작점입니다. 예전에는 접힌 "장소 정보"
-                  안의 작은 텍스트 버튼이라 사실상 찾을 수 없었습니다.
+                  손으로 누르는 체크가 아니라 촬영 기록으로 저절로 채워지는
+                  표시입니다(DetailFragment.setupCheckin). 기록이 없으면 촬영
+                  화면으로, 있으면 날짜를 보여 주고 일기로 이어 줍니다.
                   일기가 여기서 시작되므로 항상 보이는 자리에 둡니다.
                 -->
                 <com.google.android.material.button.MaterialButton
@@ -880,9 +881,12 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_xl"
                     android:minHeight="52dp"
-                    android:text="@string/detail_checkin_long"
+                    android:text="@string/detail_checkin_not_yet"
                     android:textColor="@color/maple_700"
-                    app:backgroundTint="@color/maple_50" />
+                    app:backgroundTint="@color/maple_50"
+                    app:icon="@drawable/ic_camera"
+                    app:iconGravity="textStart"
+                    app:iconTint="@color/maple_700" />
 
                 <!--
                   ============ 장소 정보 (접이식) ============

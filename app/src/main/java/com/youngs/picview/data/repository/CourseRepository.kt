@@ -152,28 +152,33 @@ class CourseRepository(context: Context) {
     /**
      * 촬영한 사진을 방문 기록에 붙입니다. 기록이 없으면 새로 만듭니다.
      *
-     * 사진을 찍었다는 건 그 자리에 있었다는 뜻이므로, 따로 "다녀왔어요"를
-     * 누르지 않아도 방문으로 봅니다. 수동 버튼은 남겨 둡니다. 촬영하지 않고
-     * 눈으로만 보고 온 경우도 기록하고 싶을 수 있습니다.
+     * "다녀왔어요"는 이 경로로만 채워집니다. 사진을 찍었다는 건 그 자리에
+     * 있었다는 뜻이라, 손으로 누르는 체크보다 믿을 만하고 GPS 상시 권한도
+     * 필요 없습니다. 상세 화면은 이 기록을 그대로 보여 줄 뿐입니다.
      *
      * @return 새 기록을 만들었으면 true, 기존 기록에 사진만 붙였으면 false
      */
     suspend fun logCapture(spot: SpotItem, phase: LightPhase, photoUri: String): Boolean {
-        val attached = visitDao.attachPhoto(spot.contentId, photoUri)
+        val since = System.currentTimeMillis() - DEDUP_WINDOW_MS
+        val attached = visitDao.attachPhoto(spot.contentId, photoUri, since)
         if (attached > 0) return false
         return logVisit(spot, phase, photoUri)
     }
 
+    /** 한 장소의 방문 기록, 최근 것부터. 촬영 직후 바로 갱신되도록 Flow 입니다. */
+    fun observeVisits(contentId: String): Flow<List<VisitLogEntity>> =
+        visitDao.observeByContentId(contentId)
+
     /**
-     * 세 장 비교에서 고른 대표 컷을 기록에 붙입니다.
+     * 시선 가이드 미션에서 찍은 컷을 기록에 붙입니다.
      *
-     * [logCapture] 와 달리 [SpotItem] 을 요구하지 않습니다. 촬영 화면은
-     * 장소 이름과 식별자만 들고 있고, 좌표나 점수는 모릅니다. 대표 컷을
+     * [logCapture] 와 달리 [SpotItem] 을 요구하지 않습니다. 미션 화면은
+     * 장소 이름과 식별자만 들고 있고, 좌표나 점수는 모릅니다. 사진을
      * 남기자고 없는 값을 지어낼 이유가 없습니다.
      *
-     * 사진이 아직 안 붙은 그 장소의 기록이 있으면 거기에 붙이고, 없으면
-     * 새 기록을 만듭니다. 세 장 중 대표만 기록에 남고 나머지 둘도 갤러리에는
-     * 그대로 있습니다.
+     * 사진이 아직 안 붙은 그 장소의 최근 기록이 있으면 거기에 붙이고, 없으면
+     * 새 기록을 만듭니다. 미션 세 장 중 첫 장만 기록에 남고 나머지도
+     * 갤러리에는 그대로 있습니다.
      */
     suspend fun attachPhoto(
         contentId: String,
@@ -181,7 +186,9 @@ class CourseRepository(context: Context) {
         phase: LightPhase,
         photoUri: String
     ) {
-        if (visitDao.attachPhoto(contentId, photoUri) > 0) return
+        val since = System.currentTimeMillis() - DEDUP_WINDOW_MS
+        if (visitDao.attachPhoto(contentId, photoUri, since) > 0) return
+        if (visitDao.countRecent(contentId, since) > 0) return
 
         visitDao.insert(
             VisitLogEntity(

@@ -50,6 +50,9 @@ import com.youngs.picview.util.TtsController
 import com.youngs.picview.util.applyTopSystemBarInsetAsMargin
 import com.youngs.picview.ui.adapter.ImagePagerAdapter
 import com.youngs.picview.ui.guide.GuideActivity
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import com.youngs.picview.ui.model.SpotItem
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
@@ -174,17 +177,7 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
         loadTip(spot)
         loadVisitInfo(spot)
 
-        binding.btnStartGuide.setOnClickListener {
-            val intent = Intent(requireContext(), GuideActivity::class.java).apply {
-                putExtra(GuideActivity.EXTRA_SPOT_NAME, spot.title)
-                putExtra(GuideActivity.EXTRA_SPOT_TYPE, spot.contentTypeId)
-                // 포즈 추천이 지금의 빛을 반영해야 하므로 함께 넘깁니다.
-                putExtra(GuideActivity.EXTRA_PHASE, mainViewModel.sunTimes.phaseNow().name)
-                // 촬영한 사진을 이 장소의 방문 기록에 붙이기 위해 필요합니다.
-                putExtra(GuideActivity.EXTRA_CONTENT_ID, spot.contentId)
-            }
-            startActivity(intent)
-        }
+        binding.btnStartGuide.setOnClickListener { startGuide(spot) }
 
         binding.btnNavigate.setOnClickListener { openNavigation(spot) }
         setupFavorite(spot)
@@ -230,39 +223,52 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
     // ───────────────────── 방문 기록 ─────────────────────
 
+    /** 촬영 가이드(앱 카메라)로 갑니다. 여기서 찍은 사진이 이 장소의 방문 기록이 됩니다. */
+    private fun startGuide(spot: SpotItem) {
+        val intent = Intent(requireContext(), GuideActivity::class.java).apply {
+            putExtra(GuideActivity.EXTRA_SPOT_NAME, spot.title)
+            putExtra(GuideActivity.EXTRA_SPOT_TYPE, spot.contentTypeId)
+            // 포즈 추천이 지금의 빛을 반영해야 하므로 함께 넘깁니다.
+            putExtra(GuideActivity.EXTRA_PHASE, mainViewModel.sunTimes.phaseNow().name)
+            // 촬영한 사진을 이 장소의 방문 기록에 붙이기 위해 필요합니다.
+            putExtra(GuideActivity.EXTRA_CONTENT_ID, spot.contentId)
+        }
+        startActivity(intent)
+    }
+
     /**
-     * "다녀왔어요" — 출사 기록(일기 탭)의 원천 데이터를 남깁니다.
+     * "다녀왔어요" — 손으로 누르는 체크가 아니라, 촬영 기록으로 저절로 채워지는 표시입니다.
      *
-     * GPS 자동 체크인 대신 수동 버튼을 쓰는 이유:
-     *  - 위치 권한을 상시 요구하지 않아도 됨(스토어 심사·배터리 모두 유리)
-     *  - 검색만 해 본 곳과 실제로 다녀온 곳이 섞이지 않음
+     * 이 앱의 카메라(촬영 가이드, 시선 가이드 미션)로 사진을 찍으면 그 장소의
+     * 방문 기록이 남고, 여기는 그 기록을 보여 줄 뿐입니다. 손으로 체크하지
+     * 않는 이유:
+     *  - 검색만 해 본 곳과 실제로 찍고 온 곳이 섞이지 않음
+     *  - GPS 상시 권한 없이도 "그 자리에 있었다"는 증거(사진)가 남음
+     *
+     * 아직 기록이 없으면 버튼이 촬영 화면으로 이어 주고, 있으면 그 날짜를
+     * 보여 주며 눌렀을 때 일기로 갑니다. Flow 라서 촬영하고 돌아오면 바로 바뀝니다.
      */
     private fun setupCheckin(spot: SpotItem) {
-        binding.btnCheckin.setOnClickListener {
-            val phase = mainViewModel.sunTimes.phaseNow()
-            viewLifecycleOwner.lifecycleScope.launch {
-                val logged = runCatching {
-                    CourseRepository(requireContext()).logVisit(spot, phase)
-                }.getOrDefault(false)
-                val view = _binding ?: return@launch
-
-                if (logged) {
-                    // 기록이 남은 곳(일기 탭)으로 바로 이어 줍니다.
-                    // 토스트는 사라지면 끝이라 "그래서 어디서 보는데"가 남습니다.
-                    Snackbar.make(view.root, R.string.detail_checkin_done, Snackbar.LENGTH_LONG)
-                        // 하단 바(고도 12dp)가 스낵바를 가립니다. 그 위에 띄웁니다.
-                        .setAnchorView(view.btnSavePlan)
-                        .setAction(R.string.detail_checkin_view_diary) {
-                            // 일기 탭에서 들어온 경우 selectTab 이 같은 탭이라
-                            // 백스택을 정리하지 않으므로, 상세부터 닫습니다.
-                            parentFragmentManager.popBackStack()
-                            (activity as? MainActivity)?.selectTab(R.id.tab_diary)
-                        }
-                        .show()
+        viewLifecycleOwner.lifecycleScope.launch {
+            CourseRepository(requireContext()).observeVisits(spot.contentId).collect { visits ->
+                val binding = _binding ?: return@collect
+                val latest = visits.firstOrNull()
+                if (latest == null) {
+                    binding.btnCheckin.text = getString(R.string.detail_checkin_not_yet)
+                    binding.btnCheckin.setIconResource(R.drawable.ic_camera)
+                    binding.btnCheckin.setOnClickListener { startGuide(spot) }
                 } else {
-                    Toast.makeText(
-                        requireContext(), R.string.detail_checkin_already, Toast.LENGTH_SHORT
-                    ).show()
+                    val date = Instant.ofEpochMilli(latest.visitedAt)
+                        .atZone(ZoneId.systemDefault())
+                        .format(DateTimeFormatter.ofPattern(getString(R.string.detail_checkin_date_pattern)))
+                    binding.btnCheckin.text = getString(R.string.detail_checkin_visited, date)
+                    binding.btnCheckin.setIconResource(R.drawable.ic_check)
+                    binding.btnCheckin.setOnClickListener {
+                        // 일기 탭에서 들어온 경우 selectTab 이 같은 탭이라
+                        // 백스택을 정리하지 않으므로, 상세부터 닫습니다.
+                        parentFragmentManager.popBackStack()
+                        (activity as? MainActivity)?.selectTab(R.id.tab_diary)
+                    }
                 }
             }
         }

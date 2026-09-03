@@ -19,6 +19,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -27,6 +28,7 @@ import com.google.android.material.chip.Chip
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import com.youngs.picview.R
+import com.youngs.picview.data.repository.CourseRepository
 import com.youngs.picview.databinding.ActivitySiseonGuideBinding
 import com.youngs.picview.databinding.DialogPhotoSourceBinding
 import com.youngs.picview.databinding.DialogSiseonMissionBinding
@@ -35,10 +37,12 @@ import com.youngs.picview.databinding.ItemMissionSlotBinding
 import com.youngs.picview.databinding.ItemMissionStepBinding
 import com.youngs.picview.domain.guide.SiseonGuide
 import com.youngs.picview.domain.guide.SiseonGuideItem
+import com.youngs.picview.domain.light.LightPhase
 import com.youngs.picview.util.MediaStoreSaver
 import com.youngs.picview.util.TtsController
 import com.youngs.picview.util.applyTopSystemBarInset
 import kotlin.math.abs
+import kotlinx.coroutines.launch
 
 /**
  * 시선 가이드 — 구도 14종을 한 장씩 넘기며 배우고 바로 써 보는 화면.
@@ -92,6 +96,7 @@ class SiseonGuideActivity : AppCompatActivity() {
             if (uri == null || slot !in missionPhotos.indices) return@registerForActivityResult
             missionPhotos[slot] = uri
             renderMissionSlots()
+            recordMissionPhoto(uri)
         }
 
     // ── 카메라 촬영. 시스템 카메라가 이 URI 에 직접 쓰고 돌아옵니다.
@@ -590,6 +595,31 @@ class SiseonGuideActivity : AppCompatActivity() {
             .check()
     }
 
+    /**
+     * 미션 컷을 그 장소의 방문 기록에 붙입니다.
+     *
+     * 사진을 찍었다는 건 그 자리에 있었다는 뜻이라 "다녀왔어요"는 여기서
+     * 저절로 채워집니다. 장소를 모른 채 들어온 경우(홈의 일반 가이드)는
+     * 붙일 곳이 없으므로 건너뜁니다. 사진은 이미 갤러리에 있습니다.
+     */
+    private fun recordMissionPhoto(uri: Uri) {
+        val contentId = intent.getStringExtra(EXTRA_CONTENT_ID) ?: return
+        val title = spotTitle ?: return
+        val phase = intent.getStringExtra(EXTRA_PHASE)
+            ?.let { name -> LightPhase.entries.firstOrNull { it.name == name } }
+            ?: return
+        lifecycleScope.launch {
+            runCatching {
+                CourseRepository(applicationContext)
+                    .attachPhoto(contentId, title, phase, uri.toString())
+            }.onSuccess {
+                Toast.makeText(
+                    this@SiseonGuideActivity, R.string.guide_photo_logged, Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
     /** 안드로이드 9 이하는 MediaStore 저장에도 쓰기 권한이 필요합니다. */
     private fun cameraPermissions(): Array<String> =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -715,6 +745,12 @@ class SiseonGuideActivity : AppCompatActivity() {
 
     companion object {
         private const val EXTRA_SPOT_TITLE = "spot_title"
+
+        /** 촬영지 식별자. 있어야 미션 컷이 그 장소의 방문 기록에 붙습니다. */
+        private const val EXTRA_CONTENT_ID = "content_id"
+
+        /** 들어올 때의 빛 구간([LightPhase] 이름). 방문 기록에 남깁니다. */
+        private const val EXTRA_PHASE = "phase"
         private const val EXTRA_CONTEXT = "context_id"
         private const val EXTRA_GUIDE_ID = "guide_id"
 
@@ -722,15 +758,21 @@ class SiseonGuideActivity : AppCompatActivity() {
          * @param spotTitle 홈에서 고른 장소 이름 (없으면 일반 문구)
          * @param contextId 빛 상황 칩 id — [SiseonGuide.contextIdFor]
          * @param guideId   첫 구도 id — [SiseonGuide.guideIdFor]
+         * @param contentId 촬영지 식별자. 넘기면 미션 컷이 그 장소의 방문 기록이 됩니다.
+         * @param phaseName 지금의 빛 구간 이름([LightPhase.name]). 방문 기록에 남깁니다.
          */
         fun intent(
             context: Context,
             spotTitle: String? = null,
             contextId: String? = null,
-            guideId: String? = null
+            guideId: String? = null,
+            contentId: String? = null,
+            phaseName: String? = null
         ): Intent = Intent(context, SiseonGuideActivity::class.java)
             .putExtra(EXTRA_SPOT_TITLE, spotTitle)
             .putExtra(EXTRA_CONTEXT, contextId)
             .putExtra(EXTRA_GUIDE_ID, guideId)
+            .putExtra(EXTRA_CONTENT_ID, contentId)
+            .putExtra(EXTRA_PHASE, phaseName)
     }
 }

@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">정읍 시선</string>
     <string name="app_tagline">오늘, 정읍에서 가장 잘 나오는 곳</string>
+    <!-- 스플래시에서 태그라인 중 주황으로 강조할 낱말. 태그라인에 없으면 강조하지 않습니다. -->
+    <string name="splash_tagline_accent_word">가장</string>
 
     <!-- 온보딩 -->
     <string name="onboarding_skip">건너뛰기</string>
@@ -399,7 +401,7 @@
     <string name="my_delete_confirm">\"%1$s\" 코스를 삭제할까요?</string>
     <string name="my_accessibility">접근성</string>
     <string name="visited_title">다녀온 곳</string>
-    <string name="visited_empty">아직 다녀온 곳이 없어요.\n촬영지 상세에서 \"다녀왔어요\"를 눌러보세요.</string>
+    <string name="visited_empty">아직 다녀온 곳이 없어요.\n촬영지에서 사진을 찍으면 저절로 쌓여요.</string>
     <string name="visited_count">%1$d곳</string>
     <string name="visited_when">%1$s · %2$s</string>
     <string name="my_senior_title">큰 글씨 모드</string>
@@ -485,7 +487,7 @@
     <string name="diary_subtitle">다녀온 곳이 하루 단위로 모여요</string>
     <string name="diary_month_count">📖 이번 달 %1$d일의 기록</string>
     <string name="diary_empty_title">아직 기록이 없어요</string>
-    <string name="diary_empty_desc">촬영지 상세에서 \"다녀왔어요\"를 누르면\n이곳에 하루가 쌓입니다.</string>
+    <string name="diary_empty_desc">촬영지에서 사진을 찍으면\n이곳에 하루가 쌓입니다.</string>
     <string name="diary_stats_format">%1$d곳 · 평균 %2$d</string>
     <string name="diary_stats_places">%1$d곳</string>
     <string name="diary_generate">일기 만들기</string>
@@ -493,10 +495,10 @@
     <string name="diary_share">공유</string>
     <string name="diary_share_tag">#정읍시선 #출사 #정읍</string>
     <string name="detail_checkin">다녀왔어요</string>
-    <string name="detail_checkin_long">다녀왔어요 · 오늘 기록 남기기</string>
-    <string name="detail_checkin_done">출사 기록에 담았어요</string>
-    <string name="detail_checkin_already">오늘 이미 기록한 곳이에요</string>
-    <string name="detail_checkin_view_diary">일기 보기</string>
+    <!-- "다녀왔어요"는 앱 카메라로 찍은 기록이 있을 때만 채워집니다. -->
+    <string name="detail_checkin_not_yet">아직 안 다녀왔어요 · 찍으면 저절로 기록돼요</string>
+    <string name="detail_checkin_visited">다녀왔어요 · %1$s 촬영</string>
+    <string name="detail_checkin_date_pattern" translatable="false">M월 d일</string>
 
     <!-- 미션 & 배지 -->
     <string name="mission_title">미션 &amp; 기록</string>
