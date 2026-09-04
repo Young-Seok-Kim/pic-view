@@ -50,6 +50,11 @@ import com.youngs.picview.util.TtsController
 import com.youngs.picview.util.applyTopSystemBarInsetAsMargin
 import com.youngs.picview.ui.adapter.ImagePagerAdapter
 import com.youngs.picview.ui.guide.GuideActivity
+import com.youngs.picview.ui.photo.PhotoDeleter
+import com.youngs.picview.ui.photo.PhotoViewerActivity
+import android.app.Activity
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -172,6 +177,7 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
         renderScoreBreakdown(spot)
         renderPlaceMissions(spot)
         setupCheckin(spot)
+        setupMyShots(spot)
 
         loadImages(spot)
         loadTip(spot)
@@ -270,6 +276,86 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                         (activity as? MainActivity)?.selectTab(R.id.tab_diary)
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * "내가 찍은 사진" 띠.
+     *
+     * 다녀온 곳을 눌러 들어오면 "다녀왔어요 · 9월 4일 촬영"까지는 보였지만
+     * 정작 그때 무엇을 찍었는지는 볼 수 없었습니다. 이 장소의 촬영 기록에
+     * 붙은 사진을 전부 가로로 늘어놓고, 누르면 그 장부터 크게 펼칩니다.
+     * Flow 라서 촬영하고 돌아오면 바로 늘어납니다.
+     */
+    private fun setupMyShots(spot: SpotItem) {
+        val adapter = MyShotAdapter(
+            onClick = { index ->
+                val photos = myShots
+                if (index !in photos.indices) return@MyShotAdapter
+                startActivity(
+                    PhotoViewerActivity.intent(
+                        requireContext(),
+                        photoIds = photos.map { it.id },
+                        uris = photos.map { it.uri },
+                        takenAt = photos.map { it.takenAt },
+                        place = spot.title,
+                        start = index
+                    )
+                )
+            },
+            onLongClick = { photo ->
+                PhotoDeleter.confirm(requireContext()) { deleteShot(photo) }
+            }
+        )
+        binding.rvMyShots.adapter = adapter
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            CourseRepository(requireContext()).observePhotos(spot.contentId).collect { photos ->
+                val binding = _binding ?: return@collect
+                myShots = photos
+                adapter.submitList(photos)
+                binding.layoutMyShots.isVisible = photos.isNotEmpty()
+                binding.tvMyShotsTitle.text =
+                    getString(R.string.detail_my_shots_count, photos.size)
+            }
+        }
+    }
+
+    /** 띠에 올라와 있는 사진. 누른 순간 큰 화면에 넘길 목록입니다. */
+    private var myShots: List<com.youngs.picview.data.local.VisitPhotoEntity> = emptyList()
+
+    /** 시스템 삭제 확인창이 필요했던 사진. 승인되면 기록에서 뺍니다. */
+    private var pendingShotDelete: com.youngs.picview.data.local.VisitPhotoEntity? = null
+    private val shotDeleteRequest =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            val photo = pendingShotDelete ?: return@registerForActivityResult
+            pendingShotDelete = null
+            if (result.resultCode == Activity.RESULT_OK) {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    PhotoDeleter.removeRecord(requireContext(), photo.id)
+                }
+            }
+        }
+
+    /**
+     * 띠에서 꾹 눌러 지우기.
+     *
+     * 띠는 Flow 를 보고 있어서 기록에서 빠지는 순간 저절로 줄어듭니다.
+     * 여기서는 지우기만 하고 화면은 건드리지 않습니다.
+     */
+    private fun deleteShot(photo: com.youngs.picview.data.local.VisitPhotoEntity) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val context = context ?: return@launch
+            when (val outcome = PhotoDeleter.delete(context, photo.id, photo.uri)) {
+                PhotoDeleter.Outcome.Done ->
+                    Toast.makeText(context, R.string.photo_viewer_deleted, Toast.LENGTH_SHORT).show()
+                is PhotoDeleter.Outcome.NeedsSystemPrompt -> {
+                    pendingShotDelete = photo
+                    shotDeleteRequest.launch(IntentSenderRequest.Builder(outcome.sender).build())
+                }
+                PhotoDeleter.Outcome.Failed ->
+                    Toast.makeText(context, R.string.photo_viewer_delete_failed, Toast.LENGTH_SHORT).show()
             }
         }
     }

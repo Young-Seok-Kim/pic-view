@@ -1,11 +1,14 @@
 package com.youngs.picview.data.repository
 
 import android.content.Context
+import android.net.Uri
+import android.provider.MediaStore
 import com.youngs.picview.data.local.PicViewDatabase
 import com.youngs.picview.data.local.SavedCourseEntity
 import com.youngs.picview.data.local.SavedCourseWithStops
 import com.youngs.picview.data.local.SavedStopEntity
 import com.youngs.picview.data.local.VisitLogEntity
+import com.youngs.picview.data.local.VisitPhotoEntity
 import com.youngs.picview.domain.course.CourseStop
 import com.youngs.picview.domain.light.SunTimes
 import com.youngs.picview.domain.course.ShootingCourse
@@ -15,7 +18,10 @@ import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.util.AppPrefs
 import com.youngs.picview.util.TravelMode
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import java.time.LocalTime
 
 /**
@@ -158,16 +164,67 @@ class CourseRepository(context: Context) {
      *
      * @return 새 기록을 만들었으면 true, 기존 기록에 사진만 붙였으면 false
      */
-    suspend fun logCapture(spot: SpotItem, phase: LightPhase, photoUri: String): Boolean {
-        val since = System.currentTimeMillis() - DEDUP_WINDOW_MS
-        val attached = visitDao.attachPhoto(spot.contentId, photoUri, since)
-        if (attached > 0) return false
-        return logVisit(spot, phase, photoUri)
-    }
+    suspend fun logCapture(spot: SpotItem, phase: LightPhase, photoUri: String): Boolean =
+        recordPhoto(
+            contentId = spot.contentId,
+            title = spot.title,
+            phase = phase,
+            photoUri = photoUri,
+            score = spot.score,
+            imageUrl = spot.imageUrl
+        )
 
     /** 한 장소의 방문 기록, 최근 것부터. 촬영 직후 바로 갱신되도록 Flow 입니다. */
     fun observeVisits(contentId: String): Flow<List<VisitLogEntity>> =
         visitDao.observeByContentId(contentId)
+
+    /**
+     * 한 장소에서 찍은 사진 중 **갤러리에 아직 있는 것**만, 최근 것부터.
+     *
+     * 기록에는 갤러리 주소만 있어서, 사용자가 갤러리에서 사진을 지우면 주소가
+     * 허공을 가리킵니다. 그걸 그대로 띄우면 회색 자리표시만 나와 "사진이
+     * 안 뜬다"로 보입니다(2026-09-04 폰에서 확인: 8월 23일 사진이 지워져
+     * 있었음). 그래서 보여 주기 전에 한 장씩 있는지 묻고, 없는 것은 뺍니다.
+     *
+     * 기록 자체는 지우지 않습니다. 방문했다는 사실은 그대로이고, 사진을
+     * 지운 것은 사용자의 선택입니다.
+     */
+    fun observePhotos(contentId: String): Flow<List<VisitPhotoEntity>> =
+        visitDao.observePhotosByContentId(contentId)
+            .map { photos -> photos.filter { photoExists(it.uri) } }
+            .flowOn(Dispatchers.IO)
+
+    /**
+     * 사진 한 장을 기록에서 뺍니다.
+     *
+     * 사진 보기 화면의 삭제가 부릅니다. 갤러리 파일은 화면 쪽에서 따로
+     * 지우고(시스템 확인이 필요할 수 있어서), 여기서는 기록만 다룹니다.
+     *
+     * 지운 사진이 방문 기록의 대표 사진이었으면 남은 사진 중 가장 먼저 찍은
+     * 것으로 바꿉니다. 대표 사진은 MY 탭 아카이브와 다녀온 곳 목록이 쓰는데,
+     * 그대로 두면 거기서 지운 사진의 빈 자리가 계속 보입니다.
+     */
+    suspend fun deletePhoto(photoId: Long) {
+        val photo = visitDao.getPhoto(photoId) ?: return
+        visitDao.deletePhoto(photoId)
+
+        val visit = visitDao.getVisit(photo.visitId) ?: return
+        if (visit.photoUri == photo.uri) {
+            visitDao.updateCover(visit.id, visitDao.photosOfVisit(visit.id).firstOrNull()?.uri)
+        }
+    }
+
+    /**
+     * 갤러리에 그 항목이 남아 있는지.
+     *
+     * 구형 기기에서 권한이 없어 물어볼 수 없으면 있는 것으로 칩니다.
+     * 모르는 것과 없는 것은 다르고, 잘못 숨기는 쪽이 더 나쁩니다.
+     */
+    private fun photoExists(uri: String): Boolean = runCatching {
+        appContext.contentResolver.query(
+            Uri.parse(uri), arrayOf(MediaStore.MediaColumns._ID), null, null, null
+        )?.use { it.moveToFirst() } ?: false
+    }.getOrDefault(true)
 
     /**
      * 시선 가이드 미션에서 찍은 컷을 기록에 붙입니다.
@@ -175,10 +232,6 @@ class CourseRepository(context: Context) {
      * [logCapture] 와 달리 [SpotItem] 을 요구하지 않습니다. 미션 화면은
      * 장소 이름과 식별자만 들고 있고, 좌표나 점수는 모릅니다. 사진을
      * 남기자고 없는 값을 지어낼 이유가 없습니다.
-     *
-     * 사진이 아직 안 붙은 그 장소의 최근 기록이 있으면 거기에 붙이고, 없으면
-     * 새 기록을 만듭니다. 미션 세 장 중 첫 장만 기록에 남고 나머지도
-     * 갤러리에는 그대로 있습니다.
      */
     suspend fun attachPhoto(
         contentId: String,
@@ -186,23 +239,49 @@ class CourseRepository(context: Context) {
         phase: LightPhase,
         photoUri: String
     ) {
-        val since = System.currentTimeMillis() - DEDUP_WINDOW_MS
-        if (visitDao.attachPhoto(contentId, photoUri, since) > 0) return
-        if (visitDao.countRecent(contentId, since) > 0) return
+        // 장소 점수는 촬영 화면이 모릅니다. 0 은 "안 잼"이라는 뜻입니다.
+        recordPhoto(contentId, title, phase, photoUri, score = 0, imageUrl = "")
+    }
 
-        visitDao.insert(
+    /**
+     * 사진 한 장을 기록으로 남기는 실제 작업.
+     *
+     * 예전에는 방문 기록의 photoUri 한 칸이 전부라, 한 자리에서 세 장을 찍으면
+     * 첫 장만 남고 두 장은 앱이 잊었습니다. 지금은 [DEDUP_WINDOW_MS] 안의
+     * 최근 방문 기록을 찾아(없으면 만들어) 거기에 사진을 **전부** 쌓습니다.
+     * 방문 기록의 photoUri 는 첫 장을 대표로 채워 두는 용도로만 남습니다.
+     *
+     * @return 새 방문 기록을 만들었으면 true
+     */
+    private suspend fun recordPhoto(
+        contentId: String,
+        title: String,
+        phase: LightPhase,
+        photoUri: String,
+        score: Int,
+        imageUrl: String
+    ): Boolean {
+        val now = System.currentTimeMillis()
+        val since = now - DEDUP_WINDOW_MS
+
+        val existing = visitDao.latestVisitId(contentId, since)
+        val visitId = existing ?: visitDao.insert(
             VisitLogEntity(
                 contentId = contentId,
                 title = title,
-                visitedAt = System.currentTimeMillis(),
-                // 장소 점수는 촬영 화면이 모릅니다. 0 은 "안 잼"이라는 뜻입니다.
-                score = 0,
-                imageUrl = "",
+                visitedAt = now,
+                score = score,
+                imageUrl = imageUrl,
                 phaseName = phase.name,
                 installId = AppPrefs.installId(appContext),
                 photoUri = photoUri
             )
         )
+        // 이미 있던 기록에 대표 사진이 비어 있으면 이 장으로 채웁니다.
+        if (existing != null) visitDao.attachPhoto(contentId, photoUri, since)
+
+        visitDao.insertPhoto(VisitPhotoEntity(visitId = visitId, uri = photoUri, takenAt = now))
+        return existing == null
     }
 
     companion object {

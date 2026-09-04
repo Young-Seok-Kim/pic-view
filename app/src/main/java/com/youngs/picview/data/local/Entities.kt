@@ -105,3 +105,34 @@ data class VisitLogEntity(
      */
     val photoUri: String? = null
 )
+
+/**
+ * 한 방문에서 찍은 사진 한 장.
+ *
+ * [VisitLogEntity.photoUri] 는 칸이 하나라 첫 장만 남고, 같은 자리에서 더
+ * 찍은 사진은 갤러리에만 있고 앱은 몰랐습니다. 그래서 상세 화면이 "다녀왔어요"
+ * 까지는 말해도 **무엇을 찍었는지**는 보여 주지 못했습니다. 사진은 여기에
+ * 전부 쌓고, 방문 기록의 photoUri 는 대표 사진(첫 장)으로만 씁니다.
+ *
+ * 방문 기록이 지워지면 함께 지워집니다. 사진 파일은 갤러리에 그대로 있습니다.
+ */
+@Entity(
+    tableName = "visit_photo",
+    foreignKeys = [
+        ForeignKey(
+            entity = VisitLogEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["visitId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index("visitId")]
+)
+data class VisitPhotoEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val visitId: Long,
+    /** 갤러리(MediaStore) 주소 */
+    val uri: String,
+    /** 찍은 시각 epoch millis */
+    val takenAt: Long
+)

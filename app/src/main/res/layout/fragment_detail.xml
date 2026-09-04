@@ -889,6 +889,43 @@
                     app:iconTint="@color/maple_700" />
 
                 <!--
+                  ============ 내가 찍은 사진 ============
+
+                  "다녀왔어요"가 언제 갔는지를 말한다면, 이 띠는 **무엇을 찍었는지**를
+                  보여 줍니다. 예전에는 기록에 사진 한 장만 남아 이 자리가 없었고,
+                  다녀온 곳을 눌러도 사진을 볼 길이 없었습니다. 사진이 없으면
+                  통째로 감춥니다. 누르면 그 장부터 크게 펼칩니다.
+                -->
+                <LinearLayout
+                    android:id="@+id/layout_my_shots"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_l"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/tv_my_shots_title"
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_secondary"
+                        tools:text="내가 찍은 사진 3장" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_my_shots"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_s"
+                        android:clipToPadding="false"
+                        android:orientation="horizontal"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:itemCount="3"
+                        tools:listitem="@layout/item_detail_my_photo" />
+                </LinearLayout>
+
+                <!--
                   ============ 장소 정보 (접이식) ============
 
                   역사·건축 설명은 길고, 출사 결정에는 쓰이지 않습니다. 예전에는

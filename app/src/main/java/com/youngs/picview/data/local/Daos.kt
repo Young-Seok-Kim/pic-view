@@ -83,7 +83,49 @@ interface DiaryDao {
 interface VisitDao {
 
     @Insert
-    suspend fun insert(log: VisitLogEntity)
+    suspend fun insert(log: VisitLogEntity): Long
+
+    @Insert
+    suspend fun insertPhoto(photo: VisitPhotoEntity)
+
+    /**
+     * 한 장소에서 찍은 사진 전부, 최근 것부터.
+     *
+     * 방문 기록이 여러 건이어도 장소 하나로 묶어서 봅니다. 상세 화면의
+     * "내가 찍은 사진"이 이걸 봅니다.
+     */
+    @Query("""
+        SELECT visit_photo.* FROM visit_photo
+        INNER JOIN visit_log ON visit_photo.visitId = visit_log.id
+        WHERE visit_log.contentId = :contentId
+        ORDER BY visit_photo.takenAt DESC
+    """)
+    fun observePhotosByContentId(contentId: String): Flow<List<VisitPhotoEntity>>
+
+    @Query("SELECT * FROM visit_photo WHERE id = :id")
+    suspend fun getPhoto(id: Long): VisitPhotoEntity?
+
+    @Query("DELETE FROM visit_photo WHERE id = :id")
+    suspend fun deletePhoto(id: Long)
+
+    /** 한 방문 기록에 남은 사진, 오래된 것부터. 대표 사진을 고를 때 씁니다. */
+    @Query("SELECT * FROM visit_photo WHERE visitId = :visitId ORDER BY takenAt ASC")
+    suspend fun photosOfVisit(visitId: Long): List<VisitPhotoEntity>
+
+    @Query("SELECT * FROM visit_log WHERE id = :id")
+    suspend fun getVisit(id: Long): VisitLogEntity?
+
+    /** 방문 기록의 대표 사진을 바꿉니다. 남은 사진이 없으면 null 로 비웁니다. */
+    @Query("UPDATE visit_log SET photoUri = :uri WHERE id = :visitId")
+    suspend fun updateCover(visitId: Long, uri: String?)
+
+    /** [since] 이후의 그 장소 최근 방문 기록 id. 사진을 붙일 곳을 찾는 데 씁니다. */
+    @Query("""
+        SELECT id FROM visit_log
+        WHERE contentId = :contentId AND visitedAt >= :since
+        ORDER BY visitedAt DESC LIMIT 1
+    """)
+    suspend fun latestVisitId(contentId: String, since: Long): Long?
 
     @Query("SELECT * FROM visit_log ORDER BY visitedAt DESC")
     fun observeAll(): Flow<List<VisitLogEntity>>
@@ -109,11 +151,12 @@ interface VisitDao {
 
 
     /**
-     * 이미 남아 있는 방문 기록에 사진을 붙입니다.
+     * 이미 남아 있는 방문 기록에 대표 사진을 붙입니다.
      *
      * 촬영 화면에서 셔터를 누르면 그 장소의 가장 최근 기록을 찾아 채웁니다.
      * 사진이 이미 있으면 덮지 않습니다. 한 장소에서 여러 장을 찍었을 때
-     * 첫 장(대개 가장 공들인 것)이 남는 편이 자연스럽습니다.
+     * 첫 장(대개 가장 공들인 것)이 대표로 남는 편이 자연스럽습니다.
+     * 나머지 장들은 [VisitPhotoEntity] 에 전부 쌓입니다.
      *
      * [since] 이전의 기록에는 붙이지 않습니다. 몇 주 전 기록에 오늘 사진이
      * 붙으면 일기에서 그 사진이 옛날 날짜로 들어가고 이달 촬영 수에서도

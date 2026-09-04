@@ -88,6 +88,13 @@
           다른 앱에서 "공유 → 정읍 시선" 으로 사진을 보낼 수 있게 열어 둡니다.
           갤러리에서 고른 사진에도 정읍 프레임을 입힐 수 있습니다.
         -->
+        <!-- 내가 찍은 사진 크게 보기. 상세 화면의 사진 띠에서 엽니다. -->
+        <activity
+            android:name=".ui.photo.PhotoViewerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.PicView.Camera" />
+
         <activity
             android:name=".ui.palette.ColorPaletteActivity"
             android:exported="false"

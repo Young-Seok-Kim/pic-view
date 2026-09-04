@@ -498,6 +498,19 @@
     <string name="detail_checkin_not_yet">아직 안 다녀왔어요 · 찍으면 저절로 기록돼요</string>
     <string name="detail_checkin_visited">다녀왔어요 · %1$s 촬영</string>
     <string name="detail_checkin_date_pattern" translatable="false">M월 d일</string>
+    <!-- 상세 화면 "내가 찍은 사진" 띠. 기록에 사진이 있을 때만 보입니다. -->
+    <string name="detail_my_shots_count">내가 찍은 사진 %1$d장</string>
+
+    <!-- 내가 찍은 사진 크게 보기 -->
+    <string name="photo_viewer_counter">%1$d / %2$d</string>
+    <string name="photo_viewer_when">%1$s 촬영</string>
+    <string name="photo_viewer_frame">포토 프레임</string>
+    <string name="photo_viewer_delete">사진 삭제</string>
+    <string name="photo_viewer_delete_title">이 사진을 지울까요?</string>
+    <string name="photo_viewer_delete_message">이 장소의 촬영 기록에서 빠지고, 갤러리에서도 삭제됩니다.</string>
+    <string name="photo_viewer_delete_confirm">삭제</string>
+    <string name="photo_viewer_deleted">사진을 지웠어요</string>
+    <string name="photo_viewer_delete_failed">사진을 지우지 못했어요</string>
 
     <!-- 미션 & 배지 -->
     <string name="mission_title">미션 &amp; 기록</string>
@@ -621,6 +634,7 @@
     <string name="cd_search">탐색 목록 열기</string>
     <string name="cd_layers">범례 접기/펴기</string>
     <string name="cd_spot_photo">촬영지 사진</string>
+    <string name="cd_my_shot">내가 찍은 사진</string>
 
     <!-- 상세 -->
     <string name="detail_section_info">장소 정보</string>

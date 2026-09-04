@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 사진 크게 보기의 한 장. 화면에 맞춰 통째로 보이게 fitCenter 입니다. -->
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/iv_photo_page"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:contentDescription="@string/cd_my_shot"
+    android:scaleType="fitCenter" />

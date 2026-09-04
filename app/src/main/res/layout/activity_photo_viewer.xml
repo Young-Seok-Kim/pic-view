@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    내가 찍은 사진 크게 보기.
+
+    검은 바탕에 사진만 둡니다. 위에는 닫기와 "2 / 5", 아래에는 장소와 찍은
+    시각, 그리고 포토 프레임으로 가는 버튼 하나. 사진을 보는 화면에 다른
+    장식이 들어오면 사진이 작아 보입니다.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_photo_viewer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black">
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vp_photos"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- 위: 닫기 · 몇 번째 -->
+    <LinearLayout
+        android:id="@+id/layout_viewer_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_scrim_top"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/space_s"
+        android:paddingVertical="@dimen/space_xs">
+
+        <ImageButton
+            android:id="@+id/btn_viewer_close"
+            android:layout_width="@dimen/touch_target"
+            android:layout_height="@dimen/touch_target"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/cd_back"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/white" />
+
+        <TextView
+            android:id="@+id/tv_viewer_counter"
+            style="@style/Text.Body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/white"
+            tools:text="2 / 5" />
+
+        <!-- 닫기와 같은 폭이라 가운데 숫자가 정가운데에 옵니다. -->
+        <ImageButton
+            android:id="@+id/btn_viewer_delete"
+            android:layout_width="@dimen/touch_target"
+            android:layout_height="@dimen/touch_target"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/photo_viewer_delete"
+            android:src="@drawable/ic_delete"
+            app:tint="@color/white" />
+    </LinearLayout>
+
+    <!-- 아래: 장소 · 시각 · 포토 프레임 -->
+    <LinearLayout
+        android:id="@+id/layout_viewer_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bg_scrim_bottom"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/space_l"
+        android:paddingTop="@dimen/space_2xl"
+        android:paddingBottom="@dimen/space_l">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_viewer_place"
+                style="@style/Text.SectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/white"
+                tools:text="내장산 우화정" />
+
+            <TextView
+                android:id="@+id/tv_viewer_when"
+                style="@style/Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:alpha="0.8"
+                android:textColor="@color/white"
+                tools:text="9월 4일 15:12 촬영" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_viewer_frame"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_m"
+            android:text="@string/photo_viewer_frame"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/scrim_strong"
+            app:icon="@drawable/ic_frame_crop"
+            app:iconTint="@color/white" />
+    </LinearLayout>
+</FrameLayout>

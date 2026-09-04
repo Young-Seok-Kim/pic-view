@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 /**
  * 앱 로컬 DB.
@@ -16,9 +18,10 @@ import androidx.room.RoomDatabase
         SavedCourseEntity::class,
         SavedStopEntity::class,
         VisitLogEntity::class,
+        VisitPhotoEntity::class,
         DiaryEntity::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = true
 )
 abstract class PicViewDatabase : RoomDatabase() {
@@ -41,10 +44,40 @@ abstract class PicViewDatabase : RoomDatabase() {
             PicViewDatabase::class.java,
             "picview.db"
         )
-            // 저장한 코스는 다시 만들 수 있는 데이터라, 스키마가 바뀌면
-            // 마이그레이션을 쓰기보다 초기화하는 편이 실수 여지가 적습니다.
-            // 출시 후 실사용 데이터가 쌓이면 정식 Migration 으로 바꿔야 합니다.
+            // 4 → 5 는 방문 기록·일기가 이미 쌓인 뒤의 변경이라 정식으로
+            // 옮깁니다. 그보다 옛 버전은 다시 만들 수 있는 데이터뿐이라
+            // 초기화합니다.
+            .addMigrations(MIGRATION_4_5)
             .fallbackToDestructiveMigration()
             .build()
+
+        /**
+         * 사진 표 추가.
+         *
+         * 방문 기록에 이미 붙어 있던 대표 사진을 새 표로 옮겨 둡니다.
+         * 그래야 업데이트 전에 찍은 사진도 상세 화면에서 보입니다.
+         */
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `visit_photo` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`visitId` INTEGER NOT NULL, " +
+                        "`uri` TEXT NOT NULL, " +
+                        "`takenAt` INTEGER NOT NULL, " +
+                        "FOREIGN KEY(`visitId`) REFERENCES `visit_log`(`id`) " +
+                        "ON UPDATE NO ACTION ON DELETE CASCADE )"
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_visit_photo_visitId` " +
+                        "ON `visit_photo` (`visitId`)"
+                )
+                db.execSQL(
+                    "INSERT INTO visit_photo (visitId, uri, takenAt) " +
+                        "SELECT id, photoUri, visitedAt FROM visit_log " +
+                        "WHERE photoUri IS NOT NULL AND photoUri != ''"
+                )
+            }
+        }
     }
 }
