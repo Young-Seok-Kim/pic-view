@@ -407,9 +407,18 @@ class SunArcView @JvmOverloads constructor(
             labelPaint.typeface = if (isNow) Typeface.create(bodyFont, Typeface.BOLD) else bodyFont
 
             if (isNow) {
-                val end = left + dp(16f) + labelPaint.measureText(phase.shortLabel) +
+                // 점 앞 여백과 시각 뒤 여백을 같게 둡니다. 예전엔 시각 글자가
+                // 끝나는 자리가 곧 알약 끝이라 오른쪽만 딱 붙어 보였습니다.
+                // 위아래도 고정값 대신 글꼴 메트릭으로 잡아 글자가 가운데 옵니다.
+                val textEnd = left + dp(16f) + labelPaint.measureText(phase.shortLabel) +
                     labelPaint.measureText(time)
-                pillRect.set(left - dp(6f), y - dp(11f), end, y + dp(5f))
+                val metrics = labelPaint.fontMetrics
+                pillRect.set(
+                    left - PILL_PAD_H * density,
+                    y + metrics.ascent - PILL_PAD_V * density,
+                    textEnd + PILL_PAD_H * density,
+                    y + metrics.descent + PILL_PAD_V * density
+                )
                 // 알약은 그 구간의 색입니다. 대표색으로 고정하면 야간인데
                 // 알약만 붉어서 히어로 카드와 어긋납니다.
                 scenePaint.color = ContextCompat.getColor(context, phase.heroColorRes)
@@ -502,6 +511,10 @@ class SunArcView @JvmOverloads constructor(
          * 깔 여유가 없습니다. 그 사이입니다.
          */
         private const val ARC_RISE_RATIO = 0.30f
+
+        /** 지금 구간 알약의 안쪽 여백(dp). 가로는 점 앞·시각 뒤 양쪽 같은 값입니다. */
+        private const val PILL_PAD_H = 6f
+        private const val PILL_PAD_V = 3f
 
         /** 격자 열 수. 여덟 구간이 4×2 로 딱 떨어집니다. */
         private const val COLUMNS = 4
