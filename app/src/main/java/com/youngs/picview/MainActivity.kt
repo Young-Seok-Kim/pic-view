@@ -34,6 +34,7 @@ import com.youngs.picview.domain.weather.SkyState
 import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.ui.model.SpotScoreContext
 import com.youngs.picview.util.AppPrefs
+import com.youngs.picview.data.model.WeatherResponse
 import com.youngs.picview.util.retryOrNull
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -363,6 +364,39 @@ class MainActivity : BaseActivity() {
 
     fun reloadData() = refresh(userInitiated = false)
 
+    /**
+     * 가장 최근에 올라온 초단기실황.
+     *
+     * 실황은 "매시 40분 이후면 그 시각 관측값이 있다"는 전제로 한 번만
+     * 불렀는데, 기상청이 늦게 올리는 날에는 40분이 지나도 NO_DATA(03) 가
+     * 옵니다. 그러면 HTTP 는 200 이라 재시도도 안 걸리고, 항목이 비어서
+     * 홈의 기온·체감·습도가 전부 "—" 로 남았습니다(2026-09-04 15:47 에
+     * base_time=1500 은 NO_DATA, 1400 은 정상인 것을 확인).
+     *
+     * 그래서 기준 시각에 값이 없으면 한 시간씩 물러나며 다시 묻습니다.
+     * 한 시간 전 기온이라도 "—" 보다는 낫고, 실황은 어차피 한 시간 단위라
+     * 오차도 그 안입니다.
+     */
+    private suspend fun fetchLatestObservation(base: LocalDateTime): WeatherResponse? {
+        repeat(OBSERVATION_LOOKBACK_HOURS + 1) { back ->
+            val at = base.minusHours(back.toLong())
+            val response = retryOrNull("WEATHER_API") {
+                RetrofitClient.weatherApiService.getUltraSrtNcst(
+                    serviceKey = BuildConfig.TOUR_API_KEY,
+                    baseDate = at.format(DateTimeFormatter.ofPattern("yyyyMMdd")),
+                    baseTime = at.format(DateTimeFormatter.ofPattern("HH")) + "00"
+                )
+            }
+            val items = response?.response?.body?.items?.item
+            if (!items.isNullOrEmpty()) return response
+            Log.w(
+                "WEATHER_API",
+                "실황 없음 (${at.toLocalTime().hour}시, ${response?.response?.header?.resultMsg}) — 한 시간 전으로 물러남"
+            )
+        }
+        return null
+    }
+
     private fun preLoadData() {
         if (viewModel.cachedWeather != null) {
             viewModel.isLoading.value = false
@@ -385,15 +419,7 @@ class MainActivity : BaseActivity() {
 
                 // 세 API 는 서로 의존하지 않으므로 동시에 호출합니다.
                 // 각각 독립적으로 재시도하고, 하나가 실패해도 나머지는 그대로 보여 줍니다.
-                val weatherAsync = async {
-                    retryOrNull("WEATHER_API") {
-                        RetrofitClient.weatherApiService.getUltraSrtNcst(
-                            serviceKey = BuildConfig.TOUR_API_KEY,
-                            baseDate = dateStr,
-                            baseTime = timeStr
-                        )
-                    }
-                }
+                val weatherAsync = async { fetchLatestObservation(base) }
                 // 단기예보는 02·05·08·11·14·17·20·23시 발표만 유효합니다.
                 // 그중 02시 발표가 그날 03시부터 사흘치를 담고 있어 하루 곡선을
                 // 한 번에 얻습니다. 02:10 이전이면 아직 안 올라왔으므로 전날
@@ -613,6 +639,9 @@ class MainActivity : BaseActivity() {
 
         /** 이 시간이 지난 뒤 앱으로 돌아오면 데이터를 다시 받아옵니다. */
         private const val STALE_AFTER_MS = 10 * 60 * 1000L
+
+        /** 실황이 아직 안 올라왔을 때 몇 시간 전까지 물러나 볼지. */
+        private const val OBSERVATION_LOOKBACK_HOURS = 2
 
         /** 일출·일몰 전후 이 분(分) 안쪽을 골든아워로 봅니다. */
         private const val GOLDEN_HOUR_MINUTES = 60L
