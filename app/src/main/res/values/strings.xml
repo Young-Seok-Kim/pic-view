@@ -404,6 +404,8 @@
     <string name="visited_empty">아직 다녀온 곳이 없어요.\n촬영지에서 사진을 찍으면 저절로 쌓여요.</string>
     <string name="visited_count">%1$d곳</string>
     <string name="visited_when">%1$s · %2$s</string>
+    <!-- 같은 곳을 여러 번 다녀왔을 때 시각 뒤에 붙습니다. -->
+    <string name="visited_times">%1$d번 다녀옴</string>
     <string name="my_senior_title">큰 글씨 모드</string>
     <string name="my_senior_title_on">큰 글씨 모드 사용 중</string>
     <string name="my_senior_desc">큰 글씨 · 큰 버튼 · 쉬운 메뉴\n어르신도 편하게 쓰는 정읍 출사</string>

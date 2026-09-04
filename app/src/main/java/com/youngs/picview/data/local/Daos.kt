@@ -182,6 +182,22 @@ interface VisitDao {
     suspend fun delete(id: Long)
 
     /**
+     * 사진이 하나도 안 남은 촬영 기록을 지웁니다.
+     *
+     * 사진을 지워도 방문 줄이 남던 시절에 생긴 빈 기록을 정리합니다.
+     * imageUrl 이 빈 것만 고릅니다. 촬영으로 만든 기록은 장소 사진을 안
+     * 받아 두므로 imageUrl 이 비어 있고, 옛날 수동 체크로 만든 기록은 장소
+     * 사진이 들어 있어 이 조건에 안 걸립니다. 그 기록은 사진이 없는 게
+     * 정상이라 지우면 안 됩니다.
+     */
+    @Query("""
+        DELETE FROM visit_log
+        WHERE photoUri IS NULL AND imageUrl = ''
+          AND id NOT IN (SELECT visitId FROM visit_photo)
+    """)
+    suspend fun deleteOrphans(): Int
+
+    /**
      * 방문 기록 전부.
      *
      * 사진 파일은 건드리지 않습니다. [VisitLogEntity.photoUri] 는 갤러리에

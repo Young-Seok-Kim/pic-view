@@ -35,6 +35,7 @@ import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.ui.model.SpotScoreContext
 import com.youngs.picview.util.AppPrefs
 import com.youngs.picview.data.model.WeatherResponse
+import com.youngs.picview.data.repository.CourseRepository
 import com.youngs.picview.util.retryOrNull
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -74,6 +75,10 @@ class MainActivity : BaseActivity() {
 
         setupBottomNav()
         setupWindowInsets()
+
+        // 사진을 다 지웠는데 껍데기만 남은 촬영 기록을 정리합니다. 사진을
+        // 지워도 방문 줄이 남던 빌드에서 생긴 것들이라 켤 때 한 번이면 됩니다.
+        lifecycleScope.launch { CourseRepository(applicationContext).pruneEmptyVisits() }
         setupBackStackListener()
         setupBackHandling()
 

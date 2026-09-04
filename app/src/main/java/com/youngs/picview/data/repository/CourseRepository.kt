@@ -116,7 +116,24 @@ class CourseRepository(context: Context) {
 
     // ───────────────────────── 방문 기록 ─────────────────────────
 
-    fun observeVisits(): Flow<List<VisitLogEntity>> = visitDao.observeAll()
+    /**
+     * 방문 기록 전부, 최근 것부터.
+     *
+     * 대표 사진이 갤러리에서 지워진 기록은 photoUri 를 비워서 내보냅니다.
+     * MY 탭 아카이브가 그 사진을 격자에 올리고, 누르면 포토 프레임이 "사진을
+     * 불러오지 못했어요" 를 띄웠습니다(2026-09-04 폰에서 확인). 기록은
+     * 그대로 두고 보이는 값만 정리합니다. 앱을 지웠다 다시 깔면 자기가
+     * 저장한 사진도 안 보이는데, 그때 기록까지 지우면 되돌릴 수 없습니다.
+     */
+    fun observeVisits(): Flow<List<VisitLogEntity>> =
+        visitDao.observeAll()
+            .map { visits ->
+                visits.map { v ->
+                    val uri = v.photoUri
+                    if (uri.isNullOrBlank() || photoExists(uri)) v else v.copy(photoUri = null)
+                }
+            }
+            .flowOn(Dispatchers.IO)
 
     fun observeVisitedSpotCount(): Flow<Int> = visitDao.observeVisitedSpotCount()
 
@@ -197,21 +214,33 @@ class CourseRepository(context: Context) {
     /**
      * 사진 한 장을 기록에서 뺍니다.
      *
-     * 사진 보기 화면의 삭제가 부릅니다. 갤러리 파일은 화면 쪽에서 따로
-     * 지우고(시스템 확인이 필요할 수 있어서), 여기서는 기록만 다룹니다.
+     * 사진 보기 화면과 상세의 사진 띠가 부릅니다. 갤러리 파일은 화면 쪽에서
+     * 따로 지우고(시스템 확인이 필요할 수 있어서), 여기서는 기록만 다룹니다.
      *
-     * 지운 사진이 방문 기록의 대표 사진이었으면 남은 사진 중 가장 먼저 찍은
-     * 것으로 바꿉니다. 대표 사진은 MY 탭 아카이브와 다녀온 곳 목록이 쓰는데,
-     * 그대로 두면 거기서 지운 사진의 빈 자리가 계속 보입니다.
+     * **마지막 사진이었으면 방문 기록도 지웁니다.** 이 앱에서 "다녀왔어요"의
+     * 근거는 사진뿐입니다. 사진을 다 지웠는데 다녀온 곳 목록에 그 줄이 남아
+     * 있으면 무엇을 근거로 남았는지 설명할 수 없습니다.
+     *
+     * 사진이 남아 있고 지운 것이 대표 사진이었으면 남은 사진 중 가장 먼저
+     * 찍은 것으로 바꿉니다. 대표 사진은 MY 탭 아카이브와 다녀온 곳 목록이
+     * 쓰는데, 그대로 두면 거기서 지운 사진의 빈 자리가 계속 보입니다.
      */
     suspend fun deletePhoto(photoId: Long) {
         val photo = visitDao.getPhoto(photoId) ?: return
         visitDao.deletePhoto(photoId)
 
         val visit = visitDao.getVisit(photo.visitId) ?: return
-        if (visit.photoUri == photo.uri) {
-            visitDao.updateCover(visit.id, visitDao.photosOfVisit(visit.id).firstOrNull()?.uri)
+        val remaining = visitDao.photosOfVisit(visit.id)
+        if (remaining.isEmpty()) {
+            visitDao.delete(visit.id)
+        } else if (visit.photoUri == photo.uri) {
+            visitDao.updateCover(visit.id, remaining.first().uri)
         }
+    }
+
+    /** 사진이 다 지워지고 껍데기만 남은 촬영 기록 정리. 앱을 켤 때 한 번 부릅니다. */
+    suspend fun pruneEmptyVisits() {
+        runCatching { visitDao.deleteOrphans() }
     }
 
     /**
