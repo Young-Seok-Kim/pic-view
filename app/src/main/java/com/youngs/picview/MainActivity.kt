@@ -282,6 +282,9 @@ class MainActivity : BaseActivity() {
         binding.navBottom.selectedItemId = itemId
     }
 
+    /** 살아 있는 탭 Fragment. 지도의 돋보기가 탐색 탭의 검색칸을 열 때 씁니다. */
+    fun tabFragment(itemId: Int): Fragment? = tabFragments[itemId]
+
     /** 탭 Fragment 가 구현하면 같은 탭 재탭 시 맨 위로 올라갑니다. */
     interface TabRoot {
         fun scrollToTop()

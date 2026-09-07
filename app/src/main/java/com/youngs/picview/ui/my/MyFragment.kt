@@ -133,6 +133,9 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
         }
         binding.layoutStatShots.setOnClickListener(openVisits)
         binding.tvArchiveAll.setOnClickListener(openVisits)
+        binding.tvArchiveByCourse.setOnClickListener {
+            (activity as? MainActivity)?.pushScreen(CoursePhotosFragment())
+        }
 
         // 아카이브 카드는 통째로 목적지입니다. 다만 사진이 하나도 없을 때
         // 빈 목록으로 보내는 건 "없다"를 두 번 말하는 것이라, 그때는
@@ -296,6 +299,7 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
         binding.rvMyPhotos.isVisible = photos.isNotEmpty()
         binding.layoutArchiveEmpty.isVisible = photos.isEmpty()
         binding.tvArchiveAll.isVisible = photos.isNotEmpty()
+        binding.tvArchiveByCourse.isVisible = photos.isNotEmpty()
         binding.cardArchive.contentDescription = getString(
             if (photos.isEmpty()) R.string.cd_my_archive_empty else R.string.cd_my_archive
         )

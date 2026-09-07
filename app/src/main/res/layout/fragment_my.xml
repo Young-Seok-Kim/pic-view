@@ -536,6 +536,24 @@
                         tools:itemCount="4"
                         tools:listitem="@layout/item_my_photo" />
 
+                    <!--
+                        코스별 모아보기. 격자는 최근 넉 장뿐이라 "그날 코스에서
+                        뭘 찍었지"에는 답하지 못합니다. 그 물음은 이 줄이 받습니다.
+                    -->
+                    <TextView
+                        android:id="@+id/tv_archive_by_course"
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_s"
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingVertical="2dp"
+                        android:text="@string/my_archive_by_course"
+                        android:textColor="@color/maple_600"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
                     <!-- 사진이 없을 때. 남의 사진으로 채우지 않습니다. -->
                     <LinearLayout
                         android:id="@+id/layout_archive_empty"

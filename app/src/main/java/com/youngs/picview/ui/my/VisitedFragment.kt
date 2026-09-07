@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -24,6 +25,7 @@ import com.youngs.picview.databinding.FragmentVisitedBinding
 import com.youngs.picview.databinding.ItemVisitedBinding
 import com.youngs.picview.domain.light.LightPhase
 import com.youngs.picview.ui.detail.DetailFragment
+import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.ui.model.SpotItem
 import java.time.Instant
 import java.time.ZoneId
@@ -47,6 +49,9 @@ class VisitedFragment : Fragment(R.layout.fragment_visited) {
 
     private val viewModel: VisitedViewModel by viewModels()
 
+    /** 홈이 받아 둔 촬영지 목록. 방문 기록에 없는 주소·좌표를 여기서 채웁니다. */
+    private val mainViewModel: MainViewModel by activityViewModels()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentVisitedBinding.bind(view)
@@ -56,7 +61,7 @@ class VisitedFragment : Fragment(R.layout.fragment_visited) {
 
         val adapter = VisitedAdapter { place ->
             (activity as? MainActivity)?.pushScreen(
-                DetailFragment.newInstance(place.latest.toSpotItem())
+                DetailFragment.newInstance(resolveSpot(place.latest))
             )
         }
         binding.rvVisited.adapter = adapter
@@ -69,6 +74,19 @@ class VisitedFragment : Fragment(R.layout.fragment_visited) {
             binding.tvVisitedCount.text = getString(R.string.visited_count, places.size)
         }
     }
+
+    /**
+     * 상세로 넘길 장소 정보.
+     *
+     * 방문 기록에는 이름과 사진뿐이라 그대로 넘기면 상세의 주소 줄이 비고
+     * 길찾기가 갈 곳을 모릅니다. 홈 목록에 같은 곳이 있으면 그 온전한
+     * 정보를 씁니다. 없으면(목록을 못 받았을 때) 최소 정보로 넘기고,
+     * 상세 화면이 API 로 주소를 채웁니다.
+     */
+    private fun resolveSpot(visit: VisitLogEntity): SpotItem =
+        mainViewModel.spotData.value.orEmpty()
+            .firstOrNull { it.contentId == visit.contentId }
+            ?: visit.toSpotItem()
 
     private fun applyTopInset() {
         binding.rootVisited.applyTopSystemBarInset()

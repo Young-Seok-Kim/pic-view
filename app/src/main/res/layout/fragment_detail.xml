@@ -173,7 +173,7 @@
                     android:layout_gravity="bottom"
                     android:orientation="vertical"
                     android:paddingHorizontal="24dp"
-                    android:paddingBottom="20dp">
+                    android:paddingBottom="24dp">
 
                     <LinearLayout
                         android:id="@+id/layout_detail_score"
@@ -250,15 +250,16 @@
                 </LinearLayout>
 
                 <!--
-                  페이지 인디케이터. 가운데 아래는 이제 장소명이 차지하므로
-                  오른쪽 아래 구석으로 비켜 둡니다.
+                  페이지 인디케이터. 사진 맨 아래 가운데, 주소 줄 밑에 둡니다.
+                  위에 두었더니 시계·배터리 옆에 떠서 사진 장수 표시로 읽히지
+                  않았습니다. 글 묶음의 아래 여백 안에 앉히므로 글과 겹치지 않습니다.
                 -->
                 <LinearLayout
                     android:id="@+id/layout_indicator"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="top|center_horizontal"
-                    android:layout_marginTop="18dp"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginBottom="8dp"
                     android:gravity="center"
                     android:orientation="horizontal" />
             </FrameLayout>

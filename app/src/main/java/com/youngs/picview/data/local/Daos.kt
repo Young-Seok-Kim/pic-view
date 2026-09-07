@@ -79,8 +79,33 @@ interface DiaryDao {
     suspend fun deleteAll()
 }
 
+/**
+ * 사진 한 장 + 그 사진이 붙은 방문의 장소.
+ *
+ * 코스별 사진 모아보기가 씁니다. 사진은 방문 기록만 알고 방문 기록이 장소를
+ * 아니까, 둘을 한 번에 이어 받아야 "이 사진이 어느 정거장 것인지"를 압니다.
+ */
+data class VisitPhotoWithPlace(
+    @Embedded val photo: VisitPhotoEntity,
+    val contentId: String,
+    val title: String,
+    val visitedAt: Long
+)
+
 @Dao
 interface VisitDao {
+
+    /** 내가 찍은 사진 전부(장소 포함), 최근 것부터. */
+    @Query("""
+        SELECT visit_photo.*,
+               visit_log.contentId AS contentId,
+               visit_log.title AS title,
+               visit_log.visitedAt AS visitedAt
+        FROM visit_photo
+        INNER JOIN visit_log ON visit_photo.visitId = visit_log.id
+        ORDER BY visit_photo.takenAt DESC
+    """)
+    fun observeAllPhotos(): Flow<List<VisitPhotoWithPlace>>
 
     @Insert
     suspend fun insert(log: VisitLogEntity): Long

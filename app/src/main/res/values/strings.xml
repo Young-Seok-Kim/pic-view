@@ -226,6 +226,10 @@
     <string name="explore_title">어디서 어떤 장면을\n찍을까요?</string>
     <string name="explore_sub">정읍 시선이 추천하는 오늘의 장소</string>
     <string name="explore_light_line">지금은 %1$s · %2$s</string>
+    <string name="explore_search_hint">장소 이름이나 주소로 찾기</string>
+    <string name="cd_search_clear">검색어 지우기</string>
+    <string name="explore_search_empty_title">‘%1$s’에 맞는 촬영지가 없어요</string>
+    <string name="explore_search_empty_desc">이름이나 주소를 다르게 적어 보세요</string>
     <string name="sort_reco">추천순</string>
     <string name="sort_dist">거리순</string>
     <string name="sort_light">빛 좋은 시간순</string>
@@ -433,6 +437,16 @@
     <string name="my_archive_all">전체 사진 보기</string>
     <string name="my_archive_empty">아직 남긴 사진이 없어요.\n촬영을 시작하면 여기에 쌓입니다.</string>
     <string name="my_archive_start">촬영 시작하기</string>
+    <string name="my_archive_by_course">코스별로 모아보기 →</string>
+
+    <!-- 코스별 사진 모아보기 -->
+    <string name="course_photos_title">코스별 사진</string>
+    <string name="course_photos_count">%1$d개 묶음</string>
+    <string name="course_photos_empty">아직 남긴 사진이 없어요.\n저장한 코스의 장소에서 찍으면 여기에 코스별로 모입니다.</string>
+    <string name="course_photos_meta">%1$s 출사 · %2$d곳 중 %3$d곳 · 사진 %4$d장</string>
+    <string name="course_photos_loose_title">코스 없이 찍은 사진</string>
+    <string name="course_photos_loose_meta">%1$d곳 · 사진 %2$d장</string>
+    <string name="course_photos_open">코스 보기</string>
 
     <string name="my_taste_title">나의 촬영 성향</string>
     <string name="my_taste_basis">사진 %1$d장 기준</string>

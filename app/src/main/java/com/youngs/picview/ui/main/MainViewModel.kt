@@ -78,6 +78,15 @@ class MainViewModel : ViewModel() {
 
     private var currentSpotCategory = SpotCategory.ALL
 
+    /**
+     * 탐색 탭 검색어. 장소 이름과 주소에서 찾습니다.
+     *
+     * 카테고리와 함께 겹쳐 걸립니다 — "자연"을 고른 채 "내장"을 치면 자연
+     * 가운데 내장산만 남습니다. 화면이 다시 만들어져도 검색어가 남도록
+     * 여기 둡니다.
+     */
+    private var query: String = ""
+
     var cachedWeather: String? = null
     var cachedGoldenHour: String? = null
     var cachedSpots: List<SpotItem>? = null
@@ -92,17 +101,41 @@ class MainViewModel : ViewModel() {
         updateFilteredList()
     }
 
+    fun setQuery(text: String) {
+        val trimmed = text.trim()
+        if (trimmed == query) return
+        query = trimmed
+        updateFilteredList()
+    }
+
+    fun currentQuery(): String = query
+
     private fun updateFilteredList() {
         val all = spotData.value ?: return
 
-        filteredSpots.value = when (currentSpotCategory) {
+        val byCategory = when (currentSpotCategory) {
             SpotCategory.ALL -> all
             SpotCategory.NATURE -> all.filter { it.contentTypeId == "12" }
             SpotCategory.CULTURE -> all.filter { it.contentTypeId == "14" }
             SpotCategory.LEPORTS -> all.filter { it.contentTypeId == "28" }
             SpotCategory.FOOD -> all.filter { it.contentTypeId == "39" }
         }
+
+        filteredSpots.value = if (query.isBlank()) {
+            byCategory
+        } else {
+            val needle = query.compact()
+            byCategory.filter { spot ->
+                spot.title.compact().contains(needle) || spot.addr1.compact().contains(needle)
+            }
+        }
     }
+
+    /**
+     * 띄어쓰기와 대소문자를 무시하고 견줍니다.
+     * "내장 산"이라고 쳐도 "내장산국립공원"이 잡혀야 합니다.
+     */
+    private fun String.compact(): String = filterNot { it.isWhitespace() }.lowercase()
 
     fun getCurrentCategory() = currentSpotCategory
 

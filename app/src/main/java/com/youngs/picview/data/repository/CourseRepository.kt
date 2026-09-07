@@ -9,6 +9,7 @@ import com.youngs.picview.data.local.SavedCourseWithStops
 import com.youngs.picview.data.local.SavedStopEntity
 import com.youngs.picview.data.local.VisitLogEntity
 import com.youngs.picview.data.local.VisitPhotoEntity
+import com.youngs.picview.data.local.VisitPhotoWithPlace
 import com.youngs.picview.domain.course.CourseStop
 import com.youngs.picview.domain.light.SunTimes
 import com.youngs.picview.domain.course.ShootingCourse
@@ -209,6 +210,16 @@ class CourseRepository(context: Context) {
     fun observePhotos(contentId: String): Flow<List<VisitPhotoEntity>> =
         visitDao.observePhotosByContentId(contentId)
             .map { photos -> photos.filter { photoExists(it.uri) } }
+            .flowOn(Dispatchers.IO)
+
+    /**
+     * 내가 찍은 사진 전부(장소 포함) 가운데 갤러리에 아직 있는 것, 최근 것부터.
+     * 코스별 사진 모아보기가 씁니다. 지워진 사진을 거르는 이유는
+     * [observePhotos] 와 같습니다.
+     */
+    fun observeAllPhotos(): Flow<List<VisitPhotoWithPlace>> =
+        visitDao.observeAllPhotos()
+            .map { photos -> photos.filter { photoExists(it.photo.uri) } }
             .flowOn(Dispatchers.IO)
 
     /**

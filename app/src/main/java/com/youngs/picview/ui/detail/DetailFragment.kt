@@ -19,6 +19,7 @@ import com.youngs.picview.BuildConfig
 import com.youngs.picview.MainActivity
 import com.youngs.picview.R
 import com.youngs.picview.data.api.RetrofitClient
+import com.youngs.picview.data.model.DetailItem
 import com.youngs.picview.data.model.ImageItem
 import com.youngs.picview.data.repository.CourseRepository
 import com.youngs.picview.data.repository.DiaryRepository
@@ -74,14 +75,27 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
         private const val ARG_SPOT = "spot"
 
         private val imageCache = mutableMapOf<String, List<ImageItem>>()
-        private val detailCache = mutableMapOf<String, String>()
+        private val detailCache = mutableMapOf<String, DetailItem>()
 
         fun newInstance(spot: SpotItem) = DetailFragment().apply {
             arguments = Bundle().apply { putSerializable(ARG_SPOT, spot) }
         }
+
+        /** 관광공사에 개요가 없는 장소에 대신 보여 주는 한 줄. */
+        private const val DEFAULT_OVERVIEW =
+            "이 장소는 삼분할 구도를 활용해 인물과 배경을 조화롭게 담아보세요!"
     }
 
     private val mainViewModel: MainViewModel by activityViewModels()
+
+    /**
+     * 지금 보고 있는 장소.
+     *
+     * 넘겨받은 그대로가 아닐 수 있습니다. 다녀온 곳에서 들어오면 이름과
+     * 사진뿐이라, 개요를 받아올 때 주소·좌표·유형을 함께 채워 넣습니다
+     * ([fillMissingFacts]). 길찾기·공유는 항상 이 값을 봅니다.
+     */
+    private lateinit var spot: SpotItem
 
     private var tts: TtsController? = null
 
@@ -97,11 +111,10 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentDetailBinding.bind(view)
 
-        // 히어로 사진은 상태바 뒤까지 깔리는 게 맞지만, 그 위의 버튼과
-        // 페이지 점은 시계·배터리와 겹치면 안 됩니다. 마진으로 내립니다.
+        // 히어로 사진은 상태바 뒤까지 깔리는 게 맞지만, 그 위의 버튼은
+        // 시계·배터리와 겹치면 안 됩니다. 마진으로 내립니다.
         binding.btnBack.applyTopSystemBarInsetAsMargin()
         binding.layoutHeroActions.applyTopSystemBarInsetAsMargin()
-        binding.layoutIndicator.applyTopSystemBarInsetAsMargin()
 
         binding.btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
 
@@ -165,6 +178,7 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
     private fun setListeners() {
         val spot = arguments?.getSerializable(ARG_SPOT) as? SpotItem ?: return
+        this.spot = spot
 
         binding.tvDetailTitle.text = spot.title
         binding.tvDetailAddress.text = spot.addr1
@@ -185,9 +199,40 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
         binding.btnStartGuide.setOnClickListener { startGuide(spot) }
 
-        binding.btnNavigate.setOnClickListener { openNavigation(spot) }
+        // 길찾기·공유는 필드를 봅니다. 주소·좌표가 나중에 채워질 수 있습니다.
+        binding.btnNavigate.setOnClickListener { openNavigation(this.spot) }
         setupFavorite(spot)
-        binding.btnShare.setOnClickListener { shareSpot(spot) }
+        binding.btnShare.setOnClickListener { shareSpot(this.spot) }
+    }
+
+    /**
+     * 넘겨받은 장소에 빠진 칸을 관광공사 공통 정보로 채웁니다.
+     *
+     * 다녀온 곳 → 상세로 들어오면 주소 줄이 비어 있었습니다. 방문 기록에는
+     * 주소를 안 남기기 때문입니다. 개요를 받아올 때 같은 응답에 주소·좌표·
+     * 유형이 함께 오므로, 비어 있던 칸만 그것으로 메웁니다. 이미 있던 값은
+     * 건드리지 않습니다.
+     */
+    private fun fillMissingFacts(item: DetailItem) {
+        val current = spot
+        val filled = current.copy(
+            contentTypeId = current.contentTypeId ?: item.contenttypeid?.takeIf { it.isNotBlank() },
+            addr1 = current.addr1.ifBlank { item.addr1.orEmpty().trim() },
+            imageUrl = current.imageUrl.ifBlank { item.firstimage.orEmpty() },
+            mapx = current.mapx.ifBlank { item.mapx.orEmpty() },
+            mapy = current.mapy.ifBlank { item.mapy.orEmpty() }
+        )
+        if (filled == current) return
+        spot = filled
+
+        val view = _binding ?: return
+        view.tvDetailAddress.text = filled.addr1
+        view.tvDetailAddress.isVisible = filled.addr1.isNotBlank()
+
+        // 유형을 몰라서 건너뛰었던 입장료·주차 정보도 이제 받아올 수 있습니다.
+        if (current.contentTypeId.isNullOrBlank() && !filled.contentTypeId.isNullOrBlank()) {
+            loadVisitInfo(filled)
+        }
     }
 
     // ───────────────────── 찜 · 공유 ─────────────────────
@@ -838,6 +883,15 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
     private fun openNavigation(spot: SpotItem) {
         val encodedName = URLEncoder.encode(spot.title, "UTF-8")
 
+        // 좌표가 없으면(다녀온 곳에서 왔는데 아직 못 채운 경우) 이름으로
+        // 검색한 지도를 엽니다. 빈 좌표로 길찾기를 열면 바다 한가운데가 나옵니다.
+        if (spot.mapx.isBlank() || spot.mapy.isBlank()) {
+            startActivity(
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://map.naver.com/v5/search/$encodedName"))
+            )
+            return
+        }
+
         // 1. 네이버 지도 앱 실행 스킴
         val appUrl = "nmap://route/car?dlat=${spot.mapy}&dlng=${spot.mapx}" +
                 "&dname=$encodedName&appname=${BuildConfig.APPLICATION_ID}"
@@ -962,10 +1016,12 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
     }
 
     private fun loadTip(spot: SpotItem) {
-        val cachedTip = detailCache[spot.contentId]
-        if (cachedTip != null) {
-            audioText = cachedTip
-            renderOverview(cachedTip)
+        val cached = detailCache[spot.contentId]
+        if (cached != null) {
+            fillMissingFacts(cached)
+            val overview = cached.overview.orEmpty().ifBlank { DEFAULT_OVERVIEW }
+            audioText = overview
+            renderOverview(overview)
             return
         }
 
@@ -976,11 +1032,12 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                     contentId = spot.contentId
                 )
 
-                val overview = response.response?.body?.items?.item
-                    ?.firstOrNull()?.overview
-                    ?.takeIf { it.isNotBlank() }
-                    ?: "이 장소는 삼분할 구도를 활용해 인물과 배경을 조화롭게 담아보세요!"
-                detailCache[spot.contentId] = overview
+                val item = response.response?.body?.items?.item?.firstOrNull()
+                if (item != null) {
+                    detailCache[spot.contentId] = item
+                    fillMissingFacts(item)
+                }
+                val overview = item?.overview?.takeIf { it.isNotBlank() } ?: DEFAULT_OVERVIEW
 
                 audioText = overview
                 renderOverview(overview)

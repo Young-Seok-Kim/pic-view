@@ -27,6 +27,7 @@ import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PolylineOverlay
 import com.naver.maps.map.util.FusedLocationSource
 import com.youngs.picview.MainActivity
+import com.youngs.picview.ui.main.MainFragment
 import com.youngs.picview.R
 import com.youngs.picview.databinding.FragmentMapBinding
 import com.youngs.picview.domain.guide.SiseonGuide
@@ -104,10 +105,14 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
 
         binding.btnMapBack.setOnClickListener { parentFragmentManager.popBackStack() }
 
-        // 검색은 탐색 탭(목록·검색)이 전담합니다. 지도를 닫고 그리로 보냅니다.
+        // 검색은 탐색 탭(목록·검색)이 전담합니다. 지도를 닫고 그리로 보내되,
+        // 검색칸까지 열어 둡니다. 탭만 바꿔 놓으면 "돋보기를 눌렀는데 목록이
+        // 나왔다"로 읽힙니다.
         binding.btnMapSearch.setOnClickListener {
             parentFragmentManager.popBackStack()
-            (activity as? MainActivity)?.selectTab(R.id.tab_explore)
+            val main = activity as? MainActivity ?: return@setOnClickListener
+            main.selectTab(R.id.tab_explore)
+            (main.tabFragment(R.id.tab_explore) as? MainFragment)?.focusSearch()
         }
 
         binding.btnMapLayers.setOnClickListener {
