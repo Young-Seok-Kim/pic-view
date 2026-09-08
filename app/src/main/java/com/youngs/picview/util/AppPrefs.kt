@@ -30,6 +30,7 @@ object AppPrefs {
     private const val KEY_FAVORITE_SNAPSHOT_PREFIX = "favorite_spot_"
     private const val KEY_DIARY_FEELING_PREFIX = "diary_feelings_"
     private const val KEY_POSE_HINT_SEEN = "pose_hint_seen"
+    private const val KEY_FEATURE_TOUR_SEEN = "feature_tour_seen"
 
     private fun prefs(context: Context): SharedPreferences =
         context.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -38,8 +39,26 @@ object AppPrefs {
     fun isSeniorMode(context: Context): Boolean =
         prefs(context).getBoolean(KEY_SENIOR_MODE, false)
 
+    /**
+     * 시니어 모드를 켜고 끕니다. 글씨 크기도 같이 움직입니다.
+     *
+     * 화면에서는 이 모드를 "큰 글씨"라고 부르는데, 테마만 바꾸면 버튼과
+     * 여백은 커져도 글자는 그대로라 "큰 글씨로 했는데 글씨가 안 커진다"는
+     * 말이 나옵니다. 켤 때는 글씨를 최소 "크게"로 올리고, 끌 때는 그렇게
+     * 올라간 것만 되돌립니다 — 사용자가 직접 "매우 크게"를 골랐다면
+     * 그 선택은 남겨 둡니다.
+     */
     fun setSeniorMode(context: Context, enabled: Boolean) {
-        prefs(context).edit().putBoolean(KEY_SENIOR_MODE, enabled).apply()
+        val step = fontStep(context)
+        val nextStep = when {
+            enabled && step == FontStep.NORMAL -> FontStep.LARGE
+            !enabled && step == FontStep.LARGE -> FontStep.NORMAL
+            else -> step
+        }
+        prefs(context).edit()
+            .putBoolean(KEY_SENIOR_MODE, enabled)
+            .putString(KEY_FONT_STEP, nextStep.name)
+            .apply()
     }
 
     /** 온보딩을 이미 봤는지. 최초 실행 분기에 씁니다. */
@@ -61,6 +80,20 @@ object AppPrefs {
 
     fun setPoseHintSeen(context: Context) {
         prefs(context).edit().putBoolean(KEY_POSE_HINT_SEEN, true).apply()
+    }
+
+    /**
+     * 첫 화면의 버튼 안내(코치마크)를 이미 봤는지.
+     *
+     * 온보딩이 "이 앱이 무엇인지"라면 이 안내는 "어디를 누르면 무엇이
+     * 되는지"입니다. 첫 실행 뒤 한 번만 보이고, MY 탭의 "앱 사용법 다시
+     * 보기"로 되살릴 수 있습니다.
+     */
+    fun isFeatureTourSeen(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_FEATURE_TOUR_SEEN, false)
+
+    fun setFeatureTourSeen(context: Context, seen: Boolean) {
+        prefs(context).edit().putBoolean(KEY_FEATURE_TOUR_SEEN, seen).apply()
     }
 
     /** 글씨 크기 단계. */

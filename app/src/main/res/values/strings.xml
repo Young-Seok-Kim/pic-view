@@ -24,6 +24,40 @@
     <string name="onboarding_start_senior">편하게 볼게요 (큰 글씨)</string>
     <string name="onboarding_start_normal">일반 글씨로 볼게요</string>
 
+    <!-- 첫 실행 버튼 안내(코치마크). 온보딩 뒤 홈에서 한 번 보입니다. -->
+    <string name="tour_count">%1$d / %2$d</string>
+    <string name="tour_next">다음</string>
+    <string name="tour_done">시작하기</string>
+    <string name="tour_skip">건너뛰기</string>
+    <string name="tour_home_date_title">촬영 캘린더</string>
+    <string name="tour_home_date_body">오늘 날짜를 누르면 달력이 열려요. 날짜마다 일출·일몰과 빛 시간표, 축제 일정을 볼 수 있어요.</string>
+    <string name="tour_home_quick_title">빠른 이동</string>
+    <string name="tour_home_quick_body">출사 코스 · 지도 · 캘린더 · 미션으로 바로 가는 네 칸이에요. 지도는 촬영지 위치를, 미션은 스탬프와 배지를 보여줘요.</string>
+    <string name="tour_home_best_title">지금 가면 좋은 곳</string>
+    <string name="tour_home_best_body">빛과 날씨로 점수를 매겨 지금 사진이 잘 나오는 촬영지를 순서대로 보여줘요. 장소를 누르면 촬영 방향과 좋은 시간을 알려주는 상세로 가요.</string>
+    <string name="tour_home_guide_title">시선 가이드</string>
+    <string name="tour_home_guide_body">카메라 위에 구도선과 포즈 예시를 겹쳐 보여주는 촬영 도우미예요. 찍은 사진은 바로 기록에 남아요.</string>
+    <string name="tour_tab_course_title">코스 탭</string>
+    <string name="tour_tab_course_body">가는 날과 시간을 넣으면 해를 따라가는 출사 동선을 짜 줘요. 마음에 들면 저장해 두고 그날 꺼내 보세요.</string>
+    <string name="tour_tab_explore_title">탐색 탭</string>
+    <string name="tour_tab_explore_body">정읍 촬영지를 종류별로 훑거나 이름으로 검색해요. 마음에 드는 곳은 하트로 찜해 두세요.</string>
+    <string name="tour_tab_diary_title">일기 탭</string>
+    <string name="tour_tab_diary_body">다녀온 곳과 찍은 사진이 날짜별 출사 일기로 모여요. 사진을 누르면 정읍 엽서 프레임을 씌울 수 있어요.</string>
+    <string name="tour_tab_my_title">MY 탭</string>
+    <string name="tour_tab_my_body">찜한 곳, 저장한 코스, 나의 촬영 성향이 여기 모여요. 큰 글씨 모드와 글씨 크기도 여기서 바꿔요.</string>
+    <string name="tour_senior_course_title">코스 추천받기</string>
+    <string name="tour_senior_course_body">가는 날과 시간을 고르면 해에 맞춘 출사 순서를 짜 드려요.</string>
+    <string name="tour_senior_audio_title">오디오 가이드</string>
+    <string name="tour_senior_audio_body">지금 빛과 추천 장소를 소리로 읽어 드려요. 걸으면서 들으세요.</string>
+    <string name="tour_senior_help_title">도움 요청하기</string>
+    <string name="tour_senior_help_body">관광안내소 전화, 119 신고, 내 위치 보내기가 한 화면에 있어요.</string>
+    <string name="tour_senior_spot_title">오늘 추천 장소</string>
+    <string name="tour_senior_spot_body">지금 사진이 가장 잘 나오는 곳이에요. 누르면 가는 길과 좋은 시간을 알려 드려요.</string>
+    <string name="tour_senior_tab_course_title">내 코스</string>
+    <string name="tour_senior_tab_course_body">저장해 둔 출사 코스를 다시 볼 수 있어요.</string>
+    <string name="tour_senior_tab_help_title">도움</string>
+    <string name="tour_senior_tab_help_body">급할 때 이 탭을 누르세요. 전화와 신고 버튼이 크게 있어요.</string>
+
     <!-- 온보딩 : 장면 속 예시 값(실데이터 아님, 시안 그대로) -->
     <string name="onboarding_demo_weather_value">23°C</string>
     <string name="onboarding_demo_weather_label">맑음</string>

@@ -8,6 +8,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.view.doOnPreDraw
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
@@ -25,6 +28,7 @@ import com.youngs.picview.ui.my.MyFragment
 import com.youngs.picview.ui.onboarding.OnboardingActivity
 import com.youngs.picview.ui.senior.SeniorHelpFragment
 import com.youngs.picview.ui.senior.SeniorHomeFragment
+import com.youngs.picview.ui.tour.FeatureTourView
 import com.youngs.picview.ui.main.MainFragment
 import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.domain.score.PhotoScoreEngine
@@ -34,6 +38,7 @@ import com.youngs.picview.domain.weather.SkyState
 import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.ui.model.SpotScoreContext
 import com.youngs.picview.util.AppPrefs
+import com.youngs.picview.util.FontStep
 import com.youngs.picview.data.model.WeatherResponse
 import com.youngs.picview.data.repository.CourseRepository
 import com.youngs.picview.util.retryOrNull
@@ -57,6 +62,18 @@ class MainActivity : BaseActivity() {
 
     private val isSenior get() = AppPrefs.isSeniorMode(this)
 
+    /**
+     * 이 화면을 만들 때의 모드·글씨 크기.
+     *
+     * 온보딩 다시 보기처럼 다른 Activity 에서 설정을 바꾸고 돌아오면 이
+     * 화면은 옛 테마로 남아 있습니다. 돌아올 때 비교해서 다르면 다시 만듭니다.
+     */
+    private var createdSenior = false
+    private var createdFontStep = FontStep.NORMAL
+
+    /** 첫 실행 버튼 안내. 떠 있는 동안만 값이 있습니다. */
+    private var tour: FeatureTourView? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -69,6 +86,8 @@ class MainActivity : BaseActivity() {
         }
 
         enableEdgeToEdge()
+        createdSenior = isSenior
+        createdFontStep = AppPrefs.fontStep(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -153,6 +172,12 @@ class MainActivity : BaseActivity() {
     private fun setupBackHandling() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                // 0. 버튼 안내가 떠 있으면 그것부터 걷습니다.
+                tour?.let {
+                    it.dismiss()
+                    return
+                }
+
                 // 1. 상세·지도처럼 위에 덮인 화면이 있으면 그것부터 닫습니다.
                 if (supportFragmentManager.backStackEntryCount > 0) {
                     supportFragmentManager.popBackStack()
@@ -223,10 +248,15 @@ class MainActivity : BaseActivity() {
     private fun restoreTabReferences() {
         val validIds = if (isSenior) SENIOR_TAB_IDS else NORMAL_TAB_IDS
 
-        // 1. 현재 모드에 없는 탭 Fragment 제거
+        // 1. 현재 모드에 없는 탭, 그리고 탭은 같아도 화면이 다른 모드의 것인
+        //    Fragment 제거. 홈은 두 모드 모두에 있지만 일반 홈과 간편 홈은
+        //    다른 화면이라, 태그만 보고 살려 두면 간편 모드 탭바 위에 일반
+        //    홈이 그대로 남습니다.
         val stale = supportFragmentManager.fragments.filter { fragment ->
             val tag = fragment.tag ?: return@filter false
-            tag.startsWith(TAB_TAG_PREFIX) && validIds.none { tagFor(it) == tag }
+            if (!tag.startsWith(TAB_TAG_PREFIX)) return@filter false
+            val id = validIds.firstOrNull { tagFor(it) == tag } ?: return@filter true
+            !matchesMode(fragment, id)
         }
         if (stale.isNotEmpty()) {
             supportFragmentManager.beginTransaction()
@@ -245,6 +275,13 @@ class MainActivity : BaseActivity() {
         }
         switchTab(currentTabId)
         binding.navBottom.selectedItemId = currentTabId
+    }
+
+    /** 이 Fragment 가 지금 모드에서 그 탭에 들어갈 화면인지. */
+    private fun matchesMode(fragment: Fragment, itemId: Int): Boolean = when (itemId) {
+        R.id.tab_home -> (fragment is SeniorHomeFragment) == isSenior
+        R.id.tab_help -> (fragment is SeniorHelpFragment) == isSenior
+        else -> true
     }
 
     private fun createTabFragment(itemId: Int): Fragment = when {
@@ -348,10 +385,81 @@ class MainActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        // 온보딩 다시 보기에서 큰 글씨로 바꾸고 돌아온 경우. 테마와 글씨
+        // 배율은 만들 때만 정해지므로 지금 화면으로는 반영할 수 없습니다.
+        if (isSenior != createdSenior || AppPrefs.fontStep(this) != createdFontStep) {
+            recreate()
+            return
+        }
+
         val elapsed = SystemClock.elapsedRealtime() - viewModel.lastLoadedAt
         if (viewModel.lastLoadedAt > 0L && elapsed > STALE_AFTER_MS) {
             refresh(userInitiated = false)
         }
+
+        maybeShowFeatureTour()
+    }
+
+    // ─────────────────────────── 첫 실행 버튼 안내 ───────────────────────────
+
+    /**
+     * 온보딩 뒤 처음 홈에 왔을 때 한 번, 어디를 누르면 무엇이 되는지 짚어 줍니다.
+     *
+     * 홈에서만 시작합니다 — 안내가 가리키는 자리가 홈에 있습니다. MY 탭의
+     * "앱 사용법 다시 보기"로 온보딩을 다시 본 뒤에는 이 안내도 다시 켜지는데,
+     * 그때는 MY 탭에서 돌아오므로 홈으로 옮긴 뒤 시작합니다.
+     *
+     * 봤다는 표시는 시작할 때 남깁니다. 도중에 앱이 죽어도 켤 때마다
+     * 다시 덮이는 일은 없어야 합니다.
+     */
+    private fun maybeShowFeatureTour() {
+        if (tour != null || AppPrefs.isFeatureTourSeen(this)) return
+        AppPrefs.setFeatureTourSeen(this, true)
+
+        clearBackStack()
+        if (currentTabId != R.id.tab_home) selectTab(R.id.tab_home)
+
+        // 홈 Fragment 의 뷰가 배치된 뒤에야 버튼 자리를 잴 수 있습니다.
+        // preDraw 는 그 프레임의 measure/layout 이 끝난 시점입니다.
+        binding.root.doOnPreDraw {
+            if (isFinishing || isDestroyed || tour != null) return@doOnPreDraw
+            val host = findViewById<ViewGroup>(android.R.id.content)
+            val view = FeatureTourView(this)
+            tour = view
+            view.start(host, featureTourSteps()) { tour = null }
+        }
+    }
+
+    /** 모드에 따라 짚어 줄 자리가 다릅니다. 간편 모드는 홈의 큰 버튼 셋과 탭 둘. */
+    private fun featureTourSteps(): List<FeatureTourView.Step> {
+        val home = tabFragments[R.id.tab_home]?.view
+        fun inHome(id: Int): () -> View? = { home?.findViewById(id) }
+        fun tab(id: Int): () -> View? = { binding.navBottom.findViewById(id) }
+        fun step(title: Int, body: Int, target: () -> View?, also: () -> View? = { null }) =
+            FeatureTourView.Step(getString(title), getString(body), target, also)
+
+        return if (isSenior) listOf(
+            step(R.string.tour_senior_course_title, R.string.tour_senior_course_body, inHome(R.id.btn_senior_course)),
+            step(R.string.tour_senior_audio_title, R.string.tour_senior_audio_body, inHome(R.id.btn_senior_audio)),
+            step(R.string.tour_senior_help_title, R.string.tour_senior_help_body, inHome(R.id.btn_senior_help)),
+            step(R.string.tour_senior_spot_title, R.string.tour_senior_spot_body, inHome(R.id.card_senior_spot)),
+            step(R.string.tour_senior_tab_course_title, R.string.tour_senior_tab_course_body, tab(R.id.tab_course)),
+            step(R.string.tour_senior_tab_help_title, R.string.tour_senior_tab_help_body, tab(R.id.tab_help))
+        ) else listOf(
+            step(R.string.tour_home_date_title, R.string.tour_home_date_body, inHome(R.id.card_home_date)),
+            step(R.string.tour_home_quick_title, R.string.tour_home_quick_body, inHome(R.id.layout_quick_actions)),
+            // 제목 줄과 그 아래 목록은 형제라 둘을 한 자리로 묶습니다.
+            step(
+                R.string.tour_home_best_title, R.string.tour_home_best_body,
+                inHome(R.id.layout_home_best), inHome(R.id.rv_home_best)
+            ),
+            step(R.string.tour_home_guide_title, R.string.tour_home_guide_body, inHome(R.id.card_guide_entry)),
+            step(R.string.tour_tab_course_title, R.string.tour_tab_course_body, tab(R.id.tab_course)),
+            step(R.string.tour_tab_explore_title, R.string.tour_tab_explore_body, tab(R.id.tab_explore)),
+            step(R.string.tour_tab_diary_title, R.string.tour_tab_diary_body, tab(R.id.tab_diary)),
+            step(R.string.tour_tab_my_title, R.string.tour_tab_my_body, tab(R.id.tab_my))
+        )
     }
 
     /**

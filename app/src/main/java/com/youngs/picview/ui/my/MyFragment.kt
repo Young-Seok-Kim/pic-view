@@ -27,6 +27,7 @@ import com.youngs.picview.domain.season.SeasonHighlight
 import com.youngs.picview.domain.season.SeasonHighlights
 import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.ui.course.CourseInputFragment
+import com.youngs.picview.ui.detail.DetailFragment
 import com.youngs.picview.ui.guide.GuideActivity
 import com.youngs.picview.ui.frame.PhotoFrameActivity
 import com.youngs.picview.ui.main.MainViewModel
@@ -159,6 +160,9 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
         }
 
         binding.btnTodayShoot.setOnClickListener { startTodayShoot() }
+        // 카드 자체는 그 장소로 가는 문입니다. 사진과 이름을 보여 주면서
+        // 눌러도 아무 일이 없으면 화면이 닫힌 것처럼 느껴집니다.
+        binding.cardToday.setOnClickListener { openTodaySpot() }
         binding.btnNextPlan.setOnClickListener {
             (activity as? MainActivity)?.pushScreen(CourseInputFragment())
         }
@@ -231,6 +235,22 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
             .error(R.drawable.spot_uhwajeong)
             .centerCrop()
             .into(binding.ivTodayPhoto)
+    }
+
+    /**
+     * 오늘의 시선 카드를 누르면 그 장소의 상세로.
+     *
+     * 카드가 보여 주는 장소는 [renderToday] 와 같은 목록 1위입니다. 아직
+     * 목록이 없으면 우화정 사진을 대신 보여 주고 있는 상태라 갈 상세가
+     * 없으므로 탐색 탭으로 보냅니다.
+     */
+    private fun openTodaySpot() {
+        val spot = mainViewModel.spotData.value?.firstOrNull()
+        if (spot == null) {
+            (activity as? MainActivity)?.selectTab(R.id.tab_explore)
+            return
+        }
+        (activity as? MainActivity)?.pushScreen(DetailFragment.newInstance(spot))
     }
 
     /**
