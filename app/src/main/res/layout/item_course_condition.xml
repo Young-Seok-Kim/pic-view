@@ -12,10 +12,15 @@
     android:paddingEnd="6dp"
     tools:ignore="RtlSymmetry">
 
+    <!--
+        폭은 96dp 가 기본이되 글자가 넘치면 늘어납니다. 큰 글씨 모드에서
+        "9.9 (수)"·"자가용"이 "9...."·"자..."로 잘리던 자리입니다.
+    -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_cond"
-        android:layout_width="96dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minWidth="96dp"
         android:clickable="true"
         android:focusable="true"
         app:cardBackgroundColor="@color/bg_card"

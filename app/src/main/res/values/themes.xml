@@ -371,8 +371,20 @@
         <item name="strokeWidth">1dp</item>
     </style>
 
+    <!--
+        시니어 테마의 기본 카드. 모서리만 키웁니다.
+
+        전에는 안쪽 여백(contentPadding 24dp)도 여기 있었는데, 테마 기본값이라
+        일반 화면의 모든 카드에 얹혔습니다. 화면들은 이미 제 여백을 갖고 있어
+        여백이 두 겹이 되고, 사진이 카드를 채워야 하는 히어로는 사진이 안으로
+        밀리고, 42dp 짜리 날짜 알약은 글자가 들어갈 자리가 없어 비었습니다.
+        여백이 필요한 시니어 전용 카드만 [Card.Senior.Padded] 를 씁니다.
+    -->
     <style name="Card.Senior" parent="Card.Elevated">
         <item name="cardCornerRadius">@dimen/radius_card_senior</item>
+    </style>
+
+    <style name="Card.Senior.Padded">
         <item name="contentPadding">@dimen/space_senior</item>
     </style>
 
