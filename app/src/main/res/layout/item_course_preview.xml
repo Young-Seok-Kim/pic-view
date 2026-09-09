@@ -130,7 +130,12 @@
                         android:gravity="center_vertical"
                         android:orientation="vertical">
 
+                        <!--
+                            첫 장소는 이동 시간이 없습니다. 그때 이 라벨을 그대로
+                            두면 "이동 시간 / 출발지"라는 어긋난 짝이 됩니다.
+                        -->
                         <TextView
+                            android:id="@+id/tv_stop_travel_label"
                             style="@style/Text.Caption"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

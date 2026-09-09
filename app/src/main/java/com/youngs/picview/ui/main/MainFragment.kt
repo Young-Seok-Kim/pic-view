@@ -4,9 +4,13 @@ import com.youngs.picview.util.applyTopSystemBarInset
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -49,6 +53,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
     private lateinit var spotAdapter: SpotAdapter
 
+    /** 뷰가 만들어지기 전에 검색칸을 열어 달라는 요청이 왔을 때 기억해 둡니다. */
+    private var focusSearchWhenReady = false
+
     override fun onPause() {
         super.onPause()
         recyclerViewState = binding.rvPhotoSpots.layoutManager?.onSaveInstanceState()
@@ -63,12 +70,72 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         binding.appbar.applyTopSystemBarInset()
 
         setListeners()
+        setupSearch()
         setObserve()
         renderLightLine()
 
         recyclerViewState?.let {
             binding.rvPhotoSpots.layoutManager?.onRestoreInstanceState(it)
         }
+
+        if (focusSearchWhenReady) {
+            focusSearchWhenReady = false
+            focusSearch()
+        }
+    }
+
+    // ───────────────────── 검색 ─────────────────────
+
+    /**
+     * 장소 이름·주소 검색.
+     *
+     * 지도 화면의 돋보기가 "탐색 탭이 검색을 맡는다"며 이리로 보냈지만
+     * 정작 여기에 검색칸이 없었습니다. 글자를 칠 때마다 바로 거르고,
+     * 검색어는 ViewModel 에 남아 탭을 오가도 유지됩니다.
+     */
+    private fun setupSearch() {
+        val field = binding.etSearch
+        val restored = viewModel.currentQuery()
+        if (field.text.toString() != restored) field.setText(restored)
+        binding.btnSearchClear.isVisible = restored.isNotEmpty()
+
+        field.doAfterTextChanged { text ->
+            val query = text?.toString().orEmpty()
+            binding.btnSearchClear.isVisible = query.isNotEmpty()
+            viewModel.setQuery(query)
+            binding.rvPhotoSpots.scrollToPosition(0)
+        }
+        field.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                hideKeyboard()
+                true
+            } else false
+        }
+        binding.btnSearchClear.setOnClickListener {
+            field.text?.clear()
+            field.requestFocus()
+        }
+    }
+
+    /** 다른 화면(지도의 돋보기)에서 검색칸을 바로 열고 싶을 때. */
+    fun focusSearch() {
+        val view = _binding ?: run {
+            focusSearchWhenReady = true
+            return
+        }
+        view.appbar.setExpanded(false, true)
+        view.etSearch.requestFocus()
+        view.etSearch.post {
+            requireContext().getSystemService<InputMethodManager>()
+                ?.showSoftInput(view.etSearch, InputMethodManager.SHOW_IMPLICIT)
+        }
+    }
+
+    private fun hideKeyboard() {
+        val view = _binding ?: return
+        view.etSearch.clearFocus()
+        requireContext().getSystemService<InputMethodManager>()
+            ?.hideSoftInputFromWindow(view.etSearch.windowToken, 0)
     }
 
     private fun setObserve() {
@@ -252,14 +319,28 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     /** 목록 / 빈 상태 / 로드 실패 세 가지를 한 곳에서 정리합니다. */
     private fun renderListState(isEmpty: Boolean) {
         val failed = viewModel.loadFailed.value == true
+        val query = viewModel.currentQuery()
 
         binding.rvPhotoSpots.isVisible = !isEmpty
         binding.layoutEmpty.isVisible = isEmpty
 
         if (!isEmpty) return
 
-        binding.tvEmptyTitle.setText(if (failed) R.string.error_title else R.string.empty_title)
-        binding.tvEmptyDesc.setText(if (failed) R.string.error_desc else R.string.empty_desc)
+        when {
+            failed -> {
+                binding.tvEmptyTitle.setText(R.string.error_title)
+                binding.tvEmptyDesc.setText(R.string.error_desc)
+            }
+            // 검색어 때문에 비었으면 카테고리 이야기를 하면 안 됩니다.
+            query.isNotBlank() -> {
+                binding.tvEmptyTitle.text = getString(R.string.explore_search_empty_title, query)
+                binding.tvEmptyDesc.setText(R.string.explore_search_empty_desc)
+            }
+            else -> {
+                binding.tvEmptyTitle.setText(R.string.empty_title)
+                binding.tvEmptyDesc.setText(R.string.empty_desc)
+            }
+        }
         binding.btnRetry.isVisible = failed
     }
 
@@ -329,7 +410,10 @@ class MainFragment : Fragment(R.layout.fragment_main) {
                 requireContext(),
                 spotTitle = spot.title,
                 contextId = SiseonGuide.contextIdFor(facts.bestPhase),
-                guideId = SiseonGuide.guideIdFor(facts)
+                guideId = SiseonGuide.guideIdFor(facts),
+                // 미션에서 찍은 사진이 이 장소의 방문 기록("다녀왔어요")이 되도록.
+                contentId = spot.contentId,
+                phaseName = viewModel.sunTimes.phaseNow().name
             )
         )
     }

@@ -113,13 +113,24 @@
                         app:drawableTint="#B3FFFFFF"
                         tools:text="2026.08.27 (목) · 09:09 출발" />
 
+                    <!--
+                      설명 한 줄.
+
+                      처음에는 Text.Title(마포백패킹 21sp)로 크게 넣었는데,
+                      LLM 문장이 두세 줄로 오면 카드 절반을 굵은 제목체가
+                      덮어 읽기 전에 먼저 부담이 됐습니다. 이 문장은 제목이
+                      아니라 **설명**이라, 본문 서체로 차분하게 둡니다.
+                      카드의 무게는 아래 숫자 세 칸이 받습니다.
+                    -->
                     <TextView
                         android:id="@+id/tv_result_narration"
-                        style="@style/Text.Title"
+                        style="@style/Text.Body"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/space_xs"
-                        android:textColor="@color/white"
+                        android:layout_marginTop="@dimen/space_s"
+                        android:lineSpacingExtra="5dp"
+                        android:textColor="#F2FFFFFF"
+                        android:textSize="15sp"
                         tools:text="내장산의 일몰 골든아워에 맞춰 동선을 짰어요." />
 
                     <!-- 일출·일몰 — 하루의 양 끝이라 좌우로 맞붙입니다. -->
@@ -262,6 +273,60 @@
                 android:nestedScrollingEnabled="false"
                 tools:itemCount="4"
                 tools:listitem="@layout/item_course_stop" />
+
+            <!--
+              담았는데 못 들어간 곳.
+
+              코스는 시간 안에 들어가는 곳만 세웁니다. 세 곳을 담았는데
+              두 곳만 나오면, 말해 주지 않는 한 버그로 보입니다. 빠진 곳과
+              그 까닭, 그리고 무엇을 바꾸면 들어가는지까지 여기서 밝힙니다.
+            -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_dropped"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/screen_padding"
+                android:layout_marginTop="@dimen/space_l"
+                android:visibility="gone"
+                app:cardBackgroundColor="@color/maple_50"
+                app:cardCornerRadius="@dimen/radius_card"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_l">
+
+                    <TextView
+                        android:id="@+id/tv_dropped_title"
+                        style="@style/Text.Caption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/maple_700"
+                        android:textStyle="bold"
+                        tools:text="담은 3곳 중 2곳이 들어갔어요" />
+
+                    <TextView
+                        android:id="@+id/tv_dropped_names"
+                        style="@style/Text.Body"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_xs"
+                        android:textColor="@color/text_primary"
+                        tools:text="정읍사예술회관 · 저녁 블루아워" />
+
+                    <TextView
+                        style="@style/Text.Caption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_s"
+                        android:text="@string/course_dropped_hint"
+                        android:textColor="@color/text_secondary" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

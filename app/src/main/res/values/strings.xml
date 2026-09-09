@@ -1,36 +1,74 @@
 <resources>
     <string name="app_name">정읍 시선</string>
     <string name="app_tagline">오늘, 정읍에서 가장 잘 나오는 곳</string>
+    <!-- 스플래시에서 태그라인 중 주황으로 강조할 낱말. 태그라인에 없으면 강조하지 않습니다. -->
+    <string name="splash_tagline_accent_word">가장</string>
 
     <!-- 온보딩 -->
     <string name="onboarding_skip">건너뛰기</string>
     <string name="onboarding_next">다음</string>
     <string name="onboarding_finish">다음 출사 계획 보기</string>
     <string name="onboarding_1_eyebrow">LIGHT MATCH</string>
-    <string name="onboarding_1_title">지금,
-가장 잘 나오는 곳</string>
-    <string name="onboarding_1_desc">날씨와 해의 위치를 실시간으로 계산해
-지금 사진이 가장 잘 나오는 정읍 촬영지를
-알려드려요.</string>
+    <string name="onboarding_1_title">지금,\n가장 잘 나오는 곳</string>
+    <string name="onboarding_1_desc">날씨와 해의 위치를 실시간으로 계산해\n지금 사진이 가장 잘 나오는 정읍 촬영지를\n알려드려요.</string>
     <string name="onboarding_2_eyebrow">LIGHT ROUTE</string>
-    <string name="onboarding_2_title">해를 따라
-동선을 짭니다</string>
-    <string name="onboarding_2_desc">일출부터 일몰까지, 해의 이동 경로와
-촬영지 방향을 맞춰 가장 좋은 시간을
-놓치지 않도록 도와드려요.</string>
+    <string name="onboarding_2_title">해를 따라\n동선을 짭니다</string>
+    <string name="onboarding_2_desc">일출부터 일몰까지, 해의 이동 경로와\n촬영지 방향을 맞춰 가장 좋은 시간을\n놓치지 않도록 도와드려요.</string>
     <string name="onboarding_3_eyebrow">YOUR SISEON</string>
     <string name="onboarding_3_title">어떻게 보실래요?</string>
-    <string name="onboarding_3_desc">사진을 더 잘 만드는 구도 가이드를
-원하는 방식으로 보여드릴게요.</string>
-    <string name="onboarding_3_note">언제든 MY 탭에서 바꿀 수 있어요.
-로그인이나 가입은 필요 없습니다.</string>
+    <string name="onboarding_3_desc">사진을 더 잘 만드는 구도 가이드를\n원하는 방식으로 보여드릴게요.</string>
+    <string name="onboarding_3_note">언제든 MY 탭에서 바꿀 수 있어요.\n로그인이나 가입은 필요 없습니다.</string>
     <string name="onboarding_4_eyebrow">AFTER THE FRAME</string>
-    <string name="onboarding_4_title">찍은 뒤,
-다음 장면까지</string>
-    <string name="onboarding_4_desc">촬영을 기록하고, AI가 다음에 가기 좋은
-정읍의 촬영지를 추천해 드려요.</string>
+    <string name="onboarding_4_title">찍은 뒤,\n다음 장면까지</string>
+    <string name="onboarding_4_desc">촬영을 기록하고, AI가 다음에 가기 좋은\n정읍의 촬영지를 추천해 드려요.</string>
     <string name="onboarding_start_senior">편하게 볼게요 (큰 글씨)</string>
-    <string name="onboarding_start_normal">일반 모드로 시작</string>
+    <string name="onboarding_start_normal">일반 글씨로 볼게요</string>
+
+    <!-- 첫 실행 버튼 안내(코치마크). 온보딩 뒤 홈에서 한 번 보입니다. -->
+    <string name="tour_count">%1$d / %2$d</string>
+    <string name="tour_next">다음</string>
+    <string name="tour_done">시작하기</string>
+    <string name="tour_skip">건너뛰기</string>
+    <string name="tour_home_date_title">촬영 캘린더</string>
+    <string name="tour_home_date_body">오늘 날짜를 누르면 달력이 열려요. 날짜마다 일출·일몰과 빛 시간표, 축제 일정을 볼 수 있어요.</string>
+    <string name="tour_home_quick_title">빠른 이동</string>
+    <string name="tour_home_quick_body">출사 코스 · 지도 · 캘린더 · 미션으로 바로 가는 네 칸이에요. 지도는 촬영지 위치를, 미션은 스탬프와 배지를 보여줘요.</string>
+    <string name="tour_home_best_title">지금 가면 좋은 곳</string>
+    <string name="tour_home_best_body">빛과 날씨로 점수를 매겨 지금 사진이 잘 나오는 촬영지를 순서대로 보여줘요. 장소를 누르면 촬영 방향과 좋은 시간을 알려주는 상세로 가요.</string>
+    <string name="tour_home_guide_title">시선 가이드</string>
+    <string name="tour_home_guide_body">카메라 위에 구도선과 포즈 예시를 겹쳐 보여주는 촬영 도우미예요. 찍은 사진은 바로 기록에 남아요.</string>
+    <string name="tour_tab_course_title">코스 탭</string>
+    <string name="tour_tab_course_body">가는 날과 시간을 넣으면 해를 따라가는 출사 동선을 짜 줘요. 마음에 들면 저장해 두고 그날 꺼내 보세요.</string>
+    <string name="tour_tab_explore_title">탐색 탭</string>
+    <string name="tour_tab_explore_body">정읍 촬영지를 종류별로 훑거나 이름으로 검색해요. 마음에 드는 곳은 하트로 찜해 두세요.</string>
+    <string name="tour_tab_diary_title">일기 탭</string>
+    <string name="tour_tab_diary_body">다녀온 곳과 찍은 사진이 날짜별 출사 일기로 모여요. 사진을 누르면 정읍 엽서 프레임을 씌울 수 있어요.</string>
+    <string name="tour_tab_my_title">MY 탭</string>
+    <string name="tour_tab_my_body">찜한 곳, 저장한 코스, 나의 촬영 성향이 여기 모여요. 큰 글씨 모드와 글씨 크기도 여기서 바꿔요.</string>
+    <string name="tour_senior_course_title">코스 추천받기</string>
+    <string name="tour_senior_course_body">가는 날과 시간을 고르면 해에 맞춘 출사 순서를 짜 드려요.</string>
+    <string name="tour_senior_audio_title">오디오 가이드</string>
+    <string name="tour_senior_audio_body">지금 빛과 추천 장소를 소리로 읽어 드려요. 걸으면서 들으세요.</string>
+    <string name="tour_senior_help_title">도움 요청하기</string>
+    <string name="tour_senior_help_body">관광안내소 전화, 119 신고, 내 위치 보내기가 한 화면에 있어요.</string>
+    <string name="tour_senior_spot_title">오늘 추천 장소</string>
+    <string name="tour_senior_spot_body">지금 사진이 가장 잘 나오는 곳이에요. 누르면 가는 길과 좋은 시간을 알려 드려요.</string>
+    <string name="tour_senior_tab_course_title">내 코스</string>
+    <string name="tour_senior_tab_course_body">저장해 둔 출사 코스를 다시 볼 수 있어요.</string>
+    <string name="tour_senior_tab_help_title">도움</string>
+    <string name="tour_senior_tab_help_body">급할 때 이 탭을 누르세요. 전화와 신고 버튼이 크게 있어요.</string>
+    <string name="tour_cam_grid_title">구도 가이드</string>
+    <string name="tour_cam_grid_body">아래에서 고른 피사체와 포즈에 맞춰 어디에 서고 무엇을 어디에 둘지 화면에 그려줘요. 이 버튼으로 카메라 격자처럼 끄고 켜요.</string>
+    <string name="tour_cam_example_title">포즈 예시</string>
+    <string name="tour_cam_example_body">지금 고른 포즈가 실제로 어떤 자세인지 그림으로 보여줘요.</string>
+    <string name="tour_cam_subject_title">무엇을 찍나요</string>
+    <string name="tour_cam_subject_body">인물·풍경·동물·음식 중 고르세요. 인물이면 포즈를 추천하고, 나머지는 담는 요령을 알려줘요.</string>
+    <string name="tour_cam_people_title">몇 명인가요</string>
+    <string name="tour_cam_people_body">인원에 따라 추천 포즈가 달라져요.</string>
+    <string name="tour_cam_pose_title">추천 포즈</string>
+    <string name="tour_cam_pose_body">지금 빛과 장소 방향에 맞춰 점수 순으로 골라 뒀어요. 누르면 위 안내와 구도 가이드가 따라 바뀌어요.</string>
+    <string name="tour_cam_shutter_title">촬영</string>
+    <string name="tour_cam_shutter_body">찍은 사진은 갤러리에 저장되고 이 장소에 다녀온 기록으로 남아요. 왼쪽 버튼은 갤러리예요.</string>
 
     <!-- 온보딩 : 장면 속 예시 값(실데이터 아님, 시안 그대로) -->
     <string name="onboarding_demo_weather_value">23°C</string>
@@ -53,8 +91,7 @@
     <string name="onboarding_demo_guide_leading">리딩라인</string>
     <string name="onboarding_demo_record_title">오늘의 기록</string>
     <string name="onboarding_demo_record_place">정읍사공원</string>
-    <string name="onboarding_demo_record_note">"빛이 너무 예뻤던 골든 아워.
-다음엔 반영을 더 담아보고 싶어요."</string>
+    <string name="onboarding_demo_record_note">"빛이 너무 예뻤던 골든 아워.\n다음엔 반영을 더 담아보고 싶어요."</string>
     <string name="onboarding_demo_next_label">내일 아침 추천</string>
     <string name="onboarding_demo_next_place">내장산 단풍생태공원</string>
     <string name="onboarding_demo_next_info">아침 빛 07:10 · 맑음 18°C</string>
@@ -147,7 +184,7 @@
     <!-- 앞에 자동차 아이콘이 붙으므로 이모지를 뺐습니다. -->
     <string name="course_travel_time_label">이동 시간</string>
     <string name="course_travel_minutes">%1$d분</string>
-    <string name="course_travel_start">출발지</string>
+    <string name="course_travel_start">여기서 출발</string>
     <string name="course_action_label">추천 촬영 행동</string>
     <string name="course_preview_empty">조건에 맞는 출사 코스를 찾고 있어요.\n촬영지를 불러온 뒤 다시 보여드릴게요</string>
     <string name="course_timeline_title">오늘의 빛 타임라인 ⓘ</string>
@@ -162,6 +199,26 @@
     <string name="course_timeline">코스 타임라인</string>
     <!-- 타임라인 날짜 줄. 이틀 이상일 때만 몇째 날인지를 붙입니다. -->
     <string name="course_day_nth">%1$d일차 · %2$s</string>
+    <!-- 촬영지 직접 고르기 — "장소는 내가, 순서는 빛이" -->
+    <string name="picker_entry_title">직접 고르기</string>
+    <string name="picker_entry_none">찜한 곳으로 코스를 짤 수 있어요</string>
+    <string name="picker_entry_count">%1$d곳을 담았어요 · 순서는 빛이 정합니다</string>
+    <string name="picker_title">어디를 다녀올까요</string>
+    <string name="picker_sub">고르기만 하세요 · 순서는 빛이 세웁니다</string>
+    <string name="picker_clear">비우기</string>
+    <string name="picker_filter_all">전체</string>
+    <string name="picker_filter_favorite">찜한 곳</string>
+    <string name="picker_filter_picked">담은 곳</string>
+    <string name="picker_favorited">찜한 곳</string>
+    <string name="picker_toggle">코스에 담기</string>
+    <string name="picker_done_all">전체에서 코스 짜기</string>
+    <string name="picker_done_count">%1$d곳으로 코스 짜기</string>
+    <string name="picker_empty_spots">촬영지를 아직 불러오지 못했어요</string>
+    <string name="picker_empty_favorites">찜한 곳이 없어요.\n탐색이나 상세에서 하트를 눌러 담아 보세요.</string>
+    <string name="picker_empty_picked">아직 담은 곳이 없어요</string>
+    <!-- 담았는데 시간 안에 못 들어간 곳 안내 -->
+    <string name="course_dropped_title">담은 %1$d곳 중 %2$d곳이 들어갔어요</string>
+    <string name="course_dropped_hint">출발 시각을 당기거나 체류 시간을 늘리면 들어갈 수 있어요.</string>
     <string name="course_save">저장</string>
     <string name="course_saved">내 코스에 저장했어요</string>
     <string name="course_travel_format">↳ 이동 %1$d분 · %2$.1fkm</string>
@@ -215,13 +272,26 @@
     <string name="explore_title">어디서 어떤 장면을\n찍을까요?</string>
     <string name="explore_sub">정읍 시선이 추천하는 오늘의 장소</string>
     <string name="explore_light_line">지금은 %1$s · %2$s</string>
+    <string name="explore_search_hint">장소 이름이나 주소로 찾기</string>
+    <string name="cd_search_clear">검색어 지우기</string>
+    <string name="explore_search_empty_title">‘%1$s’에 맞는 촬영지가 없어요</string>
+    <string name="explore_search_empty_desc">이름이나 주소를 다르게 적어 보세요</string>
     <string name="sort_reco">추천순</string>
     <string name="sort_dist">거리순</string>
     <string name="sort_light">빛 좋은 시간순</string>
     <string name="map_expand">지도 확대</string>
     <string name="cd_category_filter">카테고리 필터</string>
     <!-- 카드 하단 한 줄. 자동차 아이콘이 앞에 붙으므로 이모지를 뺐습니다. -->
-    <string name="spot_travel_minutes">차로 %1$d분</string>
+    <!--
+        기준을 밝혀 씁니다.
+
+        그냥 "차로 8분"이라고만 하면 누구나 **내 위치에서** 8분으로 읽는데,
+        실제로는 정읍 시내(시청 인근)에서 잰 거리입니다. 서울에서 계획을
+        짜는 사람에게 "내 위치에서 180분"은 쓸모가 없고, 정읍 안에서 곳과
+        곳 사이를 가늠하는 데는 시내 기준이 더 쓸모있습니다. 그래서 기준은
+        그대로 두고 말로 밝힙니다.
+    -->
+    <string name="spot_travel_minutes">시내에서 차로 %1$d분</string>
 
     <!-- 일기 — 감정과 다음 추천 (시안) -->
     <string name="diary_feelings_label">오늘의 감정</string>
@@ -235,7 +305,17 @@
     <string name="home_best_eyebrow">NEXT PHOTO · LIGHT MATCH</string>
     <string name="home_spot_time_today">오늘 %1$s</string>
     <string name="home_spot_time_tomorrow">내일 %1$s</string>
-    <string name="home_spot_plan_add">출사 계획에 담기</string>
+    <!--
+        장소 담기는 찜 하나로 통일했습니다.
+        예전에는 "출사 계획에 담기"가 1곳짜리 코스를 만들어 코스 목록에
+        넣었고, 담은 곳들이 모여 한 계획이 되는 게 아니라 따로 놀았습니다.
+    -->
+    <string name="home_spot_plan_add">담아 두기</string>
+    <string name="home_spot_plan_saved">찜한 곳</string>
+    <string name="bookmark_added">찜했어요 · 코스 탭에서 골라 코스를 짤 수 있어요</string>
+    <string name="bookmark_removed">찜을 풀었어요</string>
+    <string name="bookmark_save_label">담아 두기</string>
+    <string name="bookmark_saved_label">담았음</string>
 
     <!-- 홈 → 시선 가이드 진입 배너 -->
     <string name="home_guide_eyebrow">JEONGEUP SISEON · GUIDE</string>
@@ -263,51 +343,15 @@
     <string name="siseon_compare_empty">사진을 업로드하면 이곳에서 가이드와 나란히 비교할 수 있어요.</string>
     <string name="siseon_compare_caption_guide">가이드 · %1$s</string>
     <string name="siseon_compare_caption_mine">내 사진</string>
-    <string name="siseon_tab_light">빛</string>
-    <string name="siseon_tab_action">움직임</string>
-    <string name="siseon_tab_check">체크</string>
-    <string name="siseon_direction">추천 방향</string>
-    <string name="siseon_tip_label">촬영 팁</string>
-    <string name="siseon_action_title">이렇게 움직여보세요</string>
-    <string name="siseon_action_sub">한 자리에서 끝내지 말고 아래 순서대로 3장을 비교해보세요.</string>
-    <string name="siseon_action_steps">01 현재 위치에서 한 장 · 02 두 걸음 가까이 · 03 좌우로 이동</string>
-    <string name="siseon_check_title">촬영 준비도</string>
-    <string name="siseon_check_sub">셔터를 누르기 전, 네 가지만 확인하면 됩니다.</string>
-    <string name="siseon_check_progress">%1$d/%2$d 완료</string>
-    <string name="siseon_check_done_note">이제 찍어도 좋아요.</string>
-    <string name="siseon_check_todo_note">프레임을 한 번만 더 확인해보세요.</string>
     <string name="siseon_points_title">바로 적용할 촬영 포인트</string>
-    <string name="siseon_mission_start">실전 촬영 미션 시작</string>
     <string name="cd_prev_comp">이전 구도</string>
     <string name="cd_next_comp">다음 구도</string>
 
     <!-- 시선 가이드 — 실전 미션 -->
-    <string name="mission_header">FIELD MISSION · %1$s</string>
-    <string name="mission_steps_title">현장에서 이렇게 해보세요</string>
-    <string name="mission_step_first">%1$s의 기준점을 먼저 찾기</string>
-    <string name="mission_step_last">같은 장면을 한 번 더 비교해보기</string>
-    <string name="mission_step_last_hint">현재 위치·두 걸음 가까이·좌우 이동으로 비교</string>
     <!-- 미션 한 줄의 접기/펼치기. 긴 부연은 기본 접음입니다. -->
-    <string name="mission_step_more">더 알아보기 ▾</string>
-    <string name="mission_step_less">접기 ▴</string>
     <string name="cd_mission_step_example">미션 참고 사진</string>
     <string name="cd_mission_listen">미션 음성으로 듣기</string>
-    <string name="mission_capture_title">세 장을 비교해보세요</string>
-    <string name="mission_capture_sub">같은 장면을 세 위치에서 찍으면, 가장 좋은 거리와 방향을 직접 찾을 수 있어요.</string>
-    <string name="mission_added">%1$d/3 추가됨</string>
-    <string name="mission_checked">%1$d/3</string>
-    <string name="mission_add_photo">사진 추가</string>
-    <string name="mission_source_sub">%1$s 칸에 넣을 사진을 골라 주세요.</string>
-    <string name="mission_source_camera">카메라로 바로 찍기</string>
-    <string name="mission_source_camera_hint">지금 장면을 찍어 바로 넣어요</string>
-    <string name="mission_source_gallery">갤러리에서 고르기</string>
-    <string name="mission_source_gallery_hint">이미 찍어 둔 사진을 불러와요</string>
-    <string name="mission_camera_denied">카메라 권한을 허용해야 바로 찍을 수 있어요</string>
-    <string name="mission_camera_failed">사진을 저장할 준비를 하지 못했어요. 다시 시도해 주세요</string>
-    <string name="mission_feedback_title">사진 사이의 차이</string>
-    <string name="mission_feedback_auto">자동 분석</string>
-    <string name="mission_complete">3장 비교 미션 완료하기</string>
-    <string name="mission_incomplete">세 위치의 사진을 모두 추가해 주세요</string>
+    <!-- 버튼 글자. 아이콘만 두면 무엇을 읽어 주는지 알 수 없습니다. -->
     <string name="home_see_all">전체보기 →</string>
     <string name="home_score_format">★ %1$d</string>
     <string name="home_best_phase_format">%1$s에 좋아요</string>
@@ -363,30 +407,27 @@
     <string name="my_mission_done_all">모든 미션을 완성했어요 🎉</string>
     <string name="my_mission_progress">%1$d / %2$d</string>
     <string name="my_saved_course_title">내 출사 코스</string>
-    <string name="my_no_course">아직 저장한 코스가 없어요.
-코스 탭에서 출사 코스를 만들고 저장해 보세요.</string>
+    <string name="my_no_course">아직 저장한 코스가 없어요.\n코스 탭에서 출사 코스를 만들고 저장해 보세요.</string>
     <string name="my_delete_course">코스 삭제</string>
     <string name="my_delete_confirm">\"%1$s\" 코스를 삭제할까요?</string>
     <string name="my_accessibility">접근성</string>
     <string name="visited_title">다녀온 곳</string>
-    <string name="visited_empty">아직 다녀온 곳이 없어요.
-촬영지 상세에서 \"다녀왔어요\"를 눌러보세요.</string>
+    <string name="visited_empty">아직 다녀온 곳이 없어요.\n촬영지에서 사진을 찍으면 저절로 쌓여요.</string>
     <string name="visited_count">%1$d곳</string>
     <string name="visited_when">%1$s · %2$s</string>
+    <!-- 같은 곳을 여러 번 다녀왔을 때 시각 뒤에 붙습니다. -->
+    <string name="visited_times">%1$d번 다녀옴</string>
     <string name="my_senior_title">큰 글씨 모드</string>
     <string name="my_senior_title_on">큰 글씨 모드 사용 중</string>
-    <string name="my_senior_desc">큰 글씨 · 큰 버튼 · 쉬운 메뉴
-어르신도 편하게 쓰는 정읍 출사</string>
+    <string name="my_senior_desc">큰 글씨 · 큰 버튼 · 쉬운 메뉴\n어르신도 편하게 쓰는 정읍 출사</string>
     <string name="my_senior_on">큰 글씨 모드로 전환하기 →</string>
     <string name="my_senior_off">일반 모드로 돌아가기 →</string>
     <string name="my_font_size">글씨 크기</string>
     <string name="my_font_hint">앱 전체 글씨 크기가 바뀝니다. 시스템 설정이 더 크면 그쪽을 따릅니다.</string>
-    <string name="my_footer">정읍 시선 v%1$s
-관광 정보 출처 : 한국관광공사</string>
+    <string name="my_footer">정읍 시선 v%1$s\n관광 정보 출처 : 한국관광공사</string>
 
     <!-- MY 탭 · 시안 개편 -->
     <string name="my_subtitle">이 기기에만 안전하게 저장돼요</string>
-    <string name="my_local_badge">로컬 저장 · 로그인 없음</string>
 
     <string name="my_today_title">오늘의 시선</string>
     <string name="my_today_meta">%1$s · %2$s</string>
@@ -402,11 +443,25 @@
     <string name="my_archive_title">최근 촬영 아카이브</string>
     <string name="my_archive_all">전체 사진 보기</string>
     <string name="my_archive_empty">아직 남긴 사진이 없어요.\n촬영을 시작하면 여기에 쌓입니다.</string>
+    <string name="my_archive_start">촬영 시작하기</string>
+    <string name="my_archive_by_course">코스별로 모아보기 →</string>
+    <string name="my_archive_framed">프레임으로 만든 사진 →</string>
+
+    <!-- 코스별 사진 모아보기 -->
+    <string name="course_photos_title">코스별 사진</string>
+    <string name="course_photos_count">%1$d개 묶음</string>
+    <string name="course_photos_empty">아직 남긴 사진이 없어요.\n저장한 코스의 장소에서 찍으면 여기에 코스별로 모입니다.</string>
+    <string name="course_photos_meta">%1$s 출사 · %2$d곳 중 %3$d곳 · 사진 %4$d장</string>
+    <string name="course_photos_loose_title">코스 없이 찍은 사진</string>
+    <string name="course_photos_loose_meta">%1$d곳 · 사진 %2$d장</string>
+    <string name="course_photos_open">코스 보기</string>
 
     <string name="my_taste_title">나의 촬영 성향</string>
     <string name="my_taste_basis">사진 %1$d장 기준</string>
     <string name="my_taste_percent">%1$d%%</string>
     <string name="my_taste_locked">사진 %1$d장부터 성향을 읽어드려요.</string>
+    <string name="my_taste_reading">사진 %1$d장을 읽는 중이에요…</string>
+    <string name="my_taste_basis_pending">사진 %1$d장 기준 · %2$d장 읽는 중</string>
 
     <string name="my_next_title">다음에 가볼 정읍</string>
     <string name="my_next_peak_in">절정 전 %1$d일</string>
@@ -418,19 +473,18 @@
 
     <string name="my_export">사진 내보내기</string>
     <string name="my_export_none">내보낼 사진이 아직 없어요.</string>
-    <string name="my_export_message">직접 찍은 사진 %1$d장을 다른 앱으로 보냅니다.
-사진은 기기에 그대로 남습니다.</string>
+    <string name="my_export_message">직접 찍은 사진 %1$d장을 다른 앱으로 보냅니다.\n사진은 기기에 그대로 남습니다.</string>
     <string name="my_export_failed">사진을 보낼 앱을 찾지 못했어요.</string>
 
     <string name="my_reset">데이터 초기화</string>
-    <string name="my_reset_message">저장한 코스·방문 기록·일기·찜을 모두 지웁니다.
-
-갤러리의 사진과 글씨 크기 설정은 그대로 둡니다. 되돌릴 수 없습니다.</string>
+    <string name="my_reset_message">저장한 코스·방문 기록·일기·찜을 모두 지웁니다.\n\n갤러리의 사진과 글씨 크기 설정은 그대로 둡니다. 되돌릴 수 없습니다.</string>
     <string name="my_reset_confirm">지우기</string>
     <string name="my_reset_done">기록을 지웠어요.</string>
 
     <string name="cd_my_hero_photo">오늘 추천 촬영지 사진</string>
     <string name="cd_my_next_photo">다음 절정 장면 사진</string>
+    <string name="cd_my_archive">최근 촬영 아카이브, 전체 사진 보기</string>
+    <string name="cd_my_archive_empty">최근 촬영 아카이브, 비어 있음. 촬영 시작하기</string>
 
     <string name="course_save_failed">저장하지 못했어요</string>
     <string name="course_saved_missing">코스를 불러오지 못했어요</string>
@@ -450,8 +504,7 @@
     <string name="senior_call_confirm">%1$s 번으로 전화 화면을 열까요?</string>
     <string name="senior_call_failed">전화 앱을 열 수 없어요</string>
     <string name="senior_share_failed">공유할 수 있는 앱이 없어요</string>
-    <string name="senior_location_message">지금 %1$s 근처에 있어요.
-%2$s</string>
+    <string name="senior_location_message">지금 %1$s 근처에 있어요.\n%2$s</string>
     <string name="senior_location_unknown">정읍시에 있어요. 정확한 위치를 불러오지 못했어요.</string>
 
     <!-- 출사 기록(일기) -->
@@ -459,18 +512,31 @@
     <string name="diary_subtitle">다녀온 곳이 하루 단위로 모여요</string>
     <string name="diary_month_count">📖 이번 달 %1$d일의 기록</string>
     <string name="diary_empty_title">아직 기록이 없어요</string>
-    <string name="diary_empty_desc">촬영지 상세에서 \"다녀왔어요\"를 누르면
-이곳에 하루가 쌓입니다.</string>
+    <string name="diary_empty_desc">촬영지에서 사진을 찍으면\n이곳에 하루가 쌓입니다.</string>
     <string name="diary_stats_format">%1$d곳 · 평균 %2$d</string>
+    <string name="diary_stats_places">%1$d곳</string>
     <string name="diary_generate">일기 만들기</string>
     <string name="diary_regenerate">다시 만들기</string>
     <string name="diary_share">공유</string>
     <string name="diary_share_tag">#정읍시선 #출사 #정읍</string>
     <string name="detail_checkin">다녀왔어요</string>
-    <string name="detail_checkin_long">다녀왔어요 · 오늘 기록 남기기</string>
-    <string name="detail_checkin_done">출사 기록에 담았어요</string>
-    <string name="detail_checkin_already">오늘 이미 기록한 곳이에요</string>
-    <string name="detail_checkin_view_diary">일기 보기</string>
+    <!-- "다녀왔어요"는 앱 카메라로 찍은 기록이 있을 때만 채워집니다. -->
+    <string name="detail_checkin_not_yet">아직 안 다녀왔어요 · 찍으면 저절로 기록돼요</string>
+    <string name="detail_checkin_visited">다녀왔어요 · %1$s 촬영</string>
+    <string name="detail_checkin_date_pattern" translatable="false">M월 d일</string>
+    <!-- 상세 화면 "내가 찍은 사진" 띠. 기록에 사진이 있을 때만 보입니다. -->
+    <string name="detail_my_shots_count">내가 찍은 사진 %1$d장</string>
+
+    <!-- 내가 찍은 사진 크게 보기 -->
+    <string name="photo_viewer_counter">%1$d / %2$d</string>
+    <string name="photo_viewer_when">%1$s 촬영</string>
+    <string name="photo_viewer_frame">포토 프레임</string>
+    <string name="photo_viewer_delete">사진 삭제</string>
+    <string name="photo_viewer_delete_title">이 사진을 지울까요?</string>
+    <string name="photo_viewer_delete_message">이 장소의 촬영 기록에서 빠지고, 갤러리에서도 삭제됩니다.</string>
+    <string name="photo_viewer_delete_confirm">삭제</string>
+    <string name="photo_viewer_deleted">사진을 지웠어요</string>
+    <string name="photo_viewer_delete_failed">사진을 지우지 못했어요</string>
 
     <!-- 미션 & 배지 -->
     <string name="mission_title">미션 &amp; 기록</string>
@@ -583,7 +649,7 @@
     <string name="map_reco_comp">추천 구성</string>
     <string name="map_one_line">사진가를 위한 한 줄</string>
     <string name="map_open_guide">시선 가이드 열기</string>
-    <string name="map_save_plan">출사 계획에 저장</string>
+    <string name="map_save_plan">담아 두기</string>
     <string name="map_step_discover">발견</string>
     <string name="map_step_select">선택</string>
     <string name="map_step_shoot">촬영</string>
@@ -594,6 +660,7 @@
     <string name="cd_search">탐색 목록 열기</string>
     <string name="cd_layers">범례 접기/펴기</string>
     <string name="cd_spot_photo">촬영지 사진</string>
+    <string name="cd_my_shot">내가 찍은 사진</string>
 
     <!-- 상세 -->
     <string name="detail_section_info">장소 정보</string>
@@ -609,9 +676,9 @@
     <string name="guide_thirds">교차점에 피사체를 두면 안정적이에요</string>
     <string name="guide_symmetry">중앙선에 건물 중심을 맞춰보세요</string>
     <string name="guide_center">원 안을 피사체로 채워보세요</string>
+    <string name="cd_guide_grid">구도 가이드 켜기/끄기</string>
     <string name="cd_capture">촬영 버튼</string>
     <string name="cd_gallery">앨범에서 사진 고르기</string>
-    <string name="cd_last_shot">방금 찍은 사진 열기</string>
     <string name="cd_spot_thumbnail">촬영지 사진</string>
     <!-- 포즈 가이드 -->
     <string name="pose_section_title">포즈 추천</string>
@@ -648,6 +715,7 @@
     <string name="subject_activity">#체험</string>
     <string name="course_that_day_light">그날의 빛</string>
     <string name="guide_photo_logged">사진이 오늘 기록에 담겼어요</string>
+    <string name="guide_photo_view_failed">사진을 열 앱이 없어요</string>
     <string name="diary_edit">고치기</string>
     <string name="diary_edit_title">일기 고치기</string>
     <string name="diary_edit_save">저장</string>
@@ -678,8 +746,19 @@
     <string name="frame_share">SNS에 공유하기</string>
     <string name="cd_frame_preview">프레임 미리보기</string>
     <string name="frame_saved">갤러리에 저장했어요</string>
+    <string name="frame_saved_action">모아 보기</string>
+    <string name="framed_title">프레임으로 만든 사진</string>
+    <string name="framed_hint">갤러리의 PicView 폴더에도 같은 사진이 있어요. 누르면 크게 보고, 길게 누르면 공유해요.</string>
+    <string name="framed_empty">아직 프레임으로 만든 사진이 없어요.\n일기나 MY 탭의 사진을 눌러 프레임을 씌워 보세요.</string>
+    <string name="framed_count">%1$d장</string>
     <string name="frame_save_failed">저장하지 못했어요</string>
     <string name="frame_edit_place">장소 이름 바꾸기</string>
+    <string name="frame_adjust">보이는 부분 조정 ›</string>
+    <string name="frame_adjust_title">보이는 부분 조정</string>
+    <string name="frame_adjust_hint">끌어서 옮기고, 두 손가락으로 키우세요. 밝은 창 안이 프레임에 들어갑니다.</string>
+    <string name="frame_adjust_reset">원래대로</string>
+    <string name="frame_adjust_which">몇 번째 사진을 조정할까요?</string>
+    <string name="frame_adjust_slot">%1$d번째 사진</string>
     <string name="frame_edit_place_title">장소 이름</string>
     <string name="frame_edit_place_hint">예) 내장산 우화정</string>
     <string name="frame_no_photo">사진을 불러오지 못했어요</string>
@@ -783,6 +862,7 @@
     <string name="guide_comp_title_thirds">삼분할 구도</string>
     <string name="guide_comp_title_symmetry">대칭 구도</string>
     <string name="guide_comp_title_center">중앙 구도</string>
+    <string name="guide_comp_title_named">%1$s 구도</string>
     <string name="guide_comp_desc_thirds">화면을 3x3으로 나누고\n교차점에 피사체를 놓아보세요</string>
     <string name="guide_comp_desc_symmetry">가운데 축을 기준으로\n좌우가 거울처럼 맞게 서 보세요</string>
     <string name="guide_comp_desc_center">피사체를 한가운데 두고\n배경을 비워 시선을 모아보세요</string>

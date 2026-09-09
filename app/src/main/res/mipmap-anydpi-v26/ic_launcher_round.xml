@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  적응형 아이콘.
+
+  그림이 풍경 한 장면(하늘·해·능선·강·정자·단풍잎 위에 얄힌
+  카메라 윤곽)이라 배경과 전경으로 나눌 수 없습니다. 억지로 가르면
+  런처가 전경만 살짝 밀어 넣는 시차 효과를 줄 때 강과 능선이 어긋납니다.
+  그래서 배경 층에 그림 전체를 넣고 전경은 둡니다.
+
+  모서리를 깎는 것은 런처의 마스크가 하므로 원본은 네모난 채로 둡니다.
+  108dp 중 바깥 18dp 는 잘려 나갈 수 있어(안전 영역 72dp), 원본에서 흰
+  여백을 걷어내 카메라와 해가 가운데로 모이게 해 두었습니다.
+
+  monochrome 은 사진을 쓰지 않습니다 — 테마 아이콘(Android 13+)은
+  단색으로 틼트되므로 뷰파인더 모양이어야 합니다.
+-->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@drawable/ic_launcher_background" />
-    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+    <background android:drawable="@drawable/ic_launcher_scene" />
     <monochrome android:drawable="@drawable/ic_launcher_monochrome" />
 </adaptive-icon>

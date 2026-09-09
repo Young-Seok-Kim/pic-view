@@ -105,3 +105,60 @@ data class VisitLogEntity(
      */
     val photoUri: String? = null
 )
+
+/**
+ * 한 방문에서 찍은 사진 한 장.
+ *
+ * [VisitLogEntity.photoUri] 는 칸이 하나라 첫 장만 남고, 같은 자리에서 더
+ * 찍은 사진은 갤러리에만 있고 앱은 몰랐습니다. 그래서 상세 화면이 "다녀왔어요"
+ * 까지는 말해도 **무엇을 찍었는지**는 보여 주지 못했습니다. 사진은 여기에
+ * 전부 쌓고, 방문 기록의 photoUri 는 대표 사진(첫 장)으로만 씁니다.
+ *
+ * 방문 기록이 지워지면 함께 지워집니다. 사진 파일은 갤러리에 그대로 있습니다.
+ */
+@Entity(
+    tableName = "visit_photo",
+    foreignKeys = [
+        ForeignKey(
+            entity = VisitLogEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["visitId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index("visitId")]
+)
+data class VisitPhotoEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val visitId: Long,
+    /** 갤러리(MediaStore) 주소 */
+    val uri: String,
+    /** 찍은 시각 epoch millis */
+    val takenAt: Long
+)
+
+/**
+ * 사진 한 장을 읽은 결과.
+ *
+ * MY 탭의 촬영 성향이 "어디서 찍었나"가 아니라 **무엇이 찍혔나**로 세도록,
+ * 사진마다 기기 안에서 한 번 읽어 여기 남깁니다. 읽는 데 한 장에 1초 안팎이라
+ * 매번 다시 읽으면 MY 탭이 열릴 때마다 사진 전부를 훑게 됩니다.
+ *
+ * @param version 읽은 방법의 판. 방법이 바뀌면 옛 결과는 버리고 다시 읽습니다.
+ */
+@Entity(tableName = "photo_analysis")
+data class PhotoAnalysisEntity(
+    @PrimaryKey val uri: String,
+    /** 위아래나 좌우가 거울처럼 되풀이되는지 — 수면 반영이나 대칭 구도 */
+    val reflection: Boolean,
+    /** 밝은 배경 앞에 어두운 형태가 서 있는지 */
+    val silhouette: Boolean,
+    /** 호수·강·폭포·바닷가 같은 물가가 찍혔는지 */
+    val waterside: Boolean,
+    /** 노을이 찍혔는지 */
+    val sunset: Boolean,
+    /** 라벨러가 붙인 이름들(쉼표로). 왜 그렇게 읽었는지 되짚을 때 봅니다 */
+    val labels: String,
+    val version: Int,
+    val analyzedAt: Long
+)

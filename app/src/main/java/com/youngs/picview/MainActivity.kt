@@ -7,8 +7,10 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.view.doOnPreDraw
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
@@ -26,6 +28,7 @@ import com.youngs.picview.ui.my.MyFragment
 import com.youngs.picview.ui.onboarding.OnboardingActivity
 import com.youngs.picview.ui.senior.SeniorHelpFragment
 import com.youngs.picview.ui.senior.SeniorHomeFragment
+import com.youngs.picview.ui.tour.FeatureTourView
 import com.youngs.picview.ui.main.MainFragment
 import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.domain.score.PhotoScoreEngine
@@ -35,6 +38,9 @@ import com.youngs.picview.domain.weather.SkyState
 import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.ui.model.SpotScoreContext
 import com.youngs.picview.util.AppPrefs
+import com.youngs.picview.util.FontStep
+import com.youngs.picview.data.model.WeatherResponse
+import com.youngs.picview.data.repository.CourseRepository
 import com.youngs.picview.util.retryOrNull
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -56,12 +62,23 @@ class MainActivity : BaseActivity() {
 
     private val isSenior get() = AppPrefs.isSeniorMode(this)
 
+    /**
+     * 이 화면을 만들 때의 모드·글씨 크기.
+     *
+     * 온보딩 다시 보기처럼 다른 Activity 에서 설정을 바꾸고 돌아오면 이
+     * 화면은 옛 테마로 남아 있습니다. 돌아올 때 비교해서 다르면 다시 만듭니다.
+     */
+    private var createdSenior = false
+    private var createdFontStep = FontStep.NORMAL
+
+    /** 첫 실행 버튼 안내. 떠 있는 동안만 값이 있습니다. */
+    private var tour: FeatureTourView? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        // 최초 실행이면 안내부터. 여기서 모드를 고르고 돌아옵니다.
-        // setContentView 전에 넘겨야 본 화면이 한 프레임 비치지 않습니다.
+        // 최초 실행이면 안내부터. 보통은 SplashActivity 가 미리 가르지만,
+        // 다른 경로로 들어와도 본 화면이 한 프레임 비치지 않게 여기서도 막습니다.
         if (!AppPrefs.isOnboarded(this)) {
             startActivity(OnboardingActivity.intent(this))
             finish()
@@ -69,14 +86,18 @@ class MainActivity : BaseActivity() {
         }
 
         enableEdgeToEdge()
+        createdSenior = isSenior
+        createdFontStep = AppPrefs.fontStep(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        splashScreen.setKeepOnScreenCondition { viewModel.isLoading.value == true }
-
         setupBottomNav()
         setupWindowInsets()
+
+        // 사진을 다 지웠는데 껍데기만 남은 촬영 기록을 정리합니다. 사진을
+        // 지워도 방문 줄이 남던 빌드에서 생긴 것들이라 켤 때 한 번이면 됩니다.
+        lifecycleScope.launch { CourseRepository(applicationContext).pruneEmptyVisits() }
         setupBackStackListener()
         setupBackHandling()
 
@@ -151,6 +172,12 @@ class MainActivity : BaseActivity() {
     private fun setupBackHandling() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                // 0. 버튼 안내가 떠 있으면 그것부터 걷습니다.
+                tour?.let {
+                    it.dismiss()
+                    return
+                }
+
                 // 1. 상세·지도처럼 위에 덮인 화면이 있으면 그것부터 닫습니다.
                 if (supportFragmentManager.backStackEntryCount > 0) {
                     supportFragmentManager.popBackStack()
@@ -221,10 +248,15 @@ class MainActivity : BaseActivity() {
     private fun restoreTabReferences() {
         val validIds = if (isSenior) SENIOR_TAB_IDS else NORMAL_TAB_IDS
 
-        // 1. 현재 모드에 없는 탭 Fragment 제거
+        // 1. 현재 모드에 없는 탭, 그리고 탭은 같아도 화면이 다른 모드의 것인
+        //    Fragment 제거. 홈은 두 모드 모두에 있지만 일반 홈과 간편 홈은
+        //    다른 화면이라, 태그만 보고 살려 두면 간편 모드 탭바 위에 일반
+        //    홈이 그대로 남습니다.
         val stale = supportFragmentManager.fragments.filter { fragment ->
             val tag = fragment.tag ?: return@filter false
-            tag.startsWith(TAB_TAG_PREFIX) && validIds.none { tagFor(it) == tag }
+            if (!tag.startsWith(TAB_TAG_PREFIX)) return@filter false
+            val id = validIds.firstOrNull { tagFor(it) == tag } ?: return@filter true
+            !matchesMode(fragment, id)
         }
         if (stale.isNotEmpty()) {
             supportFragmentManager.beginTransaction()
@@ -243,6 +275,13 @@ class MainActivity : BaseActivity() {
         }
         switchTab(currentTabId)
         binding.navBottom.selectedItemId = currentTabId
+    }
+
+    /** 이 Fragment 가 지금 모드에서 그 탭에 들어갈 화면인지. */
+    private fun matchesMode(fragment: Fragment, itemId: Int): Boolean = when (itemId) {
+        R.id.tab_home -> (fragment is SeniorHomeFragment) == isSenior
+        R.id.tab_help -> (fragment is SeniorHelpFragment) == isSenior
+        else -> true
     }
 
     private fun createTabFragment(itemId: Int): Fragment = when {
@@ -279,6 +318,9 @@ class MainActivity : BaseActivity() {
         if (binding.navBottom.selectedItemId == itemId) return
         binding.navBottom.selectedItemId = itemId
     }
+
+    /** 살아 있는 탭 Fragment. 지도의 돋보기가 탐색 탭의 검색칸을 열 때 씁니다. */
+    fun tabFragment(itemId: Int): Fragment? = tabFragments[itemId]
 
     /** 탭 Fragment 가 구현하면 같은 탭 재탭 시 맨 위로 올라갑니다. */
     interface TabRoot {
@@ -343,10 +385,81 @@ class MainActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        // 온보딩 다시 보기에서 큰 글씨로 바꾸고 돌아온 경우. 테마와 글씨
+        // 배율은 만들 때만 정해지므로 지금 화면으로는 반영할 수 없습니다.
+        if (isSenior != createdSenior || AppPrefs.fontStep(this) != createdFontStep) {
+            recreate()
+            return
+        }
+
         val elapsed = SystemClock.elapsedRealtime() - viewModel.lastLoadedAt
         if (viewModel.lastLoadedAt > 0L && elapsed > STALE_AFTER_MS) {
             refresh(userInitiated = false)
         }
+
+        maybeShowFeatureTour()
+    }
+
+    // ─────────────────────────── 첫 실행 버튼 안내 ───────────────────────────
+
+    /**
+     * 온보딩 뒤 처음 홈에 왔을 때 한 번, 어디를 누르면 무엇이 되는지 짚어 줍니다.
+     *
+     * 홈에서만 시작합니다 — 안내가 가리키는 자리가 홈에 있습니다. MY 탭의
+     * "앱 사용법 다시 보기"로 온보딩을 다시 본 뒤에는 이 안내도 다시 켜지는데,
+     * 그때는 MY 탭에서 돌아오므로 홈으로 옮긴 뒤 시작합니다.
+     *
+     * 봤다는 표시는 시작할 때 남깁니다. 도중에 앱이 죽어도 켤 때마다
+     * 다시 덮이는 일은 없어야 합니다.
+     */
+    private fun maybeShowFeatureTour() {
+        if (tour != null || AppPrefs.isFeatureTourSeen(this)) return
+        AppPrefs.setFeatureTourSeen(this, true)
+
+        clearBackStack()
+        if (currentTabId != R.id.tab_home) selectTab(R.id.tab_home)
+
+        // 홈 Fragment 의 뷰가 배치된 뒤에야 버튼 자리를 잴 수 있습니다.
+        // preDraw 는 그 프레임의 measure/layout 이 끝난 시점입니다.
+        binding.root.doOnPreDraw {
+            if (isFinishing || isDestroyed || tour != null) return@doOnPreDraw
+            val host = findViewById<ViewGroup>(android.R.id.content)
+            val view = FeatureTourView(this)
+            tour = view
+            view.start(host, featureTourSteps()) { tour = null }
+        }
+    }
+
+    /** 모드에 따라 짚어 줄 자리가 다릅니다. 간편 모드는 홈의 큰 버튼 셋과 탭 둘. */
+    private fun featureTourSteps(): List<FeatureTourView.Step> {
+        val home = tabFragments[R.id.tab_home]?.view
+        fun inHome(id: Int): () -> View? = { home?.findViewById(id) }
+        fun tab(id: Int): () -> View? = { binding.navBottom.findViewById(id) }
+        fun step(title: Int, body: Int, target: () -> View?, also: () -> View? = { null }) =
+            FeatureTourView.Step(getString(title), getString(body), target, also)
+
+        return if (isSenior) listOf(
+            step(R.string.tour_senior_course_title, R.string.tour_senior_course_body, inHome(R.id.btn_senior_course)),
+            step(R.string.tour_senior_audio_title, R.string.tour_senior_audio_body, inHome(R.id.btn_senior_audio)),
+            step(R.string.tour_senior_help_title, R.string.tour_senior_help_body, inHome(R.id.btn_senior_help)),
+            step(R.string.tour_senior_spot_title, R.string.tour_senior_spot_body, inHome(R.id.card_senior_spot)),
+            step(R.string.tour_senior_tab_course_title, R.string.tour_senior_tab_course_body, tab(R.id.tab_course)),
+            step(R.string.tour_senior_tab_help_title, R.string.tour_senior_tab_help_body, tab(R.id.tab_help))
+        ) else listOf(
+            step(R.string.tour_home_date_title, R.string.tour_home_date_body, inHome(R.id.card_home_date)),
+            step(R.string.tour_home_quick_title, R.string.tour_home_quick_body, inHome(R.id.layout_quick_actions)),
+            // 제목 줄과 그 아래 목록은 형제라 둘을 한 자리로 묶습니다.
+            step(
+                R.string.tour_home_best_title, R.string.tour_home_best_body,
+                inHome(R.id.layout_home_best), inHome(R.id.rv_home_best)
+            ),
+            step(R.string.tour_home_guide_title, R.string.tour_home_guide_body, inHome(R.id.card_guide_entry)),
+            step(R.string.tour_tab_course_title, R.string.tour_tab_course_body, tab(R.id.tab_course)),
+            step(R.string.tour_tab_explore_title, R.string.tour_tab_explore_body, tab(R.id.tab_explore)),
+            step(R.string.tour_tab_diary_title, R.string.tour_tab_diary_body, tab(R.id.tab_diary)),
+            step(R.string.tour_tab_my_title, R.string.tour_tab_my_body, tab(R.id.tab_my))
+        )
     }
 
     /**
@@ -366,6 +479,39 @@ class MainActivity : BaseActivity() {
     }
 
     fun reloadData() = refresh(userInitiated = false)
+
+    /**
+     * 가장 최근에 올라온 초단기실황.
+     *
+     * 실황은 "매시 40분 이후면 그 시각 관측값이 있다"는 전제로 한 번만
+     * 불렀는데, 기상청이 늦게 올리는 날에는 40분이 지나도 NO_DATA(03) 가
+     * 옵니다. 그러면 HTTP 는 200 이라 재시도도 안 걸리고, 항목이 비어서
+     * 홈의 기온·체감·습도가 전부 "—" 로 남았습니다(2026-09-04 15:47 에
+     * base_time=1500 은 NO_DATA, 1400 은 정상인 것을 확인).
+     *
+     * 그래서 기준 시각에 값이 없으면 한 시간씩 물러나며 다시 묻습니다.
+     * 한 시간 전 기온이라도 "—" 보다는 낫고, 실황은 어차피 한 시간 단위라
+     * 오차도 그 안입니다.
+     */
+    private suspend fun fetchLatestObservation(base: LocalDateTime): WeatherResponse? {
+        repeat(OBSERVATION_LOOKBACK_HOURS + 1) { back ->
+            val at = base.minusHours(back.toLong())
+            val response = retryOrNull("WEATHER_API") {
+                RetrofitClient.weatherApiService.getUltraSrtNcst(
+                    serviceKey = BuildConfig.TOUR_API_KEY,
+                    baseDate = at.format(DateTimeFormatter.ofPattern("yyyyMMdd")),
+                    baseTime = at.format(DateTimeFormatter.ofPattern("HH")) + "00"
+                )
+            }
+            val items = response?.response?.body?.items?.item
+            if (!items.isNullOrEmpty()) return response
+            Log.w(
+                "WEATHER_API",
+                "실황 없음 (${at.toLocalTime().hour}시, ${response?.response?.header?.resultMsg}) — 한 시간 전으로 물러남"
+            )
+        }
+        return null
+    }
 
     private fun preLoadData() {
         if (viewModel.cachedWeather != null) {
@@ -389,15 +535,7 @@ class MainActivity : BaseActivity() {
 
                 // 세 API 는 서로 의존하지 않으므로 동시에 호출합니다.
                 // 각각 독립적으로 재시도하고, 하나가 실패해도 나머지는 그대로 보여 줍니다.
-                val weatherAsync = async {
-                    retryOrNull("WEATHER_API") {
-                        RetrofitClient.weatherApiService.getUltraSrtNcst(
-                            serviceKey = BuildConfig.TOUR_API_KEY,
-                            baseDate = dateStr,
-                            baseTime = timeStr
-                        )
-                    }
-                }
+                val weatherAsync = async { fetchLatestObservation(base) }
                 // 단기예보는 02·05·08·11·14·17·20·23시 발표만 유효합니다.
                 // 그중 02시 발표가 그날 03시부터 사흘치를 담고 있어 하루 곡선을
                 // 한 번에 얻습니다. 02:10 이전이면 아직 안 올라왔으므로 전날
@@ -617,6 +755,9 @@ class MainActivity : BaseActivity() {
 
         /** 이 시간이 지난 뒤 앱으로 돌아오면 데이터를 다시 받아옵니다. */
         private const val STALE_AFTER_MS = 10 * 60 * 1000L
+
+        /** 실황이 아직 안 올라왔을 때 몇 시간 전까지 물러나 볼지. */
+        private const val OBSERVATION_LOOKBACK_HOURS = 2
 
         /** 일출·일몰 전후 이 분(分) 안쪽을 골든아워로 봅니다. */
         private const val GOLDEN_HOUR_MINUTES = 60L

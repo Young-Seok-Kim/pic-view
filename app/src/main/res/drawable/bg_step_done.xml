@@ -7,7 +7,7 @@
         </shape>
     </item>
     <item
-        android:drawable="@drawable/ic_check"
+        android:drawable="@drawable/ic_check_on_solid"
         android:gravity="center"
         android:width="11dp"
         android:height="11dp" />

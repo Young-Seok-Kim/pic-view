@@ -25,8 +25,8 @@ android {
         applicationId = "com.youngs.picview"
         minSdk = 26
         targetSdk = 36
-        versionCode = 3
-        versionName = "2.1"
+        versionCode = 5
+        versionName = "2.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -125,6 +125,10 @@ dependencies {
     // 네이버 맵 & 글라이드
     implementation(libs.naver.map.sdk)
     implementation(libs.glide)
+
+    // 사진 라벨링(기기 안에서 동작, 서버·키 없음). MY 탭의 촬영 성향이
+    // 사진에 물가·석양이 실제로 담겼는지 읽을 때 씁니다.
+    implementation(libs.mlkit.image.labeling)
 
     // 네이버 지도의 FusedLocationSource 가 요구합니다
     implementation(libs.play.services.location)

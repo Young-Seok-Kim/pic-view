@@ -38,7 +38,7 @@ object RetrofitClient {
         Retrofit.Builder()
             .baseUrl(TOUR_BASE_URL)
             .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(TourApiGson.instance))
             .build()
             .create(TourApiService::class.java)
     }
@@ -48,7 +48,7 @@ object RetrofitClient {
         Retrofit.Builder()
             .baseUrl(WEATHER_BASE_URL)
             .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(TourApiGson.instance))
             .build()
             .create(WeatherApiService::class.java)
     }
@@ -64,7 +64,7 @@ object RetrofitClient {
         Retrofit.Builder()
             .baseUrl(GEMINI_BASE_URL)
             .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(TourApiGson.instance))
             .build()
             .create(GeminiApiService::class.java)
     }

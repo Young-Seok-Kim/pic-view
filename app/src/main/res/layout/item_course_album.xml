@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    코스 하나의 사진 묶음.
+
+    머리에 코스 이름과 "9월 4일 출사 · 5곳 중 2곳 · 사진 7장", 그 아래 세 줄
+    격자. 머리를 누르면 그 코스의 타임라인으로, 사진을 누르면 크게 봅니다.
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Card.Elevated"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/space_m">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/space_l">
+
+        <LinearLayout
+            android:id="@+id/layout_album_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_album_title"
+                    style="@style/Text.SectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    tools:text="내장산국립공원 외 4곳" />
+
+                <TextView
+                    android:id="@+id/tv_album_meta"
+                    style="@style/Text.Caption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    tools:text="9월 4일 출사 · 5곳 중 2곳 · 사진 7장" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_album_open"
+                style="@style/Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_s"
+                android:background="@drawable/bg_pill_outline"
+                android:paddingHorizontal="@dimen/space_m"
+                android:paddingVertical="4dp"
+                android:text="@string/course_photos_open"
+                android:textColor="@color/maple_600" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_album_photos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_m"
+            android:nestedScrollingEnabled="false"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="3"
+            tools:itemCount="5"
+            tools:listitem="@layout/item_course_album_photo" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

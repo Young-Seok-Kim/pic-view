@@ -17,6 +17,7 @@ okhttp = "4.12.0"
 coroutine = "1.8.1"
 naverMap = "3.23.2"
 glide = "4.16.0"
+mlkitImageLabeling = "17.0.9"
 
 lifecycle = "2.8.4"
 fragment = "1.8.2"
@@ -53,6 +54,7 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 # Naver Map & Glide
 naver-map-sdk = { group = "com.naver.maps", name = "map-sdk", version.ref = "naverMap" }
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+mlkit-image-labeling = { group = "com.google.mlkit", name = "image-labeling", version.ref = "mlkitImageLabeling" }
 
 # Lifecycle / Fragment
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }

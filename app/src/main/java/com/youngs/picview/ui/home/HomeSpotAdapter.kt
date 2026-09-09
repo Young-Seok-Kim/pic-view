@@ -15,6 +15,7 @@ import com.youngs.picview.domain.light.SunTimes
 import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.domain.spot.SpotTheme
 import com.youngs.picview.ui.model.SpotItem
+import com.youngs.picview.util.SpotBookmark
 import java.time.LocalTime
 
 /**
@@ -62,9 +63,27 @@ class HomeSpotAdapter(
                 .transition(DrawableTransitionOptions.withCrossFade(200))
                 .into(ivHomeSpot)
 
+            bindPlan(holder, item)
+
             root.setOnClickListener { onClick(item) }
-            layoutHomeSpotPlan.setOnClickListener { onPlanClick(item) }
+            layoutHomeSpotPlan.setOnClickListener {
+                onPlanClick(item)
+                // 토글한 결과를 그 자리에서 보여 줍니다. 목록을 다시 그릴 때까지
+                // 기다리면 눌렀는데 아무 변화가 없는 화면이 됩니다.
+                bindPlan(holder, item)
+            }
         }
+    }
+
+    /** 찜한 곳이면 채운 하트와 "찜한 곳", 아니면 빈 하트와 "담아 두기". */
+    private fun bindPlan(holder: SpotViewHolder, item: SpotItem) {
+        val saved = SpotBookmark.isSaved(holder.itemView.context, item.contentId)
+        holder.binding.ivHomeSpotPlan.setImageResource(
+            if (saved) R.drawable.ic_heart_filled else R.drawable.ic_heart
+        )
+        holder.binding.tvHomeSpotPlan.setText(
+            if (saved) R.string.home_spot_plan_saved else R.string.home_spot_plan_add
+        )
     }
 
     /**

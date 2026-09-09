@@ -173,7 +173,7 @@
                     android:layout_gravity="bottom"
                     android:orientation="vertical"
                     android:paddingHorizontal="24dp"
-                    android:paddingBottom="20dp">
+                    android:paddingBottom="24dp">
 
                     <LinearLayout
                         android:id="@+id/layout_detail_score"
@@ -250,15 +250,16 @@
                 </LinearLayout>
 
                 <!--
-                  페이지 인디케이터. 가운데 아래는 이제 장소명이 차지하므로
-                  오른쪽 아래 구석으로 비켜 둡니다.
+                  페이지 인디케이터. 사진 맨 아래 가운데, 주소 줄 밑에 둡니다.
+                  위에 두었더니 시계·배터리 옆에 떠서 사진 장수 표시로 읽히지
+                  않았습니다. 글 묶음의 아래 여백 안에 앉히므로 글과 겹치지 않습니다.
                 -->
                 <LinearLayout
                     android:id="@+id/layout_indicator"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="top|center_horizontal"
-                    android:layout_marginTop="18dp"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginBottom="8dp"
                     android:gravity="center"
                     android:orientation="horizontal" />
             </FrameLayout>
@@ -869,8 +870,9 @@
                 <!--
                   ============ 다녀왔어요 ============
 
-                  출사 기록(일기 탭)의 시작점입니다. 예전에는 접힌 "장소 정보"
-                  안의 작은 텍스트 버튼이라 사실상 찾을 수 없었습니다.
+                  손으로 누르는 체크가 아니라 촬영 기록으로 저절로 채워지는
+                  표시입니다(DetailFragment.setupCheckin). 기록이 없으면 촬영
+                  화면으로, 있으면 날짜를 보여 주고 일기로 이어 줍니다.
                   일기가 여기서 시작되므로 항상 보이는 자리에 둡니다.
                 -->
                 <com.google.android.material.button.MaterialButton
@@ -880,9 +882,49 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_xl"
                     android:minHeight="52dp"
-                    android:text="@string/detail_checkin_long"
+                    android:text="@string/detail_checkin_not_yet"
                     android:textColor="@color/maple_700"
-                    app:backgroundTint="@color/maple_50" />
+                    app:backgroundTint="@color/maple_50"
+                    app:icon="@drawable/ic_camera"
+                    app:iconGravity="textStart"
+                    app:iconTint="@color/maple_700" />
+
+                <!--
+                  ============ 내가 찍은 사진 ============
+
+                  "다녀왔어요"가 언제 갔는지를 말한다면, 이 띠는 **무엇을 찍었는지**를
+                  보여 줍니다. 예전에는 기록에 사진 한 장만 남아 이 자리가 없었고,
+                  다녀온 곳을 눌러도 사진을 볼 길이 없었습니다. 사진이 없으면
+                  통째로 감춥니다. 누르면 그 장부터 크게 펼칩니다.
+                -->
+                <LinearLayout
+                    android:id="@+id/layout_my_shots"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_l"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/tv_my_shots_title"
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_secondary"
+                        tools:text="내가 찍은 사진 3장" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_my_shots"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_s"
+                        android:clipToPadding="false"
+                        android:orientation="horizontal"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:itemCount="3"
+                        tools:listitem="@layout/item_detail_my_photo" />
+                </LinearLayout>
 
                 <!--
                   ============ 장소 정보 (접이식) ============

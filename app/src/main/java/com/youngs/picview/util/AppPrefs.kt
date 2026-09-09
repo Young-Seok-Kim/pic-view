@@ -2,6 +2,8 @@ package com.youngs.picview.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.gson.Gson
+import com.youngs.picview.ui.model.SpotItem
 import java.util.UUID
 
 /**
@@ -23,8 +25,17 @@ object AppPrefs {
     private const val KEY_ONBOARDED = "onboarding_done"
     private const val KEY_INSTALL_ID = "install_id"
     private const val KEY_FAVORITES = "favorite_spots"
+
+    /** 찜한 장소의 정보(JSON). 홈 목록에서 밀려나도 찜 목록에 보이게 합니다. 뒤에 contentId 가 붙습니다. */
+    private const val KEY_FAVORITE_SNAPSHOT_PREFIX = "favorite_spot_"
     private const val KEY_DIARY_FEELING_PREFIX = "diary_feelings_"
     private const val KEY_POSE_HINT_SEEN = "pose_hint_seen"
+    private const val KEY_FEATURE_TOUR_SEEN = "feature_tour_seen"
+    private const val KEY_GUIDE_OVERLAY = "guide_overlay_on"
+    private const val KEY_CAMERA_TOUR_SEEN = "camera_tour_seen"
+
+    /** 사진 하나에 대한 프레임 작업 상태(JSON). 뒤에 원본 사진 주소가 붙습니다. */
+    private const val KEY_FRAME_DRAFT_PREFIX = "frame_draft_"
 
     private fun prefs(context: Context): SharedPreferences =
         context.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -33,8 +44,26 @@ object AppPrefs {
     fun isSeniorMode(context: Context): Boolean =
         prefs(context).getBoolean(KEY_SENIOR_MODE, false)
 
+    /**
+     * 시니어 모드를 켜고 끕니다. 글씨 크기도 같이 움직입니다.
+     *
+     * 화면에서는 이 모드를 "큰 글씨"라고 부르는데, 테마만 바꾸면 버튼과
+     * 여백은 커져도 글자는 그대로라 "큰 글씨로 했는데 글씨가 안 커진다"는
+     * 말이 나옵니다. 켤 때는 글씨를 최소 "크게"로 올리고, 끌 때는 그렇게
+     * 올라간 것만 되돌립니다 — 사용자가 직접 "매우 크게"를 골랐다면
+     * 그 선택은 남겨 둡니다.
+     */
     fun setSeniorMode(context: Context, enabled: Boolean) {
-        prefs(context).edit().putBoolean(KEY_SENIOR_MODE, enabled).apply()
+        val step = fontStep(context)
+        val nextStep = when {
+            enabled && step == FontStep.NORMAL -> FontStep.LARGE
+            !enabled && step == FontStep.LARGE -> FontStep.NORMAL
+            else -> step
+        }
+        prefs(context).edit()
+            .putBoolean(KEY_SENIOR_MODE, enabled)
+            .putString(KEY_FONT_STEP, nextStep.name)
+            .apply()
     }
 
     /** 온보딩을 이미 봤는지. 최초 실행 분기에 씁니다. */
@@ -56,6 +85,52 @@ object AppPrefs {
 
     fun setPoseHintSeen(context: Context) {
         prefs(context).edit().putBoolean(KEY_POSE_HINT_SEEN, true).apply()
+    }
+
+    /**
+     * 첫 화면의 버튼 안내(코치마크)를 이미 봤는지.
+     *
+     * 온보딩이 "이 앱이 무엇인지"라면 이 안내는 "어디를 누르면 무엇이
+     * 되는지"입니다. 첫 실행 뒤 한 번만 보이고, MY 탭의 "앱 사용법 다시
+     * 보기"로 되살릴 수 있습니다.
+     */
+    fun isFeatureTourSeen(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_FEATURE_TOUR_SEEN, false)
+
+    fun setFeatureTourSeen(context: Context, seen: Boolean) {
+        prefs(context).edit().putBoolean(KEY_FEATURE_TOUR_SEEN, seen).apply()
+    }
+
+    /** 촬영 화면의 버튼 안내를 이미 봤는지. 홈의 안내와 따로 셉니다 — 카메라는 나중에 처음 엽니다. */
+    fun isCameraTourSeen(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_CAMERA_TOUR_SEEN, false)
+
+    fun setCameraTourSeen(context: Context, seen: Boolean) {
+        prefs(context).edit().putBoolean(KEY_CAMERA_TOUR_SEEN, seen).apply()
+    }
+
+    /**
+     * 촬영 화면의 구도 가이드(격자·서는 자리)를 켜 둘지. 기본은 켬.
+     * 카메라 격자처럼 화면에서 바로 끄고 켜며, 마지막 상태를 기억합니다.
+     */
+    fun isGuideOverlayOn(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_GUIDE_OVERLAY, true)
+
+    fun setGuideOverlayOn(context: Context, on: Boolean) {
+        prefs(context).edit().putBoolean(KEY_GUIDE_OVERLAY, on).apply()
+    }
+
+    /**
+     * 한 사진의 프레임 작업 상태 — 모드·프레임·넣은 사진들·보이는 부분.
+     *
+     * 저장하고 나갔다가 같은 사진으로 다시 들어오면 그대로 이어집니다.
+     * 네 장을 다시 고르고 보이는 부분을 다시 맞추는 일은 두 번 하면 화가 납니다.
+     */
+    fun frameDraft(context: Context, sourceUri: String): String? =
+        prefs(context).getString(KEY_FRAME_DRAFT_PREFIX + sourceUri, null)
+
+    fun saveFrameDraft(context: Context, sourceUri: String, json: String) {
+        prefs(context).edit().putString(KEY_FRAME_DRAFT_PREFIX + sourceUri, json).apply()
     }
 
     /** 글씨 크기 단계. */
@@ -80,14 +155,51 @@ object AppPrefs {
     fun isFavorite(context: Context, contentId: String): Boolean =
         contentId in favoriteSpots(context)
 
-    /** 찜을 토글하고, 토글 후 찜 상태를 돌려줍니다. */
-    fun toggleFavorite(context: Context, contentId: String): Boolean {
+    /**
+     * 찜을 토글하고, 토글 후 찜 상태를 돌려줍니다.
+     *
+     * 담을 때는 장소 정보도 스냅샷으로 남깁니다. 홈 목록은 관광공사 API 에서
+     * 100건만 받아 와 구성이 바뀌므로, id 만 남기면 나중에 목록에서 그 장소를
+     * 못 찾아 "찜 3곳"인데 2곳만 보이는 일이 생깁니다.
+     */
+    fun toggleFavorite(context: Context, spot: SpotItem): Boolean {
         val current = favoriteSpots(context).toMutableSet()
-        val nowFavorite = !current.remove(contentId)
-        if (nowFavorite) current.add(contentId)
-        prefs(context).edit().putStringSet(KEY_FAVORITES, current).apply()
+        val nowFavorite = !current.remove(spot.contentId)
+        if (nowFavorite) current.add(spot.contentId)
+        prefs(context).edit()
+            .putStringSet(KEY_FAVORITES, current)
+            .apply {
+                if (nowFavorite) putString(KEY_FAVORITE_SNAPSHOT_PREFIX + spot.contentId, gson.toJson(spot))
+                else remove(KEY_FAVORITE_SNAPSHOT_PREFIX + spot.contentId)
+            }
+            .apply()
         return nowFavorite
     }
+
+    /** 관광공사에서 내려간 장소처럼 더는 보여 줄 수 없는 찜을 지웁니다. */
+    fun removeFavorites(context: Context, contentIds: Collection<String>) {
+        if (contentIds.isEmpty()) return
+        val current = favoriteSpots(context).toMutableSet()
+        current.removeAll(contentIds.toSet())
+        prefs(context).edit()
+            .putStringSet(KEY_FAVORITES, current)
+            .apply { contentIds.forEach { remove(KEY_FAVORITE_SNAPSHOT_PREFIX + it) } }
+            .apply()
+    }
+
+    /** 찜한 장소의 스냅샷을 갱신합니다. 홈 목록에서 다시 만난 장소는 최신 정보로 덮습니다. */
+    fun saveFavoriteSnapshot(context: Context, spot: SpotItem) {
+        prefs(context).edit()
+            .putString(KEY_FAVORITE_SNAPSHOT_PREFIX + spot.contentId, gson.toJson(spot))
+            .apply()
+    }
+
+    /** 찜할 때 남긴 장소 정보. 스냅샷을 남기기 전에 찜한 것은 null 입니다. */
+    fun favoriteSnapshot(context: Context, contentId: String): SpotItem? =
+        prefs(context).getString(KEY_FAVORITE_SNAPSHOT_PREFIX + contentId, null)
+            ?.let { runCatching { gson.fromJson(it, SpotItem::class.java) }.getOrNull() }
+
+    private val gson by lazy { Gson() }
 
     /**
      * 그날의 감정 태그(시안 — 오늘의 감정).
@@ -120,7 +232,10 @@ object AppPrefs {
         val editor = p.edit()
         editor.remove(KEY_FAVORITES)
         p.all.keys
-            .filter { it.startsWith(KEY_DIARY_FEELING_PREFIX) }
+            .filter {
+                it.startsWith(KEY_DIARY_FEELING_PREFIX) || it.startsWith(KEY_FAVORITE_SNAPSHOT_PREFIX) ||
+                    it.startsWith(KEY_FRAME_DRAFT_PREFIX)
+            }
             .forEach { editor.remove(it) }
         editor.apply()
     }

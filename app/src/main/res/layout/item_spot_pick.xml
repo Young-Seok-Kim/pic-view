@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  코스에 담을 촬영지 한 줄.
+
+  체크박스를 왼쪽 끝에 두지 않고 오른쪽에 둔 이유는, 왼쪽이 사진 자리이기
+  때문입니다. 사진이 먼저 보여야 "여기 가고 싶다"가 생기고, 체크는 그
+  결정을 담는 손짓입니다.
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_pick"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/space_s"
+    android:checkable="true"
+    android:clickable="true"
+    android:focusable="true"
+    app:checkedIcon="@null"
+    app:cardBackgroundColor="@color/bg_card"
+    app:cardCornerRadius="@dimen/radius_card"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/card_stroke"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/space_m">
+
+        <ImageView
+            android:id="@+id/iv_pick"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@color/bg_image_placeholder"
+            android:contentDescription="@string/cd_spot_thumbnail"
+            android:scaleType="centerCrop" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_m"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_pick_title"
+                style="@style/Text.SectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                tools:text="정읍사예술회관" />
+
+            <TextView
+                android:id="@+id/tv_pick_signal"
+                style="@style/Text.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/text_secondary"
+                tools:text="일몰 · 따뜻한 사광 · 차로 8분" />
+
+            <!-- 찜해 둔 곳이라는 표시. 찜 목록에서 고를 때 길잡이가 됩니다. -->
+            <TextView
+                android:id="@+id/tv_pick_favorite"
+                style="@style/Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:drawablePadding="3dp"
+                android:gravity="center_vertical"
+                android:text="@string/picker_favorited"
+                android:textColor="@color/maple_500"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_heart_filled"
+                app:drawableTint="@color/maple_500"
+                tools:visibility="visible" />
+        </LinearLayout>
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/cb_pick"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_s"
+            android:clickable="false"
+            android:contentDescription="@string/picker_toggle"
+            android:focusable="false" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

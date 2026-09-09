@@ -2,6 +2,7 @@ package com.youngs.picview.ui.map
 
 import android.graphics.PointF
 import android.os.Bundle
+import com.youngs.picview.util.NaverMapSdkInit
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -26,6 +27,7 @@ import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PolylineOverlay
 import com.naver.maps.map.util.FusedLocationSource
 import com.youngs.picview.MainActivity
+import com.youngs.picview.ui.main.MainFragment
 import com.youngs.picview.R
 import com.youngs.picview.databinding.FragmentMapBinding
 import com.youngs.picview.domain.guide.SiseonGuide
@@ -41,7 +43,7 @@ import com.youngs.picview.ui.guide.GuideOverlayView
 import com.youngs.picview.ui.guide.SiseonGuideActivity
 import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.ui.model.SpotItem
-import com.youngs.picview.util.PlanQuickSave
+import com.youngs.picview.util.SpotBookmark
 import com.youngs.picview.util.TravelMode
 import com.youngs.picview.util.applyTopSystemBarInset
 import com.youngs.picview.util.distanceKmTo
@@ -86,6 +88,12 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
         return LatLng(lat, lng)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        // 지도 SDK 는 여기서 처음 씁니다. 뷰를 만들기 전에 초기화해야 합니다.
+        NaverMapSdkInit.ensure(requireContext())
+        super.onCreate(savedInstanceState)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentMapBinding.bind(view)
@@ -97,10 +105,14 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
 
         binding.btnMapBack.setOnClickListener { parentFragmentManager.popBackStack() }
 
-        // 검색은 탐색 탭(목록·검색)이 전담합니다. 지도를 닫고 그리로 보냅니다.
+        // 검색은 탐색 탭(목록·검색)이 전담합니다. 지도를 닫고 그리로 보내되,
+        // 검색칸까지 열어 둡니다. 탭만 바꿔 놓으면 "돋보기를 눌렀는데 목록이
+        // 나왔다"로 읽힙니다.
         binding.btnMapSearch.setOnClickListener {
             parentFragmentManager.popBackStack()
-            (activity as? MainActivity)?.selectTab(R.id.tab_explore)
+            val main = activity as? MainActivity ?: return@setOnClickListener
+            main.selectTab(R.id.tab_explore)
+            (main.tabFragment(R.id.tab_explore) as? MainFragment)?.focusSearch()
         }
 
         binding.btnMapLayers.setOnClickListener {
@@ -453,7 +465,10 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
                     requireContext(),
                     spotTitle = spot.title,
                     contextId = SiseonGuide.contextIdFor(facts.bestPhase),
-                    guideId = SiseonGuide.guideIdFor(facts)
+                    guideId = SiseonGuide.guideIdFor(facts),
+                    // 미션에서 찍은 사진이 이 장소의 방문 기록("다녀왔어요")이 되도록.
+                    contentId = spot.contentId,
+                    phaseName = viewModel.sunTimes.phaseNow().name
                 )
             )
         }
@@ -505,6 +520,7 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
             GuideOverlayView.GuideType.THIRDS -> "여백"
             GuideOverlayView.GuideType.SYMMETRY -> "대칭"
             GuideOverlayView.GuideType.CENTER -> "가까이"
+            else -> "여백"
         }
         // "여백 + 여백" 처럼 같은 말이 겹치면 빛의 결로 바꿔 말합니다.
         val second = if (composition == purpose.label) {
@@ -515,15 +531,33 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
         return "${purpose.label} + $second"
     }
 
+    /**
+     * 시트의 담기 — 찜 토글.
+     *
+     * 예전에는 한 곳짜리 코스를 만들어 코스 목록에 넣었습니다. 지도에서
+     * 여러 곳을 담아도 코스 하나로 모이지 않고 1곳짜리 코스가 여럿
+     * 생겼습니다. 지금은 찜으로 모이고, 코스 탭의 '직접 고르기'에서
+     * 그 찜한 곳을 골라 코스를 짭니다.
+     */
     private fun savePlan(spot: SpotItem) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            val saved = PlanQuickSave.save(requireContext(), spot, viewModel.sunTimes)
-            Toast.makeText(
-                requireContext(),
-                if (saved) R.string.detail_plan_saved else R.string.detail_plan_failed,
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+        val added = SpotBookmark.toggle(requireContext(), spot)
+        renderSheetSaveState(spot)
+        Toast.makeText(
+            requireContext(),
+            if (added) R.string.bookmark_added else R.string.bookmark_removed,
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    /** 담긴 곳인지 시트에 표시합니다. 눌렀는데 아무 변화가 없으면 안 됩니다. */
+    private fun renderSheetSaveState(spot: SpotItem) {
+        val saved = SpotBookmark.isSaved(requireContext(), spot.contentId)
+        binding.btnSheetBookmark.setImageResource(
+            if (saved) R.drawable.ic_heart_filled else R.drawable.ic_heart
+        )
+        binding.btnSheetSave.setText(
+            if (saved) R.string.bookmark_saved_label else R.string.bookmark_save_label
+        )
     }
 
     override fun onDestroyView() {

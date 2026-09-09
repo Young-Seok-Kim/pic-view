@@ -40,7 +40,7 @@ import com.youngs.picview.domain.guide.SiseonGuide
 import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.ui.guide.SiseonGuideActivity
 import com.youngs.picview.ui.model.SpotItem
-import com.youngs.picview.util.PlanQuickSave
+import com.youngs.picview.util.SpotBookmark
 import kotlinx.coroutines.launch
 
 /**
@@ -354,18 +354,20 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
     }
 
     /**
-     * 카드의 "출사 계획에 담기" — 한 곳짜리 출사 일정으로 바로 저장합니다.
-     * 상세 화면의 저장과 같은 저장소(코스 목록)에 쌓입니다.
+     * 카드의 "담아 두기" — 그 장소를 찜합니다.
+     *
+     * 예전에는 한 곳짜리 코스를 만들어 코스 목록에 넣었습니다. 담은 곳들이
+     * 모여 한 계획이 되는 것이 아니라 저장할 때마다 따로 놀았습니다.
+     * 지금은 찜 하나로 모이고, 코스 탭의 '직접 고르기'에서 그 찜한 곳을
+     * 골라 담으면 순서는 빛이 세웁니다.
      */
     private fun savePlan(spot: SpotItem) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            val saved = PlanQuickSave.save(requireContext(), spot, viewModel.sunTimes)
-            Toast.makeText(
-                requireContext(),
-                if (saved) R.string.detail_plan_saved else R.string.detail_plan_failed,
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+        val added = SpotBookmark.toggle(requireContext(), spot)
+        Toast.makeText(
+            requireContext(),
+            if (added) R.string.bookmark_added else R.string.bookmark_removed,
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     /**

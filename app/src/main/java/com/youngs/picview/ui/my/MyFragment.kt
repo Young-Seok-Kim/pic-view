@@ -27,7 +27,9 @@ import com.youngs.picview.domain.season.SeasonHighlight
 import com.youngs.picview.domain.season.SeasonHighlights
 import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.ui.course.CourseInputFragment
+import com.youngs.picview.ui.detail.DetailFragment
 import com.youngs.picview.ui.guide.GuideActivity
+import com.youngs.picview.ui.frame.FramedPhotosActivity
 import com.youngs.picview.ui.frame.PhotoFrameActivity
 import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.ui.mission.MissionFragment
@@ -58,6 +60,9 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
 
     private var _binding: FragmentMyBinding? = null
     private val binding get() = _binding!!
+
+    /** 아카이브 카드가 목록으로 갈지 촬영으로 갈지 가르는 값. */
+    private var hasArchivePhotos = false
 
     private val viewModel: MyViewModel by viewModels()
 
@@ -91,13 +96,29 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
         viewModel.visits.observe(viewLifecycleOwner) { visits ->
             renderRhythm(visits)
             renderArchive(visits)
-            renderTaste(visits)
             renderLightNote(visits)
         }
+        viewModel.taste.observe(viewLifecycleOwner) { renderTaste(it) }
     }
 
     override fun onResume() {
         super.onResume()
+        refreshOnReturn()
+    }
+
+    /**
+     * 상세·찜 목록은 이 화면 위에 얹히고(pushScreen 은 hide 만 함) 이 화면은
+     * 계속 RESUMED 라, 돌아와도 onResume 이 오지 않습니다. 숨김이 풀리는
+     * 순간이 "돌아온" 순간입니다.
+     */
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden && _binding != null) refreshOnReturn()
+    }
+
+    private fun refreshOnReturn() {
+        // 찜 목록에서 찜을 빼거나, 관광공사에 없는 찜이 정리됐을 수 있으므로 "n곳"을 다시 셉니다.
+        viewModel.visits.value?.let { renderFavoritesSummary(it) }
         // 빛은 가만히 있어도 흐릅니다. 탭으로 돌아왔을 때 "석양까지 58분"이
         // 아까 그대로면 화면이 시간을 놓친 것처럼 보입니다.
         renderToday()
@@ -114,6 +135,24 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
         }
         binding.layoutStatShots.setOnClickListener(openVisits)
         binding.tvArchiveAll.setOnClickListener(openVisits)
+        binding.tvArchiveByCourse.setOnClickListener {
+            (activity as? MainActivity)?.pushScreen(CoursePhotosFragment())
+        }
+        binding.tvArchiveFramed.setOnClickListener {
+            startActivity(FramedPhotosActivity.intent(requireContext()))
+        }
+
+        // 아카이브 카드는 통째로 목적지입니다. 다만 사진이 하나도 없을 때
+        // 빈 목록으로 보내는 건 "없다"를 두 번 말하는 것이라, 그때는
+        // 오늘의 촬영으로 내보냅니다.
+        binding.cardArchive.setOnClickListener {
+            if (hasArchivePhotos) {
+                (activity as? MainActivity)?.pushScreen(VisitedFragment())
+            } else {
+                startTodayShoot()
+            }
+        }
+        binding.tvArchiveStart.setOnClickListener { startTodayShoot() }
 
         val openMissions = View.OnClickListener {
             (activity as? MainActivity)?.pushScreen(MissionFragment())
@@ -125,6 +164,9 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
         }
 
         binding.btnTodayShoot.setOnClickListener { startTodayShoot() }
+        // 카드 자체는 그 장소로 가는 문입니다. 사진과 이름을 보여 주면서
+        // 눌러도 아무 일이 없으면 화면이 닫힌 것처럼 느껴집니다.
+        binding.cardToday.setOnClickListener { openTodaySpot() }
         binding.btnNextPlan.setOnClickListener {
             (activity as? MainActivity)?.pushScreen(CourseInputFragment())
         }
@@ -200,6 +242,22 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
     }
 
     /**
+     * 오늘의 시선 카드를 누르면 그 장소의 상세로.
+     *
+     * 카드가 보여 주는 장소는 [renderToday] 와 같은 목록 1위입니다. 아직
+     * 목록이 없으면 우화정 사진을 대신 보여 주고 있는 상태라 갈 상세가
+     * 없으므로 탐색 탭으로 보냅니다.
+     */
+    private fun openTodaySpot() {
+        val spot = mainViewModel.spotData.value?.firstOrNull()
+        if (spot == null) {
+            (activity as? MainActivity)?.selectTab(R.id.tab_explore)
+            return
+        }
+        (activity as? MainActivity)?.pushScreen(DetailFragment.newInstance(spot))
+    }
+
+    /**
      * 히어로의 CTA — 지금 추천 장소로 포즈 가이드를 엽니다.
      *
      * 목록을 아직 못 받았으면 장소를 특정할 수 없어 촬영한 사진을 기록에
@@ -261,35 +319,51 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
             .distinctBy { it.photoUri }
             .take(4)
 
+        hasArchivePhotos = photos.isNotEmpty()
         binding.rvMyPhotos.isVisible = photos.isNotEmpty()
         binding.layoutArchiveEmpty.isVisible = photos.isEmpty()
         binding.tvArchiveAll.isVisible = photos.isNotEmpty()
+        binding.tvArchiveByCourse.isVisible = photos.isNotEmpty()
+        binding.cardArchive.contentDescription = getString(
+            if (photos.isEmpty()) R.string.cd_my_archive_empty else R.string.cd_my_archive
+        )
         photoAdapter.submitList(photos)
     }
 
     // ─────────────────────── 나의 촬영 성향 ───────────────────────
 
-    private fun renderTaste(visits: List<VisitLogEntity>) {
-        val taste = PhotoTaste.of(visits)
-
+    private fun renderTaste(taste: PhotoTaste) {
         val axisViews = listOf(
-            binding.tasteReflection, binding.tasteGolden, binding.tasteWater
+            binding.tasteReflection, binding.tasteSilhouette,
+            binding.tasteGolden, binding.tasteWater
         )
 
-        if (taste == null) {
+        if (!taste.isReady) {
             // 사진 한두 장으로 "68%"를 말하면 그건 통계가 아니라 장식입니다.
             axisViews.forEach { it.root.isVisible = false }
             binding.dividerTaste.isVisible = false
             binding.tvTasteBasis.text =
-                getString(R.string.my_taste_locked, PhotoTaste.MIN_SAMPLE)
+                if (taste.sampleSize + taste.pending >= PhotoTaste.MIN_SAMPLE) {
+                    // 사진은 충분한데 아직 읽는 중입니다. 곧 채워집니다.
+                    getString(R.string.my_taste_reading, taste.pending)
+                } else {
+                    getString(R.string.my_taste_locked, PhotoTaste.MIN_SAMPLE)
+                }
             binding.tvTasteInsight.isVisible = false
             return
         }
 
-        binding.tvTasteBasis.text = getString(R.string.my_taste_basis, taste.sampleSize)
+        binding.tvTasteBasis.text = if (taste.pending > 0) {
+            getString(R.string.my_taste_basis_pending, taste.sampleSize, taste.pending)
+        } else {
+            getString(R.string.my_taste_basis, taste.sampleSize)
+        }
         binding.dividerTaste.isVisible = true
 
-        val icons = listOf(R.drawable.ic_glyph_drop, R.drawable.ic_sun, R.drawable.ic_wave)
+        val icons = listOf(
+            R.drawable.ic_glyph_drop, R.drawable.ic_glyph_person,
+            R.drawable.ic_sun, R.drawable.ic_wave
+        )
         axisViews.forEachIndexed { index, axisBinding ->
             axisBinding.root.isVisible = true
             bindAxis(axisBinding, taste.axes[index], icons[index])

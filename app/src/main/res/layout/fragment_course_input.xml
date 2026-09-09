@@ -14,7 +14,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_page"
-    android:clipToPadding="false"
     android:fillViewport="true">
 
     <LinearLayout
@@ -317,12 +316,76 @@
             android:textColor="@color/text_tertiary"
             android:textSize="@dimen/text_caption" />
 
+        <!--
+          ─────────── 직접 고르기 ───────────
+
+          "장소는 내가, 순서는 빛이." 코스를 앱이 전부 짜 주기만 하면
+          "나는 여기랑 여기만 갈래"가 안 되고, 찜을 해 둬도 그 찜한 곳으로
+          코스를 만들 수가 없습니다. 고르는 일만 돌려주고 세우는 일은
+          그대로 빛이 합니다.
+        -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_pick_spots"
+            style="@style/Card.Elevated"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_l"
+            android:layout_marginHorizontal="@dimen/screen_padding"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/space_m">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_place"
+                    app:tint="@color/maple_500" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_m"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/Text.SectionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/picker_entry_title" />
+
+                    <TextView
+                        android:id="@+id/tv_pick_summary"
+                        style="@style/Text.Caption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textColor="@color/text_secondary"
+                        tools:text="3곳을 담았어요 · 순서는 빛이 정합니다" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/baseline_chevron_right_24"
+                    app:tint="@color/text_tertiary" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- ─────────── 오늘의 빛 코스 ─────────── -->
         <com.google.android.material.card.MaterialCardView
             style="@style/Card.Elevated"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_xl"
+            android:layout_marginTop="@dimen/space_l"
             android:layout_marginHorizontal="@dimen/screen_padding">
 
             <LinearLayout

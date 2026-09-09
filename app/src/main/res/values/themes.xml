@@ -208,8 +208,21 @@
 
     <!-- ================= 스플래시 ================= -->
     <style name="Theme.PicView.Splash" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/maple_600</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <!--
+            시스템 스플래시(시작 창)는 OS 가 앱의 첫 프레임 전에 강제로 그리는
+            화면이라 단색 배경만 받고, 앱이 없앨 수 없습니다. Android 12+ 는
+            런처에서 켠 앱에는 windowDisablePreview 도 무시합니다(다른 경로로
+            켤 때만 시작 창을 생략). 그래서 할 수 있는 최선은:
+              - 배경색을 브랜드 스플래시의 첫 프레임(splash_veil)과 같은 색으로
+                맞춰 단색 → 그림이 끊김 없이 녹아들게 하고
+              - 아이콘은 비워 엉뚱한 그림이 한 번 비치지 않게 하고
+              - SplashActivity 를 가볍게 유지해 단색이 머무는 시간을 줄이는 것.
+            2026-09-03 무무(Android 12) 측정: 콜드 스타트 1.2초 중 0.85초가
+            프로세스 생성·클래스 로딩(디버그 APK 123MB), 화면 자체는 0.3초.
+        -->
+        <item name="android:windowDisablePreview">true</item>
+        <item name="windowSplashScreenBackground">@color/splash_sun</item>
+        <item name="windowSplashScreenAnimatedIcon">@android:color/transparent</item>
         <item name="postSplashScreenTheme">@style/Theme.PicView</item>
     </style>
 
@@ -358,8 +371,20 @@
         <item name="strokeWidth">1dp</item>
     </style>
 
+    <!--
+        시니어 테마의 기본 카드. 모서리만 키웁니다.
+
+        전에는 안쪽 여백(contentPadding 24dp)도 여기 있었는데, 테마 기본값이라
+        일반 화면의 모든 카드에 얹혔습니다. 화면들은 이미 제 여백을 갖고 있어
+        여백이 두 겹이 되고, 사진이 카드를 채워야 하는 히어로는 사진이 안으로
+        밀리고, 42dp 짜리 날짜 알약은 글자가 들어갈 자리가 없어 비었습니다.
+        여백이 필요한 시니어 전용 카드만 [Card.Senior.Padded] 를 씁니다.
+    -->
     <style name="Card.Senior" parent="Card.Elevated">
         <item name="cardCornerRadius">@dimen/radius_card_senior</item>
+    </style>
+
+    <style name="Card.Senior.Padded">
         <item name="contentPadding">@dimen/space_senior</item>
     </style>
 

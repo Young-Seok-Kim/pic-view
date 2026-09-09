@@ -68,7 +68,10 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         binding.viewMonthGrid.onDayClick = { day -> onDaySelected(shownMonth.atDay(day)) }
 
         // 지금 계절부터 보여 줍니다. 1월에 봄부터 보여 주면 쓸모가 없습니다.
-        val now = Season.now()
+        // 다만 이 계절의 절정이 이미 다 지났으면(8월 말의 연꽃처럼) 다음
+        // 계절로 넘깁니다. 첫 화면에 "D-316"을 띄우면 달력이 아니라
+        // 지난 일정표가 됩니다.
+        val now = firstSeasonWithSomethingLeft()
         binding.chipsSeason.check(chipOf(now))
         adapter.submitList(SeasonHighlights.of(now))
         renderMonth()
@@ -177,6 +180,26 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
      * 배경 그림도 계절을 따라 바뀝니다 — 겨울을 골랐는데 단풍빛 카드면
      * 그림과 글이 서로 다른 말을 합니다.
      */
+    /**
+     * 오늘부터 세어 아직 올 것이 남은 첫 계절.
+     *
+     * 지금 계절이 우선입니다. 그 계절 절정이 모두 지났을 때만 다음 계절로
+     * 넘어가고, 네 계절을 다 돌아도 없으면 지금 계절 그대로 둡니다.
+     */
+    private fun firstSeasonWithSomethingLeft(): Season {
+        val today = LocalDate.now()
+        val order = Season.entries
+        val start = order.indexOf(Season.now())
+        repeat(order.size) { step ->
+            val season = order[(start + step) % order.size]
+            val soonest = SeasonHighlights.of(season)
+                .minOfOrNull { it.daysUntilPeak(today) } ?: return@repeat
+            // 반 년보다 멀면 "다음"이 아니라 "지난"입니다.
+            if (soonest <= DAYS_AHEAD_LIMIT) return season
+        }
+        return Season.now()
+    }
+
     private fun renderHeadline(season: Season) {
         val today = LocalDate.now()
         val candidates = SeasonHighlights.of(season)
@@ -281,6 +304,9 @@ class CalendarFragment : Fragment(R.layout.fragment_calendar) {
         private const val PLACEHOLDER = "—"
 
         /** 절정 앞뒤로 이 일수만큼을 '추천'으로 표시합니다. */
+        /** 이보다 먼 절정은 "다음"이라 부르지 않습니다. */
+        private const val DAYS_AHEAD_LIMIT = 183L
+
         private const val RECO_MARGIN_DAYS = 5L
     }
 }

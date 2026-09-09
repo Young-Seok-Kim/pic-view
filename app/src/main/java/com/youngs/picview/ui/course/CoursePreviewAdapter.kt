@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -40,7 +41,9 @@ class CoursePreviewAdapter(
             tvStopAddr.text = shortAddress(stop.spot.addr1)
             tvStopArrive.text = stop.arriveAt.format(HOUR_MINUTE)
 
-            tvStopTravel.text = if (stop.travelMinutes > 0) {
+            val moving = stop.travelMinutes > 0
+            tvStopTravelLabel.isVisible = moving
+            tvStopTravel.text = if (moving) {
                 context.getString(R.string.course_travel_minutes, stop.travelMinutes)
             } else {
                 context.getString(R.string.course_travel_start)

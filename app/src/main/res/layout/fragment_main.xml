@@ -218,14 +218,73 @@
         </LinearLayout>
 
         <!--
-          상단 고정 : 정렬 (시안 — 추천순 · 거리순 · 빛 좋은 시간순).
+          상단 고정 : 검색 + 정렬.
+
+          검색칸은 접히는 머리말이 아니라 여기 둡니다. 목록을 내리다 검색어를
+          고치고 싶을 때 머리말과 함께 사라져 있으면 다시 맨 위로 올려야 합니다.
+        -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/bg_page"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/layout_search"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginHorizontal="@dimen/screen_padding"
+                android:layout_marginTop="@dimen/space_s"
+                android:background="@drawable/bg_search_field"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/space_m"
+                android:paddingEnd="@dimen/space_xs">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_search"
+                    app:tint="@color/text_tertiary" />
+
+                <EditText
+                    android:id="@+id/et_search"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="@string/explore_search_hint"
+                    android:imeOptions="actionSearch"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:paddingHorizontal="@dimen/space_s"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_tertiary"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:id="@+id/btn_search_clear"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/cd_search_clear"
+                    android:padding="9dp"
+                    android:src="@drawable/baseline_close_24"
+                    android:visibility="gone"
+                    app:tint="@color/text_secondary"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+        <!--
+          정렬 (시안 — 추천순 · 거리순 · 빛 좋은 시간순).
           카테고리는 오른쪽 필터 버튼 뒤로 옮겼습니다. 시안이 첫 줄에
           앉힌 물음은 "무엇을"이 아니라 **"어떤 순서로 볼까"**입니다.
         -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/bg_page"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingVertical="@dimen/space_s">
@@ -292,6 +351,7 @@
                 android:padding="12dp"
                 android:src="@drawable/ic_cat_all"
                 app:tint="@color/text_secondary" />
+        </LinearLayout>
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 

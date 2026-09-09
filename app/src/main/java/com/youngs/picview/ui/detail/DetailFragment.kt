@@ -19,6 +19,7 @@ import com.youngs.picview.BuildConfig
 import com.youngs.picview.MainActivity
 import com.youngs.picview.R
 import com.youngs.picview.data.api.RetrofitClient
+import com.youngs.picview.data.model.DetailItem
 import com.youngs.picview.data.model.ImageItem
 import com.youngs.picview.data.repository.CourseRepository
 import com.youngs.picview.data.repository.DiaryRepository
@@ -41,6 +42,7 @@ import com.youngs.picview.domain.weather.SkyState
 import com.youngs.picview.domain.weather.WeatherAdvice
 import com.youngs.picview.domain.weather.WeatherAdviser
 import com.youngs.picview.domain.spot.SpotFactsTable
+import com.youngs.picview.domain.guide.SiseonGuide
 import com.youngs.picview.ui.guide.GuideOverlayView
 import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.ui.mission.MissionFragment
@@ -50,6 +52,14 @@ import com.youngs.picview.util.TtsController
 import com.youngs.picview.util.applyTopSystemBarInsetAsMargin
 import com.youngs.picview.ui.adapter.ImagePagerAdapter
 import com.youngs.picview.ui.guide.GuideActivity
+import com.youngs.picview.ui.photo.PhotoDeleter
+import com.youngs.picview.ui.photo.PhotoViewerActivity
+import android.app.Activity
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import com.youngs.picview.ui.model.SpotItem
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
@@ -66,14 +76,27 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
         private const val ARG_SPOT = "spot"
 
         private val imageCache = mutableMapOf<String, List<ImageItem>>()
-        private val detailCache = mutableMapOf<String, String>()
+        private val detailCache = mutableMapOf<String, DetailItem>()
 
         fun newInstance(spot: SpotItem) = DetailFragment().apply {
             arguments = Bundle().apply { putSerializable(ARG_SPOT, spot) }
         }
+
+        /** 관광공사에 개요가 없는 장소에 대신 보여 주는 한 줄. */
+        private const val DEFAULT_OVERVIEW =
+            "이 장소는 삼분할 구도를 활용해 인물과 배경을 조화롭게 담아보세요!"
     }
 
     private val mainViewModel: MainViewModel by activityViewModels()
+
+    /**
+     * 지금 보고 있는 장소.
+     *
+     * 넘겨받은 그대로가 아닐 수 있습니다. 다녀온 곳에서 들어오면 이름과
+     * 사진뿐이라, 개요를 받아올 때 주소·좌표·유형을 함께 채워 넣습니다
+     * ([fillMissingFacts]). 길찾기·공유는 항상 이 값을 봅니다.
+     */
+    private lateinit var spot: SpotItem
 
     private var tts: TtsController? = null
 
@@ -89,11 +112,10 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentDetailBinding.bind(view)
 
-        // 히어로 사진은 상태바 뒤까지 깔리는 게 맞지만, 그 위의 버튼과
-        // 페이지 점은 시계·배터리와 겹치면 안 됩니다. 마진으로 내립니다.
+        // 히어로 사진은 상태바 뒤까지 깔리는 게 맞지만, 그 위의 버튼은
+        // 시계·배터리와 겹치면 안 됩니다. 마진으로 내립니다.
         binding.btnBack.applyTopSystemBarInsetAsMargin()
         binding.layoutHeroActions.applyTopSystemBarInsetAsMargin()
-        binding.layoutIndicator.applyTopSystemBarInsetAsMargin()
 
         binding.btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
 
@@ -157,6 +179,7 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
     private fun setListeners() {
         val spot = arguments?.getSerializable(ARG_SPOT) as? SpotItem ?: return
+        this.spot = spot
 
         binding.tvDetailTitle.text = spot.title
         binding.tvDetailAddress.text = spot.addr1
@@ -169,26 +192,48 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
         renderScoreBreakdown(spot)
         renderPlaceMissions(spot)
         setupCheckin(spot)
+        setupMyShots(spot)
 
         loadImages(spot)
         loadTip(spot)
         loadVisitInfo(spot)
 
-        binding.btnStartGuide.setOnClickListener {
-            val intent = Intent(requireContext(), GuideActivity::class.java).apply {
-                putExtra(GuideActivity.EXTRA_SPOT_NAME, spot.title)
-                putExtra(GuideActivity.EXTRA_SPOT_TYPE, spot.contentTypeId)
-                // 포즈 추천이 지금의 빛을 반영해야 하므로 함께 넘깁니다.
-                putExtra(GuideActivity.EXTRA_PHASE, mainViewModel.sunTimes.phaseNow().name)
-                // 촬영한 사진을 이 장소의 방문 기록에 붙이기 위해 필요합니다.
-                putExtra(GuideActivity.EXTRA_CONTENT_ID, spot.contentId)
-            }
-            startActivity(intent)
-        }
+        binding.btnStartGuide.setOnClickListener { startGuide(spot) }
 
-        binding.btnNavigate.setOnClickListener { openNavigation(spot) }
+        // 길찾기·공유는 필드를 봅니다. 주소·좌표가 나중에 채워질 수 있습니다.
+        binding.btnNavigate.setOnClickListener { openNavigation(this.spot) }
         setupFavorite(spot)
-        binding.btnShare.setOnClickListener { shareSpot(spot) }
+        binding.btnShare.setOnClickListener { shareSpot(this.spot) }
+    }
+
+    /**
+     * 넘겨받은 장소에 빠진 칸을 관광공사 공통 정보로 채웁니다.
+     *
+     * 다녀온 곳 → 상세로 들어오면 주소 줄이 비어 있었습니다. 방문 기록에는
+     * 주소를 안 남기기 때문입니다. 개요를 받아올 때 같은 응답에 주소·좌표·
+     * 유형이 함께 오므로, 비어 있던 칸만 그것으로 메웁니다. 이미 있던 값은
+     * 건드리지 않습니다.
+     */
+    private fun fillMissingFacts(item: DetailItem) {
+        val current = spot
+        val filled = current.copy(
+            contentTypeId = current.contentTypeId ?: item.contenttypeid?.takeIf { it.isNotBlank() },
+            addr1 = current.addr1.ifBlank { item.addr1.orEmpty().trim() },
+            imageUrl = current.imageUrl.ifBlank { item.firstimage.orEmpty() },
+            mapx = current.mapx.ifBlank { item.mapx.orEmpty() },
+            mapy = current.mapy.ifBlank { item.mapy.orEmpty() }
+        )
+        if (filled == current) return
+        spot = filled
+
+        val view = _binding ?: return
+        view.tvDetailAddress.text = filled.addr1
+        view.tvDetailAddress.isVisible = filled.addr1.isNotBlank()
+
+        // 유형을 몰라서 건너뛰었던 입장료·주차 정보도 이제 받아올 수 있습니다.
+        if (current.contentTypeId.isNullOrBlank() && !filled.contentTypeId.isNullOrBlank()) {
+            loadVisitInfo(filled)
+        }
     }
 
     // ───────────────────── 찜 · 공유 ─────────────────────
@@ -203,7 +248,7 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
         render(AppPrefs.isFavorite(requireContext(), spot.contentId))
 
         binding.btnFavorite.setOnClickListener {
-            val favorite = AppPrefs.toggleFavorite(requireContext(), spot.contentId)
+            val favorite = AppPrefs.toggleFavorite(requireContext(), spot)
             render(favorite)
             Toast.makeText(
                 requireContext(),
@@ -230,40 +275,133 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
     // ───────────────────── 방문 기록 ─────────────────────
 
+    /** 촬영 가이드(앱 카메라)로 갑니다. 여기서 찍은 사진이 이 장소의 방문 기록이 됩니다. */
+    private fun startGuide(spot: SpotItem) {
+        val intent = Intent(requireContext(), GuideActivity::class.java).apply {
+            putExtra(GuideActivity.EXTRA_SPOT_NAME, spot.title)
+            putExtra(GuideActivity.EXTRA_SPOT_TYPE, spot.contentTypeId)
+            // 포즈 추천이 지금의 빛을 반영해야 하므로 함께 넘깁니다.
+            putExtra(GuideActivity.EXTRA_PHASE, mainViewModel.sunTimes.phaseNow().name)
+            // 촬영한 사진을 이 장소의 방문 기록에 붙이기 위해 필요합니다.
+            putExtra(GuideActivity.EXTRA_CONTENT_ID, spot.contentId)
+        }
+        startActivity(intent)
+    }
+
     /**
-     * "다녀왔어요" — 출사 기록(일기 탭)의 원천 데이터를 남깁니다.
+     * "다녀왔어요" — 손으로 누르는 체크가 아니라, 촬영 기록으로 저절로 채워지는 표시입니다.
      *
-     * GPS 자동 체크인 대신 수동 버튼을 쓰는 이유:
-     *  - 위치 권한을 상시 요구하지 않아도 됨(스토어 심사·배터리 모두 유리)
-     *  - 검색만 해 본 곳과 실제로 다녀온 곳이 섞이지 않음
+     * 이 앱의 카메라(촬영 가이드, 시선 가이드 미션)로 사진을 찍으면 그 장소의
+     * 방문 기록이 남고, 여기는 그 기록을 보여 줄 뿐입니다. 손으로 체크하지
+     * 않는 이유:
+     *  - 검색만 해 본 곳과 실제로 찍고 온 곳이 섞이지 않음
+     *  - GPS 상시 권한 없이도 "그 자리에 있었다"는 증거(사진)가 남음
+     *
+     * 아직 기록이 없으면 버튼이 촬영 화면으로 이어 주고, 있으면 그 날짜를
+     * 보여 주며 눌렀을 때 일기로 갑니다. Flow 라서 촬영하고 돌아오면 바로 바뀝니다.
      */
     private fun setupCheckin(spot: SpotItem) {
-        binding.btnCheckin.setOnClickListener {
-            val phase = mainViewModel.sunTimes.phaseNow()
-            viewLifecycleOwner.lifecycleScope.launch {
-                val logged = runCatching {
-                    CourseRepository(requireContext()).logVisit(spot, phase)
-                }.getOrDefault(false)
-                val view = _binding ?: return@launch
-
-                if (logged) {
-                    // 기록이 남은 곳(일기 탭)으로 바로 이어 줍니다.
-                    // 토스트는 사라지면 끝이라 "그래서 어디서 보는데"가 남습니다.
-                    Snackbar.make(view.root, R.string.detail_checkin_done, Snackbar.LENGTH_LONG)
-                        // 하단 바(고도 12dp)가 스낵바를 가립니다. 그 위에 띄웁니다.
-                        .setAnchorView(view.btnSavePlan)
-                        .setAction(R.string.detail_checkin_view_diary) {
-                            // 일기 탭에서 들어온 경우 selectTab 이 같은 탭이라
-                            // 백스택을 정리하지 않으므로, 상세부터 닫습니다.
-                            parentFragmentManager.popBackStack()
-                            (activity as? MainActivity)?.selectTab(R.id.tab_diary)
-                        }
-                        .show()
+        viewLifecycleOwner.lifecycleScope.launch {
+            CourseRepository(requireContext()).observeVisits(spot.contentId).collect { visits ->
+                val binding = _binding ?: return@collect
+                val latest = visits.firstOrNull()
+                if (latest == null) {
+                    binding.btnCheckin.text = getString(R.string.detail_checkin_not_yet)
+                    binding.btnCheckin.setIconResource(R.drawable.ic_camera)
+                    binding.btnCheckin.setOnClickListener { startGuide(spot) }
                 } else {
-                    Toast.makeText(
-                        requireContext(), R.string.detail_checkin_already, Toast.LENGTH_SHORT
-                    ).show()
+                    val date = Instant.ofEpochMilli(latest.visitedAt)
+                        .atZone(ZoneId.systemDefault())
+                        .format(DateTimeFormatter.ofPattern(getString(R.string.detail_checkin_date_pattern)))
+                    binding.btnCheckin.text = getString(R.string.detail_checkin_visited, date)
+                    binding.btnCheckin.setIconResource(R.drawable.ic_check)
+                    binding.btnCheckin.setOnClickListener {
+                        // 일기 탭에서 들어온 경우 selectTab 이 같은 탭이라
+                        // 백스택을 정리하지 않으므로, 상세부터 닫습니다.
+                        parentFragmentManager.popBackStack()
+                        (activity as? MainActivity)?.selectTab(R.id.tab_diary)
+                    }
                 }
+            }
+        }
+    }
+
+    /**
+     * "내가 찍은 사진" 띠.
+     *
+     * 다녀온 곳을 눌러 들어오면 "다녀왔어요 · 9월 4일 촬영"까지는 보였지만
+     * 정작 그때 무엇을 찍었는지는 볼 수 없었습니다. 이 장소의 촬영 기록에
+     * 붙은 사진을 전부 가로로 늘어놓고, 누르면 그 장부터 크게 펼칩니다.
+     * Flow 라서 촬영하고 돌아오면 바로 늘어납니다.
+     */
+    private fun setupMyShots(spot: SpotItem) {
+        val adapter = MyShotAdapter(
+            onClick = { index ->
+                val photos = myShots
+                if (index !in photos.indices) return@MyShotAdapter
+                startActivity(
+                    PhotoViewerActivity.intent(
+                        requireContext(),
+                        photoIds = photos.map { it.id },
+                        uris = photos.map { it.uri },
+                        takenAt = photos.map { it.takenAt },
+                        place = spot.title,
+                        start = index
+                    )
+                )
+            },
+            onLongClick = { photo ->
+                PhotoDeleter.confirm(requireContext()) { deleteShot(photo) }
+            }
+        )
+        binding.rvMyShots.adapter = adapter
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            CourseRepository(requireContext()).observePhotos(spot.contentId).collect { photos ->
+                val binding = _binding ?: return@collect
+                myShots = photos
+                adapter.submitList(photos)
+                binding.layoutMyShots.isVisible = photos.isNotEmpty()
+                binding.tvMyShotsTitle.text =
+                    getString(R.string.detail_my_shots_count, photos.size)
+            }
+        }
+    }
+
+    /** 띠에 올라와 있는 사진. 누른 순간 큰 화면에 넘길 목록입니다. */
+    private var myShots: List<com.youngs.picview.data.local.VisitPhotoEntity> = emptyList()
+
+    /** 시스템 삭제 확인창이 필요했던 사진. 승인되면 기록에서 뺍니다. */
+    private var pendingShotDelete: com.youngs.picview.data.local.VisitPhotoEntity? = null
+    private val shotDeleteRequest =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            val photo = pendingShotDelete ?: return@registerForActivityResult
+            pendingShotDelete = null
+            if (result.resultCode == Activity.RESULT_OK) {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    PhotoDeleter.removeRecord(requireContext(), photo.id)
+                }
+            }
+        }
+
+    /**
+     * 띠에서 꾹 눌러 지우기.
+     *
+     * 띠는 Flow 를 보고 있어서 기록에서 빠지는 순간 저절로 줄어듭니다.
+     * 여기서는 지우기만 하고 화면은 건드리지 않습니다.
+     */
+    private fun deleteShot(photo: com.youngs.picview.data.local.VisitPhotoEntity) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val context = context ?: return@launch
+            when (val outcome = PhotoDeleter.delete(context, photo.id, photo.uri)) {
+                PhotoDeleter.Outcome.Done ->
+                    Toast.makeText(context, R.string.photo_viewer_deleted, Toast.LENGTH_SHORT).show()
+                is PhotoDeleter.Outcome.NeedsSystemPrompt -> {
+                    pendingShotDelete = photo
+                    shotDeleteRequest.launch(IntentSenderRequest.Builder(outcome.sender).build())
+                }
+                PhotoDeleter.Outcome.Failed ->
+                    Toast.makeText(context, R.string.photo_viewer_delete_failed, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -405,43 +543,66 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
             binding.layoutGuidePeople.isVisible = checkedId == R.id.btn_tab_people
         }
 
-        renderCompositionTab(guide)
+        renderCompositionTab(facts, phase)
         renderDirectionTab(facts.facing, phase)
         renderPeopleTab()
     }
 
-    /** 구도 탭 — 이 장소 사진 위에 실제 가이드 선을 얹어 보여 줍니다. */
-    private fun renderCompositionTab(guide: GuideOverlayView.GuideType) {
+    /**
+     * 구도 탭 — 이 장소 사진 위에 가이드 선을 얹어 보여 줍니다.
+     *
+     * 구도는 카메라·시선 가이드와 같은 판단([SiseonGuide.guideIdFor])입니다 —
+     * 장소의 촬영 특성과 지금 빛. 전에는 장소 표의 세 구도만 써서 옥정호가
+     * "삼분할"로 나오고, 카메라를 열면 "반사"가 그려져 서로 달랐습니다.
+     *
+     * 미리보기는 손바닥만 해서 선만 그립니다. 사람 그림과 글 알약까지
+     * 얹으면 아무것도 안 읽힙니다. 그것은 카메라 화면의 몫입니다.
+     */
+    private fun renderCompositionTab(facts: SpotFacts, phase: LightPhase) {
+        val guide = GuideOverlayView.GuideType.byId(SiseonGuide.guideIdFor(facts, phase))
+            ?: facts.guide
+        binding.viewCompOverlay.compact = true
         binding.viewCompOverlay.guideType = guide
 
-        binding.tvCompTitle.setText(
-            when (guide) {
-                GuideOverlayView.GuideType.THIRDS -> R.string.guide_comp_title_thirds
-                GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_comp_title_symmetry
-                GuideOverlayView.GuideType.CENTER -> R.string.guide_comp_title_center
+        when (guide) {
+            GuideOverlayView.GuideType.THIRDS, GuideOverlayView.GuideType.SYMMETRY,
+            GuideOverlayView.GuideType.CENTER -> {
+                binding.tvCompTitle.setText(
+                    when (guide) {
+                        GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_comp_title_symmetry
+                        GuideOverlayView.GuideType.CENTER -> R.string.guide_comp_title_center
+                        else -> R.string.guide_comp_title_thirds
+                    }
+                )
+                binding.tvCompDesc.setText(
+                    when (guide) {
+                        GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_comp_desc_symmetry
+                        GuideOverlayView.GuideType.CENTER -> R.string.guide_comp_desc_center
+                        else -> R.string.guide_comp_desc_thirds
+                    }
+                )
+                binding.tvCompWhen.setText(
+                    when (guide) {
+                        GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_comp_when_symmetry
+                        GuideOverlayView.GuideType.CENTER -> R.string.guide_comp_when_center
+                        else -> R.string.guide_comp_when_thirds
+                    }
+                )
             }
-        )
-        binding.tvCompDesc.setText(
-            when (guide) {
-                GuideOverlayView.GuideType.THIRDS -> R.string.guide_comp_desc_thirds
-                GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_comp_desc_symmetry
-                GuideOverlayView.GuideType.CENTER -> R.string.guide_comp_desc_center
+            else -> {
+                // 시선 가이드가 쓰는 그 구도의 말을 그대로 씁니다.
+                val item = SiseonGuide.byId(guide.id)
+                binding.tvCompTitle.text = getString(R.string.guide_comp_title_named, item.title)
+                binding.tvCompDesc.text = item.description
+                binding.tvCompWhen.text = item.tip
             }
-        )
-        binding.tvCompWhen.setText(
-            when (guide) {
-                GuideOverlayView.GuideType.THIRDS -> R.string.guide_comp_when_thirds
-                GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_comp_when_symmetry
-                GuideOverlayView.GuideType.CENTER -> R.string.guide_comp_when_center
-            }
-        )
+        }
 
-        // 다른 구도 제안 — 지금 것을 뺀 나머지 구도와, 각도·역광 계열 제안.
-        val alternatives =
-            GuideOverlayView.GuideType.entries
-                .filter { it != guide }
-                .map { ShotTokens.of(it).text } +
-                listOf("⛰ 낮은 각도", "◐ 실루엣")
+        // 다른 구도 제안 — 지금 것을 뺀 나머지. 예전에는 끝에 "낮은 각도·실루엣"을
+        // 따로 붙여 실루엣이 두 번 나왔습니다.
+        val alternatives = GuideOverlayView.GuideType.entries
+            .filter { it != guide }
+            .map { ShotTokens.of(it).text }
 
         val group = binding.chipsCompAlt
         group.removeAllViews()
@@ -746,6 +907,15 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
     private fun openNavigation(spot: SpotItem) {
         val encodedName = URLEncoder.encode(spot.title, "UTF-8")
 
+        // 좌표가 없으면(다녀온 곳에서 왔는데 아직 못 채운 경우) 이름으로
+        // 검색한 지도를 엽니다. 빈 좌표로 길찾기를 열면 바다 한가운데가 나옵니다.
+        if (spot.mapx.isBlank() || spot.mapy.isBlank()) {
+            startActivity(
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://map.naver.com/v5/search/$encodedName"))
+            )
+            return
+        }
+
         // 1. 네이버 지도 앱 실행 스킴
         val appUrl = "nmap://route/car?dlat=${spot.mapy}&dlng=${spot.mapx}" +
                 "&dname=$encodedName&appname=${BuildConfig.APPLICATION_ID}"
@@ -870,10 +1040,12 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
     }
 
     private fun loadTip(spot: SpotItem) {
-        val cachedTip = detailCache[spot.contentId]
-        if (cachedTip != null) {
-            audioText = cachedTip
-            renderOverview(cachedTip)
+        val cached = detailCache[spot.contentId]
+        if (cached != null) {
+            fillMissingFacts(cached)
+            val overview = cached.overview.orEmpty().ifBlank { DEFAULT_OVERVIEW }
+            audioText = overview
+            renderOverview(overview)
             return
         }
 
@@ -884,11 +1056,12 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                     contentId = spot.contentId
                 )
 
-                val overview = response.response?.body?.items?.item
-                    ?.firstOrNull()?.overview
-                    ?.takeIf { it.isNotBlank() }
-                    ?: "이 장소는 삼분할 구도를 활용해 인물과 배경을 조화롭게 담아보세요!"
-                detailCache[spot.contentId] = overview
+                val item = response.response?.body?.items?.item?.firstOrNull()
+                if (item != null) {
+                    detailCache[spot.contentId] = item
+                    fillMissingFacts(item)
+                }
+                val overview = item?.overview?.takeIf { it.isNotBlank() } ?: DEFAULT_OVERVIEW
 
                 audioText = overview
                 renderOverview(overview)

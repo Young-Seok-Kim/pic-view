@@ -82,6 +82,79 @@ class CourseViewModel(app: Application) : AndroidViewModel(app) {
     private val _rescheduling = MutableLiveData(false)
     val rescheduling: LiveData<Boolean> = _rescheduling
 
+    // ───────────────────── 직접 고른 촬영지 ─────────────────────
+
+    /**
+     * 사용자가 코스에 담은 촬영지의 contentId.
+     *
+     * **장소는 내가, 순서는 빛이.** 지금까지 코스는 전부 앱이 짜 줬습니다.
+     * 조건만 고르고 결과를 받는 구조라 "나는 여기랑 여기만 갈래"가 안 됐고,
+     * 찜을 해 둬도 그 찜한 곳으로 코스를 만들 수가 없었습니다.
+     *
+     * 그렇다고 순서까지 손으로 짜게 하면 이 앱의 전제가 무너집니다 —
+     * 골든아워는 하루에 두 번, 30분씩뿐이라 그 자리를 사람이 정하면
+     * 빛을 계산하는 뜻이 사라집니다. 그래서 **고르는 것은 사람, 세우는
+     * 것은 빛**으로 나눴습니다. 여기 담긴 곳만 [CoursePlanner] 에 넘기면
+     * 나머지 배치 규칙은 그대로 돕니다.
+     *
+     * 화면을 오가며 유지돼야 해서 ViewModel 이 들고 있습니다. 찜과는
+     * 별개입니다 — 찜은 "언젠가 갈 곳", 이것은 "이번에 갈 곳"입니다.
+     */
+    private val _pickedIds = MutableLiveData<Set<String>>(emptySet())
+    val pickedIds: LiveData<Set<String>> = _pickedIds
+
+    val pickedCount: Int get() = _pickedIds.value?.size ?: 0
+
+    fun isPicked(contentId: String): Boolean =
+        _pickedIds.value?.contains(contentId) == true
+
+    fun togglePicked(contentId: String) {
+        val current = _pickedIds.value.orEmpty().toMutableSet()
+        if (!current.remove(contentId)) current.add(contentId)
+        _pickedIds.value = current
+    }
+
+    fun clearPicked() {
+        _pickedIds.value = emptySet()
+    }
+
+    /**
+     * 코스를 짤 촬영지 풀.
+     *
+     * 담은 곳이 있으면 그것만, 없으면 목록 전체입니다. 담은 곳이 하나뿐일
+     * 때도 그대로 씁니다 — "이 한 곳만 제대로 보고 오겠다"도 코스입니다.
+     */
+    fun poolFor(all: List<SpotItem>): List<SpotItem> {
+        val picked = _pickedIds.value.orEmpty()
+        if (picked.isEmpty()) return all
+        return all.filter { it.contentId in picked }
+    }
+
+    /**
+     * 담았는데 코스에 못 들어간 곳.
+     *
+     * [CoursePlanner] 는 시간 안에 들어가는 곳만 세웁니다. 세 곳을 담았는데
+     * 두 곳만 나오면 **말해 주지 않는 한 버그로 보입니다.** 빠진 곳과 그
+     * 까닭을 화면이 직접 밝히게 하려고 남겨 둡니다.
+     *
+     * 담은 곳이 없으면(전체에서 짠 코스면) 빈 목록입니다 — 그때는 애초에
+     * "다 넣어 달라"는 약속이 없었으니 빠졌다는 말도 성립하지 않습니다.
+     */
+    private val _droppedPicks = MutableLiveData<List<SpotItem>>(emptyList())
+    val droppedPicks: LiveData<List<SpotItem>> = _droppedPicks
+
+    private fun updateDroppedPicks(course: ShootingCourse) {
+        val picked = _pickedIds.value.orEmpty()
+        if (picked.isEmpty()) {
+            _droppedPicks.value = emptyList()
+            return
+        }
+        val placed = course.stops.map { it.spot.contentId }.toSet()
+        _droppedPicks.value = lastSpots.filter {
+            it.contentId in picked && it.contentId !in placed
+        }
+    }
+
     fun generate(
         spots: List<SpotItem>,
         sun: SunTimes,
@@ -95,6 +168,7 @@ class CourseViewModel(app: Application) : AndroidViewModel(app) {
         val result = CoursePlanner.plan(spots, sun, request)
         _course.value = result
         _saved.value = SaveState.IDLE
+        updateDroppedPicks(result)
 
         if (result.isEmpty) {
             _narration.value = ""
@@ -123,6 +197,54 @@ class CourseViewModel(app: Application) : AndroidViewModel(app) {
             if (text.isNotEmpty()) _narration.value = text
             _narrating.value = false
         }
+    }
+
+    /**
+     * 저장한 코스를 화면에 올리면서 **다시 짤 재료도 되살립니다.**
+     *
+     * 처음에는 저장한 코스의 날짜를 못 고치게 막았습니다. 조건(촬영지 풀 ·
+     * 동행 · 체류)이 저장돼 있지 않아 다시 짤 수 없다고 봤기 때문입니다.
+     * 그런데 "이건 내일 하자"가 가장 자주 생기는 자리가 바로 저장해 둔
+     * 코스입니다. 막아 두면 정작 필요한 곳에서 못 쓰게 됩니다.
+     *
+     * 없는 것은 되살릴 수 있는 만큼만 되살립니다.
+     *   · 촬영지 풀 — 지금 목록 전체로 갈음합니다
+     *   · 출발·종료 시각 — 첫 정거장 도착과 마지막 정거장 출발에서 역산
+     *   · 이동 수단 — 저장돼 있습니다
+     *   · 곳 수 — 저장된 정거장 수를 그대로 상한으로 둡니다
+     *   · 동행·촬영 목적 — 남아 있지 않아 기본값(전체)으로 둡니다
+     *
+     * 다시 짠 결과는 저장본을 덮어쓰지 않습니다. 새 코스로 화면에 뜨고,
+     * 마음에 들면 사용자가 다시 저장합니다.
+     */
+    fun adoptSaved(
+        course: ShootingCourse,
+        date: java.time.LocalDate,
+        summary: String,
+        spots: List<SpotItem>
+    ) {
+        planDate = date
+        lastSpots = spots
+
+        val start = course.startTime
+        val end = course.endTime
+        lastRequest = if (spots.isEmpty() || start == null || end == null || end <= start) {
+            // 되살릴 수 없으면 조용히 못 고치는 상태로 둡니다.
+            // 반쯤 복원한 조건으로 엉뚱한 코스를 내놓는 것보다 낫습니다.
+            null
+        } else {
+            CourseRequest(
+                startTime = start,
+                endTime = end,
+                travelMode = course.travelMode,
+                maxStops = course.stops.size.coerceAtLeast(1)
+            )
+        }
+
+        _course.value = course
+        _narration.value = summary
+        _saved.value = SaveState.IDLE
+        _droppedPicks.value = emptyList()
     }
 
     /**
@@ -184,13 +306,24 @@ class CourseViewModel(app: Application) : AndroidViewModel(app) {
         )
     }
 
+    /**
+     * 지금 코스를 저장합니다.
+     *
+     * 같은 코스를 두 번 저장하지 않습니다. '저장'을 두 번 누르거나, 뒤로
+     * 갔다 다시 들어와 또 누르면 **목록에 똑같은 카드가 둘** 생겼습니다.
+     * 날짜와 정거장 구성이 같으면 같은 코스로 봅니다 — 그때는 저장한
+     * 것으로 치고 조용히 성공으로 돌려줍니다. "이미 저장돼 있다"는 오류가
+     * 아니라 사용자가 바라던 상태이기 때문입니다.
+     */
     fun saveCurrent() {
         val course = _course.value ?: return
         if (course.isEmpty) return
 
         viewModelScope.launch {
             val ok = runCatching {
-                repository.save(course, _narration.value.orEmpty(), planDate)
+                if (!repository.hasSameCourse(course, planDate)) {
+                    repository.save(course, _narration.value.orEmpty(), planDate)
+                }
             }.isSuccess
             _saved.value = if (ok) SaveState.SUCCESS else SaveState.FAILED
         }

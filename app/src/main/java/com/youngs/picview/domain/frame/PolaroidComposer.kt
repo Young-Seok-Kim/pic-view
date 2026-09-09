@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
-import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Typeface
 import kotlin.math.min
@@ -28,12 +27,17 @@ object PolaroidComposer {
     private const val PHOTO_TOP = 88f       // 사진 위쪽 여백
     private const val CAPTION_HEIGHT = 252f // 아랫단(글씨 들어가는 넓은 부분)
 
+    /** 손그림 아트워크가 없을 때의 사진 창. 조정 화면이 이 비율을 씁니다. */
+    val defaultWindow: RectF
+        get() = RectF(MARGIN, PHOTO_TOP, SIZE - MARGIN, SIZE - CAPTION_HEIGHT)
+
     /**
      * @param photo 원본 사진
      * @param theme 프레임 테마
      * @param place 장소 이름
      * @param dateText "2026.08.12" 형태
      * @param artwork 손그림 프레임 아트워크. 있으면 시안 원본에 사진만 끼웁니다.
+     * @param crop 사진에서 보일 부분(0~1 비율 좌표). null 이면 가운데.
      */
     fun compose(
         photo: Bitmap,
@@ -42,9 +46,10 @@ object PolaroidComposer {
         dateText: String,
         titleTypeface: Typeface? = null,
         bodyTypeface: Typeface? = null,
-        artwork: FrameArtwork? = null
+        artwork: FrameArtwork? = null,
+        crop: RectF? = null
     ): Bitmap {
-        if (artwork != null) return composeWithArtwork(photo, artwork)
+        if (artwork != null) return composeWithArtwork(photo, artwork, crop)
 
         val out = Bitmap.createBitmap(SIZE, SIZE, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(out)
@@ -64,17 +69,9 @@ object PolaroidComposer {
         // ── 사진 영역 ─────────────────────────────
         val dest = RectF(MARGIN, PHOTO_TOP, SIZE - MARGIN, SIZE - CAPTION_HEIGHT)
 
-        // 원본 비율을 지키며 영역을 꽉 채웁니다(센터 크롭).
-        // 늘려서 채우면 사람 얼굴이 일그러집니다.
-        val scale = maxOf(dest.width() / photo.width, dest.height() / photo.height)
-        val cropW = (dest.width() / scale).toInt().coerceAtMost(photo.width)
-        val cropH = (dest.height() / scale).toInt().coerceAtMost(photo.height)
-        val src = Rect(
-            (photo.width - cropW) / 2,
-            (photo.height - cropH) / 2,
-            (photo.width - cropW) / 2 + cropW,
-            (photo.height - cropH) / 2 + cropH
-        )
+        // 원본 비율을 지키며 영역을 꽉 채웁니다. 늘려서 채우면 사람 얼굴이
+        // 일그러집니다. 어느 부분을 쓸지는 사용자가 골랐으면 그것, 아니면 가운데.
+        val src = PhotoCrop.srcRect(photo, dest, crop)
 
         // 모서리를 살짝 둥글려 종이 위에 얹힌 인화지처럼 보이게 합니다.
         canvas.save()
@@ -151,26 +148,18 @@ object PolaroidComposer {
      * 장소명·날짜는 그리지 않습니다. 아트워크가 이미 제 표제를 갖고 있어
      * 글씨를 더 얹으면 시안의 균형이 무너집니다.
      */
-    private fun composeWithArtwork(photo: Bitmap, artwork: FrameArtwork): Bitmap {
+    private fun composeWithArtwork(photo: Bitmap, artwork: FrameArtwork, crop: RectF?): Bitmap {
         val out = Bitmap.createBitmap(artwork.bitmap.width, artwork.bitmap.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(out)
         canvas.drawColor(0xFFFFFFFF.toInt())
-        drawPhotoInWindow(canvas, photo, artwork.windows.first())
+        drawPhotoInWindow(canvas, photo, artwork.windows.first(), crop)
         canvas.drawBitmap(artwork.bitmap, 0f, 0f, Paint(Paint.FILTER_BITMAP_FLAG))
         return out
     }
 
-    /** 창 좌표에 센터 크롭으로 채웁니다. 늘려 채우면 얼굴이 일그러집니다. */
-    internal fun drawPhotoInWindow(canvas: Canvas, photo: Bitmap, dest: RectF) {
-        val scale = maxOf(dest.width() / photo.width, dest.height() / photo.height)
-        val cropW = (dest.width() / scale).toInt().coerceAtMost(photo.width)
-        val cropH = (dest.height() / scale).toInt().coerceAtMost(photo.height)
-        val src = Rect(
-            (photo.width - cropW) / 2,
-            (photo.height - cropH) / 2,
-            (photo.width - cropW) / 2 + cropW,
-            (photo.height - cropH) / 2 + cropH
-        )
+    /** 창 좌표에 비율을 지켜 채웁니다. 늘려 채우면 얼굴이 일그러집니다. */
+    internal fun drawPhotoInWindow(canvas: Canvas, photo: Bitmap, dest: RectF, crop: RectF? = null) {
+        val src = PhotoCrop.srcRect(photo, dest, crop)
         canvas.drawBitmap(photo, src, dest, Paint(Paint.FILTER_BITMAP_FLAG))
     }
 

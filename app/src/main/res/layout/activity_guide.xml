@@ -87,6 +87,18 @@
                 android:textStyle="bold"
                 tools:text="내장산 국립공원" />
 
+            <!-- 구도 가이드 켜기/끄기. 카메라 앱의 격자 버튼과 같은 자리·같은 뜻입니다. -->
+            <ImageView
+                android:id="@+id/btn_guide_grid"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="@dimen/space_s"
+                android:background="@drawable/bg_glass_circle"
+                android:contentDescription="@string/cd_guide_grid"
+                android:padding="9dp"
+                android:src="@drawable/ic_composition_grid"
+                app:tint="@color/white" />
+
             <!--
               지금 고른 포즈의 예시 그림.
 
@@ -282,26 +294,11 @@
                 android:contentDescription="@string/cd_capture"
                 android:src="@android:color/transparent" />
 
-            <!-- 방금 찍은 사진. 누르면 그 사진을 들고 포토 프레임으로 갑니다. -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_last_shot"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="end|center_vertical"
-                android:visibility="gone"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#99FFFFFF"
-                app:strokeWidth="1.5dp"
-                tools:visibility="visible">
-
-                <ImageView
-                    android:id="@+id/iv_last_shot"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/cd_last_shot"
-                    android:scaleType="centerCrop" />
-            </com.google.android.material.card.MaterialCardView>
+            <!--
+                방금 찍은 사진 썸네일은 뺐습니다. 셔터를 누르면 카메라가 바로
+                닫히므로 볼 사람이 없고, 남겨 두면 "확인하려면 여기를 누르라"는
+                거짓 안내가 됩니다. 찍은 사진은 MY 아카이브에서 봅니다.
+            -->
         </FrameLayout>
     </LinearLayout>
 

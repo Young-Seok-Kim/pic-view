@@ -28,6 +28,7 @@ object ShotTokens {
         GuideOverlayView.GuideType.THIRDS -> ShotToken("▣", "삼분할")
         GuideOverlayView.GuideType.SYMMETRY -> ShotToken("⇆", "대칭")
         GuideOverlayView.GuideType.CENTER -> ShotToken("⊙", "가까이")
+        else -> ShotToken("▣", guide.label)
     }
 
     /**

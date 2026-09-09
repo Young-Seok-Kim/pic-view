@@ -127,7 +127,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_senior_spot"
-            style="@style/Card.Senior"
+            style="@style/Card.Senior.Padded"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_m"

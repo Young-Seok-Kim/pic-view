@@ -304,4 +304,11 @@
     <!-- 빛 흐름 아치 아래 언덕. 지평선을 만들어 호의 시작·끝을 받쳐 줍니다. -->
     <!-- 호 아래를 옅게 채우는 색. 카드 배경보다 한 톤만 어두워야 합니다. -->
     <color name="sun_arc_fill">#FFF3EDE4</color>
+
+    <!-- 스플래시. splash_sun 은 시작 창이 만들어지는 예외 상황의 바탕색(풍경의 노을빛). -->
+    <color name="splash_sun">#F2CF8C</color>
+    <color name="splash_title">#3D5A50</color>
+    <color name="splash_divider">#803D5A50</color>
+    <color name="splash_tagline">#5B605C</color>
+    <color name="splash_accent">#DD5A28</color>
 </resources>

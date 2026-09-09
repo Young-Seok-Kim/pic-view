@@ -169,6 +169,22 @@
             app:cornerRadius="@dimen/radius_button"
             app:strokeColor="#66FFFFFF" />
 
+        <!-- 보이는 부분 조정 — 창과 사진 비율이 달라 잘리는 부분을 사람이 정합니다. -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_frame_adjust"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_s"
+            android:layout_marginHorizontal="@dimen/screen_padding"
+            android:fontFamily="@font/mapo_backpacking"
+            android:minHeight="52dp"
+            android:text="@string/frame_adjust"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_button"
+            app:cornerRadius="@dimen/radius_button"
+            app:strokeColor="#66FFFFFF" />
+
         <!-- 장소 이름 — 손그림 폴라로이드(장소명이 찍히는 프레임)에서만 보입니다. -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_frame_place"

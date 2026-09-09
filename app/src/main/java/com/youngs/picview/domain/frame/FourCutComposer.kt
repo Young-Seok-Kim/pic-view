@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
-import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Typeface
 
@@ -30,14 +29,24 @@ object FourCutComposer {
     private const val SLOT_HEIGHT = 322f
     private const val SLOT_GAP = 26f
 
+    /** 손그림 아트워크가 없을 때 [index] 번째 칸. 조정 화면이 이 비율을 씁니다. */
+    fun slotWindow(index: Int): RectF {
+        val top = SLOT_TOP + index * (SLOT_HEIGHT + SLOT_GAP)
+        return RectF(SLOT_LEFT, top, SLOT_RIGHT, top + SLOT_HEIGHT)
+    }
+
+    /**
+     * @param crops 사진마다 보일 부분(0~1 비율 좌표). 짧거나 null 이면 가운데.
+     */
     fun compose(
-        photos: List<Bitmap>,
+        photos: List<Bitmap?>,
         theme: FrameTheme,
         titleTypeface: Typeface? = null,
         bodyTypeface: Typeface? = null,
-        artwork: FrameArtwork? = null
+        artwork: FrameArtwork? = null,
+        crops: List<RectF?> = emptyList()
     ): Bitmap {
-        if (artwork != null) return composeWithArtwork(photos, theme, artwork)
+        if (artwork != null) return composeWithArtwork(photos, theme, artwork, crops)
 
         val out = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(out)
@@ -67,7 +76,7 @@ object FourCutComposer {
             val photo = photos.getOrNull(index)
 
             if (photo != null) {
-                drawPhoto(canvas, photo, dest)
+                drawPhoto(canvas, photo, dest, crops.getOrNull(index))
             } else {
                 drawEmptySlot(canvas, dest, theme, index)
             }
@@ -127,7 +136,9 @@ object FourCutComposer {
      * 빈 칸은 흰 인화지에 옅은 순번만 남깁니다(기존과 같은 약속 —
      * "더 채울 수 있다"가 보여야 합니다).
      */
-    private fun composeWithArtwork(photos: List<Bitmap>, theme: FrameTheme, artwork: FrameArtwork): Bitmap {
+    private fun composeWithArtwork(
+        photos: List<Bitmap?>, theme: FrameTheme, artwork: FrameArtwork, crops: List<RectF?>
+    ): Bitmap {
         val out = Bitmap.createBitmap(artwork.bitmap.width, artwork.bitmap.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(out)
         canvas.drawColor(0xFFFFFFFF.toInt())
@@ -135,7 +146,7 @@ object FourCutComposer {
         artwork.windows.forEachIndexed { index, dest ->
             val photo = photos.getOrNull(index)
             if (photo != null) {
-                PolaroidComposer.drawPhotoInWindow(canvas, photo, dest)
+                PolaroidComposer.drawPhotoInWindow(canvas, photo, dest, crops.getOrNull(index))
             } else {
                 val hint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                     color = theme.captionColor
@@ -151,16 +162,8 @@ object FourCutComposer {
         return out
     }
 
-    private fun drawPhoto(canvas: Canvas, photo: Bitmap, dest: RectF) {
-        val scale = maxOf(dest.width() / photo.width, dest.height() / photo.height)
-        val cropW = (dest.width() / scale).toInt().coerceAtMost(photo.width)
-        val cropH = (dest.height() / scale).toInt().coerceAtMost(photo.height)
-        val src = Rect(
-            (photo.width - cropW) / 2,
-            (photo.height - cropH) / 2,
-            (photo.width - cropW) / 2 + cropW,
-            (photo.height - cropH) / 2 + cropH
-        )
+    private fun drawPhoto(canvas: Canvas, photo: Bitmap, dest: RectF, crop: RectF?) {
+        val src = PhotoCrop.srcRect(photo, dest, crop)
 
         canvas.save()
         canvas.clipPath(Path().apply { addRoundRect(dest, 10f, 10f, Path.Direction.CW) })

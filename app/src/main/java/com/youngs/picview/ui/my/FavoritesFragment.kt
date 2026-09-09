@@ -17,6 +17,7 @@ import com.google.android.material.chip.Chip
 import com.youngs.picview.MainActivity
 import com.youngs.picview.R
 import com.youngs.picview.data.repository.CourseRepository
+import com.youngs.picview.data.repository.FavoriteSpots
 import com.youngs.picview.databinding.FragmentFavoritesBinding
 import com.youngs.picview.databinding.ItemFavoriteBinding
 import com.youngs.picview.domain.spot.ShotPurpose
@@ -68,7 +69,7 @@ class FavoritesFragment : Fragment(R.layout.fragment_favorites) {
                 (activity as? MainActivity)?.pushScreen(DetailFragment.newInstance(row.spot))
             },
             onRemove = { row ->
-                AppPrefs.toggleFavorite(requireContext(), row.spot.contentId)
+                AppPrefs.toggleFavorite(requireContext(), row.spot)
                 render()
             }
         )
@@ -121,14 +122,31 @@ class FavoritesFragment : Fragment(R.layout.fragment_favorites) {
         }
     }
 
+    /**
+     * 찜한 장소를 모아 그립니다.
+     *
+     * 홈 목록(100건)에 없는 찜도 빠뜨리지 않도록 [FavoriteSpots.resolve] 로
+     * 스냅샷·API 까지 찾아봅니다. 그래서 비동기이고, 화면이 사라진 뒤에
+     * 결과가 오면 그냥 버립니다.
+     */
     private fun render() {
+        if (_binding == null) return
+        val known = mainViewModel.spotData.value.orEmpty()
+        viewLifecycleOwner.lifecycleScope.launch {
+            val resolved = FavoriteSpots.resolve(requireContext(), known)
+            val context = context ?: return@launch
+            // 관광공사에서 내려간 장소는 찜에서 지워야 MY 의 "n곳"과 이 목록이 맞습니다.
+            AppPrefs.removeFavorites(context, resolved.gone)
+            renderRows(resolved.spots)
+        }
+    }
+
+    private fun renderRows(spots: List<SpotItem>) {
         val view = _binding ?: return
         val favoriteIds = AppPrefs.favoriteSpots(requireContext())
         val phase = mainViewModel.sunTimes.phaseNow()
 
-        val rows = mainViewModel.spotData.value
-            .orEmpty()
-            .filter { it.contentId in favoriteIds }
+        val rows = spots
             .map { spot ->
                 val facts = SpotFactsTable.of(spot.title, spot.contentTypeId)
                 FavoriteRow(
