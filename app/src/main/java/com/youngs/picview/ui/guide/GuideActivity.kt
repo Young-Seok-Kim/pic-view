@@ -220,6 +220,15 @@ class GuideActivity : AppCompatActivity() {
     private fun applyGuideType() {
         guideType = guideTypeFor()
         binding.guideOverlay.guideType = guideType
+        // 사람 자리에 놓는 그림도 고른 포즈를 따릅니다. 인물이 아니면 구도 기본 그림.
+        binding.guideOverlay.figure = if (subject != Subject.PERSON) null else when (selectedPose?.pose) {
+            Pose.WALK_AWAY, Pose.SILHOUETTE -> GuideOverlayView.Figure.WALK
+            Pose.SITTING -> GuideOverlayView.Figure.SIT
+            Pose.REACH_SKY -> GuideOverlayView.Figure.ARMS_UP
+            Pose.JUMP -> GuideOverlayView.Figure.JUMP
+            Pose.HAND_FRAME -> GuideOverlayView.Figure.FRAME
+            null -> null
+        }
     }
 
     /**

@@ -1,6 +1,8 @@
 package com.youngs.picview.ui.guide
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.DashPathEffect
@@ -11,6 +13,8 @@ import android.graphics.RectF
 import android.graphics.Shader
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.DrawableRes
+import com.youngs.picview.R
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -65,7 +69,27 @@ class GuideOverlayView @JvmOverloads constructor(
         }
     }
 
+    /**
+     * 자리에 놓는 사람 그림. 포즈에 맞는 실루엣이라 "여기에 이렇게 서라"가
+     * 한 번에 읽힙니다. 그림은 따로 그려 받은 단색 PNG 입니다.
+     */
+    enum class Figure(@DrawableRes val res: Int) {
+        WALK(R.drawable.guide_fig_walk),
+        SIT(R.drawable.guide_fig_sit),
+        ARMS_UP(R.drawable.guide_fig_arms_up),
+        JUMP(R.drawable.guide_fig_jump),
+        FRAME(R.drawable.guide_fig_frame),
+        TOP(R.drawable.guide_fig_top)
+    }
+
     var guideType: GuideType = GuideType.THIRDS
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    /** 고른 포즈의 그림. null 이면 구도마다 어울리는 기본 그림을 씁니다. */
+    var figure: Figure? = null
         set(value) {
             field = value
             invalidate()
@@ -141,6 +165,24 @@ class GuideOverlayView @JvmOverloads constructor(
     private val dash = DashPathEffect(floatArrayOf(dp(7f), dp(6f)), 0f)
     private val path = Path()
     private val rectF = RectF()
+
+    private val bitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+    private val bitmaps = mutableMapOf<Int, Bitmap>()
+
+    private fun bitmap(@DrawableRes res: Int): Bitmap =
+        bitmaps.getOrPut(res) { BitmapFactory.decodeResource(resources, res) }
+
+    /**
+     * 그림 한 장을 (cx, cy) 가운데에 [height] 높이로. 가로는 비율대로.
+     * 뒤에 옅은 그림자를 한 번 깔아 밝은 하늘에서도 윤곽이 남게 합니다.
+     */
+    private fun icon(canvas: Canvas, @DrawableRes res: Int, cx: Float, cy: Float, height: Float, alpha: Int = 235) {
+        val bmp = bitmap(res)
+        val width = height * bmp.width / bmp.height
+        rectF.set(cx - width / 2f, cy - height / 2f, cx + width / 2f, cy + height / 2f)
+        bitmapPaint.alpha = alpha
+        canvas.drawBitmap(bmp, null, rectF, bitmapPaint)
+    }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -266,33 +308,14 @@ class GuideOverlayView @JvmOverloads constructor(
     }
 
     /**
-     * 사람이 설 자리. 발끝이 (x, footY) 에 오는 부드러운 실루엣 —
-     * 머리와 어깨선이 둥근 한 덩어리입니다. 뒤에 빛무리를 깔아 사진 위에서
-     * 떠 보이게 합니다.
+     * 사람이 설 자리. 발끝이 (x, footY) 에 오도록 포즈 그림을 놓습니다.
+     * 고른 포즈가 있으면 그 그림, 없으면 구도가 어울리는 [fallback].
+     * 뒤에 빛무리를 깔아 사진 위에서 떠 보이게 합니다.
      */
-    private fun person(canvas: Canvas, x: Float, footY: Float, tall: Float = dp(46f)) {
-        val headR = tall * 0.13f
-        val headCy = footY - tall + headR
-        val shoulderY = headCy + headR * 1.7f
-        val halfShoulder = tall * 0.2f
-        val halfHip = tall * 0.13f
-
-        glow(canvas, x, footY - tall * 0.45f, tall * 0.75f)
-
-        path.reset()
-        path.moveTo(x - halfShoulder, shoulderY + tall * 0.08f)
-        path.quadTo(x - halfShoulder, shoulderY - tall * 0.04f, x - halfShoulder * 0.45f, shoulderY - tall * 0.05f)
-        path.lineTo(x + halfShoulder * 0.45f, shoulderY - tall * 0.05f)
-        path.quadTo(x + halfShoulder, shoulderY - tall * 0.04f, x + halfShoulder, shoulderY + tall * 0.08f)
-        path.lineTo(x + halfHip, footY)
-        path.lineTo(x - halfHip, footY)
-        path.close()
-
-        shadowPaint.strokeWidth = dp(2.5f)
-        canvas.drawPath(path, shadowPaint)
-        canvas.drawCircle(x, headCy, headR + dp(1.2f), shadowPaint)
-        canvas.drawPath(path, warmFillPaint)
-        canvas.drawCircle(x, headCy, headR, warmFillPaint)
+    private fun person(canvas: Canvas, x: Float, footY: Float, tall: Float = dp(52f), fallback: Figure = Figure.WALK) {
+        val fig = figure ?: fallback
+        glow(canvas, x, footY - tall * 0.45f, tall * 0.8f)
+        icon(canvas, fig.res, x, footY - tall / 2f, tall)
     }
 
     /** 흐름의 방향. 둥근 선과 채운 화살촉. */
@@ -337,7 +360,7 @@ class GuideOverlayView @JvmOverloads constructor(
         dot(canvas, x2, y1)
         dot(canvas, x1, y2)
 
-        person(canvas, x2, y2 + dp(4f))
+        person(canvas, x2, y2 + dp(4f), fallback = Figure.SIT)
         dot(canvas, x2, y2, warmColor = true)
         pill(canvas, "교차점에 피사체", x2, y2 + dp(12f))
     }
@@ -376,13 +399,13 @@ class GuideOverlayView @JvmOverloads constructor(
 
         val sunX = w * 0.6f
         val sunY = h * 0.4f
-        val r = w * 0.07f
-        glow(canvas, sunX, sunY, r * 2.6f, 120)
-        circle(canvas, sunX, sunY, r, dp(1.6f), warmColor = true)
+        val r = w * 0.09f
+        glow(canvas, sunX, sunY, r * 2.4f, 120)
+        icon(canvas, R.drawable.guide_icon_sun, sunX, sunY, r * 2f)
         pill(canvas, "해는 사람 뒤에", sunX, sunY + r + dp(8f))
 
         val px = w * 0.38f
-        person(canvas, px, horizon, dp(58f))
+        person(canvas, px, horizon, dp(64f), fallback = Figure.ARMS_UP)
         pill(canvas, "사람은 해 앞, 지평선 위", px, horizon + dp(8f))
     }
 
@@ -398,6 +421,7 @@ class GuideOverlayView @JvmOverloads constructor(
         box(canvas, l, water, r, mirrored, dp(1.2f), dashed = true, fill = true)
         glow(canvas, w / 2f, water, w * 0.36f, 50)
         line(canvas, 0f, water, w, water, dp(1.6f), warmColor = true)
+        icon(canvas, R.drawable.guide_icon_waves, w * 0.85f, water + dp(26f), dp(30f), 170)
 
         pill(canvas, "피사체", (l + r) / 2f, top + dp(8f))
         pill(canvas, "수면선은 절반보다 조금 아래", dp(12f), water - dp(30f), Align.LEFT)
@@ -417,7 +441,7 @@ class GuideOverlayView @JvmOverloads constructor(
         glow(canvas, vx, vy, dp(40f), 110)
         dot(canvas, vx, vy, warmColor = true)
         pill(canvas, "소실점 — 선이 모이는 자리에 사람", vx, vy - dp(34f))
-        person(canvas, vx, vy + dp(34f), dp(36f))
+        person(canvas, vx, vy + dp(38f), dp(40f), fallback = Figure.WALK)
         pill(canvas, "선의 시작은 화면 아래에서", dp(12f), h - dp(34f), Align.LEFT)
     }
 
@@ -437,7 +461,7 @@ class GuideOverlayView @JvmOverloads constructor(
             line(canvas, cx, cy, cx, cy + c * sy, dp(2.6f), warmColor = true)
         }
         pill(canvas, "문·창틀을 이 선까지 채우기", w / 2f, t + dp(8f))
-        person(canvas, w / 2f, h * 0.66f, dp(48f))
+        person(canvas, w / 2f, h * 0.66f, dp(56f), fallback = Figure.FRAME)
         pill(canvas, "안쪽 가운데에 피사체", w / 2f, h * 0.66f + dp(8f))
     }
 
@@ -455,10 +479,9 @@ class GuideOverlayView @JvmOverloads constructor(
 
         val px = w * 0.5f
         val py = h * 0.6f
-        glow(canvas, px, py, dp(34f), 110)
-        canvas.drawCircle(px, py, dp(9f), warmFillPaint)
-        circle(canvas, px, py, dp(15f), dp(1.6f), warmColor = true)
-        pill(canvas, "위에서 본 사람 — 패턴 한가운데", px, py + dp(22f))
+        glow(canvas, px, py, dp(38f), 110)
+        icon(canvas, R.drawable.guide_fig_top, px, py, dp(34f))
+        pill(canvas, "위에서 본 사람 — 패턴 한가운데", px, py + dp(24f))
     }
 
     /** 사람은 한쪽 1/3 교차점에, 시선이 향하는 쪽은 비웁니다. */
@@ -470,7 +493,7 @@ class GuideOverlayView @JvmOverloads constructor(
         box(canvas, w * 0.42f, h * 0.12f, w * 0.92f, h * 0.6f, dashed = true, warmColor = true, fill = true)
         pill(canvas, "이쪽은 비워 두기", w * 0.67f, h * 0.34f)
 
-        person(canvas, px, py + dp(4f))
+        person(canvas, px, py + dp(4f), fallback = Figure.ARMS_UP)
         pill(canvas, "여기에 서기", px, py + dp(12f))
         arrow(canvas, px + dp(28f), py - dp(26f), w * 0.5f, h * 0.5f)
     }
@@ -481,6 +504,7 @@ class GuideOverlayView @JvmOverloads constructor(
         pill(canvas, "고정된 배경", w * 0.21f, h * 0.2f + dp(8f))
 
         line(canvas, 0f, h * 0.55f, w, h * 0.55f, dp(0.8f), dashed = true)
+        icon(canvas, R.drawable.guide_icon_waves, w * 0.66f, h * 0.55f - dp(26f), dp(30f), 170)
         arrow(canvas, w * 0.42f, h * 0.55f, w * 0.9f, h * 0.55f)
         pill(canvas, "사람·물결이 흐르는 방향", w * 0.66f, h * 0.55f + dp(12f))
     }
@@ -494,7 +518,7 @@ class GuideOverlayView @JvmOverloads constructor(
         pill(canvas, "뒤 — 장소가 보이게", dp(12f), h * 0.16f, Align.LEFT)
         pill(canvas, "중간 — 사람·빛", dp(12f), (y1 + y2) / 2f - dp(32f), Align.LEFT)
 
-        person(canvas, w * 0.55f, y2 - dp(6f), dp(44f))
+        person(canvas, w * 0.55f, y2 - dp(6f), dp(48f), fallback = Figure.WALK)
         // 앞쪽에 걸치는 잎·난간 자리
         box(canvas, w * 0.62f, y2 + dp(6f), w + dp(20f), h + dp(20f), dp(1.4f), warmColor = true, fill = true)
         pill(canvas, "앞 — 잎·난간을 한쪽에 걸치기", dp(12f), h - dp(34f), Align.LEFT)
@@ -511,8 +535,8 @@ class GuideOverlayView @JvmOverloads constructor(
         val bx = w * 3f / cols
         val by = h * 0.5f
         glow(canvas, bx, by, dp(44f), 110)
-        circle(canvas, bx, by, dp(20f), dp(1.6f), warmColor = true)
-        person(canvas, bx, by + dp(18f), dp(34f))
+        circle(canvas, bx, by, dp(22f), dp(1.6f), warmColor = true)
+        person(canvas, bx, by + dp(18f), dp(36f), fallback = Figure.WALK)
         pill(canvas, "하나만 다르게 — 사람이나 색", bx, by + dp(28f))
     }
 }
