@@ -78,7 +78,6 @@ class GuideOverlayView @JvmOverloads constructor(
         SIT(R.drawable.guide_fig_sit),
         ARMS_UP(R.drawable.guide_fig_arms_up),
         JUMP(R.drawable.guide_fig_jump),
-        FRAME(R.drawable.guide_fig_frame),
         TOP(R.drawable.guide_fig_top)
     }
 
@@ -461,7 +460,8 @@ class GuideOverlayView @JvmOverloads constructor(
             line(canvas, cx, cy, cx, cy + c * sy, dp(2.6f), warmColor = true)
         }
         pill(canvas, "문·창틀을 이 선까지 채우기", w / 2f, t + dp(8f))
-        person(canvas, w / 2f, h * 0.66f, dp(56f), fallback = Figure.FRAME)
+        // 손 프레임 포즈여도 틀 안에는 그냥 사람. 틀이 곧 프레임이라 손 그림까지 겹치면 두 번 말하는 셈입니다.
+        person(canvas, w / 2f, h * 0.66f, dp(56f), fallback = Figure.WALK)
         pill(canvas, "안쪽 가운데에 피사체", w / 2f, h * 0.66f + dp(8f))
     }
 
