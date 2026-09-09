@@ -19,9 +19,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         SavedStopEntity::class,
         VisitLogEntity::class,
         VisitPhotoEntity::class,
-        DiaryEntity::class
+        DiaryEntity::class,
+        PhotoAnalysisEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = true
 )
 abstract class PicViewDatabase : RoomDatabase() {
@@ -29,6 +30,7 @@ abstract class PicViewDatabase : RoomDatabase() {
     abstract fun courseDao(): CourseDao
     abstract fun visitDao(): VisitDao
     abstract fun diaryDao(): DiaryDao
+    abstract fun photoAnalysisDao(): PhotoAnalysisDao
 
     companion object {
         @Volatile
@@ -47,7 +49,7 @@ abstract class PicViewDatabase : RoomDatabase() {
             // 4 → 5 는 방문 기록·일기가 이미 쌓인 뒤의 변경이라 정식으로
             // 옮깁니다. 그보다 옛 버전은 다시 만들 수 있는 데이터뿐이라
             // 초기화합니다.
-            .addMigrations(MIGRATION_4_5)
+            .addMigrations(MIGRATION_4_5, MIGRATION_5_6)
             .fallbackToDestructiveMigration()
             .build()
 
@@ -76,6 +78,27 @@ abstract class PicViewDatabase : RoomDatabase() {
                     "INSERT INTO visit_photo (visitId, uri, takenAt) " +
                         "SELECT id, photoUri, visitedAt FROM visit_log " +
                         "WHERE photoUri IS NOT NULL AND photoUri != ''"
+                )
+            }
+        }
+
+        /**
+         * 사진 읽기 결과 표 추가. 옮길 데이터는 없습니다 — 업데이트 전에
+         * 찍은 사진은 MY 탭을 열 때 새로 읽습니다.
+         */
+        private val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `photo_analysis` (" +
+                        "`uri` TEXT NOT NULL, " +
+                        "`reflection` INTEGER NOT NULL, " +
+                        "`silhouette` INTEGER NOT NULL, " +
+                        "`waterside` INTEGER NOT NULL, " +
+                        "`sunset` INTEGER NOT NULL, " +
+                        "`labels` TEXT NOT NULL, " +
+                        "`version` INTEGER NOT NULL, " +
+                        "`analyzedAt` INTEGER NOT NULL, " +
+                        "PRIMARY KEY(`uri`))"
                 )
             }
         }

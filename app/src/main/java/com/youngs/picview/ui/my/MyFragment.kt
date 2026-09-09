@@ -95,9 +95,9 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
         viewModel.visits.observe(viewLifecycleOwner) { visits ->
             renderRhythm(visits)
             renderArchive(visits)
-            renderTaste(visits)
             renderLightNote(visits)
         }
+        viewModel.taste.observe(viewLifecycleOwner) { renderTaste(it) }
     }
 
     override fun onResume() {
@@ -328,27 +328,38 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
 
     // ─────────────────────── 나의 촬영 성향 ───────────────────────
 
-    private fun renderTaste(visits: List<VisitLogEntity>) {
-        val taste = PhotoTaste.of(visits)
-
+    private fun renderTaste(taste: PhotoTaste) {
         val axisViews = listOf(
-            binding.tasteReflection, binding.tasteGolden, binding.tasteWater
+            binding.tasteReflection, binding.tasteSilhouette,
+            binding.tasteGolden, binding.tasteWater
         )
 
-        if (taste == null) {
+        if (!taste.isReady) {
             // 사진 한두 장으로 "68%"를 말하면 그건 통계가 아니라 장식입니다.
             axisViews.forEach { it.root.isVisible = false }
             binding.dividerTaste.isVisible = false
             binding.tvTasteBasis.text =
-                getString(R.string.my_taste_locked, PhotoTaste.MIN_SAMPLE)
+                if (taste.sampleSize + taste.pending >= PhotoTaste.MIN_SAMPLE) {
+                    // 사진은 충분한데 아직 읽는 중입니다. 곧 채워집니다.
+                    getString(R.string.my_taste_reading, taste.pending)
+                } else {
+                    getString(R.string.my_taste_locked, PhotoTaste.MIN_SAMPLE)
+                }
             binding.tvTasteInsight.isVisible = false
             return
         }
 
-        binding.tvTasteBasis.text = getString(R.string.my_taste_basis, taste.sampleSize)
+        binding.tvTasteBasis.text = if (taste.pending > 0) {
+            getString(R.string.my_taste_basis_pending, taste.sampleSize, taste.pending)
+        } else {
+            getString(R.string.my_taste_basis, taste.sampleSize)
+        }
         binding.dividerTaste.isVisible = true
 
-        val icons = listOf(R.drawable.ic_glyph_drop, R.drawable.ic_sun, R.drawable.ic_wave)
+        val icons = listOf(
+            R.drawable.ic_glyph_drop, R.drawable.ic_glyph_person,
+            R.drawable.ic_sun, R.drawable.ic_wave
+        )
         axisViews.forEachIndexed { index, axisBinding ->
             axisBinding.root.isVisible = true
             bindAxis(axisBinding, taste.axes[index], icons[index])

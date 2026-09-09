@@ -486,6 +486,8 @@
     <string name="my_taste_basis">사진 %1$d장 기준</string>
     <string name="my_taste_percent">%1$d%%</string>
     <string name="my_taste_locked">사진 %1$d장부터 성향을 읽어드려요.</string>
+    <string name="my_taste_reading">사진 %1$d장을 읽는 중이에요…</string>
+    <string name="my_taste_basis_pending">사진 %1$d장 기준 · %2$d장 읽는 중</string>
 
     <string name="my_next_title">다음에 가볼 정읍</string>
     <string name="my_next_peak_in">절정 전 %1$d일</string>

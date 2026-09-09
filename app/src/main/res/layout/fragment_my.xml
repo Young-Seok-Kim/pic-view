@@ -629,13 +629,20 @@
                         android:layout_marginTop="2dp"
                         tools:text="사진 12장 기준" />
 
-                    <!-- 세 축은 코드에서 채웁니다. 아이콘은 축 이름과 함께 답니다. -->
+                    <!-- 네 축은 코드에서 채웁니다. 아이콘은 축 이름과 함께 답니다. -->
                     <include
                         android:id="@+id/taste_reflection"
                         layout="@layout/item_taste_axis"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_m" />
+
+                    <include
+                        android:id="@+id/taste_silhouette"
+                        layout="@layout/item_taste_axis"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_s" />
 
                     <include
                         android:id="@+id/taste_golden"

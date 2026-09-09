@@ -232,3 +232,19 @@ interface VisitDao {
     @Query("DELETE FROM visit_log")
     suspend fun deleteAll()
 }
+
+@Dao
+interface PhotoAnalysisDao {
+
+    @Query("SELECT * FROM photo_analysis")
+    fun observeAll(): Flow<List<PhotoAnalysisEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(analysis: PhotoAnalysisEntity)
+
+    @Query("SELECT uri FROM photo_analysis WHERE version >= :version")
+    suspend fun analyzedUris(version: Int): List<String>
+
+    @Query("DELETE FROM photo_analysis")
+    suspend fun deleteAll()
+}
