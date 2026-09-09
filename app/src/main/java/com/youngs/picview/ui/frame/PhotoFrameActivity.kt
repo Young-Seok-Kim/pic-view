@@ -82,15 +82,22 @@ class PhotoFrameActivity : AppCompatActivity() {
     /** 사진 프레임(한 장) 모드의 원본. */
     private var source: Bitmap? = null
 
-    /** 네컷 모드의 원본들. 처음 들어온 사진이 1번 칸이 됩니다. */
-    private val fourPhotos = mutableListOf<Bitmap>()
+    /** 네컷 모드의 네 칸. 처음 들어온 사진이 1번 칸이 되고, 빈 칸은 null 입니다. */
+    private val fourPhotos = MutableList<Bitmap?>(4) { null }
+
+    /** 미리보기에서 마지막으로 누른 자리. 네컷에서 어느 칸을 눌렀는지 알아내는 데 씁니다. */
+    private var lastTapX = 0f
+    private var lastTapY = 0f
+
+    /** 빈 칸을 눌러 사진 하나를 고를 때, 그 칸 번호. */
+    private var pendingSlot = -1
 
     /**
      * 사진에서 보일 부분(0~1 비율 좌표). null 이면 가운데.
      * 프레임 창과 사진의 비율이 달라 잘리는데, 어디를 남길지는 사람이 정합니다.
      */
     private var singleCrop: RectF? = null
-    private val fourCrops = mutableListOf<RectF?>()
+    private val fourCrops = MutableList<RectF?>(4) { null }
 
     private var composed: Bitmap? = null
 
@@ -138,9 +145,24 @@ class PhotoFrameActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val loaded = uris.take(4).mapNotNull { decode(it) }
             if (loaded.isEmpty()) return@launch
-            fourPhotos.clear()
-            fourPhotos.addAll(loaded)
-            fourCrops.clear()
+            fourPhotos.fill(null)
+            loaded.forEachIndexed { index, bitmap -> fourPhotos[index] = bitmap }
+            fourCrops.fill(null)
+            renderPreview()
+        }
+    }
+
+    /** 네컷의 빈 칸 하나를 눌러 그 칸에 넣을 사진 고르기. */
+    private val pickForSlot = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        val slot = pendingSlot
+        pendingSlot = -1
+        if (uri == null || slot !in fourPhotos.indices) return@registerForActivityResult
+        lifecycleScope.launch {
+            val bitmap = decode(uri) ?: return@launch
+            fourPhotos[slot] = bitmap
+            fourCrops[slot] = null
             renderPreview()
         }
     }
@@ -179,9 +201,16 @@ class PhotoFrameActivity : AppCompatActivity() {
         }
         placeName = intent.getStringExtra(EXTRA_PLACE)
         binding.btnFramePlace.setOnClickListener { showPlaceDialog() }
-        // 미리보기를 눌러도, 버튼을 눌러도 같은 조정 화면입니다.
         binding.btnFrameAdjust.setOnClickListener { adjustCrop() }
-        binding.ivFramePreview.setOnClickListener { adjustCrop() }
+        // 미리보기는 누른 자리가 중요합니다 — 네컷에서 어느 칸인지.
+        binding.ivFramePreview.setOnTouchListener { _, event ->
+            if (event.actionMasked == android.view.MotionEvent.ACTION_DOWN) {
+                lastTapX = event.x
+                lastTapY = event.y
+            }
+            false
+        }
+        binding.ivFramePreview.setOnClickListener { onPreviewTapped() }
 
         binding.btnFrameSave.setOnClickListener { save(share = false) }
         binding.btnFrameShare.setOnClickListener { save(share = true) }
@@ -203,24 +232,58 @@ class PhotoFrameActivity : AppCompatActivity() {
                 openCropDialog(photo, singleWindowAspect(), singleCrop) { singleCrop = it }
             }
             Mode.FOUR_CUT -> {
-                if (fourPhotos.isEmpty()) return
-                if (fourPhotos.size == 1) {
-                    adjustFourCut(0)
+                val filled = fourPhotos.indices.filter { fourPhotos[it] != null }
+                if (filled.isEmpty()) return
+                if (filled.size == 1) {
+                    adjustFourCut(filled.first())
                     return
                 }
-                val labels = fourPhotos.indices.map { getString(R.string.frame_adjust_slot, it + 1) }
+                val labels = filled.map { getString(R.string.frame_adjust_slot, it + 1) }
                 com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                     .setTitle(R.string.frame_adjust_which)
-                    .setItems(labels.toTypedArray()) { _, index -> adjustFourCut(index) }
+                    .setItems(labels.toTypedArray()) { _, which -> adjustFourCut(filled[which]) }
                     .setNegativeButton(R.string.cancel, null)
                     .show()
             }
         }
     }
 
+    /**
+     * 미리보기를 누르면 — 한 장 모드는 바로 조정, 네컷은 누른 칸을 봅니다.
+     * 빈 칸이면 그 칸에 넣을 사진을 고르고, 찬 칸이면 그 사진의 보이는
+     * 부분을 조정합니다. 칸 밖(테두리·표제)을 누르면 아무 일도 없습니다.
+     */
+    private fun onPreviewTapped() {
+        if (mode == Mode.SINGLE) {
+            adjustCrop()
+            return
+        }
+        val slot = slotAt(lastTapX, lastTapY) ?: return
+        if (fourPhotos[slot] == null) {
+            pendingSlot = slot
+            pickForSlot.launch("image/*")
+        } else {
+            adjustFourCut(slot)
+        }
+    }
+
+    /** 미리보기 위의 좌표가 네컷의 몇 번째 칸인지. 합성본 좌표로 되돌려 창과 견줍니다. */
+    private fun slotAt(viewX: Float, viewY: Float): Int? {
+        val inverse = android.graphics.Matrix()
+        if (!binding.ivFramePreview.imageMatrix.invert(inverse)) return null
+        val point = floatArrayOf(
+            viewX - binding.ivFramePreview.paddingLeft, viewY - binding.ivFramePreview.paddingTop
+        )
+        inverse.mapPoints(point)
+        return (0 until 4).firstOrNull { fourWindow(it).contains(point[0], point[1]) }
+    }
+
+    private fun fourWindow(index: Int): RectF =
+        artworkCache.getOrPut(theme to Mode.FOUR_CUT) { FrameArtwork.fourCut(this, theme) }
+            ?.windows?.getOrNull(index) ?: FourCutComposer.slotWindow(index)
+
     private fun adjustFourCut(index: Int) {
         val photo = fourPhotos.getOrNull(index) ?: return
-        while (fourCrops.size < fourPhotos.size) fourCrops.add(null)
         openCropDialog(photo, fourWindowAspect(index), fourCrops[index]) { fourCrops[index] = it }
     }
 
@@ -232,8 +295,7 @@ class PhotoFrameActivity : AppCompatActivity() {
     }
 
     private fun fourWindowAspect(index: Int): Float {
-        val window = artworkCache.getOrPut(theme to Mode.FOUR_CUT) { FrameArtwork.fourCut(this, theme) }
-            ?.windows?.getOrNull(index) ?: FourCutComposer.slotWindow(index)
+        val window = fourWindow(index)
         return window.width() / window.height()
     }
 
@@ -389,7 +451,7 @@ class PhotoFrameActivity : AppCompatActivity() {
             }
             source = bitmap
             // 들어온 사진이 네컷의 첫 칸도 채웁니다.
-            if (fourPhotos.isEmpty()) fourPhotos.add(bitmap)
+            if (fourPhotos.all { it == null }) fourPhotos[0] = bitmap
             renderPreview()
         }
     }
@@ -514,7 +576,7 @@ class PhotoFrameActivity : AppCompatActivity() {
         super.onDestroy()
         composed?.recycle()
         // 네컷 1번 칸은 source 와 같은 비트맵일 수 있어 한 번만 정리합니다.
-        (fourPhotos + listOfNotNull(source)).distinct().forEach { it.recycle() }
+        (fourPhotos.filterNotNull() + listOfNotNull(source)).distinct().forEach { it.recycle() }
     }
 }
 

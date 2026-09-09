@@ -39,7 +39,7 @@ object FourCutComposer {
      * @param crops 사진마다 보일 부분(0~1 비율 좌표). 짧거나 null 이면 가운데.
      */
     fun compose(
-        photos: List<Bitmap>,
+        photos: List<Bitmap?>,
         theme: FrameTheme,
         titleTypeface: Typeface? = null,
         bodyTypeface: Typeface? = null,
@@ -137,7 +137,7 @@ object FourCutComposer {
      * "더 채울 수 있다"가 보여야 합니다).
      */
     private fun composeWithArtwork(
-        photos: List<Bitmap>, theme: FrameTheme, artwork: FrameArtwork, crops: List<RectF?>
+        photos: List<Bitmap?>, theme: FrameTheme, artwork: FrameArtwork, crops: List<RectF?>
     ): Bitmap {
         val out = Bitmap.createBitmap(artwork.bitmap.width, artwork.bitmap.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(out)
