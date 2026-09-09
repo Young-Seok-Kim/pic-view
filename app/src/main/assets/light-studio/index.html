@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'">
+  <title>빛 연습실 · 정읍 시선</title>
+  <link rel="stylesheet" href="studio.css">
+  <script defer src="three.min.js"></script>
+  <script defer src="studio.js"></script>
+</head>
+<body>
+<main>
+  <header><span class="eyebrow">정읍 시선 · 촬영 가이드</span><span class="badge">학습용 장면</span></header>
+  <h1>빛을 옮기면,<br>사진이 달라져요.</h1>
+  <p class="intro">같은 피사체에 다른 빛을 놓아보세요.<br>촬영 전에, 빛과 그림자의 관계를 익혀요.</p>
+  <section class="scene-card" aria-label="빛의 방향과 그림자">
+    <div class="scene-title"><span>빛 연습실</span><span id="scene-label">측광 · 25°</span></div>
+    <div id="scene" role="img" aria-label="고정된 카메라 앞의 피사체에 측면에서 빛이 비치는 장면"></div>
+    <p id="fallback" hidden>3D 화면을 표시할 수 없어요. 아래 조작과 설명으로 빛의 방향을 익혀보세요.</p>
+    <div class="legend"><span><i class="sun"></i>빛</span><span><i class="subject"></i>피사체</span><span>시점 = 카메라 위치</span></div>
+  </section>
+  <section class="controls" aria-label="조명 조절">
+    <h2>01 <span>어디에서 빛이 오나요?</span></h2>
+    <div class="presets" role="group" aria-label="빛의 방향">
+      <button type="button" data-angle="0" aria-pressed="false">순광<span>카메라 뒤에서</span></button>
+      <button type="button" data-angle="90" aria-pressed="true">측광<span>피사체 옆에서</span></button>
+      <button type="button" data-angle="180" aria-pressed="false">역광<span>피사체 뒤에서</span></button>
+    </div>
+    <h2><label for="elevation">02 <span>빛의 높이를 바꿔보세요</span></label><output id="angle" for="elevation">25°</output></h2>
+    <input id="elevation" type="range" min="10" max="75" value="25" step="1" aria-valuetext="25도">
+    <div class="range-labels"><span>낮은 빛 · 긴 그림자</span><span>높은 빛 · 짧은 그림자</span></div>
+  </section>
+  <aside aria-live="polite" aria-atomic="true"><span class="eyebrow">이렇게 담아보세요</span><h2 id="tip-title">측광으로 입체감을 살려요</h2><p id="tip">피사체 옆에서 오는 빛은 밝은 면과 어두운 면을 나눠 질감을 드러내요.</p></aside>
+  <footer>실제 정읍의 태양 위치·날씨를 재현한 화면이 아니에요.<br>실제 촬영 시각은 홈의 빛 보고서에서 확인하세요.</footer>
+</main>
+</body>
+</html>

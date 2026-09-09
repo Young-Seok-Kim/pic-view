@@ -827,4 +827,8 @@
     <string name="sun_arc_sunrise">일출 %1$s</string>
     <string name="sun_arc_sunset">일몰 %1$s</string>
     <string name="sun_arc_daylight">🌿  오늘은 %1$d시간 %2$d분 동안 빛이 머물러요</string>
+    <string name="light_studio_title">빛 연습실</string>
+    <string name="light_studio_back">뒤로</string>
+    <string name="light_studio_open">빛의 방향 직접 연습하기</string>
+    <string name="home_plan_now">오늘의 출사 코스 만들기</string>
 </resources>

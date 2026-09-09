@@ -66,6 +66,10 @@ class HomeFragment : Fragment(R.layout.fragment_home), MainActivity.TabRoot {
 
         applyTopInset()
         renderDate()
+        binding.btnHomePlan.setOnClickListener { goToTab(R.id.tab_course) }
+        binding.btnLightStudio.setOnClickListener {
+            startActivity(android.content.Intent(requireContext(), com.youngs.picview.ui.guide.LightStudioActivity::class.java))
+        }
         setupActions()
         setupBestSpots()
         renderLight()
