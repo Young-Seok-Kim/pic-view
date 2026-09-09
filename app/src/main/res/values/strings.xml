@@ -862,6 +862,7 @@
     <string name="guide_comp_title_thirds">삼분할 구도</string>
     <string name="guide_comp_title_symmetry">대칭 구도</string>
     <string name="guide_comp_title_center">중앙 구도</string>
+    <string name="guide_comp_title_named">%1$s 구도</string>
     <string name="guide_comp_desc_thirds">화면을 3x3으로 나누고\n교차점에 피사체를 놓아보세요</string>
     <string name="guide_comp_desc_symmetry">가운데 축을 기준으로\n좌우가 거울처럼 맞게 서 보세요</string>
     <string name="guide_comp_desc_center">피사체를 한가운데 두고\n배경을 비워 시선을 모아보세요</string>

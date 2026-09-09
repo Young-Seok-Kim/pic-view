@@ -42,6 +42,7 @@ import com.youngs.picview.domain.weather.SkyState
 import com.youngs.picview.domain.weather.WeatherAdvice
 import com.youngs.picview.domain.weather.WeatherAdviser
 import com.youngs.picview.domain.spot.SpotFactsTable
+import com.youngs.picview.domain.guide.SiseonGuide
 import com.youngs.picview.ui.guide.GuideOverlayView
 import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.ui.mission.MissionFragment
@@ -542,49 +543,66 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
             binding.layoutGuidePeople.isVisible = checkedId == R.id.btn_tab_people
         }
 
-        renderCompositionTab(guide)
+        renderCompositionTab(facts, phase)
         renderDirectionTab(facts.facing, phase)
         renderPeopleTab()
     }
 
-    /** 구도 탭 — 이 장소 사진 위에 실제 가이드 선을 얹어 보여 줍니다. */
-    private fun renderCompositionTab(guide: GuideOverlayView.GuideType) {
+    /**
+     * 구도 탭 — 이 장소 사진 위에 가이드 선을 얹어 보여 줍니다.
+     *
+     * 구도는 카메라·시선 가이드와 같은 판단([SiseonGuide.guideIdFor])입니다 —
+     * 장소의 촬영 특성과 지금 빛. 전에는 장소 표의 세 구도만 써서 옥정호가
+     * "삼분할"로 나오고, 카메라를 열면 "반사"가 그려져 서로 달랐습니다.
+     *
+     * 미리보기는 손바닥만 해서 선만 그립니다. 사람 그림과 글 알약까지
+     * 얹으면 아무것도 안 읽힙니다. 그것은 카메라 화면의 몫입니다.
+     */
+    private fun renderCompositionTab(facts: SpotFacts, phase: LightPhase) {
+        val guide = GuideOverlayView.GuideType.byId(SiseonGuide.guideIdFor(facts, phase))
+            ?: facts.guide
+        binding.viewCompOverlay.compact = true
         binding.viewCompOverlay.guideType = guide
 
-        binding.tvCompTitle.setText(
-            when (guide) {
-                GuideOverlayView.GuideType.THIRDS -> R.string.guide_comp_title_thirds
-                GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_comp_title_symmetry
-                GuideOverlayView.GuideType.CENTER -> R.string.guide_comp_title_center
-                // 장소 표는 세 구도만 쓰고, 나머지는 카메라에서 직접 고르는 것입니다.
-                else -> R.string.guide_comp_title_thirds
+        when (guide) {
+            GuideOverlayView.GuideType.THIRDS, GuideOverlayView.GuideType.SYMMETRY,
+            GuideOverlayView.GuideType.CENTER -> {
+                binding.tvCompTitle.setText(
+                    when (guide) {
+                        GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_comp_title_symmetry
+                        GuideOverlayView.GuideType.CENTER -> R.string.guide_comp_title_center
+                        else -> R.string.guide_comp_title_thirds
+                    }
+                )
+                binding.tvCompDesc.setText(
+                    when (guide) {
+                        GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_comp_desc_symmetry
+                        GuideOverlayView.GuideType.CENTER -> R.string.guide_comp_desc_center
+                        else -> R.string.guide_comp_desc_thirds
+                    }
+                )
+                binding.tvCompWhen.setText(
+                    when (guide) {
+                        GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_comp_when_symmetry
+                        GuideOverlayView.GuideType.CENTER -> R.string.guide_comp_when_center
+                        else -> R.string.guide_comp_when_thirds
+                    }
+                )
             }
-        )
-        binding.tvCompDesc.setText(
-            when (guide) {
-                GuideOverlayView.GuideType.THIRDS -> R.string.guide_comp_desc_thirds
-                GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_comp_desc_symmetry
-                GuideOverlayView.GuideType.CENTER -> R.string.guide_comp_desc_center
-                // 장소 표는 세 구도만 쓰고, 나머지는 카메라에서 직접 고르는 것입니다.
-                else -> R.string.guide_comp_desc_thirds
+            else -> {
+                // 시선 가이드가 쓰는 그 구도의 말을 그대로 씁니다.
+                val item = SiseonGuide.byId(guide.id)
+                binding.tvCompTitle.text = getString(R.string.guide_comp_title_named, item.title)
+                binding.tvCompDesc.text = item.description
+                binding.tvCompWhen.text = item.tip
             }
-        )
-        binding.tvCompWhen.setText(
-            when (guide) {
-                GuideOverlayView.GuideType.THIRDS -> R.string.guide_comp_when_thirds
-                GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_comp_when_symmetry
-                GuideOverlayView.GuideType.CENTER -> R.string.guide_comp_when_center
-                // 장소 표는 세 구도만 쓰고, 나머지는 카메라에서 직접 고르는 것입니다.
-                else -> R.string.guide_comp_when_thirds
-            }
-        )
+        }
 
-        // 다른 구도 제안 — 지금 것을 뺀 나머지 구도와, 각도·역광 계열 제안.
-        val alternatives =
-            GuideOverlayView.GuideType.entries
-                .filter { it != guide }
-                .map { ShotTokens.of(it).text } +
-                listOf("⛰ 낮은 각도", "◐ 실루엣")
+        // 다른 구도 제안 — 지금 것을 뺀 나머지. 예전에는 끝에 "낮은 각도·실루엣"을
+        // 따로 붙여 실루엣이 두 번 나왔습니다.
+        val alternatives = GuideOverlayView.GuideType.entries
+            .filter { it != guide }
+            .map { ShotTokens.of(it).text }
 
         val group = binding.chipsCompAlt
         group.removeAllViews()

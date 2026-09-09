@@ -95,6 +95,17 @@ class GuideOverlayView @JvmOverloads constructor(
         }
 
     /**
+     * 선만 그리는 작은 판. 상세 화면의 손바닥만 한 미리보기처럼 사람 그림과
+     * 글 알약까지 얹으면 아무것도 안 읽히는 자리에 씁니다. 격자·축·창·
+     * 점만 남습니다.
+     */
+    var compact = false
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    /**
      * 위아래로 가려지는 만큼. 상단 바와 하단 컨트롤이 미리보기를 덮고
      * 있어서, 그 아래에 그린 안내는 보이지 않습니다. 그림은 이 안쪽에
      * 맞춥니다 — 사람이 실제로 보며 구도를 잡는 영역이 거기입니다.
@@ -176,6 +187,7 @@ class GuideOverlayView @JvmOverloads constructor(
      * 뒤에 옅은 그림자를 한 번 깔아 밝은 하늘에서도 윤곽이 남게 합니다.
      */
     private fun icon(canvas: Canvas, @DrawableRes res: Int, cx: Float, cy: Float, height: Float, alpha: Int = 235) {
+        if (compact) return
         val bmp = bitmap(res)
         val width = height * bmp.width / bmp.height
         rectF.set(cx - width / 2f, cy - height / 2f, cx + width / 2f, cy + height / 2f)
@@ -207,7 +219,9 @@ class GuideOverlayView @JvmOverloads constructor(
         }
 
         // 왼쪽 위에 구도 이름. 어떤 구도가 그려진 건지 격자만 보고는 모릅니다.
-        pill(canvas, "구도 · ${guideType.label}", dp(12f), dp(10f), Align.LEFT, warmDot = true)
+        if (!compact) {
+            pill(canvas, "구도 · ${guideType.label}", dp(12f), dp(10f), Align.LEFT, warmDot = true)
+        }
         canvas.restore()
     }
 
@@ -260,6 +274,7 @@ class GuideOverlayView @JvmOverloads constructor(
 
     /** 부드러운 빛무리. 자리 표시 뒤에 깔아 "여기"가 은은히 떠오르게 합니다. */
     private fun glow(canvas: Canvas, cx: Float, cy: Float, r: Float, alpha: Int = 90) {
+        if (compact) return
         glowPaint.shader = RadialGradient(
             cx, cy, r,
             intArrayOf(Color.argb(alpha, 255, 205, 112), Color.argb(0, 255, 205, 112)),
@@ -285,6 +300,7 @@ class GuideOverlayView @JvmOverloads constructor(
         canvas: Canvas, text: String, x: Float, y: Float,
         align: Align = Align.CENTER, warmDot: Boolean = false
     ) {
+        if (compact) return
         val padX = dp(9f)
         val padY = dp(5f)
         val dotSpace = if (warmDot) dp(11f) else 0f
@@ -312,6 +328,7 @@ class GuideOverlayView @JvmOverloads constructor(
      * 뒤에 빛무리를 깔아 사진 위에서 떠 보이게 합니다.
      */
     private fun person(canvas: Canvas, x: Float, footY: Float, tall: Float = dp(52f), fallback: Figure = Figure.WALK) {
+        if (compact) return
         val fig = figure ?: fallback
         glow(canvas, x, footY - tall * 0.45f, tall * 0.8f)
         icon(canvas, fig.res, x, footY - tall / 2f, tall)
