@@ -34,6 +34,9 @@ object AppPrefs {
     private const val KEY_GUIDE_OVERLAY = "guide_overlay_on"
     private const val KEY_CAMERA_TOUR_SEEN = "camera_tour_seen"
 
+    /** 사진 하나에 대한 프레임 작업 상태(JSON). 뒤에 원본 사진 주소가 붙습니다. */
+    private const val KEY_FRAME_DRAFT_PREFIX = "frame_draft_"
+
     private fun prefs(context: Context): SharedPreferences =
         context.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE)
 
@@ -115,6 +118,19 @@ object AppPrefs {
 
     fun setGuideOverlayOn(context: Context, on: Boolean) {
         prefs(context).edit().putBoolean(KEY_GUIDE_OVERLAY, on).apply()
+    }
+
+    /**
+     * 한 사진의 프레임 작업 상태 — 모드·프레임·넣은 사진들·보이는 부분.
+     *
+     * 저장하고 나갔다가 같은 사진으로 다시 들어오면 그대로 이어집니다.
+     * 네 장을 다시 고르고 보이는 부분을 다시 맞추는 일은 두 번 하면 화가 납니다.
+     */
+    fun frameDraft(context: Context, sourceUri: String): String? =
+        prefs(context).getString(KEY_FRAME_DRAFT_PREFIX + sourceUri, null)
+
+    fun saveFrameDraft(context: Context, sourceUri: String, json: String) {
+        prefs(context).edit().putString(KEY_FRAME_DRAFT_PREFIX + sourceUri, json).apply()
     }
 
     /** 글씨 크기 단계. */
@@ -217,7 +233,8 @@ object AppPrefs {
         editor.remove(KEY_FAVORITES)
         p.all.keys
             .filter {
-                it.startsWith(KEY_DIARY_FEELING_PREFIX) || it.startsWith(KEY_FAVORITE_SNAPSHOT_PREFIX)
+                it.startsWith(KEY_DIARY_FEELING_PREFIX) || it.startsWith(KEY_FAVORITE_SNAPSHOT_PREFIX) ||
+                    it.startsWith(KEY_FRAME_DRAFT_PREFIX)
             }
             .forEach { editor.remove(it) }
         editor.apply()

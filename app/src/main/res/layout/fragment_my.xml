@@ -554,6 +554,23 @@
                         android:visibility="gone"
                         tools:visibility="visible" />
 
+                    <!--
+                        프레임으로 만든 사진. 갤러리에만 남아 앱 안에서는 다시 볼
+                        자리가 없었습니다. 사진이 없어도 보입니다 — 어디 있는지를
+                        알려 주는 줄이라서입니다.
+                    -->
+                    <TextView
+                        android:id="@+id/tv_archive_framed"
+                        style="@style/Text.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_xs"
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingVertical="2dp"
+                        android:text="@string/my_archive_framed"
+                        android:textColor="@color/maple_600"
+                        android:textStyle="bold" />
+
                     <!-- 사진이 없을 때. 남의 사진으로 채우지 않습니다. -->
                     <LinearLayout
                         android:id="@+id/layout_archive_empty"

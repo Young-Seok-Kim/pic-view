@@ -445,6 +445,7 @@
     <string name="my_archive_empty">아직 남긴 사진이 없어요.\n촬영을 시작하면 여기에 쌓입니다.</string>
     <string name="my_archive_start">촬영 시작하기</string>
     <string name="my_archive_by_course">코스별로 모아보기 →</string>
+    <string name="my_archive_framed">프레임으로 만든 사진 →</string>
 
     <!-- 코스별 사진 모아보기 -->
     <string name="course_photos_title">코스별 사진</string>
@@ -745,6 +746,11 @@
     <string name="frame_share">SNS에 공유하기</string>
     <string name="cd_frame_preview">프레임 미리보기</string>
     <string name="frame_saved">갤러리에 저장했어요</string>
+    <string name="frame_saved_action">모아 보기</string>
+    <string name="framed_title">프레임으로 만든 사진</string>
+    <string name="framed_hint">갤러리의 PicView 폴더에도 같은 사진이 있어요. 누르면 크게 보고, 길게 누르면 공유해요.</string>
+    <string name="framed_empty">아직 프레임으로 만든 사진이 없어요.\n일기나 MY 탭의 사진을 눌러 프레임을 씌워 보세요.</string>
+    <string name="framed_count">%1$d장</string>
     <string name="frame_save_failed">저장하지 못했어요</string>
     <string name="frame_edit_place">장소 이름 바꾸기</string>
     <string name="frame_adjust">보이는 부분 조정 ›</string>

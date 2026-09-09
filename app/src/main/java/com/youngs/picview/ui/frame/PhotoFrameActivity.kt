@@ -26,7 +26,10 @@ import com.youngs.picview.domain.frame.FourCutComposer
 import com.youngs.picview.domain.frame.FrameArtwork
 import com.youngs.picview.domain.frame.FrameTheme
 import com.youngs.picview.domain.frame.PolaroidComposer
+import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import com.youngs.picview.ui.palette.ColorPaletteActivity
+import com.youngs.picview.util.AppPrefs
 import com.youngs.picview.util.MediaStoreSaver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -85,6 +88,12 @@ class PhotoFrameActivity : AppCompatActivity() {
     /** 네컷 모드의 네 칸. 처음 들어온 사진이 1번 칸이 되고, 빈 칸은 null 입니다. */
     private val fourPhotos = MutableList<Bitmap?>(4) { null }
 
+    /** 네 칸의 갤러리 주소. 작업 상태를 남겨 다음에 되살릴 때 씁니다. */
+    private val fourUris = MutableList<String?>(4) { null }
+
+    /** 들어올 때의 원본 사진 주소. 작업 상태는 이 주소에 묶입니다. */
+    private var sourceUri: Uri? = null
+
     /** 미리보기에서 마지막으로 누른 자리. 네컷에서 어느 칸을 눌렀는지 알아내는 데 씁니다. */
     private var lastTapX = 0f
     private var lastTapY = 0f
@@ -133,6 +142,7 @@ class PhotoFrameActivity : AppCompatActivity() {
             val bitmap = decode(uri) ?: return@launch
             source = bitmap
             singleCrop = null
+            sourceUri = uri
             renderPreview()
         }
     }
@@ -146,7 +156,9 @@ class PhotoFrameActivity : AppCompatActivity() {
             val loaded = uris.take(4).mapNotNull { decode(it) }
             if (loaded.isEmpty()) return@launch
             fourPhotos.fill(null)
+            fourUris.fill(null)
             loaded.forEachIndexed { index, bitmap -> fourPhotos[index] = bitmap }
+            uris.take(4).forEachIndexed { index, uri -> fourUris[index] = uri.toString() }
             fourCrops.fill(null)
             renderPreview()
         }
@@ -162,6 +174,7 @@ class PhotoFrameActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val bitmap = decode(uri) ?: return@launch
             fourPhotos[slot] = bitmap
+            fourUris[slot] = uri.toString()
             fourCrops[slot] = null
             renderPreview()
         }
@@ -187,6 +200,7 @@ class PhotoFrameActivity : AppCompatActivity() {
             finish()
             return
         }
+        sourceUri = uri
 
         setupSwatches()
         setupModeToggle()
@@ -451,8 +465,75 @@ class PhotoFrameActivity : AppCompatActivity() {
             }
             source = bitmap
             // 들어온 사진이 네컷의 첫 칸도 채웁니다.
-            if (fourPhotos.all { it == null }) fourPhotos[0] = bitmap
+            if (fourPhotos.all { it == null }) {
+                fourPhotos[0] = bitmap
+                fourUris[0] = uri.toString()
+            }
+            restoreDraft(uri, bitmap)
             renderPreview()
+        }
+    }
+
+    // ─────────────────────── 작업 상태 남기기 · 되살리기 ───────────────────────
+
+    /**
+     * 저장할 때 남기는 작업 상태. 같은 사진으로 다시 들어오면 되살립니다.
+     * 사진 자체는 갤러리 주소로만 두고, 색감 필터를 거친 결과는 남기지 않습니다.
+     */
+    private data class FrameDraft(
+        val mode: String,
+        val theme: String,
+        val place: String?,
+        val singleCrop: List<Float>?,
+        val slots: List<String?>,
+        val slotCrops: List<List<Float>?>
+    )
+
+    private fun RectF.toList() = listOf(left, top, right, bottom)
+    private fun List<Float>.toRect() = RectF(this[0], this[1], this[2], this[3])
+
+    private fun persistDraft() {
+        val key = sourceUri?.toString() ?: return
+        val draft = FrameDraft(
+            mode = mode.name,
+            theme = theme.name,
+            place = placeName,
+            singleCrop = singleCrop?.toList(),
+            slots = fourUris.toList(),
+            slotCrops = fourCrops.map { it?.toList() }
+        )
+        AppPrefs.saveFrameDraft(this, key, Gson().toJson(draft))
+    }
+
+    private suspend fun restoreDraft(uri: Uri, sourceBitmap: Bitmap) {
+        val json = AppPrefs.frameDraft(this, uri.toString()) ?: return
+        val draft = runCatching { Gson().fromJson(json, FrameDraft::class.java) }.getOrNull() ?: return
+
+        runCatching { FrameTheme.valueOf(draft.theme) }.getOrNull()?.let {
+            theme = it
+            adapter.select(it)
+        }
+        placeName = draft.place ?: placeName
+        singleCrop = draft.singleCrop?.takeIf { it.size == 4 }?.toRect()
+
+        // 네 칸 — 갤러리에서 지워진 사진은 빈 칸으로 남깁니다.
+        draft.slots.take(4).forEachIndexed { index, slotUri ->
+            val bitmap = when {
+                slotUri == null -> null
+                slotUri == uri.toString() -> sourceBitmap
+                else -> decode(Uri.parse(slotUri))
+            }
+            fourPhotos[index] = bitmap
+            fourUris[index] = if (bitmap != null) slotUri else null
+            fourCrops[index] = draft.slotCrops.getOrNull(index)?.takeIf { it.size == 4 }?.toRect()
+        }
+
+        val wantFourCut = draft.mode == Mode.FOUR_CUT.name
+        val target = if (wantFourCut) R.id.btn_mode_fourcut else R.id.btn_mode_single
+        if (binding.toggleFrameMode.checkedButtonId != target) {
+            binding.toggleFrameMode.check(target)
+        } else {
+            updatePlaceButton()
         }
     }
 
@@ -520,7 +601,13 @@ class PhotoFrameActivity : AppCompatActivity() {
                 return@launch
             }
 
-            Toast.makeText(this@PhotoFrameActivity, R.string.frame_saved, Toast.LENGTH_SHORT).show()
+            persistDraft()
+            // "저장했어요"만으로는 어디로 갔는지 모릅니다. 앱 안의 모아 보기로 잇습니다.
+            Snackbar.make(binding.root, R.string.frame_saved, Snackbar.LENGTH_LONG)
+                .setAction(R.string.frame_saved_action) {
+                    startActivity(FramedPhotosActivity.intent(this@PhotoFrameActivity))
+                }
+                .show()
             if (share) shareImage(uri)
         }
     }

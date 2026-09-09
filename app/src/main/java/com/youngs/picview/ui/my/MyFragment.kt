@@ -29,6 +29,7 @@ import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.ui.course.CourseInputFragment
 import com.youngs.picview.ui.detail.DetailFragment
 import com.youngs.picview.ui.guide.GuideActivity
+import com.youngs.picview.ui.frame.FramedPhotosActivity
 import com.youngs.picview.ui.frame.PhotoFrameActivity
 import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.ui.mission.MissionFragment
@@ -136,6 +137,9 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
         binding.tvArchiveAll.setOnClickListener(openVisits)
         binding.tvArchiveByCourse.setOnClickListener {
             (activity as? MainActivity)?.pushScreen(CoursePhotosFragment())
+        }
+        binding.tvArchiveFramed.setOnClickListener {
+            startActivity(FramedPhotosActivity.intent(requireContext()))
         }
 
         // 아카이브 카드는 통째로 목적지입니다. 다만 사진이 하나도 없을 때

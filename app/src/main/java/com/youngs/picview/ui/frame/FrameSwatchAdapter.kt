@@ -29,6 +29,16 @@ class FrameSwatchAdapter(
 
     override fun getItemCount() = themes.size
 
+    /** 저장해 둔 프레임을 되살릴 때. 콜백은 부르지 않습니다 — 부르는 쪽이 이미 압니다. */
+    fun select(theme: FrameTheme) {
+        val index = themes.indexOf(theme)
+        if (index < 0 || index == selected) return
+        val previous = selected
+        selected = index
+        notifyItemChanged(previous)
+        notifyItemChanged(selected)
+    }
+
     override fun onBindViewHolder(holder: Holder, position: Int) {
         val theme = themes[position]
         val isSelected = position == selected
