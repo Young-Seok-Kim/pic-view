@@ -31,6 +31,7 @@ object AppPrefs {
     private const val KEY_DIARY_FEELING_PREFIX = "diary_feelings_"
     private const val KEY_POSE_HINT_SEEN = "pose_hint_seen"
     private const val KEY_FEATURE_TOUR_SEEN = "feature_tour_seen"
+    private const val KEY_GUIDE_OVERLAY = "guide_overlay_on"
 
     private fun prefs(context: Context): SharedPreferences =
         context.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -94,6 +95,17 @@ object AppPrefs {
 
     fun setFeatureTourSeen(context: Context, seen: Boolean) {
         prefs(context).edit().putBoolean(KEY_FEATURE_TOUR_SEEN, seen).apply()
+    }
+
+    /**
+     * 촬영 화면의 구도 가이드(격자·서는 자리)를 켜 둘지. 기본은 켬.
+     * 카메라 격자처럼 화면에서 바로 끄고 켜며, 마지막 상태를 기억합니다.
+     */
+    fun isGuideOverlayOn(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_GUIDE_OVERLAY, true)
+
+    fun setGuideOverlayOn(context: Context, on: Boolean) {
+        prefs(context).edit().putBoolean(KEY_GUIDE_OVERLAY, on).apply()
     }
 
     /** 글씨 크기 단계. */

@@ -62,7 +62,6 @@ class SiseonGuideActivity : AppCompatActivity() {
     private var contextId = "sunset"
     private var spotTitle: String? = null
 
-    private val checkState = BooleanArray(SiseonGuide.checklist.size)
 
     /**
      * 미션을 소리로 읽어 줍니다.
@@ -136,8 +135,6 @@ class SiseonGuideActivity : AppCompatActivity() {
 
         setupCarousel()
         setupContextChips()
-        setupTools()
-        setupChecklist()
 
         binding.btnCompareUpload.setOnClickListener { comparePicker.launch("image/*") }
         binding.btnShootNow.setOnClickListener { openMission() }
@@ -192,8 +189,6 @@ class SiseonGuideActivity : AppCompatActivity() {
         binding.tvGuideEnglish.text = item.english
         binding.tvGuideKorean.text = item.title
         binding.tvGuideDesc.text = item.description
-        binding.tvPanelDirection.text = item.direction
-        binding.tvPanelTip.text = item.tip
         binding.tvGuideTips.text = item.tips.joinToString("\n") { "• $it" }
         binding.tvCompareGuideCaption.text =
             getString(R.string.siseon_compare_caption_guide, item.title)
@@ -218,10 +213,6 @@ class SiseonGuideActivity : AppCompatActivity() {
      */
     private fun renderContext() {
         val context = SiseonGuide.contextById(contextId)
-        binding.tvLightLabel.text = context.label
-        binding.tvLightTitle.text = context.title
-        binding.tvLightHint.text = context.hint
-        binding.tvLightDetail.text = context.detail
 
         val tone = ContextCompat.getColor(this, context.toneRes)
 
@@ -349,46 +340,6 @@ class SiseonGuideActivity : AppCompatActivity() {
             renderContext()
             syncGuideToContext()
         }
-    }
-
-    // ───────────────────── 구도·빛·움직임·체크 탭 ─────────────────────
-
-    private fun setupTools() {
-        binding.toggleGuideTools.addOnButtonCheckedListener { _, checkedId, isChecked ->
-            if (!isChecked) return@addOnButtonCheckedListener
-            binding.panelComposition.isVisible = checkedId == R.id.btn_tool_composition
-            binding.panelLight.isVisible = checkedId == R.id.btn_tool_light
-            binding.panelAction.isVisible = checkedId == R.id.btn_tool_action
-            binding.panelCheck.isVisible = checkedId == R.id.btn_tool_check
-        }
-    }
-
-    private fun setupChecklist() {
-        SiseonGuide.checklist.forEachIndexed { index, item ->
-            binding.layoutCheckList.addView(
-                CheckBox(this).apply {
-                    text = item
-                    setOnCheckedChangeListener { _, checked ->
-                        checkState[index] = checked
-                        renderCheckProgress()
-                    }
-                }
-            )
-        }
-        renderCheckProgress()
-    }
-
-    private fun renderCheckProgress() {
-        val done = checkState.count { it }
-        val total = checkState.size
-        val percent = done * 100 / total
-        binding.tvCheckPercent.text = "$percent%"
-        binding.progressCheck.setProgressCompat(percent, true)
-        binding.tvCheckCaption.text = getString(R.string.siseon_check_progress, done, total) +
-            " · " + getString(
-                if (done == total) R.string.siseon_check_done_note
-                else R.string.siseon_check_todo_note
-            )
     }
 
     // ───────────────────── 실전 미션 ─────────────────────

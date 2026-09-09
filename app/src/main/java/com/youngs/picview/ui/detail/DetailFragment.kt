@@ -556,6 +556,8 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                 GuideOverlayView.GuideType.THIRDS -> R.string.guide_comp_title_thirds
                 GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_comp_title_symmetry
                 GuideOverlayView.GuideType.CENTER -> R.string.guide_comp_title_center
+                // 장소 표는 세 구도만 쓰고, 나머지는 카메라에서 직접 고르는 것입니다.
+                else -> R.string.guide_comp_title_thirds
             }
         )
         binding.tvCompDesc.setText(
@@ -563,6 +565,8 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                 GuideOverlayView.GuideType.THIRDS -> R.string.guide_comp_desc_thirds
                 GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_comp_desc_symmetry
                 GuideOverlayView.GuideType.CENTER -> R.string.guide_comp_desc_center
+                // 장소 표는 세 구도만 쓰고, 나머지는 카메라에서 직접 고르는 것입니다.
+                else -> R.string.guide_comp_desc_thirds
             }
         )
         binding.tvCompWhen.setText(
@@ -570,6 +574,8 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                 GuideOverlayView.GuideType.THIRDS -> R.string.guide_comp_when_thirds
                 GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_comp_when_symmetry
                 GuideOverlayView.GuideType.CENTER -> R.string.guide_comp_when_center
+                // 장소 표는 세 구도만 쓰고, 나머지는 카메라에서 직접 고르는 것입니다.
+                else -> R.string.guide_comp_when_thirds
             }
         )
 

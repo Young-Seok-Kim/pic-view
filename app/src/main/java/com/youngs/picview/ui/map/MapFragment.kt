@@ -520,6 +520,7 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
             GuideOverlayView.GuideType.THIRDS -> "여백"
             GuideOverlayView.GuideType.SYMMETRY -> "대칭"
             GuideOverlayView.GuideType.CENTER -> "가까이"
+            else -> "여백"
         }
         // "여백 + 여백" 처럼 같은 말이 겹치면 빛의 결로 바꿔 말합니다.
         val second = if (composition == purpose.label) {

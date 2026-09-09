@@ -176,7 +176,7 @@ object SiseonGuide {
      * 참고 사진은 전부 다른 장을 씁니다 — 한국관광공사가 찍은 정읍 실사진
      * 중에서 그 날씨의 빛에 실제로 맞는 컷을 골랐습니다. 맑음은 처마
      * 그림자가 진 고택, 흐림은 안개 낀 내장산, 일출은 능선 위 실루엣,
-     * 일몰은 역광의 구절초 언덕, 야간은 등불이 켜진 정읍사, 비는 잔잔한
+     * 일몰은 역광에 물든 성황산 은행나무, 야간은 등불이 켜진 정읍사, 비는 잔잔한
      * 수면입니다. 같은 사진에 문구만 바꿔 다는 것은 필터가 아닙니다.
      */
     val contexts: List<GuideContext> = listOf(
@@ -228,7 +228,9 @@ object SiseonGuide {
             hint = "낮은 빛이 길게 들어오는 상황",
             detail = "지붕선·수면·나뭇가지에 닿은 따뜻한 빛을 따라 이동해보세요.",
             emoji = "🌇", concept = "지금 아니면 놓치는 마지막 빛",
-            photoRes = R.drawable.guide_space,
+            // 성황산 — 낮은 해가 은행나무 뒤에서 들어와 잎을 통과합니다.
+            // 전에는 구절초 언덕(낮 사진)이 붙어 있어 "일몰" 카드에 해가 없었습니다.
+            photoRes = R.drawable.guide_last_light,
             photoLabelEn = "LAST LIGHT", photoLabelKo = "마지막 빛",
             guidePoint = "역광으로 들어온 빛이 꽃과 잎을 통과하는 자리를 찾으세요.",
             tools = listOf("일몰 카운트다운", "태양 위치", "촬영 포인트"),
@@ -284,14 +286,6 @@ object SiseonGuide {
 
     fun signalOf(guideId: String): GuideSignal = signals.getValue(
         if (guideId in signals) guideId else "reflection"
-    )
-
-    /** 셔터를 누르기 전 확인 네 가지. */
-    val checklist: List<String> = listOf(
-        "수평선과 수직선이 기울지 않았나요?",
-        "모서리에 불필요한 물체가 없나요?",
-        "주 피사체가 배경과 분리되어 있나요?",
-        "빛의 방향과 피사체의 시선이 맞나요?"
     )
 
     /** 미션의 세 위치. 같은 장면을 세 번 움직여 비교합니다. */
@@ -403,6 +397,8 @@ object SiseonGuide {
                 GuideOverlayView.GuideType.SYMMETRY -> "symmetry"
                 GuideOverlayView.GuideType.CENTER -> "frame"
                 GuideOverlayView.GuideType.THIRDS -> "leading"
+                // 장소 표는 위 셋만 씁니다. 나머지 구도는 그 이름 그대로 구도 항목입니다.
+                else -> facts.guide.id
             }
         }
     }

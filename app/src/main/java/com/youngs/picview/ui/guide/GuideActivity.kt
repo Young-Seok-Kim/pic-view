@@ -28,6 +28,7 @@ import androidx.core.view.updatePadding
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import com.youngs.picview.BuildConfig
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.youngs.picview.R
 import com.youngs.picview.util.AppPrefs
 import com.youngs.picview.util.MediaStoreSaver
@@ -41,6 +42,7 @@ import com.youngs.picview.domain.pose.PoseRecommender
 import com.youngs.picview.domain.pose.PoseScore
 import com.youngs.picview.domain.spot.Facing
 import com.youngs.picview.domain.spot.SpotFactsTable
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import androidx.lifecycle.lifecycleScope
@@ -62,6 +64,9 @@ class GuideActivity : AppCompatActivity() {
 
         /** 촬영한 사진을 방문 기록에 붙이기 위한 장소 식별자. */
         const val EXTRA_CONTENT_ID = "CONTENT_ID"
+
+        /** 시작 구도([GuideOverlayView.GuideType.id]). 없으면 장소 종류로 정합니다. */
+        const val EXTRA_GUIDE_ID = "GUIDE_ID"
 
         /** 첫 안내가 스스로 사라지기까지. 읽기에 넉넉하고 방해되지 않는 선. */
         private const val POSE_HINT_MS = 6000L
@@ -164,25 +169,84 @@ class GuideActivity : AppCompatActivity() {
 
         binding.tvSpotName.text = spotName
 
-        guideType = when (spotType) {
-            "14" -> GuideOverlayView.GuideType.SYMMETRY // 문화시설 : 건축 대칭
-            "39" -> GuideOverlayView.GuideType.CENTER   // 음식점 : 근접 촬영
-            else -> GuideOverlayView.GuideType.THIRDS   // 자연·레포츠 등 풍경
-        }
+        // 시선 가이드에서 구도를 보고 넘어왔으면 그 구도로, 아니면 장소 종류로.
+        guideType = GuideOverlayView.GuideType.byId(intent.getStringExtra(EXTRA_GUIDE_ID))
+            ?: when (spotType) {
+                "14" -> GuideOverlayView.GuideType.SYMMETRY // 문화시설 : 건축 대칭
+                "39" -> GuideOverlayView.GuideType.CENTER   // 음식점 : 근접 촬영
+                else -> GuideOverlayView.GuideType.THIRDS   // 자연·레포츠 등 풍경
+            }
 
         setOnClickListener()
 
-        binding.guideOverlay.guideType = guideType
-        binding.tvGuideMessage.setText(
-            when (guideType) {
-                GuideOverlayView.GuideType.THIRDS -> R.string.guide_thirds
-                GuideOverlayView.GuideType.SYMMETRY -> R.string.guide_symmetry
-                GuideOverlayView.GuideType.CENTER -> R.string.guide_center
-            }
-        )
+        applyGuideType()
+        renderOverlayToggle()
+        fitOverlayToVisibleArea()
 
         setupPoses(spotName, spotType)
         showPoseHintOnce()
+    }
+
+    /** 구도를 화면에 반영합니다 — 격자 그림, 상단 알약, 안내 문구. */
+    private fun applyGuideType() {
+        binding.guideOverlay.guideType = guideType
+        binding.btnGuideComposition.text = guideType.label
+        binding.tvGuideMessage.text = guideMessage(guideType)
+    }
+
+    /**
+     * 구도 한 줄 요령. 삼분할·대칭·중앙은 카메라 화면의 옛 문구를, 나머지는
+     * 시선 가이드 화면이 쓰는 그 구도의 요령을 그대로 씁니다.
+     */
+    private fun guideMessage(type: GuideOverlayView.GuideType): String = when (type) {
+        GuideOverlayView.GuideType.THIRDS -> getString(R.string.guide_thirds)
+        GuideOverlayView.GuideType.SYMMETRY -> getString(R.string.guide_symmetry)
+        GuideOverlayView.GuideType.CENTER -> getString(R.string.guide_center)
+        else -> SiseonGuide.byId(type.id).tip
+    }
+
+    /**
+     * 구도 고르기. 카메라를 든 채 목록을 고르는 것이라 긴 설명 없이 이름만 둡니다.
+     * 어떤 구도인지는 고르는 즉시 격자가 보여 줍니다.
+     */
+    private fun pickGuideType() {
+        val types = GuideOverlayView.GuideType.entries
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.guide_pick_composition)
+            .setSingleChoiceItems(
+                types.map { it.label }.toTypedArray(), types.indexOf(guideType)
+            ) { dialog, index ->
+                dialog.dismiss()
+                guideType = types[index]
+                applyGuideType()
+                // 골랐는데 꺼져 있으면 고른 보람이 없습니다. 켭니다.
+                if (!AppPrefs.isGuideOverlayOn(this)) {
+                    AppPrefs.setGuideOverlayOn(this, true)
+                    renderOverlayToggle()
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    /**
+     * 상단 바 첫 줄과 하단 컨트롤이 덮는 만큼 격자를 안쪽으로 들입니다.
+     * 두 바의 높이는 인셋과 글씨 크기에 따라 달라서 배치가 끝난 뒤에 잽니다.
+     */
+    private fun fitOverlayToVisibleArea() {
+        binding.layoutBottomBar.doOnLayout {
+            binding.guideOverlay.setInsets(
+                top = binding.layoutTopBar.top + binding.layoutTopBar.paddingTop + dp(40),
+                bottom = binding.root.height - binding.layoutBottomBar.top
+            )
+        }
+    }
+
+    /** 격자 버튼과 격자의 켜짐 상태를 맞춥니다. 꺼진 버튼은 반투명입니다. */
+    private fun renderOverlayToggle() {
+        val on = AppPrefs.isGuideOverlayOn(this)
+        binding.guideOverlay.isVisible = on
+        binding.btnGuideGrid.alpha = if (on) 1f else 0.45f
     }
 
     /**
@@ -400,6 +464,11 @@ class GuideActivity : AppCompatActivity() {
     private fun setOnClickListener() {
         binding.btnGuideBack.setOnClickListener { finish() }
         binding.btnGuideExample.setOnClickListener { showExample() }
+        binding.btnGuideComposition.setOnClickListener { pickGuideType() }
+        binding.btnGuideGrid.setOnClickListener {
+            AppPrefs.setGuideOverlayOn(this, !AppPrefs.isGuideOverlayOn(this))
+            renderOverlayToggle()
+        }
 
         binding.btnCapture.setOnClickListener {
             // 셔터를 누른 느낌을 주는 짧은 스케일 피드백
