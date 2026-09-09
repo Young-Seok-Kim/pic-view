@@ -28,8 +28,11 @@ import androidx.core.view.updatePadding
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import com.youngs.picview.BuildConfig
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import android.view.View
+import androidx.activity.addCallback
 import com.youngs.picview.R
+import com.youngs.picview.ui.tour.FeatureTourView
+import com.youngs.picview.domain.spot.SpotFacts
 import com.youngs.picview.util.AppPrefs
 import com.youngs.picview.util.MediaStoreSaver
 import com.youngs.picview.databinding.ActivityGuideBinding
@@ -43,6 +46,7 @@ import com.youngs.picview.domain.pose.PoseScore
 import com.youngs.picview.domain.spot.Facing
 import com.youngs.picview.domain.spot.SpotFactsTable
 import androidx.core.view.doOnLayout
+import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import androidx.lifecycle.lifecycleScope
@@ -65,9 +69,6 @@ class GuideActivity : AppCompatActivity() {
         /** 촬영한 사진을 방문 기록에 붙이기 위한 장소 식별자. */
         const val EXTRA_CONTENT_ID = "CONTENT_ID"
 
-        /** 시작 구도([GuideOverlayView.GuideType.id]). 없으면 장소 종류로 정합니다. */
-        const val EXTRA_GUIDE_ID = "GUIDE_ID"
-
         /** 첫 안내가 스스로 사라지기까지. 읽기에 넉넉하고 방해되지 않는 선. */
         private const val POSE_HINT_MS = 6000L
 
@@ -80,6 +81,9 @@ class GuideActivity : AppCompatActivity() {
 
     /** 이 장소의 방위. 실내면 하늘·역광 포즈를 후순위로 내립니다. */
     private lateinit var facing: Facing
+
+    /** 이 장소의 촬영 특성. 풍경을 고르면 여기서 구도를 고릅니다. */
+    private lateinit var facts: SpotFacts
 
     /** 지금의 빛. 화면이 떠 있는 동안은 바뀌지 않습니다. */
     private lateinit var phase: LightPhase
@@ -130,6 +134,14 @@ class GuideActivity : AppCompatActivity() {
         binding = ActivityGuideBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        onBackPressedDispatcher.addCallback(this) {
+            cameraTour?.let {
+                it.dismiss()
+                return@addCallback
+            }
+            finish()
+        }
+
         applyWindowInsets()
 
         if (showDemoBackdropIfPresent()) {
@@ -157,76 +169,57 @@ class GuideActivity : AppCompatActivity() {
     }
 
     /**
-     * 장소 종류에 맞는 구도 가이드를 화면에 반영합니다.
+     * 구도 가이드를 화면에 붙입니다.
      *
-     * 예전에는 장소 이름에 '산', '향교' 가 들어있는지로 판단했는데,
-     * 이름에 안 걸리면 엉뚱한 가이드가 나왔습니다.
-     * 앱 다른 화면과 같은 기준인 contentTypeId 로 판단합니다.
+     * 구도 자체는 아래에서 고른 것이 정합니다([guideTypeFor]) — 피사체
+     * 칩과 포즈 칩을 누를 때마다 격자가 따라 바뀝니다. 위에서 따로 고르게
+     * 하지 않습니다. "무엇을 찍나"를 골랐는데 "어떤 구도로"를 또 고르라고
+     * 하면 같은 질문을 두 번 하는 셈입니다.
      */
     private fun setupGuide() {
         val spotName = intent.getStringExtra(EXTRA_SPOT_NAME) ?: ""
         val spotType = intent.getStringExtra(EXTRA_SPOT_TYPE)
 
         binding.tvSpotName.text = spotName
-
-        // 시선 가이드에서 구도를 보고 넘어왔으면 그 구도로, 아니면 장소 종류로.
-        guideType = GuideOverlayView.GuideType.byId(intent.getStringExtra(EXTRA_GUIDE_ID))
-            ?: when (spotType) {
-                "14" -> GuideOverlayView.GuideType.SYMMETRY // 문화시설 : 건축 대칭
-                "39" -> GuideOverlayView.GuideType.CENTER   // 음식점 : 근접 촬영
-                else -> GuideOverlayView.GuideType.THIRDS   // 자연·레포츠 등 풍경
-            }
+        facts = SpotFactsTable.of(spotName, spotType)
 
         setOnClickListener()
-
-        applyGuideType()
         renderOverlayToggle()
         fitOverlayToVisibleArea()
 
         setupPoses(spotName, spotType)
-        showPoseHintOnce()
+        applyGuideType()
+        showCameraTourOnce()
     }
 
-    /** 구도를 화면에 반영합니다 — 격자 그림, 상단 알약, 안내 문구. */
+    /**
+     * 지금 고른 것에 맞는 구도.
+     *
+     * - 인물: 포즈가 정합니다. 뒤돌아 걷기는 길을 따라가는 리딩라인, 점프와
+     *   하늘 향해는 하늘을 비우는 여백, 손 프레임은 프레임 인 프레임.
+     * - 풍경: 장소와 지금 빛이 정합니다. 물가면 반사, 능선이면 여백 —
+     *   시선 가이드 화면이 쓰는 것과 같은 판단입니다.
+     * - 동물: 눈높이에서 시선 앞을 비우는 여백. 음식: 원 안에 채우는 중앙.
+     */
+    private fun guideTypeFor(): GuideOverlayView.GuideType = when (subject) {
+        Subject.PERSON -> when (selectedPose?.pose) {
+            Pose.WALK_AWAY -> GuideOverlayView.GuideType.LEADING
+            Pose.JUMP, Pose.REACH_SKY -> GuideOverlayView.GuideType.SPACE
+            Pose.SILHOUETTE -> GuideOverlayView.GuideType.SILHOUETTE
+            Pose.HAND_FRAME -> GuideOverlayView.GuideType.FRAME
+            Pose.SITTING, null -> GuideOverlayView.GuideType.THIRDS
+        }
+        Subject.LANDSCAPE ->
+            GuideOverlayView.GuideType.byId(SiseonGuide.guideIdFor(facts, phase))
+                ?: GuideOverlayView.GuideType.THIRDS
+        Subject.ANIMAL -> GuideOverlayView.GuideType.SPACE
+        Subject.FOOD -> GuideOverlayView.GuideType.CENTER
+    }
+
+    /** 아래 선택이 바뀔 때마다 부릅니다. 격자와 왼쪽 위 구도 이름이 따라갑니다. */
     private fun applyGuideType() {
+        guideType = guideTypeFor()
         binding.guideOverlay.guideType = guideType
-        binding.btnGuideComposition.text = guideType.label
-        binding.tvGuideMessage.text = guideMessage(guideType)
-    }
-
-    /**
-     * 구도 한 줄 요령. 삼분할·대칭·중앙은 카메라 화면의 옛 문구를, 나머지는
-     * 시선 가이드 화면이 쓰는 그 구도의 요령을 그대로 씁니다.
-     */
-    private fun guideMessage(type: GuideOverlayView.GuideType): String = when (type) {
-        GuideOverlayView.GuideType.THIRDS -> getString(R.string.guide_thirds)
-        GuideOverlayView.GuideType.SYMMETRY -> getString(R.string.guide_symmetry)
-        GuideOverlayView.GuideType.CENTER -> getString(R.string.guide_center)
-        else -> SiseonGuide.byId(type.id).tip
-    }
-
-    /**
-     * 구도 고르기. 카메라를 든 채 목록을 고르는 것이라 긴 설명 없이 이름만 둡니다.
-     * 어떤 구도인지는 고르는 즉시 격자가 보여 줍니다.
-     */
-    private fun pickGuideType() {
-        val types = GuideOverlayView.GuideType.entries
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.guide_pick_composition)
-            .setSingleChoiceItems(
-                types.map { it.label }.toTypedArray(), types.indexOf(guideType)
-            ) { dialog, index ->
-                dialog.dismiss()
-                guideType = types[index]
-                applyGuideType()
-                // 골랐는데 꺼져 있으면 고른 보람이 없습니다. 켭니다.
-                if (!AppPrefs.isGuideOverlayOn(this)) {
-                    AppPrefs.setGuideOverlayOn(this, true)
-                    renderOverlayToggle()
-                }
-            }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
     }
 
     /**
@@ -234,12 +227,16 @@ class GuideActivity : AppCompatActivity() {
      * 두 바의 높이는 인셋과 글씨 크기에 따라 달라서 배치가 끝난 뒤에 잽니다.
      */
     private fun fitOverlayToVisibleArea() {
-        binding.layoutBottomBar.doOnLayout {
+        // 안내 문구는 포즈를 바꿀 때마다 길이가 달라 한 줄이 두 줄이 되기도
+        // 합니다. 상단 바 전체(문구까지)가 끝나는 곳을 그때그때 다시 잽니다.
+        val refit = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             binding.guideOverlay.setInsets(
-                top = binding.layoutTopBar.top + binding.layoutTopBar.paddingTop + dp(40),
+                top = binding.layoutTopBar.bottom,
                 bottom = binding.root.height - binding.layoutBottomBar.top
             )
         }
+        binding.layoutTopBar.addOnLayoutChangeListener(refit)
+        binding.layoutBottomBar.addOnLayoutChangeListener(refit)
     }
 
     /** 격자 버튼과 격자의 켜짐 상태를 맞춥니다. 꺼진 버튼은 반투명입니다. */
@@ -248,6 +245,45 @@ class GuideActivity : AppCompatActivity() {
         binding.guideOverlay.isVisible = on
         binding.btnGuideGrid.alpha = if (on) 1f else 0.45f
     }
+
+    /**
+     * 처음 한 번만, 이 화면의 버튼이 무엇인지 짚어 줍니다.
+     *
+     * 홈의 버튼 안내와 같은 덮개입니다. 격자 버튼 → 포즈 예시 → 피사체 →
+     * 인원 → 포즈 목록 → 셔터. 한 번 보면 다시 뜨지 않고, MY 탭의
+     * "앱 사용법 다시 보기"를 끝까지 보면 다시 켜집니다.
+     *
+     * "?" 말풍선은 이 안내가 이미 "?"를 설명하므로, 안내가 끝난 뒤에는
+     * 띄우지 않습니다. 안내를 이미 본 사람에게만 예전처럼 한 번 보입니다.
+     */
+    private fun showCameraTourOnce() {
+        if (AppPrefs.isCameraTourSeen(this)) {
+            showPoseHintOnce()
+            return
+        }
+        AppPrefs.setCameraTourSeen(this, true)
+        AppPrefs.setPoseHintSeen(this)
+
+        binding.root.doOnPreDraw {
+            if (isFinishing || isDestroyed || cameraTour != null) return@doOnPreDraw
+            fun step(title: Int, body: Int, target: View) =
+                FeatureTourView.Step(getString(title), getString(body), { target })
+            val steps = listOf(
+                step(R.string.tour_cam_grid_title, R.string.tour_cam_grid_body, binding.btnGuideGrid),
+                step(R.string.tour_cam_example_title, R.string.tour_cam_example_body, binding.btnGuideExample),
+                step(R.string.tour_cam_subject_title, R.string.tour_cam_subject_body, binding.chipGroupSubject),
+                step(R.string.tour_cam_people_title, R.string.tour_cam_people_body, binding.layoutPeopleRow),
+                step(R.string.tour_cam_pose_title, R.string.tour_cam_pose_body, binding.rvPoses),
+                step(R.string.tour_cam_shutter_title, R.string.tour_cam_shutter_body, binding.btnCapture)
+            )
+            val view = FeatureTourView(this)
+            cameraTour = view
+            view.start(findViewById(android.R.id.content), steps) { cameraTour = null }
+        }
+    }
+
+    /** 첫 실행 버튼 안내. 떠 있는 동안만 값이 있습니다. */
+    private var cameraTour: FeatureTourView? = null
 
     /**
      * 처음 한 번만 "?" 를 가리키는 안내.
@@ -356,13 +392,14 @@ class GuideActivity : AppCompatActivity() {
     private fun setupPoses(spotName: String, spotType: String?) {
         phase = runCatching { LightPhase.valueOf(intent.getStringExtra(EXTRA_PHASE).orEmpty()) }
             .getOrDefault(LightPhase.AFTERNOON)
-        facing = SpotFactsTable.of(spotName, spotType).facing
+        facing = facts.facing
 
         poseAdapter = PoseAdapter { selected ->
             // 고른 포즈의 촬영 요령을 상단 안내 문구 자리에 띄웁니다.
             binding.tvGuideMessage.text = selected.pose.tip
             // 예시 버튼이 "지금 고른 그 포즈"를 보여 줘야 하므로 들고 있습니다.
             selectedPose = selected
+            applyGuideType()
         }
         binding.rvPoses.adapter = poseAdapter
 
@@ -422,6 +459,7 @@ class GuideActivity : AppCompatActivity() {
         } else {
             binding.tvGuideMessage.text = subject.tipFor(phase)
         }
+        applyGuideType()
     }
 
     private fun refreshPoses() {
@@ -464,7 +502,6 @@ class GuideActivity : AppCompatActivity() {
     private fun setOnClickListener() {
         binding.btnGuideBack.setOnClickListener { finish() }
         binding.btnGuideExample.setOnClickListener { showExample() }
-        binding.btnGuideComposition.setOnClickListener { pickGuideType() }
         binding.btnGuideGrid.setOnClickListener {
             AppPrefs.setGuideOverlayOn(this, !AppPrefs.isGuideOverlayOn(this))
             renderOverlayToggle()

@@ -164,7 +164,10 @@ class OnboardingActivity : BaseActivity() {
      */
     private fun finishOnboarding() {
         AppPrefs.setOnboarded(this)
-        if (isReview) AppPrefs.setFeatureTourSeen(this, false)
+        if (isReview) {
+            AppPrefs.setFeatureTourSeen(this, false)
+            AppPrefs.setCameraTourSeen(this, false)
+        }
 
         startActivity(
             Intent(this, MainActivity::class.java)

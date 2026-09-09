@@ -87,28 +87,6 @@
                 android:textStyle="bold"
                 tools:text="내장산 국립공원" />
 
-            <!--
-              지금 구도. 누르면 구도를 고릅니다. 이름이 곧 상태라, 고른 것이
-              무엇인지 다시 열어 보지 않아도 압니다.
-            -->
-            <TextView
-                android:id="@+id/btn_guide_composition"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/space_s"
-                android:background="@drawable/bg_pill_dark"
-                android:drawablePadding="4dp"
-                android:gravity="center_vertical"
-                android:maxLines="1"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="8dp"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                app:drawableEndCompat="@drawable/baseline_chevron_right_24"
-                app:drawableTint="@color/white"
-                tools:text="삼분할" />
-
             <!-- 구도 가이드 켜기/끄기. 카메라 앱의 격자 버튼과 같은 자리·같은 뜻입니다. -->
             <ImageView
                 android:id="@+id/btn_guide_grid"

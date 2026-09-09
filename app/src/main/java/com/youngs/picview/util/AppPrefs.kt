@@ -32,6 +32,7 @@ object AppPrefs {
     private const val KEY_POSE_HINT_SEEN = "pose_hint_seen"
     private const val KEY_FEATURE_TOUR_SEEN = "feature_tour_seen"
     private const val KEY_GUIDE_OVERLAY = "guide_overlay_on"
+    private const val KEY_CAMERA_TOUR_SEEN = "camera_tour_seen"
 
     private fun prefs(context: Context): SharedPreferences =
         context.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -95,6 +96,14 @@ object AppPrefs {
 
     fun setFeatureTourSeen(context: Context, seen: Boolean) {
         prefs(context).edit().putBoolean(KEY_FEATURE_TOUR_SEEN, seen).apply()
+    }
+
+    /** 촬영 화면의 버튼 안내를 이미 봤는지. 홈의 안내와 따로 셉니다 — 카메라는 나중에 처음 엽니다. */
+    fun isCameraTourSeen(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_CAMERA_TOUR_SEEN, false)
+
+    fun setCameraTourSeen(context: Context, seen: Boolean) {
+        prefs(context).edit().putBoolean(KEY_CAMERA_TOUR_SEEN, seen).apply()
     }
 
     /**

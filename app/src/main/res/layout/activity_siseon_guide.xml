@@ -586,16 +586,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_mission_start"
-                style="@style/Button.Primary"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="@dimen/space_l"
-                android:text="@string/siseon_mission_start"
-                app:backgroundTint="@color/maple_500"
-                app:icon="@drawable/baseline_camera_alt_24"
-                app:iconTint="@color/white" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

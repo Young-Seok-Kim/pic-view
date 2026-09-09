@@ -288,9 +288,6 @@ object SiseonGuide {
         if (guideId in signals) guideId else "reflection"
     )
 
-    /** 미션의 세 위치. 같은 장면을 세 번 움직여 비교합니다. */
-    val missionSlots: List<String> = listOf("현재 위치", "두 걸음 가까이", "좌우 이동")
-
     // ───────────────── 홈 → 가이드 연결 ─────────────────
 
     /**

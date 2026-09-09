@@ -57,6 +57,18 @@
     <string name="tour_senior_tab_course_body">저장해 둔 출사 코스를 다시 볼 수 있어요.</string>
     <string name="tour_senior_tab_help_title">도움</string>
     <string name="tour_senior_tab_help_body">급할 때 이 탭을 누르세요. 전화와 신고 버튼이 크게 있어요.</string>
+    <string name="tour_cam_grid_title">구도 가이드</string>
+    <string name="tour_cam_grid_body">아래에서 고른 피사체와 포즈에 맞춰 어디에 서고 무엇을 어디에 둘지 화면에 그려줘요. 이 버튼으로 카메라 격자처럼 끄고 켜요.</string>
+    <string name="tour_cam_example_title">포즈 예시</string>
+    <string name="tour_cam_example_body">지금 고른 포즈가 실제로 어떤 자세인지 그림으로 보여줘요.</string>
+    <string name="tour_cam_subject_title">무엇을 찍나요</string>
+    <string name="tour_cam_subject_body">인물·풍경·동물·음식 중 고르세요. 인물이면 포즈를 추천하고, 나머지는 담는 요령을 알려줘요.</string>
+    <string name="tour_cam_people_title">몇 명인가요</string>
+    <string name="tour_cam_people_body">인원에 따라 추천 포즈가 달라져요.</string>
+    <string name="tour_cam_pose_title">추천 포즈</string>
+    <string name="tour_cam_pose_body">지금 빛과 장소 방향에 맞춰 점수 순으로 골라 뒀어요. 누르면 위 안내와 구도 가이드가 따라 바뀌어요.</string>
+    <string name="tour_cam_shutter_title">촬영</string>
+    <string name="tour_cam_shutter_body">찍은 사진은 갤러리에 저장되고 이 장소에 다녀온 기록으로 남아요. 왼쪽 버튼은 갤러리예요.</string>
 
     <!-- 온보딩 : 장면 속 예시 값(실데이터 아님, 시안 그대로) -->
     <string name="onboarding_demo_weather_value">23°C</string>
@@ -332,40 +344,14 @@
     <string name="siseon_compare_caption_guide">가이드 · %1$s</string>
     <string name="siseon_compare_caption_mine">내 사진</string>
     <string name="siseon_points_title">바로 적용할 촬영 포인트</string>
-    <string name="siseon_mission_start">실전 촬영 미션 시작</string>
     <string name="cd_prev_comp">이전 구도</string>
     <string name="cd_next_comp">다음 구도</string>
 
     <!-- 시선 가이드 — 실전 미션 -->
-    <string name="mission_header">FIELD MISSION · %1$s</string>
-    <string name="mission_steps_title">현장에서 이렇게 해보세요</string>
-    <string name="mission_step_first">%1$s의 기준점을 먼저 찾기</string>
-    <string name="mission_step_last">같은 장면을 한 번 더 비교해보기</string>
-    <string name="mission_step_last_hint">현재 위치·두 걸음 가까이·좌우 이동으로 비교</string>
     <!-- 미션 한 줄의 접기/펼치기. 긴 부연은 기본 접음입니다. -->
-    <string name="mission_step_more">더 알아보기 ▾</string>
-    <string name="mission_step_less">접기 ▴</string>
     <string name="cd_mission_step_example">미션 참고 사진</string>
     <string name="cd_mission_listen">미션 음성으로 듣기</string>
     <!-- 버튼 글자. 아이콘만 두면 무엇을 읽어 주는지 알 수 없습니다. -->
-    <string name="mission_listen">미션 듣기</string>
-    <string name="mission_listen_stop">듣기 멈추기</string>
-    <string name="mission_capture_title">세 장을 비교해보세요</string>
-    <string name="mission_capture_sub">같은 장면을 세 위치에서 찍으면, 가장 좋은 거리와 방향을 직접 찾을 수 있어요.</string>
-    <string name="mission_added">%1$d/3 추가됨</string>
-    <string name="mission_checked">%1$d/3</string>
-    <string name="mission_add_photo">사진 추가</string>
-    <string name="mission_source_sub">%1$s 칸에 넣을 사진을 골라 주세요.</string>
-    <string name="mission_source_camera">카메라로 바로 찍기</string>
-    <string name="mission_source_camera_hint">지금 장면을 찍어 바로 넣어요</string>
-    <string name="mission_source_gallery">갤러리에서 고르기</string>
-    <string name="mission_source_gallery_hint">이미 찍어 둔 사진을 불러와요</string>
-    <string name="mission_camera_denied">카메라 권한을 허용해야 바로 찍을 수 있어요</string>
-    <string name="mission_camera_failed">사진을 저장할 준비를 하지 못했어요. 다시 시도해 주세요</string>
-    <string name="mission_feedback_title">사진 사이의 차이</string>
-    <string name="mission_feedback_auto">자동 분석</string>
-    <string name="mission_complete">3장 비교 미션 완료하기</string>
-    <string name="mission_incomplete">세 위치의 사진을 모두 추가해 주세요</string>
     <string name="home_see_all">전체보기 →</string>
     <string name="home_score_format">★ %1$d</string>
     <string name="home_best_phase_format">%1$s에 좋아요</string>
@@ -689,7 +675,6 @@
     <string name="guide_thirds">교차점에 피사체를 두면 안정적이에요</string>
     <string name="guide_symmetry">중앙선에 건물 중심을 맞춰보세요</string>
     <string name="guide_center">원 안을 피사체로 채워보세요</string>
-    <string name="guide_pick_composition">구도 고르기</string>
     <string name="cd_guide_grid">구도 가이드 켜기/끄기</string>
     <string name="cd_capture">촬영 버튼</string>
     <string name="cd_gallery">앨범에서 사진 고르기</string>

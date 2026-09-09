@@ -5,20 +5,30 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.DashPathEffect
 import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RadialGradient
+import android.graphics.RectF
+import android.graphics.Shader
 import android.util.AttributeSet
 import android.view.View
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 /**
  * 카메라 미리보기 위에 구도 가이드를 그립니다.
  *
  * 격자만 긋는 것이 아니라 **어디에 서고 무엇을 어디에 둘지**를 그립니다 —
- * 사람 표시, 수면선, 소실점, 비워 둘 자리. 포즈 예시("?")가 그림으로
+ * 사람 자리, 수면선, 소실점, 비워 둘 자리. 포즈 예시("?")가 그림으로
  * 보여 주던 것을 화면 위에 직접 얹은 셈입니다. 카메라 격자처럼 상단
- * 버튼으로 켜고 끕니다.
+ * 버튼으로 켜고 끕니다. 구도 자체는 아래에서 고른 피사체·포즈가 정합니다.
  *
- * 밝은 하늘 위에서 흰 선이 사라지지 않도록, 모든 선은
- * 어두운 선을 먼저 깔고 그 위에 흰 선을 겹쳐 그립니다.
- * 크기는 전부 dp 또는 화면 비율 기준이라 해상도가 달라도 같은 비율로 보입니다.
+ * 그리는 법의 원칙 셋.
+ *  - 선은 가늘고 흰색, 자리는 따뜻한 색. 흰 것은 "기준", 따뜻한 것은 "여기".
+ *  - 글은 전부 어두운 알약 안에. 사진 위에 맨 글자를 얹으면 밝은 하늘에서
+ *    사라지고 어두운 숲에서는 떠 보입니다.
+ *  - 비울 자리는 옅게 채웁니다. 점선 상자만으로는 "여기를 비워라"가 아니라
+ *    "여기에 넣어라"로 읽힙니다.
  */
 class GuideOverlayView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -27,9 +37,8 @@ class GuideOverlayView @JvmOverloads constructor(
     /**
      * 구도 종류.
      *
-     * @param id 시선 가이드 화면의 구도 식별자와 같습니다. 그 화면에서
-     *   넘어오면 같은 구도로 시작합니다.
-     * @param label 카메라 상단 알약과 고르기 목록에 보이는 이름.
+     * @param id 시선 가이드 화면의 구도 식별자와 같습니다.
+     * @param label 화면 왼쪽 위에 보이는 이름.
      */
     enum class GuideType(val id: String, val label: String) {
         /** 삼분할. 풍경·자연에 쓰며 교차점을 표시합니다. */
@@ -64,7 +73,7 @@ class GuideOverlayView @JvmOverloads constructor(
 
     /**
      * 위아래로 가려지는 만큼. 상단 바와 하단 컨트롤이 미리보기를 덮고
-     * 있어서, 그 아래에 그린 안내 글은 보이지 않습니다. 그림은 이 안쪽에
+     * 있어서, 그 아래에 그린 안내는 보이지 않습니다. 그림은 이 안쪽에
      * 맞춥니다 — 사람이 실제로 보며 구도를 잡는 영역이 거기입니다.
      */
     fun setInsets(top: Int, bottom: Int) {
@@ -77,50 +86,61 @@ class GuideOverlayView @JvmOverloads constructor(
     private var insetBottom = 0
 
     private val density = resources.displayMetrics.density
-
     private fun dp(value: Float) = value * density
 
+    // ───────────────────────── 색과 붓 ─────────────────────────
+
     /** 밝은 배경에서도 선이 보이도록 아래에 깔아 주는 어두운 선. */
-    private val shadowPaint = Paint().apply {
-        isAntiAlias = true
+    private val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
-        color = Color.argb(70, 0, 0, 0)
-    }
-
-    private val linePaint = Paint().apply {
-        isAntiAlias = true
-        style = Paint.Style.STROKE
-        color = Color.argb(200, 255, 255, 255)
-    }
-
-    /** 선택된 자리·강조를 나타내는 따뜻한 색. 흰 선과 구분됩니다. */
-    private val accentPaint = Paint().apply {
-        isAntiAlias = true
-        style = Paint.Style.STROKE
-        color = Color.argb(230, 255, 196, 92)
-    }
-
-    private val dotPaint = Paint().apply {
-        isAntiAlias = true
-        style = Paint.Style.FILL
-        color = Color.argb(235, 255, 255, 255)
-    }
-
-    private val dotShadowPaint = Paint().apply {
-        isAntiAlias = true
-        style = Paint.Style.FILL
+        strokeCap = Paint.Cap.ROUND
         color = Color.argb(60, 0, 0, 0)
     }
 
-    private val textPaint = Paint().apply {
-        isAntiAlias = true
-        color = Color.WHITE
-        textSize = dp(11f)
-        isFakeBoldText = true
-        setShadowLayer(dp(2.5f), 0f, dp(1f), Color.argb(170, 0, 0, 0))
+    private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
+        color = Color.argb(185, 255, 255, 255)
     }
 
-    private val dash = DashPathEffect(floatArrayOf(dp(6f), dp(5f)), 0f)
+    private val warmLinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
+        strokeJoin = Paint.Join.ROUND
+        color = Color.argb(235, 255, 205, 112)
+    }
+
+    private val warmFillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+        color = Color.argb(205, 255, 205, 112)
+    }
+
+    private val whiteFillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+        color = Color.argb(240, 255, 255, 255)
+    }
+
+    private val glowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
+
+    private val zonePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+        color = Color.argb(28, 255, 255, 255)
+    }
+
+    private val pillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+        color = Color.argb(150, 20, 14, 10)
+    }
+
+    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.WHITE
+        textSize = dp(11.5f)
+        isFakeBoldText = true
+    }
+
+    private val dash = DashPathEffect(floatArrayOf(dp(7f), dp(6f)), 0f)
+    private val path = Path()
+    private val rectF = RectF()
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -144,17 +164,22 @@ class GuideOverlayView @JvmOverloads constructor(
             GuideType.LAYER -> drawLayer(canvas, w, h)
             GuideType.PATTERN -> drawPattern(canvas, w, h)
         }
+
+        // 왼쪽 위에 구도 이름. 어떤 구도가 그려진 건지 격자만 보고는 모릅니다.
+        pill(canvas, "구도 · ${guideType.label}", dp(12f), dp(10f), Align.LEFT, warmDot = true)
         canvas.restore()
     }
 
     // ───────────────────────── 그리기 부품 ─────────────────────────
 
+    private enum class Align { LEFT, CENTER, RIGHT }
+
     /** 선 하나를 어두운 선 + 흰 선 두 번 그립니다. */
     private fun line(
-        canvas: Canvas, x1: Float, y1: Float, x2: Float, y2: Float, width: Float,
-        dashed: Boolean = false, accent: Boolean = false
+        canvas: Canvas, x1: Float, y1: Float, x2: Float, y2: Float,
+        width: Float = dp(1f), dashed: Boolean = false, warmColor: Boolean = false
     ) {
-        val top = if (accent) accentPaint else linePaint
+        val top = if (warmColor) warmLinePaint else linePaint
         shadowPaint.pathEffect = if (dashed) dash else null
         top.pathEffect = if (dashed) dash else null
         shadowPaint.strokeWidth = width + dp(1.5f)
@@ -165,68 +190,124 @@ class GuideOverlayView @JvmOverloads constructor(
         top.pathEffect = null
     }
 
-    private fun rect(
-        canvas: Canvas, l: Float, t: Float, r: Float, b: Float, width: Float,
-        dashed: Boolean = false, accent: Boolean = false
+    /** 둥근 모서리 사각형. 비울 자리·틀·배경 상자에 씁니다. */
+    private fun box(
+        canvas: Canvas, l: Float, t: Float, r: Float, b: Float,
+        width: Float = dp(1.2f), dashed: Boolean = false, warmColor: Boolean = false, fill: Boolean = false
     ) {
-        line(canvas, l, t, r, t, width, dashed, accent)
-        line(canvas, r, t, r, b, width, dashed, accent)
-        line(canvas, r, b, l, b, width, dashed, accent)
-        line(canvas, l, b, l, t, width, dashed, accent)
+        rectF.set(l, t, r, b)
+        val radius = dp(10f)
+        if (fill) canvas.drawRoundRect(rectF, radius, radius, zonePaint)
+        val top = if (warmColor) warmLinePaint else linePaint
+        shadowPaint.pathEffect = if (dashed) dash else null
+        top.pathEffect = if (dashed) dash else null
+        shadowPaint.strokeWidth = width + dp(1.5f)
+        canvas.drawRoundRect(rectF, radius, radius, shadowPaint)
+        top.strokeWidth = width
+        canvas.drawRoundRect(rectF, radius, radius, top)
+        shadowPaint.pathEffect = null
+        top.pathEffect = null
     }
 
-    private fun circle(canvas: Canvas, cx: Float, cy: Float, r: Float, width: Float, accent: Boolean = false) {
-        val top = if (accent) accentPaint else linePaint
+    private fun circle(canvas: Canvas, cx: Float, cy: Float, r: Float, width: Float, warmColor: Boolean = false) {
+        val top = if (warmColor) warmLinePaint else linePaint
         shadowPaint.strokeWidth = width + dp(1.5f)
         canvas.drawCircle(cx, cy, r, shadowPaint)
         top.strokeWidth = width
         canvas.drawCircle(cx, cy, r, top)
     }
 
-    private fun dot(canvas: Canvas, cx: Float, cy: Float) {
+    /** 부드러운 빛무리. 자리 표시 뒤에 깔아 "여기"가 은은히 떠오르게 합니다. */
+    private fun glow(canvas: Canvas, cx: Float, cy: Float, r: Float, alpha: Int = 90) {
+        glowPaint.shader = RadialGradient(
+            cx, cy, r,
+            intArrayOf(Color.argb(alpha, 255, 205, 112), Color.argb(0, 255, 205, 112)),
+            null, Shader.TileMode.CLAMP
+        )
+        canvas.drawCircle(cx, cy, r, glowPaint)
+        glowPaint.shader = null
+    }
+
+    /** 삼분할 교차점 같은 기준점. 흰 점에 옅은 테. */
+    private fun dot(canvas: Canvas, cx: Float, cy: Float, warmColor: Boolean = false) {
         val r = dp(3.5f)
-        canvas.drawCircle(cx, cy, r + dp(1f), dotShadowPaint)
-        canvas.drawCircle(cx, cy, r, dotPaint)
-    }
-
-    /** 짧은 안내 글. 가운데 정렬로 (cx, cy) 아래에 둡니다. */
-    private fun label(canvas: Canvas, text: String, cx: Float, cy: Float) {
-        textPaint.textAlign = Paint.Align.CENTER
-        canvas.drawText(text, cx, cy + textPaint.textSize, textPaint)
-    }
-
-    private fun labelLeft(canvas: Canvas, text: String, x: Float, cy: Float) {
-        textPaint.textAlign = Paint.Align.LEFT
-        canvas.drawText(text, x, cy + textPaint.textSize * 0.4f, textPaint)
+        shadowPaint.strokeWidth = dp(2f)
+        canvas.drawCircle(cx, cy, r, shadowPaint)
+        canvas.drawCircle(cx, cy, r, if (warmColor) warmFillPaint else whiteFillPaint)
     }
 
     /**
-     * 사람이 설 자리. 발끝이 (x, footY) 에 오는 작은 막대 인물입니다.
-     * 따뜻한 색이라 흰 격자 사이에서 "여기"가 바로 보입니다.
+     * 글은 어두운 알약 안에. (x, y) 는 알약의 위쪽 모서리 기준이고,
+     * [align] 에 따라 x 가 왼쪽·가운데·오른쪽이 됩니다.
      */
-    private fun person(canvas: Canvas, x: Float, footY: Float, tall: Float = dp(40f)) {
-        val head = tall * 0.14f
-        val top = footY - tall
-        val neck = top + head * 2
-        val hip = footY - tall * 0.42f
-        val stroke = dp(2.2f)
-
-        circle(canvas, x, top + head, head, stroke, accent = true)
-        line(canvas, x, neck, x, hip, stroke, accent = true)
-        line(canvas, x - tall * 0.18f, neck + tall * 0.2f, x + tall * 0.18f, neck + tall * 0.2f, stroke, accent = true)
-        line(canvas, x, hip, x - tall * 0.14f, footY, stroke, accent = true)
-        line(canvas, x, hip, x + tall * 0.14f, footY, stroke, accent = true)
+    private fun pill(
+        canvas: Canvas, text: String, x: Float, y: Float,
+        align: Align = Align.CENTER, warmDot: Boolean = false
+    ) {
+        val padX = dp(9f)
+        val padY = dp(5f)
+        val dotSpace = if (warmDot) dp(11f) else 0f
+        val textW = textPaint.measureText(text)
+        val w = textW + padX * 2 + dotSpace
+        val h = textPaint.textSize + padY * 2
+        val left = when (align) {
+            Align.LEFT -> x
+            Align.CENTER -> x - w / 2f
+            Align.RIGHT -> x - w
+        }
+        rectF.set(left, y, left + w, y + h)
+        canvas.drawRoundRect(rectF, h / 2f, h / 2f, pillPaint)
+        if (warmDot) {
+            canvas.drawCircle(left + padX + dp(2.5f), y + h / 2f, dp(3f), warmFillPaint)
+        }
+        textPaint.textAlign = Paint.Align.LEFT
+        val baseline = y + padY + textPaint.textSize - textPaint.descent() * 0.6f
+        canvas.drawText(text, left + padX + dotSpace, baseline, textPaint)
     }
 
+    /**
+     * 사람이 설 자리. 발끝이 (x, footY) 에 오는 부드러운 실루엣 —
+     * 머리와 어깨선이 둥근 한 덩어리입니다. 뒤에 빛무리를 깔아 사진 위에서
+     * 떠 보이게 합니다.
+     */
+    private fun person(canvas: Canvas, x: Float, footY: Float, tall: Float = dp(46f)) {
+        val headR = tall * 0.13f
+        val headCy = footY - tall + headR
+        val shoulderY = headCy + headR * 1.7f
+        val halfShoulder = tall * 0.2f
+        val halfHip = tall * 0.13f
+
+        glow(canvas, x, footY - tall * 0.45f, tall * 0.75f)
+
+        path.reset()
+        path.moveTo(x - halfShoulder, shoulderY + tall * 0.08f)
+        path.quadTo(x - halfShoulder, shoulderY - tall * 0.04f, x - halfShoulder * 0.45f, shoulderY - tall * 0.05f)
+        path.lineTo(x + halfShoulder * 0.45f, shoulderY - tall * 0.05f)
+        path.quadTo(x + halfShoulder, shoulderY - tall * 0.04f, x + halfShoulder, shoulderY + tall * 0.08f)
+        path.lineTo(x + halfHip, footY)
+        path.lineTo(x - halfHip, footY)
+        path.close()
+
+        shadowPaint.strokeWidth = dp(2.5f)
+        canvas.drawPath(path, shadowPaint)
+        canvas.drawCircle(x, headCy, headR + dp(1.2f), shadowPaint)
+        canvas.drawPath(path, warmFillPaint)
+        canvas.drawCircle(x, headCy, headR, warmFillPaint)
+    }
+
+    /** 흐름의 방향. 둥근 선과 채운 화살촉. */
     private fun arrow(canvas: Canvas, x1: Float, y1: Float, x2: Float, y2: Float) {
-        val stroke = dp(1.8f)
-        line(canvas, x1, y1, x2, y2, stroke, accent = true)
-        val head = dp(9f)
-        val angle = Math.atan2((y2 - y1).toDouble(), (x2 - x1).toDouble())
-        val a1 = angle + Math.PI * 0.8
-        val a2 = angle - Math.PI * 0.8
-        line(canvas, x2, y2, x2 + (head * Math.cos(a1)).toFloat(), y2 + (head * Math.sin(a1)).toFloat(), stroke, accent = true)
-        line(canvas, x2, y2, x2 + (head * Math.cos(a2)).toFloat(), y2 + (head * Math.sin(a2)).toFloat(), stroke, accent = true)
+        line(canvas, x1, y1, x2, y2, dp(2f), warmColor = true)
+        val angle = atan2((y2 - y1).toDouble(), (x2 - x1).toDouble())
+        val head = dp(11f)
+        val a1 = angle + Math.PI * 0.82
+        val a2 = angle - Math.PI * 0.82
+        path.reset()
+        path.moveTo(x2, y2)
+        path.lineTo(x2 + (head * cos(a1)).toFloat(), y2 + (head * sin(a1)).toFloat())
+        path.lineTo(x2 + (head * cos(a2)).toFloat(), y2 + (head * sin(a2)).toFloat())
+        path.close()
+        canvas.drawPath(path, warmFillPaint)
     }
 
     /** 삼분할 선을 옅게. 다른 구도의 바탕으로 깝니다. */
@@ -240,47 +321,38 @@ class GuideOverlayView @JvmOverloads constructor(
 
     // ───────────────────────── 구도별 ─────────────────────────
 
-    /** 삼분할 격자 + 네 교차점. 피사체를 교차점에 두면 안정적인 구도가 됩니다. */
+    /** 삼분할 격자 + 네 교차점. 피사체는 오른쪽 아래 교차점에. */
     private fun drawThirds(canvas: Canvas, w: Float, h: Float) {
-        val stroke = dp(1f)
         val x1 = w / 3f
         val x2 = w * 2f / 3f
         val y1 = h / 3f
         val y2 = h * 2f / 3f
 
-        line(canvas, x1, 0f, x1, h, stroke)
-        line(canvas, x2, 0f, x2, h, stroke)
-        line(canvas, 0f, y1, w, y1, stroke)
-        line(canvas, 0f, y2, w, y2, stroke)
+        line(canvas, x1, 0f, x1, h)
+        line(canvas, x2, 0f, x2, h)
+        line(canvas, 0f, y1, w, y1)
+        line(canvas, 0f, y2, w, y2)
 
-        // 교차점 강조 — 안내 문구가 가리키는 지점
         dot(canvas, x1, y1)
         dot(canvas, x2, y1)
         dot(canvas, x1, y2)
-        dot(canvas, x2, y2)
 
-        person(canvas, x2, y2 + dp(6f))
-        label(canvas, "교차점에 피사체", x2, y2 + dp(8f))
+        person(canvas, x2, y2 + dp(4f))
+        dot(canvas, x2, y2, warmColor = true)
+        pill(canvas, "교차점에 피사체", x2, y2 + dp(12f))
     }
 
     /** 중앙 수직선 + 좌우 여백 기준선. 건물의 대칭을 맞추는 데 씁니다. */
     private fun drawSymmetry(canvas: Canvas, w: Float, h: Float) {
         val cx = w / 2f
-        val stroke = dp(1f)
-
-        // 중앙 축
-        line(canvas, cx, 0f, cx, h, dp(1.4f), accent = true)
-
-        // 좌우 대칭 확인용 보조선
         val offset = w * 0.25f
-        line(canvas, cx - offset, 0f, cx - offset, h, stroke)
-        line(canvas, cx + offset, 0f, cx + offset, h, stroke)
-
-        // 수평 기준선 (건물이 기울지 않았는지)
-        line(canvas, 0f, h / 2f, w, h / 2f, stroke)
-
-        dot(canvas, cx, h / 2f)
-        label(canvas, "중심축을 건물 가운데에", cx, h * 0.5f + dp(6f))
+        line(canvas, cx - offset, 0f, cx - offset, h, dashed = true)
+        line(canvas, cx + offset, 0f, cx + offset, h, dashed = true)
+        line(canvas, 0f, h / 2f, w, h / 2f)
+        glow(canvas, cx, h / 2f, dp(28f), 70)
+        line(canvas, cx, 0f, cx, h, dp(1.6f), warmColor = true)
+        dot(canvas, cx, h / 2f, warmColor = true)
+        pill(canvas, "중심축을 건물 가운데에", cx, h * 0.5f + dp(12f))
     }
 
     /** 중앙 원. 원 안에 피사체를 채우면 시선이 가운데로 모입니다. */
@@ -288,55 +360,48 @@ class GuideOverlayView @JvmOverloads constructor(
         val cx = w / 2f
         val cy = h / 2f
         val r = minOf(w, h) * 0.32f
-
+        glow(canvas, cx, cy, r * 1.1f, 45)
         circle(canvas, cx, cy, r, dp(1.4f))
-
-        // 가운데를 잡아 주는 짧은 십자선
-        val tick = dp(14f)
-        line(canvas, cx - tick, cy, cx + tick, cy, dp(1f))
-        line(canvas, cx, cy - tick, cx, cy + tick, dp(1f))
-        label(canvas, "원 안을 피사체로 채우기", cx, cy + r + dp(4f))
+        val tick = dp(10f)
+        line(canvas, cx - tick, cy, cx + tick, cy)
+        line(canvas, cx, cy - tick, cx, cy + tick)
+        pill(canvas, "원 안을 피사체로 채우기", cx, cy + r + dp(8f))
     }
 
     /** 낮은 지평선, 위쪽의 해, 그 앞에 서는 사람. 해를 등지고 형태만 남깁니다. */
     private fun drawSilhouette(canvas: Canvas, w: Float, h: Float) {
         val horizon = h * 0.68f
         line(canvas, 0f, horizon, w, horizon, dp(1.2f))
-        labelLeft(canvas, "지평선은 아래 1/3", dp(12f), horizon - dp(12f))
+        pill(canvas, "지평선은 아래 1/3", dp(12f), horizon - dp(30f), Align.LEFT)
 
         val sunX = w * 0.6f
         val sunY = h * 0.4f
         val r = w * 0.07f
-        circle(canvas, sunX, sunY, r, dp(1.4f), accent = true)
-        for (i in 0 until 8) {
-            val a = Math.PI * 2 * i / 8
-            val x1 = sunX + (Math.cos(a) * (r + dp(4f))).toFloat()
-            val y1 = sunY + (Math.sin(a) * (r + dp(4f))).toFloat()
-            val x2 = sunX + (Math.cos(a) * (r + dp(11f))).toFloat()
-            val y2 = sunY + (Math.sin(a) * (r + dp(11f))).toFloat()
-            line(canvas, x1, y1, x2, y2, dp(1.2f), accent = true)
-        }
-        label(canvas, "해는 사람 뒤에", sunX, sunY + r + dp(4f))
+        glow(canvas, sunX, sunY, r * 2.6f, 120)
+        circle(canvas, sunX, sunY, r, dp(1.6f), warmColor = true)
+        pill(canvas, "해는 사람 뒤에", sunX, sunY + r + dp(8f))
 
-        person(canvas, w * 0.4f, horizon, dp(52f))
-        label(canvas, "사람은 해 앞, 지평선 위에", w * 0.4f, horizon + dp(4f))
+        val px = w * 0.38f
+        person(canvas, px, horizon, dp(58f))
+        pill(canvas, "사람은 해 앞, 지평선 위", px, horizon + dp(8f))
     }
 
     /** 수면선을 화면 절반 아래 두고, 위의 피사체가 아래에 뒤집혀 비칩니다. */
     private fun drawReflection(canvas: Canvas, w: Float, h: Float) {
         val water = h * 0.56f
-        line(canvas, 0f, water, w, water, dp(1.4f), accent = true)
-        labelLeft(canvas, "수면선은 절반보다 조금 아래", dp(12f), water - dp(12f))
-
         val l = w * 0.3f
         val r = w * 0.7f
         val top = h * 0.3f
-        rect(canvas, l, top, r, water, dp(1.2f))
-        label(canvas, "피사체", (l + r) / 2f, top + dp(4f))
-
         val mirrored = water + (water - top)
-        rect(canvas, l, water, r, mirrored, dp(1.2f), dashed = true)
-        label(canvas, "비친 상이 여기까지", (l + r) / 2f, mirrored + dp(2f))
+
+        box(canvas, l, top, r, water, dp(1.2f))
+        box(canvas, l, water, r, mirrored, dp(1.2f), dashed = true, fill = true)
+        glow(canvas, w / 2f, water, w * 0.36f, 50)
+        line(canvas, 0f, water, w, water, dp(1.6f), warmColor = true)
+
+        pill(canvas, "피사체", (l + r) / 2f, top + dp(8f))
+        pill(canvas, "수면선은 절반보다 조금 아래", dp(12f), water - dp(30f), Align.LEFT)
+        pill(canvas, "비친 상은 여기까지", (l + r) / 2f, mirrored - dp(30f))
     }
 
     /** 아래 양쪽에서 시작한 선이 한 점으로 모입니다. 그 끝에 사람이나 빛을 둡니다. */
@@ -346,14 +411,14 @@ class GuideOverlayView @JvmOverloads constructor(
         val vy = h * 0.36f
         line(canvas, w * 0.1f, h, vx, vy, dp(1.4f))
         line(canvas, w * 0.9f, h, vx, vy, dp(1.4f))
-        line(canvas, w * 0.3f, h, vx, vy, dp(1f), dashed = true)
-        line(canvas, w * 0.7f, h, vx, vy, dp(1f), dashed = true)
+        line(canvas, w * 0.3f, h, vx, vy, dashed = true)
+        line(canvas, w * 0.7f, h, vx, vy, dashed = true)
 
-        dot(canvas, vx, vy)
-        label(canvas, "소실점", vx, vy - dp(26f))
-        person(canvas, vx, vy + dp(30f), dp(34f))
-        label(canvas, "선이 모이는 자리에 사람", vx, vy + dp(32f))
-        labelLeft(canvas, "선의 시작은 화면 아래에서", dp(12f), h - dp(28f))
+        glow(canvas, vx, vy, dp(40f), 110)
+        dot(canvas, vx, vy, warmColor = true)
+        pill(canvas, "소실점 — 선이 모이는 자리에 사람", vx, vy - dp(34f))
+        person(canvas, vx, vy + dp(34f), dp(36f))
+        pill(canvas, "선의 시작은 화면 아래에서", dp(12f), h - dp(34f), Align.LEFT)
     }
 
     /** 문·창·아치가 화면 가장자리까지 오도록 안쪽 사각형을 둡니다. */
@@ -362,22 +427,21 @@ class GuideOverlayView @JvmOverloads constructor(
         val t = h * 0.14f
         val r = w * 0.86f
         val b = h * 0.86f
-        rect(canvas, l, t, r, b, dp(1.4f))
-        // 모서리 표시 — 테두리가 여기까지 차야 합니다
-        val c = dp(16f)
-        line(canvas, l, t, l + c, t, dp(2.4f), accent = true)
-        line(canvas, l, t, l, t + c, dp(2.4f), accent = true)
-        line(canvas, r, t, r - c, t, dp(2.4f), accent = true)
-        line(canvas, r, t, r, t + c, dp(2.4f), accent = true)
-        line(canvas, l, b, l + c, b, dp(2.4f), accent = true)
-        line(canvas, l, b, l, b - c, dp(2.4f), accent = true)
-        line(canvas, r, b, r - c, b, dp(2.4f), accent = true)
-        line(canvas, r, b, r, b - c, dp(2.4f), accent = true)
-
-        label(canvas, "문·창틀을 이 선까지 채우기", w / 2f, t + dp(4f))
-        person(canvas, w / 2f, h * 0.66f, dp(44f))
-        label(canvas, "안쪽 가운데에 피사체", w / 2f, h * 0.66f + dp(4f))
+        box(canvas, l, t, r, b, dp(1.2f))
+        // 모서리 — 테두리가 여기까지 차야 합니다
+        val c = dp(18f)
+        for ((cx, cy, sx, sy) in listOf(
+            Corner(l, t, 1f, 1f), Corner(r, t, -1f, 1f), Corner(l, b, 1f, -1f), Corner(r, b, -1f, -1f)
+        )) {
+            line(canvas, cx, cy, cx + c * sx, cy, dp(2.6f), warmColor = true)
+            line(canvas, cx, cy, cx, cy + c * sy, dp(2.6f), warmColor = true)
+        }
+        pill(canvas, "문·창틀을 이 선까지 채우기", w / 2f, t + dp(8f))
+        person(canvas, w / 2f, h * 0.66f, dp(48f))
+        pill(canvas, "안쪽 가운데에 피사체", w / 2f, h * 0.66f + dp(8f))
     }
+
+    private data class Corner(val x: Float, val y: Float, val sx: Float, val sy: Float)
 
     /** 바닥 패턴 점과 그 위의 사람. 그림자 방향을 사선으로 표시합니다. */
     private fun drawTop(canvas: Canvas, w: Float, h: Float) {
@@ -386,13 +450,15 @@ class GuideOverlayView @JvmOverloads constructor(
         for (i in 1 until cols) for (j in 1 until rows) {
             dot(canvas, w * i / cols, h * j / rows)
         }
-        line(canvas, w * 0.15f, h * 0.85f, w * 0.85f, h * 0.15f, dp(1f), dashed = true)
-        labelLeft(canvas, "그림자 방향", w * 0.6f, h * 0.3f)
+        line(canvas, w * 0.15f, h * 0.85f, w * 0.85f, h * 0.15f, dashed = true)
+        pill(canvas, "그림자 방향", w * 0.72f, h * 0.24f)
 
         val px = w * 0.5f
         val py = h * 0.6f
-        circle(canvas, px, py, dp(12f), dp(2f), accent = true)
-        label(canvas, "위에서 본 사람 — 패턴 한가운데", px, py + dp(12f))
+        glow(canvas, px, py, dp(34f), 110)
+        canvas.drawCircle(px, py, dp(9f), warmFillPaint)
+        circle(canvas, px, py, dp(15f), dp(1.6f), warmColor = true)
+        pill(canvas, "위에서 본 사람 — 패턴 한가운데", px, py + dp(22f))
     }
 
     /** 사람은 한쪽 1/3 교차점에, 시선이 향하는 쪽은 비웁니다. */
@@ -400,51 +466,53 @@ class GuideOverlayView @JvmOverloads constructor(
         faintThirds(canvas, w, h)
         val px = w / 3f
         val py = h * 2f / 3f
-        person(canvas, px, py + dp(6f), dp(40f))
-        label(canvas, "여기에 서기", px, py + dp(8f))
 
-        rect(canvas, w * 0.42f, h * 0.12f, w * 0.92f, h * 0.6f, dp(1.2f), dashed = true, accent = true)
-        label(canvas, "이쪽은 비워 두기", w * 0.67f, h * 0.34f)
-        arrow(canvas, px + dp(26f), py - dp(22f), w * 0.5f, h * 0.5f)
+        box(canvas, w * 0.42f, h * 0.12f, w * 0.92f, h * 0.6f, dashed = true, warmColor = true, fill = true)
+        pill(canvas, "이쪽은 비워 두기", w * 0.67f, h * 0.34f)
+
+        person(canvas, px, py + dp(4f))
+        pill(canvas, "여기에 서기", px, py + dp(12f))
+        arrow(canvas, px + dp(28f), py - dp(26f), w * 0.5f, h * 0.5f)
     }
 
     /** 고정된 배경을 한쪽에 남기고, 흐름의 방향을 화살표로 보입니다. */
     private fun drawMotion(canvas: Canvas, w: Float, h: Float) {
-        rect(canvas, w * 0.06f, h * 0.2f, w * 0.36f, h * 0.78f, dp(1.2f), dashed = true)
-        label(canvas, "고정된 배경", w * 0.21f, h * 0.2f + dp(4f))
+        box(canvas, w * 0.06f, h * 0.2f, w * 0.36f, h * 0.78f, dashed = true, fill = true)
+        pill(canvas, "고정된 배경", w * 0.21f, h * 0.2f + dp(8f))
 
-        arrow(canvas, w * 0.42f, h * 0.55f, w * 0.9f, h * 0.55f)
-        label(canvas, "사람·물결이 흐르는 방향", w * 0.66f, h * 0.55f + dp(8f))
         line(canvas, 0f, h * 0.55f, w, h * 0.55f, dp(0.8f), dashed = true)
+        arrow(canvas, w * 0.42f, h * 0.55f, w * 0.9f, h * 0.55f)
+        pill(canvas, "사람·물결이 흐르는 방향", w * 0.66f, h * 0.55f + dp(12f))
     }
 
     /** 앞·중간·뒤 세 겹. 앞은 걸치고, 중간에 사람, 뒤는 장소가 보이게. */
     private fun drawLayer(canvas: Canvas, w: Float, h: Float) {
         val y1 = h * 0.36f
         val y2 = h * 0.72f
-        line(canvas, 0f, y1, w, y1, dp(1.2f), dashed = true)
-        line(canvas, 0f, y2, w, y2, dp(1.2f), dashed = true)
-        labelLeft(canvas, "뒤 — 장소가 보이게", dp(12f), h * 0.18f)
-        labelLeft(canvas, "중간 — 사람·빛", dp(12f), (y1 + y2) / 2f - dp(20f))
-        labelLeft(canvas, "앞 — 잎·난간을 한쪽에 걸치기", dp(12f), h * 0.86f)
+        line(canvas, 0f, y1, w, y1, dashed = true)
+        line(canvas, 0f, y2, w, y2, dashed = true)
+        pill(canvas, "뒤 — 장소가 보이게", dp(12f), h * 0.16f, Align.LEFT)
+        pill(canvas, "중간 — 사람·빛", dp(12f), (y1 + y2) / 2f - dp(32f), Align.LEFT)
 
-        person(canvas, w * 0.55f, y2 - dp(8f), dp(40f))
+        person(canvas, w * 0.55f, y2 - dp(6f), dp(44f))
         // 앞쪽에 걸치는 잎·난간 자리
-        rect(canvas, w * 0.66f, y2, w, h, dp(1.2f), accent = true)
+        box(canvas, w * 0.62f, y2 + dp(6f), w + dp(20f), h + dp(20f), dp(1.4f), warmColor = true, fill = true)
+        pill(canvas, "앞 — 잎·난간을 한쪽에 걸치기", dp(12f), h - dp(34f), Align.LEFT)
     }
 
     /** 같은 형태가 이어지다 한 번 깨지는 자리. 그 자리에 사람이나 색 하나. */
     private fun drawPattern(canvas: Canvas, w: Float, h: Float) {
         val cols = 5
         for (i in 1 until cols) {
-            line(canvas, w * i / cols, h * 0.15f, w * i / cols, h * 0.85f, dp(1f), dashed = true)
+            line(canvas, w * i / cols, h * 0.15f, w * i / cols, h * 0.85f, dashed = true)
         }
-        labelLeft(canvas, "같은 것이 세 번 이상 이어지게", dp(12f), h * 0.1f)
+        pill(canvas, "같은 것이 세 번 이상 이어지게", dp(12f), h * 0.08f, Align.LEFT)
 
         val bx = w * 3f / cols
         val by = h * 0.5f
-        circle(canvas, bx, by, dp(16f), dp(2f), accent = true)
-        person(canvas, bx, by + dp(16f), dp(30f))
-        label(canvas, "하나만 다르게 — 사람이나 색", bx, by + dp(18f))
+        glow(canvas, bx, by, dp(44f), 110)
+        circle(canvas, bx, by, dp(20f), dp(1.6f), warmColor = true)
+        person(canvas, bx, by + dp(18f), dp(34f))
+        pill(canvas, "하나만 다르게 — 사람이나 색", bx, by + dp(28f))
     }
 }
