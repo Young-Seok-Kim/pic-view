@@ -396,16 +396,21 @@ class GuideOverlayView @JvmOverloads constructor(
         line(canvas, 0f, horizon, w, horizon, dp(1.2f))
         pill(canvas, "지평선은 아래 1/3", dp(12f), horizon - dp(30f), Align.LEFT)
 
-        val sunX = w * 0.6f
-        val sunY = h * 0.4f
+        // 해는 사람 뒤쪽, 조금 옆. 몸으로 해를 완전히 가리면 윤곽이 뭉개지고
+        // 플레어가 생겨서, 비껴 두고 밝은 하늘을 등지게 하는 편이 실루엣이
+        // 잘 삽니다. 둘이 따로 노는 것으로 보이지 않게 점선으로 잇습니다.
+        val sunX = w * 0.56f
+        val sunY = h * 0.38f
         val r = w * 0.09f
+        val px = w * 0.4f
+        val tall = dp(64f)
+        line(canvas, sunX - r * 0.7f, sunY + r * 0.7f, px + dp(8f), horizon - tall * 0.8f, dp(1.2f), dashed = true, warmColor = true)
         glow(canvas, sunX, sunY, r * 2.4f, 120)
         icon(canvas, R.drawable.guide_icon_sun, sunX, sunY, r * 2f)
-        pill(canvas, "해는 사람 뒤에", sunX, sunY + r + dp(8f))
+        pill(canvas, "해는 사람 뒤쪽에, 조금 비껴서", sunX, sunY + r + dp(8f))
 
-        val px = w * 0.38f
-        person(canvas, px, horizon, dp(64f), fallback = Figure.ARMS_UP)
-        pill(canvas, "사람은 해 앞, 지평선 위", px, horizon + dp(8f))
+        person(canvas, px, horizon, tall, fallback = Figure.ARMS_UP)
+        pill(canvas, "사람은 밝은 하늘을 등지고 지평선 위", px, horizon + dp(8f))
     }
 
     /** 수면선을 화면 절반 아래 두고, 위의 피사체가 아래에 뒤집혀 비칩니다. */
