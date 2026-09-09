@@ -747,6 +747,12 @@
     <string name="frame_saved">갤러리에 저장했어요</string>
     <string name="frame_save_failed">저장하지 못했어요</string>
     <string name="frame_edit_place">장소 이름 바꾸기</string>
+    <string name="frame_adjust">보이는 부분 조정 ›</string>
+    <string name="frame_adjust_title">보이는 부분 조정</string>
+    <string name="frame_adjust_hint">끌어서 옮기고, 두 손가락으로 키우세요. 밝은 창 안이 프레임에 들어갑니다.</string>
+    <string name="frame_adjust_reset">원래대로</string>
+    <string name="frame_adjust_which">몇 번째 사진을 조정할까요?</string>
+    <string name="frame_adjust_slot">%1$d번째 사진</string>
     <string name="frame_edit_place_title">장소 이름</string>
     <string name="frame_edit_place_hint">예) 내장산 우화정</string>
     <string name="frame_no_photo">사진을 불러오지 못했어요</string>

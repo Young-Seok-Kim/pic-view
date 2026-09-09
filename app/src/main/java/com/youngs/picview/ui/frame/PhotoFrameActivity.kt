@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.RectF
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -84,6 +85,13 @@ class PhotoFrameActivity : AppCompatActivity() {
     /** 네컷 모드의 원본들. 처음 들어온 사진이 1번 칸이 됩니다. */
     private val fourPhotos = mutableListOf<Bitmap>()
 
+    /**
+     * 사진에서 보일 부분(0~1 비율 좌표). null 이면 가운데.
+     * 프레임 창과 사진의 비율이 달라 잘리는데, 어디를 남길지는 사람이 정합니다.
+     */
+    private var singleCrop: RectF? = null
+    private val fourCrops = mutableListOf<RectF?>()
+
     private var composed: Bitmap? = null
 
     /** 테마·모드별 아트워크. 디코드를 렌더마다 반복하지 않으려는 캐시입니다. */
@@ -105,6 +113,7 @@ class PhotoFrameActivity : AppCompatActivity() {
 
         source?.recycle()
         source = graded
+        // 색만 바뀌고 크기는 그대로라 고른 부분은 그대로 둡니다.
         renderPreview()
     }
 
@@ -116,6 +125,7 @@ class PhotoFrameActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val bitmap = decode(uri) ?: return@launch
             source = bitmap
+            singleCrop = null
             renderPreview()
         }
     }
@@ -130,6 +140,7 @@ class PhotoFrameActivity : AppCompatActivity() {
             if (loaded.isEmpty()) return@launch
             fourPhotos.clear()
             fourPhotos.addAll(loaded)
+            fourCrops.clear()
             renderPreview()
         }
     }
@@ -168,9 +179,92 @@ class PhotoFrameActivity : AppCompatActivity() {
         }
         placeName = intent.getStringExtra(EXTRA_PLACE)
         binding.btnFramePlace.setOnClickListener { showPlaceDialog() }
+        // 미리보기를 눌러도, 버튼을 눌러도 같은 조정 화면입니다.
+        binding.btnFrameAdjust.setOnClickListener { adjustCrop() }
+        binding.ivFramePreview.setOnClickListener { adjustCrop() }
 
         binding.btnFrameSave.setOnClickListener { save(share = false) }
         binding.btnFrameShare.setOnClickListener { save(share = true) }
+    }
+
+    // ─────────────────────── 보이는 부분 조정 ───────────────────────
+
+    /**
+     * 프레임 창에 보일 부분을 고릅니다.
+     *
+     * 창과 사진의 비율이 달라 어딘가는 잘리는데, 전에는 무조건 가운데를
+     * 남겨서 한쪽에 선 사람이 잘려 나갔습니다. 네컷에서 사진이 여럿이면
+     * 어느 칸을 조정할지 먼저 묻습니다.
+     */
+    private fun adjustCrop() {
+        when (mode) {
+            Mode.SINGLE -> {
+                val photo = source ?: return
+                openCropDialog(photo, singleWindowAspect(), singleCrop) { singleCrop = it }
+            }
+            Mode.FOUR_CUT -> {
+                if (fourPhotos.isEmpty()) return
+                if (fourPhotos.size == 1) {
+                    adjustFourCut(0)
+                    return
+                }
+                val labels = fourPhotos.indices.map { getString(R.string.frame_adjust_slot, it + 1) }
+                com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.frame_adjust_which)
+                    .setItems(labels.toTypedArray()) { _, index -> adjustFourCut(index) }
+                    .setNegativeButton(R.string.cancel, null)
+                    .show()
+            }
+        }
+    }
+
+    private fun adjustFourCut(index: Int) {
+        val photo = fourPhotos.getOrNull(index) ?: return
+        while (fourCrops.size < fourPhotos.size) fourCrops.add(null)
+        openCropDialog(photo, fourWindowAspect(index), fourCrops[index]) { fourCrops[index] = it }
+    }
+
+    /** 지금 프레임의 사진 창 비율(가로/세로). 아트워크가 있으면 그 창, 없으면 기본 창. */
+    private fun singleWindowAspect(): Float {
+        val window = artworkCache.getOrPut(theme to Mode.SINGLE) { FrameArtwork.single(this, theme) }
+            ?.windows?.firstOrNull() ?: PolaroidComposer.defaultWindow
+        return window.width() / window.height()
+    }
+
+    private fun fourWindowAspect(index: Int): Float {
+        val window = artworkCache.getOrPut(theme to Mode.FOUR_CUT) { FrameArtwork.fourCut(this, theme) }
+            ?.windows?.getOrNull(index) ?: FourCutComposer.slotWindow(index)
+        return window.width() / window.height()
+    }
+
+    private fun openCropDialog(
+        photo: Bitmap, aspect: Float, initial: RectF?, onApply: (RectF?) -> Unit
+    ) {
+        val view = CropAdjustView(this)
+        view.bind(photo, aspect, initial)
+        val height = (resources.displayMetrics.heightPixels * 0.55f).toInt()
+        val container = android.widget.FrameLayout(this).apply {
+            addView(
+                view,
+                android.widget.FrameLayout.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT, height
+                )
+            )
+        }
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.frame_adjust_title)
+            .setMessage(R.string.frame_adjust_hint)
+            .setView(container)
+            .setPositiveButton(R.string.confirm) { _, _ ->
+                onApply(view.cropOrNull)
+                renderPreview()
+            }
+            .setNeutralButton(R.string.frame_adjust_reset) { _, _ ->
+                onApply(null)
+                renderPreview()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     /** 장소 이름 입력 — 폴라로이드 아랫단에 그대로 찍힙니다. */
@@ -329,7 +423,8 @@ class PhotoFrameActivity : AppCompatActivity() {
             bodyTypeface = ResourcesCompat.getFont(this, R.font.pretendard_regular),
             artwork = artworkCache.getOrPut(theme to Mode.SINGLE) {
                 FrameArtwork.single(this, theme)
-            }
+            },
+            crop = singleCrop
         )
     }
 
@@ -340,7 +435,8 @@ class PhotoFrameActivity : AppCompatActivity() {
         bodyTypeface = ResourcesCompat.getFont(this, R.font.pretendard_bold),
         artwork = artworkCache.getOrPut(theme to Mode.FOUR_CUT) {
             FrameArtwork.fourCut(this, theme)
-        }
+        },
+        crops = fourCrops.toList()
     )
 
     // ─────────────────────── 저장·공유 ───────────────────────
