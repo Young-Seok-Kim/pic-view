@@ -90,6 +90,18 @@
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
+        <TextView
+            style="@style/Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/screen_padding"
+            android:layout_marginTop="@dimen/space_l"
+            android:letterSpacing="0.08"
+            android:text="오늘 촬영 판단"
+            android:textColor="@color/maple_600"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
         <!-- ─────────── 히어로 : 지금의 빛 ─────────── -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_light"
