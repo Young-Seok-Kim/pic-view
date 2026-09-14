@@ -19,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import com.youngs.picview.data.api.RetrofitClient
 import com.youngs.picview.databinding.ActivityMainBinding
 import com.youngs.picview.ui.base.BaseActivity
+import com.youngs.picview.domain.light.LightPhase
 import com.youngs.picview.domain.light.SunTimes
 import com.youngs.picview.ui.common.PlaceholderFragment
 import com.youngs.picview.ui.course.CourseInputFragment
@@ -609,9 +610,18 @@ class MainActivity : BaseActivity() {
                     val contentId = item.contentid ?: return@mapIndexedNotNull null
                     val contentTypeId = item.contentTypeId ?: "0"
 
-                    val (inferredDirection, inferredBestTime) = when (contentTypeId) {
-                        "12" -> "WEST" to "SUNSET"    // 자연은 일몰/서쪽이 최고
-                        else -> "NONE" to "AFTERNOON"
+                    // 해가 지금 어느 쪽에 있는지. 예전에는 장소 분류로 "WEST"를
+                    // 박아 두어 아침 10시에도 "서향이라 해가 드는 방향이에요"가
+                    // 나왔습니다. 방위 점수는 해의 위치와 견주는 것이라 시각이 정합니다.
+                    val inferredDirection = when (sunTimes.phaseNow()) {
+                        LightPhase.BLUE_DAWN, LightPhase.SUNRISE, LightPhase.MORNING -> "EAST"
+                        LightPhase.MIDDAY -> "SOUTH"
+                        LightPhase.AFTERNOON, LightPhase.SUNSET, LightPhase.BLUE_DUSK -> "WEST"
+                        LightPhase.NIGHT -> "NONE"
+                    }
+                    val inferredBestTime = when (contentTypeId) {
+                        "12" -> "SUNSET"    // 자연은 일몰이 최고
+                        else -> "AFTERNOON"
                     }
 
                     val spot = SpotItem(

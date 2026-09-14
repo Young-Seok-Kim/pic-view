@@ -121,6 +121,20 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
         setupTts()
         setListeners()
+        // 점수 유무와 상관없이 '장소 정보'는 펴져야 합니다. 예전에는 점수
+        // 근거를 그린 뒤에만 이어 붙여, 저장한 코스·다녀온 곳에서 들어온
+        // 장소는 "더 알아보기"를 눌러도 아무 일이 없었습니다.
+        setupInfoToggle()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 황금시간 호의 '현재' 점은 뷰가 만들어질 때 시각을 굳혀 둡니다.
+        // 촬영하고 돌아오면 몇 분이 지나 있으므로 다시 맞춥니다.
+        _binding?.viewShootWindow?.let {
+            it.nowTime = LocalTime.now()
+            it.invalidate()
+        }
     }
 
     // ───────────────────── 오디오 가이드 ─────────────────────
@@ -284,6 +298,10 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
             putExtra(GuideActivity.EXTRA_PHASE, mainViewModel.sunTimes.phaseNow().name)
             // 촬영한 사진을 이 장소의 방문 기록에 붙이기 위해 필요합니다.
             putExtra(GuideActivity.EXTRA_CONTENT_ID, spot.contentId)
+            // 방문 기록의 점수. "오늘의 빛 사냥꾼" 미션이 70점 이상 기록을 세는데,
+            // 넘기지 않으면 모든 촬영이 0점으로 남아 그 미션은 영영 못 채웁니다.
+            putExtra(GuideActivity.EXTRA_SCORE, mainViewModel.scoreOf(spot.contentId)?.total ?: spot.score)
+            putExtra(GuideActivity.EXTRA_IMAGE_URL, spot.imageUrl)
         }
         startActivity(intent)
     }
@@ -782,17 +800,32 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
             isHighlight = true
         )
 
+        // 오늘의 창이 이미 지났으면 내일 계획으로 저장합니다. 밤 9시에 저장한
+        // 18:40 창을 "오늘의 출사 계획"으로 띄우면 이미 끝난 일정입니다.
+        val planDate = if (arrive.isBefore(LocalTime.now())) {
+            java.time.LocalDate.now().plusDays(1)
+        } else {
+            java.time.LocalDate.now()
+        }
+        val course = ShootingCourse(
+            stops = listOf(stop),
+            sun = sun,
+            travelMode = TravelMode.CAR,
+            totalDistanceKm = 0.0
+        )
+
         viewLifecycleOwner.lifecycleScope.launch {
+            // 같은 날짜에 같은 한 곳짜리 계획이 있으면 다시 넣지 않습니다.
+            // 버튼을 누를 때마다 똑같은 카드가 코스 목록에 쌓였습니다.
             val saved = runCatching {
-                CourseRepository(requireContext()).save(
-                    ShootingCourse(
-                        stops = listOf(stop),
-                        sun = sun,
-                        travelMode = TravelMode.CAR,
-                        totalDistanceKm = 0.0
-                    ),
-                    summary = binding.tvDetailBestTime.text.toString()
-                )
+                val repository = CourseRepository(requireContext())
+                if (!repository.hasSameCourse(course, planDate)) {
+                    repository.save(
+                        course,
+                        summary = binding.tvDetailBestTime.text.toString(),
+                        planDate = planDate
+                    )
+                }
             }.isSuccess
 
             Toast.makeText(
@@ -855,6 +888,9 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
     private fun applyInfoVisibility() {
         binding.layoutInfoBody.isVisible = infoExpanded
+        // 요약은 접힌 자리의 몫입니다. 전문의 첫 문단이 곧 요약이라, 펼친 뒤에도
+        // 남겨 두면 같은 문장을 두 번 잇달아 읽게 됩니다.
+        binding.tvInfoSummary.isVisible = !infoExpanded && !binding.tvInfoSummary.text.isNullOrBlank()
         binding.tvInfoToggle.setText(
             if (infoExpanded) R.string.detail_info_collapse else R.string.detail_info_expand
         )
@@ -1089,6 +1125,7 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
 
         view.tvDetailTip.text = OverviewFormatter.format(overview)
         view.tvInfoSummary.text = OverviewDigest.summaryOf(overview)
+        applyInfoVisibility()
 
         val tags = OverviewDigest.tagsOf(overview)
         view.chipsInfoTags.removeAllViews()

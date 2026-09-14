@@ -4,6 +4,7 @@ import com.youngs.picview.domain.season.SeasonHighlights
 import com.youngs.picview.domain.spot.Facing
 import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.ui.model.SpotScoreContext
+import com.youngs.picview.util.byBatchim
 import kotlin.math.roundToInt
 
 /**
@@ -135,9 +136,12 @@ object PhotoScoreEngine {
      * [SeasonHighlights] 에 있는데 점수 엔진이 쓰지 않고 있었습니다.
      */
     private fun seasonFactor(c: SpotScoreContext): ScoreFactor {
-        val highlight = SeasonHighlights.ALL.firstOrNull {
-            c.spot.title.contains(it.spotKeyword)
-        } ?: return ScoreFactor(
+        // 내장산처럼 신록·계곡·단풍·설경 넷이 같은 이름을 쓰는 곳은 **가장
+        // 가까운 절정**으로 봅니다. 목록 첫 항목(신록)만 보면 11월의 내장산이
+        // "연둣빛 계곡은 철이 아니에요"로 깎입니다.
+        val highlight = SeasonHighlights.ALL
+            .filter { c.spot.title.contains(it.spotKeyword) }
+            .minByOrNull { it.daysUntilPeak() } ?: return ScoreFactor(
             FactorKind.SEASON, 9.0, 0.0, 18.0, "계절을 크게 타지 않는 곳이에요"
         )
 
@@ -146,7 +150,7 @@ object PhotoScoreEngine {
             highlight.isPeakNow() -> 18.0 to "지금이 ${highlight.subject} 절정이에요"
             days <= 14 -> 13.0 to "${days}일 뒤면 ${highlight.subject} 절정이에요"
             days <= 45 -> 7.0 to "${highlight.subject} 철까지는 아직 남았어요"
-            else -> 3.0 to "${highlight.subject}는 지금 철이 아니에요"
+            else -> 3.0 to "${highlight.subject}${highlight.subject.byBatchim("은", "는")} 지금 철이 아니에요"
         }
         return ScoreFactor(FactorKind.SEASON, score, 0.0, 18.0, reason)
     }

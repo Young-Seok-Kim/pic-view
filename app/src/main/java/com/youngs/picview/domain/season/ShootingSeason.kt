@@ -17,17 +17,22 @@ enum class Season(val label: String, val emoji: String, val months: Set<Int>) {
     /**
      * 이 계절을 골랐을 때 달력이 펴야 하는 달.
      *
-     * 다른 계절이면 그 계절의 첫 달로 넘어가되, **지금이 그 계절 안이면
-     * 이번 달**을 폅니다. 8월에 여름을 열었는데 6월이 나오면 절정 점을
-     * 보러 두 번을 더 넘겨야 합니다.
-     *
-     * 겨울의 "첫 달"은 12월이 아니라 1월입니다. 이 화면은 같은 해 달력을
-     * 보여 주므로, 5월에 겨울을 고른 사람이 보고 싶은 눈 절정은 지난
-     * 1~2월(같은 해)이 맞습니다.
+     * 다른 계절이면 **다가오는 그 계절의 첫 달**로 넘어가되, 지금이 그
+     * 계절 안이면 이번 달을 폅니다. 8월에 여름을 열었는데 6월이 나오면
+     * 절정 점을 보러 두 번을 더 넘겨야 합니다.
      */
-    fun monthToShow(now: YearMonth): YearMonth =
-        if (now.monthValue in months) now
-        else YearMonth.of(now.year, months.min())
+    fun monthToShow(now: YearMonth): YearMonth {
+        if (now.monthValue in months) return now
+        // 다가오는 쪽으로 넘깁니다. 9월에 겨울을 고르면 지난 1월이 아니라
+        // 오는 12월이어야 히어로의 D-day(쌍화차 거리 D-78)와 달력이 같은
+        // 달을 가리킵니다. 같은 해 1월로 가면 열 달 전 달력이 펴집니다.
+        var month = now
+        repeat(12) {
+            month = month.plusMonths(1)
+            if (month.monthValue in months) return month
+        }
+        return YearMonth.of(now.year, months.min())
+    }
 
     companion object {
         fun of(date: LocalDate): Season =

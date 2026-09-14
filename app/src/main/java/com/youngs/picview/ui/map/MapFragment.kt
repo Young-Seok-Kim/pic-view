@@ -440,6 +440,9 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
         binding.tvSheetTitle.text = spot.title
         binding.tvSheetReason.text = reasonFor(purpose)
         binding.tvSheetNote.text = facts.note
+        // 이미 찜한 곳이면 "담았음"으로 열어야 합니다. 이전 장소의 상태가
+        // 남아 있으면 찜한 곳에서 "담아 두기"를 눌러 찜이 풀리는 일이 생깁니다.
+        renderSheetSaveState(spot)
 
         Glide.with(binding.ivSheetPhoto)
             .load(spot.imageUrl.takeIf { it.isNotBlank() })

@@ -145,12 +145,14 @@ class DiaryFragment : Fragment(R.layout.fragment_diary), MainActivity.TabRoot {
      * 담아 둔 곳들로 코스를 짜는 길은 코스 탭의 '직접 고르기'에 있습니다.
      */
     private fun prepareNext(rec: DiaryAdapter.NextRec) {
-        val added = SpotBookmark.toggle(requireContext(), rec.spot)
-        Toast.makeText(
-            requireContext(),
-            if (added) R.string.bookmark_added else R.string.bookmark_removed,
-            Toast.LENGTH_SHORT
-        ).show()
+        // "출사 준비하기"는 담는 버튼이지 토글이 아닙니다. 두 번 누르면 찜이
+        // 풀리던 것을, 이미 담긴 곳이면 그렇다고만 알려 주게 바꿉니다.
+        if (SpotBookmark.isSaved(requireContext(), rec.spot.contentId)) {
+            Toast.makeText(requireContext(), R.string.bookmark_already, Toast.LENGTH_SHORT).show()
+            return
+        }
+        SpotBookmark.toggle(requireContext(), rec.spot)
+        Toast.makeText(requireContext(), R.string.bookmark_added, Toast.LENGTH_SHORT).show()
     }
 
     private fun applyTopInset() {

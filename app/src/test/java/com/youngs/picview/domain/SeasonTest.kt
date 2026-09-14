@@ -107,10 +107,11 @@ class SeasonTest {
     }
 
     @Test
-    fun `다른 계절이면 그 계절의 첫 달로 넘어간다`() {
+    fun `다른 계절이면 다가오는 그 계절의 첫 달로 넘어간다`() {
         val aug = YearMonth.of(2026, 8)
         assertEquals(YearMonth.of(2026, 9), Season.AUTUMN.monthToShow(aug))
-        assertEquals(YearMonth.of(2026, 3), Season.SPRING.monthToShow(aug))
+        // 8월에 고른 봄은 지난 3월이 아니라 오는 3월 — 히어로의 D-day 와 같은 방향
+        assertEquals(YearMonth.of(2027, 3), Season.SPRING.monthToShow(aug))
     }
 
     @Test
@@ -120,7 +121,8 @@ class SeasonTest {
         assertEquals(dec, Season.WINTER.monthToShow(dec))
         val jan = YearMonth.of(2027, 1)
         assertEquals(jan, Season.WINTER.monthToShow(jan))
-        // 계절 밖(5월)에서 겨울을 고르면 같은 해 1월 — 달력은 같은 해를 본다
-        assertEquals(YearMonth.of(2026, 1), Season.WINTER.monthToShow(YearMonth.of(2026, 5)))
+        // 계절 밖(5월·9월)에서 겨울을 고르면 다가오는 12월 — 지난 1월로 되돌아가지 않는다
+        assertEquals(YearMonth.of(2026, 12), Season.WINTER.monthToShow(YearMonth.of(2026, 5)))
+        assertEquals(YearMonth.of(2026, 12), Season.WINTER.monthToShow(YearMonth.of(2026, 9)))
     }
 }

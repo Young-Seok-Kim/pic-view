@@ -275,6 +275,8 @@ class MyFragment : Fragment(R.layout.fragment_my), MainActivity.TabRoot {
                 putExtra(GuideActivity.EXTRA_SPOT_TYPE, spot.contentTypeId)
                 putExtra(GuideActivity.EXTRA_PHASE, mainViewModel.sunTimes.phaseNow().name)
                 putExtra(GuideActivity.EXTRA_CONTENT_ID, spot.contentId)
+                putExtra(GuideActivity.EXTRA_SCORE, mainViewModel.scoreOf(spot.contentId)?.total ?: spot.score)
+                putExtra(GuideActivity.EXTRA_IMAGE_URL, spot.imageUrl)
             }
         )
     }

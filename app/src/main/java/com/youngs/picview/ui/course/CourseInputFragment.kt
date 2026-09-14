@@ -676,9 +676,13 @@ class CourseInputFragment : Fragment(R.layout.fragment_course_input),
 
         binding.tvCourseError.isVisible = false
         viewLifecycleOwner.lifecycleScope.launch {
+            // 같은 날짜·같은 정거장이면 이미 저장된 것으로 봅니다. 두 번 누를
+            // 때마다 똑같은 카드가 하나씩 늘던 문제입니다.
             val ok = runCatching {
-                CourseRepository(requireContext())
-                    .save(course, TemplateNarrator.narrate(course), tripDate)
+                val repository = CourseRepository(requireContext())
+                if (!repository.hasSameCourse(course, tripDate)) {
+                    repository.save(course, TemplateNarrator.narrate(course), tripDate)
+                }
             }.isSuccess
             Toast.makeText(
                 requireContext(),

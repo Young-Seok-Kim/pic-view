@@ -30,7 +30,7 @@
     <string name="tour_done">시작하기</string>
     <string name="tour_skip">건너뛰기</string>
     <string name="tour_home_date_title">촬영 캘린더</string>
-    <string name="tour_home_date_body">오늘 날짜를 누르면 달력이 열려요. 날짜마다 일출·일몰과 빛 시간표, 축제 일정을 볼 수 있어요.</string>
+    <string name="tour_home_date_body">오늘 날짜를 누르면 사계절 촬영 캘린더가 열려요. 단풍·구절초 같은 피사체의 절정 시기와 D-day를 볼 수 있어요.</string>
     <string name="tour_home_quick_title">빠른 이동</string>
     <string name="tour_home_quick_body">출사 코스 · 지도 · 캘린더 · 미션으로 바로 가는 네 칸이에요. 지도는 촬영지 위치를, 미션은 스탬프와 배지를 보여줘요.</string>
     <string name="tour_home_best_title">지금 가면 좋은 곳</string>
@@ -314,6 +314,7 @@
     <string name="home_spot_plan_saved">찜한 곳</string>
     <string name="bookmark_added">찜했어요 · 코스 탭에서 골라 코스를 짤 수 있어요</string>
     <string name="bookmark_removed">찜을 풀었어요</string>
+    <string name="bookmark_already">이미 찜한 곳이에요 · 코스 탭에서 골라 코스를 짤 수 있어요</string>
     <string name="bookmark_save_label">담아 두기</string>
     <string name="bookmark_saved_label">담았음</string>
 
@@ -716,6 +717,8 @@
     <string name="course_that_day_light">그날의 빛</string>
     <string name="guide_photo_logged">사진이 오늘 기록에 담겼어요</string>
     <string name="guide_photo_view_failed">사진을 열 앱이 없어요</string>
+    <string name="guide_camera_unavailable">이 기기에서는 카메라를 쓸 수 없어요</string>
+    <string name="guide_capture_failed">촬영에 실패했어요 · 다시 눌러 보세요</string>
     <string name="diary_edit">고치기</string>
     <string name="diary_edit_title">일기 고치기</string>
     <string name="diary_edit_save">저장</string>
@@ -769,8 +772,8 @@
       줄이 나뉩니다.
     -->
     <string name="home_qa_course_desc">해의 위치에 맞춘\n출사 동선 시간표</string>
-    <string name="home_qa_map_desc">명소·포토존·맛집\n위치를 한눈에</string>
-    <string name="home_qa_calendar_desc">출사 일정과\n축제·행사 일정 확인</string>
+    <string name="home_qa_map_desc">촬영 목적별 마커로\n촬영지 위치를 한눈에</string>
+    <string name="home_qa_calendar_desc">피사체 절정 시기와\n사계절 촬영 D-day</string>
     <string name="home_qa_mission_desc">출사 미션 참여하고\n스탬프·배지 획득</string>
     <string name="detail_visit_info">방문 정보</string>
     <string name="detail_visit_fee">입장료</string>

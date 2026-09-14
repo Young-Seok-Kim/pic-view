@@ -157,8 +157,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         viewModel.filteredSpots.observe(viewLifecycleOwner) { filteredList ->
             val ordered = sorted(filteredList)
-            spotAdapter.updateData(ordered)
-            renderMapPins(ordered)
+            submitOrdered(ordered)
             renderListState(filteredList.isEmpty())
         }
 
@@ -215,6 +214,24 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     // ───────────────────── 약도 ↔ 목록 연동 ─────────────────────
+
+    /**
+     * 정렬된 목록을 어댑터와 약도에 함께 올리고, 목록을 맨 위로 돌립니다.
+     *
+     * [ListAdapter.submitList] 는 차이 계산을 뒤에서 하므로, 그 직후에
+     * `scrollToPosition(0)` 을 불러도 계산이 끝나는 순간 리사이클러뷰가
+     * **직전 맨 위 카드를 붙잡고** 그 카드가 옮겨 간 자리까지 따라갑니다.
+     * 그래서 정렬을 바꿔도 화면은 정렬 전 첫 카드에서 시작해 "정렬이 안
+     * 먹는다"로 보였습니다(약도의 핀 셋과 목록 맨 위가 서로 달랐습니다).
+     * 차이 계산이 끝난 뒤에 맨 위로 옮겨야 정렬한 순서의 첫 카드가 보입니다.
+     */
+    private fun submitOrdered(ordered: List<SpotItem>) {
+        spotAdapter.submitList(ordered) {
+            val view = _binding ?: return@submitList
+            view.rvPhotoSpots.scrollToPosition(0)
+            renderMapPins(ordered)
+        }
+    }
 
     /**
      * 약도의 핀 셋에 지금 목록의 맨 위 세 곳을 앉힙니다.
@@ -357,9 +374,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
                 else -> SortMode.RECO
             }
             val ordered = sorted(viewModel.filteredSpots.value.orEmpty())
-            spotAdapter.updateData(ordered)
-            renderMapPins(ordered)
-            binding.rvPhotoSpots.scrollToPosition(0)
+            submitOrdered(ordered)
             binding.appbar.setExpanded(true, true)
         }
 

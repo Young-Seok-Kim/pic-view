@@ -127,7 +127,14 @@ class PhotoFrameActivity : AppCompatActivity() {
             ?: return@registerForActivityResult
         val graded = BitmapFactory.decodeFile(path) ?: return@registerForActivityResult
 
-        source?.recycle()
+        // 네컷 1번 칸이 원본과 같은 비트맵을 가리키고 있으면 그 칸도 함께
+        // 갈아 끼웁니다. 원본만 재활용(recycle)하고 칸은 그대로 두면 네컷으로
+        // 전환하는 순간 "recycled bitmap" 으로 앱이 죽습니다.
+        val previous = source
+        fourPhotos.forEachIndexed { index, bitmap ->
+            if (bitmap != null && bitmap === previous) fourPhotos[index] = graded
+        }
+        previous?.recycle()
         source = graded
         // 색만 바뀌고 크기는 그대로라 고른 부분은 그대로 둡니다.
         renderPreview()
@@ -207,7 +214,9 @@ class PhotoFrameActivity : AppCompatActivity() {
         withStoragePermission { loadPhoto(uri) }
 
         binding.btnFrameColor.setOnClickListener {
-            colorFilter.launch(ColorPaletteActivity.intent(this, uri))
+            // 사진을 갈아 끼웠으면 그 사진에 색을 입혀야 합니다. 처음 들어온
+            // 주소를 고정해 두면 바꾼 사진이 첫 사진의 색감본으로 되돌아갑니다.
+            colorFilter.launch(ColorPaletteActivity.intent(this, sourceUri ?: uri))
         }
         binding.btnFramePick.setOnClickListener {
             if (mode == Mode.SINGLE) pickSingle.launch("image/*")
@@ -539,12 +548,21 @@ class PhotoFrameActivity : AppCompatActivity() {
 
     private fun renderPreview() {
         lifecycleScope.launch {
+            // 합성 중에 뒤로 가면 onDestroy 가 비트맵을 정리하는데, 배경 스레드는
+            // 그걸 모른 채 그리다 죽을 수 있습니다. 실패는 삼키고, 화면이 살아
+            // 있을 때만 결과를 겁니다.
             val bitmap = withContext(Dispatchers.Default) {
-                when (mode) {
-                    Mode.SINGLE -> source?.let(::composeSingle)
-                    Mode.FOUR_CUT -> composeFourCut()
-                }
+                runCatching {
+                    when (mode) {
+                        Mode.SINGLE -> source?.let(::composeSingle)
+                        Mode.FOUR_CUT -> composeFourCut()
+                    }
+                }.getOrNull()
             } ?: return@launch
+            if (isFinishing || isDestroyed) {
+                bitmap.recycle()
+                return@launch
+            }
             composed = bitmap
             binding.ivFramePreview.setImageBitmap(bitmap)
         }

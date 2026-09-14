@@ -4,6 +4,7 @@ import android.util.Log
 import com.youngs.picview.data.api.GeminiRequest
 import com.youngs.picview.data.api.RetrofitClient
 import com.youngs.picview.util.ApiKeys
+import com.youngs.picview.util.byBatchim
 import com.youngs.picview.util.retryOrNull
 import java.time.format.DateTimeFormatter
 
@@ -37,7 +38,7 @@ object TemplateNarrator : CourseNarrator {
             it.phase == com.youngs.picview.domain.light.LightPhase.MIDDAY
         }
         val tail = indoor?.let {
-            " 빛이 강한 한낮엔 ${it.spot.title}으로 잠시 피해 가세요."
+            " 빛이 강한 한낮엔 ${it.spot.title}${it.spot.title.byBatchim("으로", "로")} 잠시 피해 가세요."
         }.orEmpty()
 
         return head + tail

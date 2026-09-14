@@ -25,8 +25,9 @@ class SiseonGuideTest {
     ) = SpotFacts(Facing.WEST, phase, guide, 60, note)
 
     @Test
-    fun `구도는 14종이고 문구가 비지 않는다`() {
-        assertEquals(14, SiseonGuide.items.size)
+    fun `구도는 10종이고 문구가 비지 않는다`() {
+        // 관광공사 실사진이 있는 구도만 남겼습니다(README '시선 가이드' 참고).
+        assertEquals(10, SiseonGuide.items.size)
         SiseonGuide.items.forEach { item ->
             assertTrue("${item.id} title", item.title.isNotBlank())
             assertTrue("${item.id} english", item.english.isNotBlank())
@@ -43,29 +44,46 @@ class SiseonGuideTest {
     }
 
     @Test
-    fun `대칭과 중앙은 같은 성격의 구도로 이어진다`() {
+    fun `대칭 장소는 빛과 상관없이 대칭으로 간다`() {
         assertEquals("symmetry", SiseonGuide.guideIdFor(facts(GuideOverlayView.GuideType.SYMMETRY)))
-        assertEquals("frame", SiseonGuide.guideIdFor(facts(GuideOverlayView.GuideType.CENTER)))
+        assertEquals(
+            "symmetry",
+            SiseonGuide.guideIdFor(facts(GuideOverlayView.GuideType.SYMMETRY, LightPhase.AFTERNOON))
+        )
+        // 중앙 구도 장소는 조명이 켜지는 블루아워에 프레임 인 프레임으로.
+        assertEquals(
+            "frame",
+            SiseonGuide.guideIdFor(facts(GuideOverlayView.GuideType.CENTER, LightPhase.BLUE_DUSK))
+        )
     }
 
     @Test
-    fun `삼분할은 장소가 구도를 정한다`() {
-        // 물가면 반사
+    fun `삼분할은 장소의 특성과 빛이 구도를 정한다`() {
+        // 물가면 반사 — 촬영 특성 한 줄이 시각보다 먼저입니다.
         assertEquals(
             "reflection",
             SiseonGuide.guideIdFor(
                 facts(GuideOverlayView.GuideType.THIRDS, note = "연못 수면 반영이 좋아요")
             )
         )
-        // 해질 무렵이면 실루엣
+        // 해질 무렵 서향이면 실루엣
         assertEquals(
             "silhouette",
             SiseonGuide.guideIdFor(facts(GuideOverlayView.GuideType.THIRDS, LightPhase.SUNSET))
         )
-        // 그 외에는 리딩라인
+        // 측광이 도는 오전은 겹침(레이어드), 오후는 리딩라인
+        assertEquals(
+            "layer",
+            SiseonGuide.guideIdFor(facts(GuideOverlayView.GuideType.THIRDS, LightPhase.MORNING))
+        )
         assertEquals(
             "leading",
-            SiseonGuide.guideIdFor(facts(GuideOverlayView.GuideType.THIRDS, LightPhase.MORNING))
+            SiseonGuide.guideIdFor(facts(GuideOverlayView.GuideType.THIRDS, LightPhase.AFTERNOON))
+        )
+        // 빛이 강한 한낮은 반복 패턴
+        assertEquals(
+            "pattern",
+            SiseonGuide.guideIdFor(facts(GuideOverlayView.GuideType.THIRDS, LightPhase.MIDDAY))
         )
     }
 

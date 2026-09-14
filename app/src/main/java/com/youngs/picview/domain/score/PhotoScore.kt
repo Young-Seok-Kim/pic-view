@@ -93,10 +93,13 @@ data class PhotoScore(
 
             val drag = penalty?.reason
 
+            // 항목 근거는 저마다 한 문장("…이에요")이라 마침표로 끊어야
+            // "방향이에요 비 없이 맑아요"처럼 두 문장이 붙어 읽히지 않습니다.
+            val head = strengths.joinToString(". ")
             return when {
                 strengths.isEmpty() -> drag.orEmpty()
-                drag == null -> strengths.joinToString(" ")
-                else -> "${strengths.joinToString(" ")} 다만 $drag"
+                drag == null -> "$head."
+                else -> "$head. 다만 $drag"
             }
         }
 

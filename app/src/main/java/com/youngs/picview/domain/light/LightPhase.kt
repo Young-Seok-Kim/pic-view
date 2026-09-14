@@ -37,7 +37,7 @@ enum class LightPhase(
     SUNRISE("일출 골든아워", "가장 부드러운 빛", "한옥 지붕선에 닿는 따뜻한 사광", R.color.light_sunrise, R.color.hero_sunrise),
 
     /** 일출 후 ~ 남중 전. 측광이 살아있는 안정적인 시간. */
-    MORNING("오전", "측광이 좋은 시간", "목재와 돌의 결을 담기 좋은 빛", R.color.light_morning, R.color.hero_morning),
+    MORNING("오전", "측광이 좋은 시간", "목재와 돌의 결", R.color.light_morning, R.color.hero_morning),
 
     /** 남중 전후. 그림자가 짧고 대비가 강해 야외 인물·풍경에 불리합니다. */
     MIDDAY("한낮", "빛이 강해 실내가 유리", "넓은 시야와 지역의 색", R.color.light_midday, R.color.hero_midday),

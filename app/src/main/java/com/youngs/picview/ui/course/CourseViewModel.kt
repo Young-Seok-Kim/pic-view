@@ -224,11 +224,21 @@ class CourseViewModel(app: Application) : AndroidViewModel(app) {
         spots: List<SpotItem>
     ) {
         planDate = date
-        lastSpots = spots
+        // 다시 짤 때의 풀은 **저장한 코스의 그 장소들**입니다. 목록 전체로
+        // 두면 "내일로" 한 번에 충무공원 코스가 구절초 정원 코스로 바뀌어
+        // 저장한 계획과 아무 상관없는 코스가 됩니다. 목록에서 못 찾은 곳은
+        // 저장본의 정거장 정보로 대신합니다.
+        val savedIds = course.stops.map { it.spot.contentId }.toSet()
+        val fromList = spots.filter { it.contentId in savedIds }
+        val missing = course.stops.map { it.spot }
+            .filter { stop -> fromList.none { it.contentId == stop.contentId } }
+        lastSpots = fromList + missing
+        // 이전에 '직접 고르기'로 담아 둔 것은 이 코스와 무관합니다.
+        _pickedIds.value = emptySet()
 
         val start = course.startTime
         val end = course.endTime
-        lastRequest = if (spots.isEmpty() || start == null || end == null || end <= start) {
+        lastRequest = if (lastSpots.isEmpty() || start == null || end == null || end <= start) {
             // 되살릴 수 없으면 조용히 못 고치는 상태로 둡니다.
             // 반쯤 복원한 조건으로 엉뚱한 코스를 내놓는 것보다 낫습니다.
             null

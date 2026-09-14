@@ -69,6 +69,12 @@ class GuideActivity : AppCompatActivity() {
         /** 촬영한 사진을 방문 기록에 붙이기 위한 장소 식별자. */
         const val EXTRA_CONTENT_ID = "CONTENT_ID"
 
+        /** 방문 기록에 남길 포토스코어. 미션 판정("70점 이상에서 촬영")이 이 값을 봅니다. */
+        const val EXTRA_SCORE = "SCORE"
+
+        /** 방문 기록·일기에 쓰는 대표 사진 주소. */
+        const val EXTRA_IMAGE_URL = "IMAGE_URL"
+
         /** 첫 안내가 스스로 사라지기까지. 읽기에 넉넉하고 방해되지 않는 선. */
         private const val POSE_HINT_MS = 6000L
 
@@ -556,7 +562,17 @@ class GuideActivity : AppCompatActivity() {
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
-            val cameraProvider = cameraProviderFuture.get()
+            // 카메라 서비스 자체가 없거나 초기화에 실패하는 기기가 있습니다
+            // (uses-feature 가 required=false 라 설치는 됩니다). 여기서 던지면
+            // 메인 스레드라 앱이 죽으므로 안내하고 닫습니다.
+            val cameraProvider = try {
+                cameraProviderFuture.get()
+            } catch (e: Exception) {
+                Log.e("CAMERA_ERROR", "카메라 초기화 실패: ${e.message}")
+                Toast.makeText(this, R.string.guide_camera_unavailable, Toast.LENGTH_LONG).show()
+                finish()
+                return@addListener
+            }
             // 미리보기 해상도를 기기가 고르게 두면, 카메라2 legacy 계층을 쓰는
             // 구형 기기·에뮬레이터에서 활성 배열보다 큰 크기가 잡혀
             // "previewSize must not be taller than activeArray" 로 죽습니다.
@@ -580,6 +596,9 @@ class GuideActivity : AppCompatActivity() {
                 cameraProvider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageCapture)
             } catch (e: Exception) {
                 Log.e("CAMERA_ERROR", "카메라 바인딩 실패: ${e.message}")
+                // 검은 화면에 눌러도 반응 없는 셔터만 남기지 않습니다.
+                Toast.makeText(this, R.string.guide_camera_unavailable, Toast.LENGTH_LONG).show()
+                binding.btnCapture.isEnabled = false
             }
         }, ContextCompat.getMainExecutor(this))
     }
@@ -624,7 +643,12 @@ class GuideActivity : AppCompatActivity() {
                 recordVisitWithPhoto(saved) { runOnUiThread { finish() } }
             }
             override fun onError(exception: ImageCaptureException) {
-                runOnUiThread { binding.btnCapture.isEnabled = true }
+                runOnUiThread {
+                    binding.btnCapture.isEnabled = true
+                    Toast.makeText(
+                        this@GuideActivity, R.string.guide_capture_failed, Toast.LENGTH_SHORT
+                    ).show()
+                }
                 Log.e("CAMERA_ERROR", "촬영 실패: ${exception.message}")
             }
         })
@@ -654,7 +678,8 @@ class GuideActivity : AppCompatActivity() {
                         title = name,
                         addr1 = "",
                         tip = "",
-                        imageUrl = "",
+                        imageUrl = intent.getStringExtra(EXTRA_IMAGE_URL).orEmpty(),
+                        score = intent.getIntExtra(EXTRA_SCORE, 0),
                         mapx = "",
                         mapy = ""
                     ),

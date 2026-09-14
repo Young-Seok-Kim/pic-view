@@ -77,6 +77,19 @@ class CourseResultFragment : Fragment(R.layout.fragment_course_result) {
 
     private fun showGeneratedCourse() {
         binding.btnResultSave.isVisible = true
+        wireSaveButton()
+
+        // 설명 문구는 규칙 요약 → LLM 문장 순으로 두 번 들어옵니다.
+        // 타임라인은 이미 떠 있으므로 문구 생성 중에도 화면을 막지 않습니다.
+        observeCourse(savedTitle = null)
+    }
+
+    /** 저장 버튼과 저장 결과 토스트. 방금 만든 코스와 다시 짠 저장 코스가 함께 씁니다. */
+    private var saveWired = false
+
+    private fun wireSaveButton() {
+        if (saveWired) return
+        saveWired = true
         binding.btnResultSave.setOnClickListener { courseViewModel.saveCurrent() }
 
         courseViewModel.saved.observe(viewLifecycleOwner) { state ->
@@ -88,10 +101,6 @@ class CourseResultFragment : Fragment(R.layout.fragment_course_result) {
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
             courseViewModel.consumeSaved()
         }
-
-        // 설명 문구는 규칙 요약 → LLM 문장 순으로 두 번 들어옵니다.
-        // 타임라인은 이미 떠 있으므로 문구 생성 중에도 화면을 막지 않습니다.
-        observeCourse(savedTitle = null)
     }
 
     // ─────────────────── 저장한 코스 ───────────────────
@@ -145,8 +154,11 @@ class CourseResultFragment : Fragment(R.layout.fragment_course_result) {
             val rescheduled = savedTitle != null && emissions > 1
             if (rescheduled) {
                 // 다시 짠 코스는 아직 저장 전입니다. 제목도 새 코스의 것으로.
+                // 저장 버튼은 보이기만 하고 눌러도 아무 일이 없었습니다 —
+                // 방금 만든 코스와 같은 저장 경로를 여기서도 잇습니다.
                 binding.btnResultSave.isVisible = true
                 binding.tvResultTitle.setText(R.string.course_today_title)
+                wireSaveButton()
             }
 
             renderDate(courseViewModel.planDate, editable = courseViewModel.canReschedule)
