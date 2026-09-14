@@ -188,6 +188,7 @@
           인물이면 포즈 목록이, 나머지면 촬영 요령이 나옵니다.
         -->
         <HorizontalScrollView
+            android:id="@+id/layout_subject_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/space_s"

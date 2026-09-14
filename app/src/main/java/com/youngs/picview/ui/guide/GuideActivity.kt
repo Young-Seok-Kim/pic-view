@@ -251,6 +251,11 @@ class GuideActivity : AppCompatActivity() {
     private fun renderOverlayToggle() {
         val on = AppPrefs.isGuideOverlayOn(this)
         binding.guideOverlay.isVisible = on
+        binding.tvGuideMessage.isVisible = on
+        binding.layoutSubjectRow.isVisible = on
+        binding.layoutPeopleRow.isVisible = on && subject == Subject.PERSON
+        binding.rvPoses.isVisible = on && subject == Subject.PERSON
+        if (!on) binding.layoutPoseHint.isVisible = false
         binding.btnGuideGrid.alpha = if (on) 1f else 0.45f
     }
 
@@ -304,7 +309,7 @@ class GuideActivity : AppCompatActivity() {
      * 셔터를 누르려는 사람을 기다리게 하지 않기 위해서입니다.
      */
     private fun showPoseHintOnce() {
-        if (AppPrefs.isPoseHintSeen(this)) return
+        if (AppPrefs.isPoseHintSeen(this) || !AppPrefs.isGuideOverlayOn(this)) return
 
         val hint = binding.layoutPoseHint
         hint.isVisible = true
@@ -459,8 +464,9 @@ class GuideActivity : AppCompatActivity() {
     private fun applySubject() {
         val isPerson = subject == Subject.PERSON
 
-        binding.rvPoses.isVisible = isPerson
-        binding.layoutPeopleRow.isVisible = isPerson
+        val guideOn = AppPrefs.isGuideOverlayOn(this)
+        binding.rvPoses.isVisible = guideOn && isPerson
+        binding.layoutPeopleRow.isVisible = guideOn && isPerson
 
         if (isPerson) {
             refreshPoses()
