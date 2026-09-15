@@ -8,10 +8,19 @@
 
     1단  사진 위 뱃지  — "언제 · 어떤 빛" 은 사진 위에서 읽힙니다
     2단  장소명(크게) + 이유(작게)
-    3단  구도·거리를 아이콘 한 줄로, 보조 액션(찜·가이드)은 오른쪽 끝
+    3단  구도·거리를 아이콘 한 줄로
 
   버튼 하나가 카드 폭의 1/3을 먹던 자리를 없애고 카드 전체를 탭 영역으로
   넓혔습니다. 손가락이 큰 과녁을 찾아가는 편이 언제나 빠릅니다.
+
+  찜(하트)과 카메라는 장소명 줄 오른쪽에 둡니다. 거리 줄에 두었을 때는
+  "내 위치에서 차로 6시간 20분"처럼 긴 문구가 아이콘에 밀려 잘렸습니다.
+  장소명이 길면 줄임표 대신 흐르게(marquee) 해서 아이콘 자리를 내주고도
+  이름을 다 보입니다.
+
+  카메라는 그 장소의 **촬영 시작**(앱 카메라, 상세의 촬영 시작과 같은 곳)
+  입니다. 예전에는 "한 장을 더 잘 찍는 순서" 가이드를 열었는데, 어느 카드를
+  눌러도 같은 화면이라 카드마다 둘 이유가 없었고 홈에 공통 진입점이 있습니다.
 -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -79,16 +88,49 @@
             android:orientation="vertical"
             android:paddingHorizontal="@dimen/space_l"
             android:paddingTop="@dimen/space_m"
-            android:paddingBottom="@dimen/space_s">
+            android:paddingBottom="@dimen/space_l">
 
-            <TextView
-                android:id="@+id/tv_spot_title"
-                style="@style/Text.Title"
+            <!-- 장소명 + 찜. 이름이 길면 잘리지 않고 흐릅니다(어댑터가 isSelected 를 켭니다). -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                tools:text="내장산 국립공원" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_spot_title"
+                    style="@style/Text.Title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"
+                    tools:text="내장산 국립공원" />
+
+                <ImageView
+                    android:id="@+id/btn_spot_favorite"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="@dimen/space_s"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/cd_favorite"
+                    android:padding="9dp"
+                    android:src="@drawable/ic_heart"
+                    app:tint="@color/maple_500" />
+
+                <ImageView
+                    android:id="@+id/btn_spot_shoot"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="-9dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/action_shoot_start"
+                    android:padding="9dp"
+                    android:src="@drawable/baseline_camera_alt_24"
+                    app:tint="@color/maple_500" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tv_spot_reason"
@@ -138,28 +180,7 @@
                     android:textColor="@color/text_secondary"
                     app:drawableStartCompat="@drawable/ic_car"
                     app:drawableTint="@color/text_tertiary"
-                    tools:text="차로 25분" />
-
-                <!-- 보조 액션 둘. 카드 본문과 겨루지 않게 아이콘만 둡니다. -->
-                <ImageView
-                    android:id="@+id/btn_spot_favorite"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/cd_favorite"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_heart"
-                    app:tint="@color/maple_500" />
-
-                <ImageView
-                    android:id="@+id/btn_spot_guide"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/home_guide_open"
-                    android:padding="9dp"
-                    android:src="@drawable/baseline_camera_alt_24"
-                    app:tint="@color/maple_500" />
+                    tools:text="내 위치에서 차로 25분" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

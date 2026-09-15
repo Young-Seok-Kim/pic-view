@@ -46,6 +46,7 @@ import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.util.SpotBookmark
 import com.youngs.picview.util.TravelMode
 import com.youngs.picview.util.applyTopSystemBarInset
+import com.youngs.picview.util.UserLocation
 import com.youngs.picview.util.distanceKmTo
 import com.youngs.picview.util.estimateTravelMinutes
 import com.bumptech.glide.Glide
@@ -493,21 +494,17 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
     }
 
     /**
-     * 이동 시간(분). 위치 권한이 있으면 내 위치, 없으면 정읍역 기준입니다.
-     * 코스 계산과 같은 근사식([estimateTravelMinutes])을 씁니다.
+     * 이동 시간(분). 내 위치 기준이고, 모르면 시내 기준입니다.
+     * 탐색 카드·코스 장소 고르기와 같은 출발점([UserLocation.origin])과
+     * 같은 근사식([estimateTravelMinutes])을 써서 화면마다 숫자가 다르지 않습니다.
      */
     private fun travelMinutesTo(spot: SpotItem): Int {
         val target = com.youngs.picview.util.LatLng.parseOrNull(spot.mapy, spot.mapx)
             ?: return TravelMode.CAR.minMinutes
 
-        // 내 위치가 정읍권 밖이면(여행 전에 미리 보는 경우) 몇 백 분짜리
-        // 숫자가 나와 오히려 판단을 흐립니다. 그때는 정읍역 기준으로 말합니다.
-        val last = locationSource.lastLocation
-        val from = last
-            ?.let { com.youngs.picview.util.LatLng(it.latitude, it.longitude) }
-            ?.takeIf { it.distanceKmTo(JEONGEUP_STATION) <= NEARBY_KM }
-            ?: JEONGEUP_STATION
-        return estimateTravelMinutes(from.distanceKmTo(target), TravelMode.CAR)
+        // 지도의 위치 소스가 먼저 잡은 좌표가 있으면 공용 저장소에도 나눠 줍니다.
+        locationSource.lastLocation?.let { UserLocation.update(it.latitude, it.longitude) }
+        return estimateTravelMinutes(UserLocation.origin().distanceKmTo(target), TravelMode.CAR)
     }
 
     /** 체류 시간이 길수록 발품이 드는 곳입니다. 걸음 난이도로 옮겨 말합니다. */
@@ -568,11 +565,4 @@ class MapFragment : Fragment(R.layout.fragment_map), OnMapReadyCallback {
         _binding = null
     }
 
-    companion object {
-        /** 위치를 모를 때 이동 시간의 기준점 — 정읍역. */
-        private val JEONGEUP_STATION = com.youngs.picview.util.LatLng(35.5637, 126.8420)
-
-        /** 이 거리(km) 안에 있어야 "내 위치 기준 이동 시간"이 뜻이 있습니다. */
-        private const val NEARBY_KM = 60.0
-    }
 }

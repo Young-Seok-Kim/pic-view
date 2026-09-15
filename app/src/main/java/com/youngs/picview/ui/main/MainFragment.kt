@@ -1,6 +1,7 @@
 package com.youngs.picview.ui.main
 
 import com.youngs.picview.util.applyTopSystemBarInset
+import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
@@ -18,16 +19,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.youngs.picview.MainActivity
 import com.youngs.picview.R
 import com.youngs.picview.databinding.FragmentMainBinding
-import com.youngs.picview.domain.guide.SiseonGuide
 import com.youngs.picview.domain.light.LightPhase
 import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.ui.adapter.SpotAdapter
 import com.youngs.picview.ui.detail.DetailFragment
-import com.youngs.picview.ui.guide.SiseonGuideActivity
+import com.youngs.picview.ui.guide.GuideActivity
 import com.youngs.picview.ui.map.MapFragment
 import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.util.AppPrefs
 import com.youngs.picview.util.LatLng
+import com.youngs.picview.util.UserLocation
 import com.youngs.picview.util.distanceKmTo
 import java.time.Duration
 import java.time.LocalTime
@@ -36,7 +37,7 @@ import java.time.LocalTime
  * 탐색 — 빛이 맞는 출사 (시안).
  *
  * 위에서부터 약도 → 정렬 → 장소 카드. 첫 줄의 물음이 "무엇을"이 아니라
- * "어떤 순서로 볼까"입니다 — 추천순(포토스코어), 거리순(시내 기준),
+ * "어떤 순서로 볼까"입니다 — 추천순(포토스코어), 거리순(내 위치 기준·모르면 시내),
  * 빛 좋은 시간순(그 장소의 빛이 맞는 다음 시각이 가까운 순).
  * 카테고리는 오른쪽 필터 버튼 뒤에 있습니다.
  */
@@ -141,7 +142,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     private fun setObserve() {
         spotAdapter = SpotAdapter(
             onItemClick = { spot -> openDetail(spot) },
-            onGuideClick = { spot -> openGuide(spot) },
+            onShootClick = { spot -> startShoot(spot) },
             onFavoriteClick = { spot -> toastFavorite(spot) }
         )
         binding.rvPhotoSpots.adapter = spotAdapter
@@ -168,6 +169,14 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         // 천문 정보가 도착하면 머리말의 빛 상태줄을 다시 씁니다.
         viewModel.goldenHourData.observe(viewLifecycleOwner) { renderLightLine() }
+
+        // 내 위치가 들어오거나 바뀌면 거리순 순서와 카드의 "차로 N분" 을 다시 잽니다.
+        // 목록 항목은 그대로라 DiffUtil 이 다시 그리지 않으므로 직접 갱신합니다.
+        UserLocation.latLng.observe(viewLifecycleOwner) {
+            val list = viewModel.filteredSpots.value.orEmpty()
+            if (sortMode == SortMode.DIST) submitOrdered(sorted(list))
+            spotAdapter.notifyItemRangeChanged(0, spotAdapter.itemCount)
+        }
     }
 
     /**
@@ -303,10 +312,14 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
     private fun sorted(list: List<SpotItem>): List<SpotItem> = when (sortMode) {
         SortMode.RECO -> list.sortedByDescending { it.score }
-        SortMode.DIST -> list.sortedBy { spot ->
-            LatLng.parseOrNull(spot.mapy, spot.mapx)
-                ?.let { SpotAdapter.CITY_CENTER.distanceKmTo(it) }
-                ?: Double.MAX_VALUE
+        SortMode.DIST -> {
+            // 내 위치에서 가까운 순. 위치를 모르면 시내 기준(UserLocation.origin).
+            val from = UserLocation.origin()
+            list.sortedBy { spot ->
+                LatLng.parseOrNull(spot.mapy, spot.mapx)
+                    ?.let { from.distanceKmTo(it) }
+                    ?: Double.MAX_VALUE
+            }
         }
         SortMode.LIGHT -> list.sortedBy { minutesUntilBestLight(it) }
     }
@@ -418,19 +431,21 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         (activity as? MainActivity)?.pushScreen(DetailFragment.newInstance(spot))
     }
 
-    private fun openGuide(spot: SpotItem) {
-        val facts = SpotFactsTable.of(spot.title, spot.contentTypeId)
-        startActivity(
-            SiseonGuideActivity.intent(
-                requireContext(),
-                spotTitle = spot.title,
-                contextId = SiseonGuide.contextIdFor(facts.bestPhase),
-                guideId = SiseonGuide.guideIdFor(facts),
-                // 미션에서 찍은 사진이 이 장소의 방문 기록("다녀왔어요")이 되도록.
-                contentId = spot.contentId,
-                phaseName = viewModel.sunTimes.phaseNow().name
-            )
-        )
+    /**
+     * 카드의 카메라 — 이 장소의 촬영 시작. 상세 화면의 "촬영 시작"과 같은
+     * 곳(앱 카메라)으로 같은 정보를 넘겨, 여기서 찍은 사진도 이 장소의 방문
+     * 기록이 되고 점수도 미션에 셉니다.
+     */
+    private fun startShoot(spot: SpotItem) {
+        val intent = Intent(requireContext(), GuideActivity::class.java).apply {
+            putExtra(GuideActivity.EXTRA_SPOT_NAME, spot.title)
+            putExtra(GuideActivity.EXTRA_SPOT_TYPE, spot.contentTypeId)
+            putExtra(GuideActivity.EXTRA_PHASE, viewModel.sunTimes.phaseNow().name)
+            putExtra(GuideActivity.EXTRA_CONTENT_ID, spot.contentId)
+            putExtra(GuideActivity.EXTRA_SCORE, viewModel.scoreOf(spot.contentId)?.total ?: spot.score)
+            putExtra(GuideActivity.EXTRA_IMAGE_URL, spot.imageUrl)
+        }
+        startActivity(intent)
     }
 
     override fun onDestroyView() {

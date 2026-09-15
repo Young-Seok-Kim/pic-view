@@ -285,13 +285,16 @@
     <!--
         기준을 밝혀 씁니다.
 
-        그냥 "차로 8분"이라고만 하면 누구나 **내 위치에서** 8분으로 읽는데,
-        실제로는 정읍 시내(시청 인근)에서 잰 거리입니다. 서울에서 계획을
-        짜는 사람에게 "내 위치에서 180분"은 쓸모가 없고, 정읍 안에서 곳과
-        곳 사이를 가늠하는 데는 시내 기준이 더 쓸모있습니다. 그래서 기준은
-        그대로 두고 말로 밝힙니다.
+        거리·이동 시간은 내 위치에서 잽니다(UserLocation). 위치 권한이 없거나
+        아직 측위 전이면 정읍 시내(시청 인근) 기준으로 물러나는데, 그때는
+        "시내에서" 라고 말해 두 기준이 섞이지 않게 합니다. %1$s 에는
+        "8분" · "1시간 20분" 처럼 접은 시간이 들어갑니다.
     -->
-    <string name="spot_travel_minutes">시내에서 차로 %1$d분</string>
+    <string name="spot_travel_from_me">내 위치에서 차로 %1$s</string>
+    <string name="spot_travel_from_city">시내에서 차로 %1$s</string>
+    <string name="travel_minutes">%1$d분</string>
+    <string name="travel_hours">%1$d시간</string>
+    <string name="travel_hours_minutes">%1$d시간 %2$d분</string>
 
     <!-- 일기 — 감정과 다음 추천 (시안) -->
     <string name="diary_feelings_label">오늘의 감정</string>
