@@ -1282,4 +1282,4 @@ docker compose -f docker/docker-compose.yml run --rm aab
   날씨별 사진을 모으는 것이 다음 단계입니다.
 - 컨테이너 빌드 결과물은 **서명되지 않습니다**(키스토어 미포함).
 
-진행 상황과 남은 작업은 **[docs/PROGRESS.md](docs/PROGRESS.md)** 를 보세요.
+진행 상황과 남은 작업은 **[docs/PROGRESS.md](docs/PROGRESS.md)** 를, 버전별 변경 내역은 **[docs/CHANGELOG.md](docs/CHANGELOG.md)** 를 보세요.
