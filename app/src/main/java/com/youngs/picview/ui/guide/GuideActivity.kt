@@ -100,6 +100,16 @@ class GuideActivity : AppCompatActivity() {
     private lateinit var guideType: GuideOverlayView.GuideType
 
     /**
+     * 구도 가이드(격자·자리 표시)가 켜져 있는지. 화면을 열 때마다 켜진 채로 시작합니다.
+     *
+     * 예전에는 마지막 상태를 저장해 두었는데, 한 번 끄면 어느 경로로 카메라를
+     * 열어도 격자가 없는 채로 남아 "탐색 카드의 카메라로 들어가면 격자가 안
+     * 보인다"는 제보가 됐습니다. 이 앱의 카메라는 격자가 곧 안내라서, 끄는 건
+     * 그 촬영 동안만입니다.
+     */
+    private var overlayOn = true
+
+    /**
      * 포즈 목록에서 지금 고른 것.
      *
      * [PoseAdapter] 는 목록을 새로 받을 때마다 1등을 자동으로 고르고
@@ -255,7 +265,7 @@ class GuideActivity : AppCompatActivity() {
 
     /** 격자 버튼과 격자의 켜짐 상태를 맞춥니다. 꺼진 버튼은 반투명입니다. */
     private fun renderOverlayToggle() {
-        val on = AppPrefs.isGuideOverlayOn(this)
+        val on = overlayOn
         binding.guideOverlay.isVisible = on
         binding.tvGuideMessage.isVisible = on
         binding.layoutSubjectRow.isVisible = on
@@ -315,7 +325,7 @@ class GuideActivity : AppCompatActivity() {
      * 셔터를 누르려는 사람을 기다리게 하지 않기 위해서입니다.
      */
     private fun showPoseHintOnce() {
-        if (AppPrefs.isPoseHintSeen(this) || !AppPrefs.isGuideOverlayOn(this)) return
+        if (AppPrefs.isPoseHintSeen(this) || !overlayOn) return
 
         val hint = binding.layoutPoseHint
         hint.isVisible = true
@@ -470,7 +480,7 @@ class GuideActivity : AppCompatActivity() {
     private fun applySubject() {
         val isPerson = subject == Subject.PERSON
 
-        val guideOn = AppPrefs.isGuideOverlayOn(this)
+        val guideOn = overlayOn
         binding.rvPoses.isVisible = guideOn && isPerson
         binding.layoutPeopleRow.isVisible = guideOn && isPerson
 
@@ -523,7 +533,7 @@ class GuideActivity : AppCompatActivity() {
         binding.btnGuideBack.setOnClickListener { finish() }
         binding.btnGuideExample.setOnClickListener { showExample() }
         binding.btnGuideGrid.setOnClickListener {
-            AppPrefs.setGuideOverlayOn(this, !AppPrefs.isGuideOverlayOn(this))
+            overlayOn = !overlayOn
             renderOverlayToggle()
         }
 

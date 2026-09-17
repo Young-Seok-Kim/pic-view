@@ -12,10 +12,14 @@
     android:overScrollMode="never"
     android:scrollbars="none">
 
+    <!--
+        layout_gravity="center" 를 두지 않습니다. ScrollView 안에서 내용이
+        화면보다 길어지면 가운데 맞춤이 위아래를 똑같이 잘라 내고, 잘린 위쪽은
+        스크롤로도 닿지 않습니다. 남는 자리의 가운데 맞춤은 gravity 가 합니다.
+    -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:gravity="center"
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/space_3xl"

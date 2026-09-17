@@ -13,10 +13,14 @@
     android:overScrollMode="never"
     android:scrollbars="none">
 
+    <!--
+        layout_gravity="center" 를 두지 않습니다. ScrollView 안에서 내용이
+        화면보다 길어지면 가운데 맞춤이 위아래를 똑같이 잘라 내고, 잘린 위쪽은
+        스크롤로도 닿지 않습니다. 남는 자리의 가운데 맞춤은 gravity 가 합니다.
+    -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:gravity="center"
         android:orientation="vertical"
         android:paddingVertical="@dimen/space_l">
@@ -50,14 +54,18 @@
             android:paddingHorizontal="@dimen/space_3xl"
             android:text="@string/onboarding_3_desc" />
 
-        <FrameLayout
+        <!-- 대표 사진 : 글이 남긴 높이를 받습니다(OnboardingHeroLayout 참고). -->
+        <com.youngs.picview.ui.onboarding.OnboardingHeroLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_xl">
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/space_xl"
+            android:layout_weight="1"
+            android:maxHeight="280dp"
+            android:minHeight="@dimen/onboarding_hero_min">
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="280dp"
+                android:layout_height="match_parent"
                 android:contentDescription="@null"
                 android:scaleType="centerCrop"
                 android:src="@drawable/onb_siseon" />
@@ -73,7 +81,7 @@
                 android:layout_height="64dp"
                 android:layout_gravity="bottom"
                 android:background="@drawable/bg_onboarding_fade_bottom" />
-        </FrameLayout>
+        </com.youngs.picview.ui.onboarding.OnboardingHeroLayout>
 
         <!-- 구도 가이드 맛보기 : 실루엣 · 반영 · 리딩라인 -->
         <LinearLayout

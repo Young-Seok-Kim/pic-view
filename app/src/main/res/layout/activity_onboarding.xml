@@ -81,8 +81,9 @@
             android:layout_height="wrap_content"
             android:minHeight="@dimen/touch_target_senior"
             android:text="@string/onboarding_start_senior"
+            android:textColor="@color/onboarding_choice_selected_text"
             android:visibility="gone"
-            app:backgroundTint="@color/moss_500"
+            app:backgroundTint="@color/onboarding_choice_selected_bg"
             tools:visibility="visible" />
 
         <com.google.android.material.button.MaterialButton
@@ -93,8 +94,9 @@
             android:layout_marginTop="@dimen/space_s"
             android:minHeight="@dimen/touch_target"
             android:text="@string/onboarding_start_normal"
+            android:textColor="@color/onboarding_choice_text"
             android:visibility="gone"
-            app:backgroundTint="@color/maple_50"
+            app:backgroundTint="@color/onboarding_choice_bg"
             tools:visibility="visible" />
 
         <com.google.android.material.button.MaterialButton

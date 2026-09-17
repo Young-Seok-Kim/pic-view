@@ -140,20 +140,19 @@ class OnboardingActivity : BaseActivity() {
         styleChoice(binding.btnOnboardingNormal, selected = !senior)
     }
 
+    /**
+     * 배경과 글자색을 짝으로 박습니다. 한쪽만 고정하고 글자색을 테마에 맡기면
+     * 테마가 바뀔 때(다크 모드 등) 연한 배경 위에 흰 글씨가 올라와 안 보입니다.
+     */
     private fun styleChoice(button: MaterialButton, selected: Boolean) {
         val context = button.context
-        if (selected) {
-            button.backgroundTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.moss_500))
-            button.setTextColor(ContextCompat.getColor(context, R.color.white))
-            button.icon = AppCompatResources.getDrawable(context, R.drawable.ic_check)
-            button.iconTint = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white))
-        } else {
-            button.backgroundTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.maple_50))
-            button.setTextColor(ContextCompat.getColor(context, R.color.text_primary))
-            button.icon = null
-        }
+        val bg = if (selected) R.color.onboarding_choice_selected_bg else R.color.onboarding_choice_bg
+        val text = if (selected) R.color.onboarding_choice_selected_text else R.color.onboarding_choice_text
+        val textColor = ContextCompat.getColor(context, text)
+        button.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, bg))
+        button.setTextColor(textColor)
+        button.icon = if (selected) AppCompatResources.getDrawable(context, R.drawable.ic_check) else null
+        button.iconTint = ColorStateList.valueOf(textColor)
     }
 
     /**

@@ -41,6 +41,9 @@
     <dimen name="touch_target">48dp</dimen>
     <dimen name="touch_target_senior">68dp</dimen>
 
+    <!-- 온보딩 대표 사진이 글에 밀려 줄어들 때의 바닥. 사진 위에 얹힌 예시 카드가 들어갈 높이입니다. -->
+    <dimen name="onboarding_hero_min">160dp</dimen>
+
     <!-- ============ 하단 탭 ============ -->
     <dimen name="bottom_nav_height">72dp</dimen>
     <dimen name="bottom_nav_height_senior">96dp</dimen>
