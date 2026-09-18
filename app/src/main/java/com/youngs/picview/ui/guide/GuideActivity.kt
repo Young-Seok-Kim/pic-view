@@ -78,6 +78,9 @@ class GuideActivity : AppCompatActivity() {
         /** 첫 안내가 스스로 사라지기까지. 읽기에 넉넉하고 방해되지 않는 선. */
         private const val POSE_HINT_MS = 6000L
 
+        /** 이번 실행에서의 격자 상태. 프로세스가 살아 있는 동안만 남고, 앱을 새로 켜면 true. */
+        private var overlayOnThisRun = true
+
     }
 
     private lateinit var binding: ActivityGuideBinding
@@ -100,14 +103,17 @@ class GuideActivity : AppCompatActivity() {
     private lateinit var guideType: GuideOverlayView.GuideType
 
     /**
-     * 구도 가이드(격자·자리 표시)가 켜져 있는지. 화면을 열 때마다 켜진 채로 시작합니다.
+     * 구도 가이드(격자·자리 표시)가 켜져 있는지.
      *
-     * 예전에는 마지막 상태를 저장해 두었는데, 한 번 끄면 어느 경로로 카메라를
-     * 열어도 격자가 없는 채로 남아 "탐색 카드의 카메라로 들어가면 격자가 안
-     * 보인다"는 제보가 됐습니다. 이 앱의 카메라는 격자가 곧 안내라서, 끄는 건
-     * 그 촬영 동안만입니다.
+     * 앱을 켜 있는 동안은 끈 상태를 기억하고(카메라를 나갔다 다시 들어와도 그대로),
+     * 앱을 새로 켜면 다시 켜진 채로 시작합니다. 그래서 디스크가 아니라 프로세스
+     * 메모리([overlayOnThisRun])에 둡니다. 예전에는 SharedPreferences 에 영구
+     * 저장해서, 한 번 끄면 며칠 뒤 어느 경로로 카메라를 열어도 격자가 없는 채로
+     * 남아 "탐색 카드의 카메라로 들어가면 격자가 안 보인다"는 제보가 됐습니다.
      */
-    private var overlayOn = true
+    private var overlayOn: Boolean
+        get() = overlayOnThisRun
+        set(value) { overlayOnThisRun = value }
 
     /**
      * 포즈 목록에서 지금 고른 것.
