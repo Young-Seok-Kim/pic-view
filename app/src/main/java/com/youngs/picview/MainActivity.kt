@@ -1,10 +1,12 @@
 package com.youngs.picview
 
+import android.Manifest
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
@@ -40,6 +42,9 @@ import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.ui.model.SpotScoreContext
 import com.youngs.picview.util.AppPrefs
 import com.youngs.picview.util.FontStep
+import com.youngs.picview.util.LatLng
+import com.youngs.picview.util.UserLocation
+import com.youngs.picview.util.distanceKmTo
 import com.youngs.picview.data.model.WeatherResponse
 import com.youngs.picview.data.repository.CourseRepository
 import com.youngs.picview.util.retryOrNull
@@ -111,6 +116,59 @@ class MainActivity : BaseActivity() {
         }
 
         preLoadData()
+        requestLocationIfNeeded()
+
+        // 내 위치가 잡히면 접근성 항목(거리)을 다시 매겨 추천순도 내 위치를 따릅니다.
+        UserLocation.latLng.observe(this) { if (it != null) rescoreForLocation() }
+    }
+
+    // ─────────────────────────────── 위치 ───────────────────────────────
+
+    private val locationPermission = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { UserLocation.refresh(this) }
+
+    /**
+     * 거리·이동 시간·접근성 점수가 모두 내 위치에서 재므로 켤 때 한 번 묻습니다.
+     * 거부하면 시내 기준으로 물러나고 문구도 "시내에서" 로 바뀌므로 막히는 곳은 없습니다.
+     */
+    private fun requestLocationIfNeeded() {
+        if (UserLocation.hasPermission(this)) {
+            UserLocation.refresh(this)
+            return
+        }
+        locationPermission.launch(
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+        )
+    }
+
+    /** 내 위치에서 이 스팟까지 km. 위치나 좌표를 모르면 0.0(미측정). */
+    private fun userDistanceKm(spot: SpotItem): Double {
+        val me = UserLocation.current() ?: return 0.0
+        val target = LatLng.parseOrNull(spot.mapy, spot.mapx) ?: return 0.0
+        return me.distanceKmTo(target)
+    }
+
+    /**
+     * 거리만 바꿔 점수를 다시 매깁니다. 날씨·빛·신선도는 그대로 두고
+     * 저장해 둔 입력([MainViewModel.scoreContexts])의 userDistance 만 갈아 넣습니다.
+     */
+    private fun rescoreForLocation() {
+        val spots = viewModel.spotData.value ?: return
+        val contexts = viewModel.scoreContexts
+        if (contexts.isEmpty()) return
+
+        val breakdowns = viewModel.scoreBreakdowns.toMutableMap()
+        val updated = contexts.mapValues { (_, c) -> c.copy(userDistance = userDistanceKm(c.spot)) }
+        spots.forEach { spot ->
+            val context = updated[spot.contentId] ?: return@forEach
+            val evaluated = PhotoScoreEngine.evaluate(context)
+            spot.score = evaluated.total
+            breakdowns[spot.contentId] = evaluated
+        }
+        viewModel.scoreContexts = updated
+        viewModel.scoreBreakdowns = breakdowns
+        viewModel.spotData.value = spots.sortedByDescending { it.score }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -398,6 +456,8 @@ class MainActivity : BaseActivity() {
         if (viewModel.lastLoadedAt > 0L && elapsed > STALE_AFTER_MS) {
             refresh(userInitiated = false)
         }
+        // 설정에서 권한을 켜고 돌아온 경우까지 포함해, 돌아올 때마다 위치를 다시 읽습니다.
+        UserLocation.refresh(this)
 
         maybeShowFeatureTour()
     }
@@ -476,6 +536,8 @@ class MainActivity : BaseActivity() {
         viewModel.loadFailed.value = false
 
         if (userInitiated) viewModel.isRefreshing.value = true else viewModel.isLoading.value = true
+        // 당겨서 새로고침이면 위치도 다시 읽습니다. 값이 바뀌면 거리·접근성 점수가 따라 갱신됩니다.
+        UserLocation.refresh(this)
         preLoadData()
     }
 
@@ -605,6 +667,7 @@ class MainActivity : BaseActivity() {
                 val rawSpots = spotsAsync.await()?.response?.body?.items?.item.orEmpty()
                 val lastIndex = (rawSpots.size - 1).coerceAtLeast(1)
                 val breakdowns = mutableMapOf<String, com.youngs.picview.domain.score.PhotoScore>()
+                val contexts = mutableMapOf<String, SpotScoreContext>()
 
                 val spots = rawSpots.mapIndexedNotNull { index, item ->
                     val contentId = item.contentid ?: return@mapIndexedNotNull null
@@ -640,7 +703,7 @@ class MainActivity : BaseActivity() {
                         currentTemp = tempValue,
                         isGoldenHour = isGoldenHour,
                         isRaining = isRaining,
-                        userDistance = 0.0,
+                        userDistance = userDistanceKm(spot),
                         direction = inferredDirection,
                         bestTime = inferredBestTime,
                         freshnessRank = index.toDouble() / lastIndex,
@@ -651,10 +714,12 @@ class MainActivity : BaseActivity() {
                     val evaluated = PhotoScoreEngine.evaluate(context)
                     spot.score = evaluated.total
                     breakdowns[contentId] = evaluated
+                    contexts[contentId] = context
                     spot
                 }.sortedByDescending { it.score }
 
                 viewModel.scoreBreakdowns = breakdowns
+                viewModel.scoreContexts = contexts
                 viewModel.spotData.postValue(spots)
 
                 val weatherResult = if (temp != null) "지금 정읍은 ${temp}℃" else "정읍의 촬영지"

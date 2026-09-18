@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- ================= 앱 기본 테마 (단풍) ================= -->
-    <style name="Base.Theme.PicView" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.PicView" parent="Theme.Material3.Light.NoActionBar">
         <!-- Primary : 단풍 레드 -->
         <item name="colorPrimary">@color/maple_500</item>
         <item name="colorOnPrimary">@color/white</item>

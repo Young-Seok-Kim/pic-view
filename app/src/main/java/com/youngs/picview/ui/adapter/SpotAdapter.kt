@@ -16,9 +16,7 @@ import com.youngs.picview.domain.spot.SpotFactsTable
 import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.util.AppPrefs
 import com.youngs.picview.util.LatLng
-import com.youngs.picview.util.TravelMode
-import com.youngs.picview.util.distanceKmTo
-import com.youngs.picview.util.estimateTravelMinutes
+import com.youngs.picview.util.UserLocation
 
 /**
  * 탐색 '빛이 맞는 출사' 목록 (시안).
@@ -27,12 +25,13 @@ import com.youngs.picview.util.estimateTravelMinutes
  * 구도·거리 순으로 좁혀 갑니다. 예전에는 이 여섯이 전부 같은 크기의
  * 글줄이라 무엇을 먼저 봐야 할지 알 수 없었습니다.
  *
+ * @param onShootClick 카메라 아이콘 — 그 장소의 촬영 시작(앱 카메라).
  * @param onFavoriteClick 찜 토글. 찜 상태는 화면이 아니라 [com.youngs.picview.util.AppPrefs]
  *                        가 들고 있어, 어느 화면에서 눌러도 같은 값을 봅니다.
  */
 class SpotAdapter(
     private val onItemClick: (SpotItem) -> Unit,
-    private val onGuideClick: (SpotItem) -> Unit,
+    private val onShootClick: (SpotItem) -> Unit,
     private val onFavoriteClick: (SpotItem) -> Unit = {}
 ) : ListAdapter<SpotItem, SpotAdapter.SpotViewHolder>(DIFF) {
 
@@ -53,6 +52,8 @@ class SpotAdapter(
 
         with(holder.binding) {
             tvSpotTitle.text = item.title
+            // marquee 는 선택된 뷰에서만 흐릅니다. 짧은 이름은 그대로 서 있습니다.
+            tvSpotTitle.isSelected = true
 
             // 빛 신호 — "일몰 · 따뜻한 사광". 언제 가는지와 그때 빛의 결.
             // 사진 위에 얹히므로 바탕을 그 빛 구간의 색으로 칠합니다.
@@ -72,13 +73,10 @@ class SpotAdapter(
             // 아이콘이 "구도"라는 말을 대신하므로 낱말은 뺍니다.
             tvSpotGuideLine.text = SiseonGuide.byId(SiseonGuide.guideIdFor(facts)).title
 
-            // 시내 기준 이동 시간. 좌표가 없으면 줄을 감춥니다.
+            // 내 위치 기준 이동 시간(모르면 시내 기준). 좌표가 없으면 줄을 감춥니다.
             val coords = LatLng.parseOrNull(item.mapy, item.mapx)
             tvSpotTravel.visibility = if (coords == null) View.GONE else View.VISIBLE
-            coords?.let {
-                val minutes = estimateTravelMinutes(CITY_CENTER.distanceKmTo(it), TravelMode.CAR)
-                tvSpotTravel.text = context.getString(R.string.spot_travel_minutes, minutes)
-            }
+            coords?.let { tvSpotTravel.text = UserLocation.travelLine(context, it) }
 
             renderFavorite(btnSpotFavorite, AppPrefs.isFavorite(context, item.contentId))
             btnSpotFavorite.setOnClickListener {
@@ -97,7 +95,7 @@ class SpotAdapter(
                 .into(ivSpotImage)
 
             root.setOnClickListener { onItemClick(item) }
-            btnSpotGuide.setOnClickListener { onGuideClick(item) }
+            btnSpotShoot.setOnClickListener { onShootClick(item) }
         }
     }
 
@@ -111,20 +109,6 @@ class SpotAdapter(
     fun updateData(newList: List<SpotItem>) = submitList(newList)
 
     companion object {
-        /**
-         * 거리·이동 시간의 출발점 — 정읍 시내(시청 인근).
-         *
-         * **내 위치가 아닙니다.** 목록은 대개 집에서 계획을 짤 때 보는
-         * 화면이라, 내 위치 기준으로 재면 모든 곳이 "차로 180분"이 되어
-         * 곳과 곳을 견줄 수가 없습니다. 시내를 원점으로 두면 정읍 안에서의
-         * 멀고 가까움이 그대로 읽힙니다. 화면 문구도 "시내에서 차로 8분"
-         * 으로 기준을 밝혀 씁니다(R.string.spot_travel_minutes).
-         *
-         * 현장에서 실제로 움직일 때 쓰는 "내 위치 기준"은 지도 시트가
-         * 따로 계산합니다([com.youngs.picview.ui.map.MapFragment]).
-         */
-        val CITY_CENTER = LatLng(35.5699, 126.8559)
-
         private val DIFF = object : DiffUtil.ItemCallback<SpotItem>() {
             override fun areItemsTheSame(oldItem: SpotItem, newItem: SpotItem) =
                 oldItem.contentId == newItem.contentId

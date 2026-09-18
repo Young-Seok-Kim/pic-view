@@ -78,6 +78,9 @@ class GuideActivity : AppCompatActivity() {
         /** 첫 안내가 스스로 사라지기까지. 읽기에 넉넉하고 방해되지 않는 선. */
         private const val POSE_HINT_MS = 6000L
 
+        /** 이번 실행에서의 격자 상태. 프로세스가 살아 있는 동안만 남고, 앱을 새로 켜면 true. */
+        private var overlayOnThisRun = true
+
     }
 
     private lateinit var binding: ActivityGuideBinding
@@ -98,6 +101,19 @@ class GuideActivity : AppCompatActivity() {
 
     /** 이 화면의 구도. 격자가 이 값을 봅니다. */
     private lateinit var guideType: GuideOverlayView.GuideType
+
+    /**
+     * 구도 가이드(격자·자리 표시)가 켜져 있는지.
+     *
+     * 앱을 켜 있는 동안은 끈 상태를 기억하고(카메라를 나갔다 다시 들어와도 그대로),
+     * 앱을 새로 켜면 다시 켜진 채로 시작합니다. 그래서 디스크가 아니라 프로세스
+     * 메모리([overlayOnThisRun])에 둡니다. 예전에는 SharedPreferences 에 영구
+     * 저장해서, 한 번 끄면 며칠 뒤 어느 경로로 카메라를 열어도 격자가 없는 채로
+     * 남아 "탐색 카드의 카메라로 들어가면 격자가 안 보인다"는 제보가 됐습니다.
+     */
+    private var overlayOn: Boolean
+        get() = overlayOnThisRun
+        set(value) { overlayOnThisRun = value }
 
     /**
      * 포즈 목록에서 지금 고른 것.
@@ -255,7 +271,7 @@ class GuideActivity : AppCompatActivity() {
 
     /** 격자 버튼과 격자의 켜짐 상태를 맞춥니다. 꺼진 버튼은 반투명입니다. */
     private fun renderOverlayToggle() {
-        val on = AppPrefs.isGuideOverlayOn(this)
+        val on = overlayOn
         binding.guideOverlay.isVisible = on
         binding.tvGuideMessage.isVisible = on
         binding.layoutSubjectRow.isVisible = on
@@ -315,7 +331,7 @@ class GuideActivity : AppCompatActivity() {
      * 셔터를 누르려는 사람을 기다리게 하지 않기 위해서입니다.
      */
     private fun showPoseHintOnce() {
-        if (AppPrefs.isPoseHintSeen(this) || !AppPrefs.isGuideOverlayOn(this)) return
+        if (AppPrefs.isPoseHintSeen(this) || !overlayOn) return
 
         val hint = binding.layoutPoseHint
         hint.isVisible = true
@@ -470,7 +486,7 @@ class GuideActivity : AppCompatActivity() {
     private fun applySubject() {
         val isPerson = subject == Subject.PERSON
 
-        val guideOn = AppPrefs.isGuideOverlayOn(this)
+        val guideOn = overlayOn
         binding.rvPoses.isVisible = guideOn && isPerson
         binding.layoutPeopleRow.isVisible = guideOn && isPerson
 
@@ -523,7 +539,7 @@ class GuideActivity : AppCompatActivity() {
         binding.btnGuideBack.setOnClickListener { finish() }
         binding.btnGuideExample.setOnClickListener { showExample() }
         binding.btnGuideGrid.setOnClickListener {
-            AppPrefs.setGuideOverlayOn(this, !AppPrefs.isGuideOverlayOn(this))
+            overlayOn = !overlayOn
             renderOverlayToggle()
         }
 

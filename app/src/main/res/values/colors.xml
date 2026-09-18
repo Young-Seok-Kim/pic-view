@@ -7,7 +7,7 @@
 
     ▸ 팔레트(maple_*, moss_*, sand_*)는 직접 쓰지 말고
       아래 시맨틱 토큰(bg_*, text_*, chip_* …)을 통해 쓰세요.
-      values-night 에서 시맨틱만 재정의하면 다크 모드가 따라옵니다.
+      다크 모드는 두지 않습니다(라이트 고정, MyApplication 참고).
 -->
 <resources>
     <color name="black">#FF000000</color>
@@ -58,7 +58,7 @@
     <color name="naver_green">#03C75A</color>
     <color name="kakao_yellow">#FEE500</color>
 
-    <!-- ============ 시맨틱(라이트) : values-night 에서 재정의됨 ============ -->
+    <!-- ============ 시맨틱(라이트 고정) ============ -->
     <color name="bg_page">#FDF6EF</color>
     <color name="bg_card">#FFFFFF</color>
     <color name="bg_card_muted">#F6EEE6</color>
@@ -69,6 +69,14 @@
     <color name="text_secondary">#5A4A3E</color>
     <color name="text_tertiary">#9B8878</color>
     <color name="text_on_brand">#FFFFFF</color>
+
+    <!-- 온보딩 3장 보기 모드 버튼. 고른 쪽은 초록 위 흰 글씨, 안 고른 쪽은
+         연한 베이지 위 진한 글씨. 테마 속성에 기대지 않고 네 색을 직접 박습니다 —
+         한쪽 배경만 고정하고 글자색을 테마에 맡기면 조합이 깨집니다. -->
+    <color name="onboarding_choice_selected_bg">#6B7F4B</color>
+    <color name="onboarding_choice_selected_text">#FFFFFF</color>
+    <color name="onboarding_choice_bg">#FBEEE9</color>
+    <color name="onboarding_choice_text">#2A211C</color>
 
     <color name="divider">#EDE2D8</color>
     <color name="card_stroke">#F0E6DC</color>

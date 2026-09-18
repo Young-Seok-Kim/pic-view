@@ -70,6 +70,14 @@ class MainViewModel : ViewModel() {
 
     fun scoreOf(contentId: String): PhotoScore? = scoreBreakdowns[contentId]
 
+    /**
+     * 스팟별 점수 계산 입력(contentId -> 컨텍스트).
+     *
+     * 내 위치는 목록보다 늦게 들어오기 마련입니다. 그때 날씨·빛 정보를 다시
+     * 받지 않고 거리만 바꿔 접근성 항목을 다시 매기려면 입력이 남아 있어야 합니다.
+     */
+    var scoreContexts: Map<String, com.youngs.picview.ui.model.SpotScoreContext> = emptyMap()
+
     // 원본 데이터
     val spotData = MutableLiveData<List<SpotItem>>()
 

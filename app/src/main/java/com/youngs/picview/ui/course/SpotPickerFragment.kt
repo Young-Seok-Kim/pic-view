@@ -17,16 +17,13 @@ import com.youngs.picview.R
 import com.youngs.picview.databinding.FragmentSpotPickerBinding
 import com.youngs.picview.databinding.ItemSpotPickBinding
 import com.youngs.picview.domain.spot.SpotFactsTable
-import com.youngs.picview.ui.adapter.SpotAdapter
 import com.youngs.picview.ui.main.MainViewModel
 import com.youngs.picview.ui.model.SpotItem
 import com.youngs.picview.util.AppPrefs
 import com.youngs.picview.data.repository.FavoriteSpots
 import com.youngs.picview.util.LatLng
-import com.youngs.picview.util.TravelMode
 import com.youngs.picview.util.applyTopSystemBarInset
-import com.youngs.picview.util.distanceKmTo
-import com.youngs.picview.util.estimateTravelMinutes
+import com.youngs.picview.util.UserLocation
 import kotlinx.coroutines.launch
 
 /**
@@ -77,6 +74,10 @@ class SpotPickerFragment : Fragment(R.layout.fragment_spot_picker) {
         // 담은 곳이 바뀌면 목록의 체크와 아래 버튼이 함께 따라옵니다.
         courseViewModel.pickedIds.observe(viewLifecycleOwner) { render() }
         mainViewModel.spotData.observe(viewLifecycleOwner) { render() }
+        // 내 위치가 들어오면 각 줄의 "차로 N분" 을 다시 잽니다.
+        UserLocation.latLng.observe(viewLifecycleOwner) {
+            adapter.notifyItemRangeChanged(0, adapter.itemCount)
+        }
     }
 
     private fun buildFilterChips() {
@@ -202,10 +203,7 @@ private class PickAdapter(
             tvPickSignal.text = if (coords == null) {
                 signal
             } else {
-                val minutes = estimateTravelMinutes(
-                    SpotAdapter.CITY_CENTER.distanceKmTo(coords), TravelMode.CAR
-                )
-                "$signal · " + context.getString(R.string.spot_travel_minutes, minutes)
+                "$signal · " + UserLocation.travelLine(context, coords)
             }
 
             tvPickFavorite.isVisible = row.favorite
