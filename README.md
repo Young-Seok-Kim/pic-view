@@ -6,6 +6,11 @@
 『2026 관광데이터 활용 공모전』 출품작 · Android Native
 
 <p align="center">
+  <a href="docs/promo/promo.mp4"><img src="docs/promo/promo.webp" width="320" alt="정읍 시선 홍보 영상 — 새벽부터 밤까지 하루의 빛을 따라가며 주요 기능을 소개합니다" /></a>
+  <br /><sub>▶ 홍보 영상 (1분) · 눌러서 고화질 MP4로 보기 · 원본 <a href="docs/promo/index.html">HTML</a></sub>
+</p>
+
+<p align="center">
   <img src="docs/screenshots/01-home.png" width="240" alt="홈" />
   <img src="docs/screenshots/05-detail.png" width="240" alt="촬영지 상세" />
   <img src="docs/screenshots/08-pose-guide.png" width="240" alt="포즈 가이드" />
